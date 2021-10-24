@@ -52,3 +52,7 @@ Hardcoded param 1 and the param1 referred to in some of the instruction notes ar
  
 Credits
 -------
+
+License
+-------
+Copyright (C) 2021 Kenneth Trimmer. SALSA is licensed under the GNU General Public License, Version 3.0. See LICENSE.md for full license text
