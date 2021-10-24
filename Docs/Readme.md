@@ -25,7 +25,7 @@ Instruction Descriptions
 Instruction descriptions are flexible, in that certain modifiers can be used to display the result of parameters from the instruction, or even perform basic manipulation of those parameter values.
 
 * Displaying a parameter value -
-By enclosing a parameter name with greater and less than signs, e.g. <offset> for the parameter named offset, the text will be replaced by the result of the parameter. This is performed first, and can be used in other operations
+By enclosing a parameter name with greater and less than signs, e.g. \<offset\> for the parameter named offset, the text will be replaced by the result of the parameter. This is performed first, and can be used in other operations
 
 * Basic Operations -
 Certain basic operations are available: add, subtract, multiply, and link. These operations all use a similar syntax and take in two parameters and can read hex, float, or ints. The format of the first parameter determines the format of the output.
@@ -40,7 +40,7 @@ Certain basic operations are available: add, subtract, multiply, and link. These
   * e.g. *mul[1,2]* -> 2
   
 * link - *lnk[(1),(2)]* - Link determines the target of an offset. (1) is the name of the parameter to use as the start position. (2) is the offset. With instructions which link to other positions in the script file, a parameter is used to determine the jump offset to the linked data. The position of the offset parameter is used as the start point, with the value of the parameter being the offset itself
-  * e.g. *lnk[offset,<offset>]* -> Target instruction/string.
+  * e.g. *lnk[offset,\<offset\>]* -> Target instruction/string.
 
 
 Other Notes
