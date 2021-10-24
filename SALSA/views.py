@@ -1055,8 +1055,6 @@ class ScriptView(tk.Frame):
 
         if insts is None:
             return
-        else:
-            self.insts = insts
 
         hasSelection = True
         if new_id is None:
