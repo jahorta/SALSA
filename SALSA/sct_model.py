@@ -157,12 +157,13 @@ class SctModel:
                     self.decoded_sct['Sections'][key]['errors'] = data['errors']
                     self.decoded_sct['Errors'].append(key)
                     data.pop('errors')
-                for value in data.values():
-                    if not isinstance(value, dict):
+                # noinspection PyAssignmentToLoopOrWithParameter
+                for value1 in data.values():
+                    if not isinstance(value1, dict):
                         continue
-                    if 'instruction' not in value.keys():
+                    if 'instruction' not in value1.keys():
                         continue
-                    inst = value['instruction']
+                    inst = value1['instruction']
                     if not re.search('^[0-9]+$', inst):
                         continue
                     inst = int(inst)

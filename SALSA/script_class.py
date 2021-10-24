@@ -33,9 +33,7 @@ class SCTAnalysis:
         """Request info from sections for either all or error"""
         script_tree = {}
         for key, value in self.Sections.items():
-            current = {}
-            current['Type'] = value.type
-            current['Length'] = value.length
+            current = {'Type': value.type, 'Length': value.length}
             script_tree[key] = current
         return script_tree
 
