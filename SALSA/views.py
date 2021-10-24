@@ -1,4 +1,3 @@
-import json
 import re
 import tkinter as tk
 from threading import Timer

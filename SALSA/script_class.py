@@ -1,4 +1,4 @@
-from SALSA.byte_array_utils import word2SignedInt, getTypeFromString, toInt, asStringOfType, toFloat
+from SALSA.byte_array_utils import getTypeFromString, toInt, asStringOfType, toFloat
 import re
 
 class SCTAnalysis:

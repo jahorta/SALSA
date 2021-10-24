@@ -1,7 +1,7 @@
 import os
 from .constants import FieldTypes as FT
 from .byte_array_utils import getString, getWord, deriveStringLength, word2Float, applyHexMask, padded_hex, \
-    word2SignedInt, toInt, is_utf_8_file_character
+    word2SignedInt, toInt
 import re
 
 

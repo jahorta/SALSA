@@ -6,7 +6,7 @@ from threading import Timer
 from tkinter import ttk, messagebox, filedialog
 
 from SALSA import views as v
-from SALSA.script_class import  SCTAnalysis
+from SALSA.script_class import SCTAnalysis
 from SALSA.instruction_class import Instruct
 from SALSA.sct_model import SctModel
 from SALSA.instruction_model import InstructionModel
