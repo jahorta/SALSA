@@ -297,7 +297,7 @@ class Application(tk.Tk):
 
 
 class Settings:
-    filename = './settings.json'
+    filename = './Lib/settings.json'
     defaults = {
         'previous_sct_file': '',
         'script_directory': './scripts/'
