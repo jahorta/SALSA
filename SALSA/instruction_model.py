@@ -45,11 +45,6 @@ class InstructionModel:
         print("saving to file")
 
         with open(self.filename, 'w') as fh:
-            fh.write(json.dumps(inst_dict))
-
-        readable = "./Lib/Instructions-Readable.json"
-
-        with open(readable, 'w') as fh:
             fh.write(json.dumps(inst_dict, indent=2))
 
 
