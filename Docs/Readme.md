@@ -25,7 +25,7 @@ Instruction Descriptions
 Instruction descriptions are flexible, in that certain modifiers can be used to display the result of parameters from the instruction, or even perform basic manipulation of those parameter values.
 
 * Displaying a parameter value -
-By enclosing a parameter name with greater and less than signs, e.g. \<offset\> for the parameter named offset, the text will be replaced by the result of the parameter. This is performed first, and can be used in other operations
+By enclosing a parameter name with greater and less than signs, e.g. \<offset\> for the parameter named offset, the text will be replaced by the result of the parameter. This is performed first, and its result can be used in other operations
 
 * Basic Operations -
 Certain basic operations are available: add, subtract, multiply, and link. These operations all use a similar syntax and take in two parameters and can read hex, float, or ints. The format of the first parameter determines the format of the output.
