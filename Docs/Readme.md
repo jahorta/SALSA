@@ -7,8 +7,9 @@ SALSA is a GUI-based tool to assist in parsing and decoding the script system in
 Requirements
 ------------
 
-* Python 3.8 was used to create this program. Previous versions of Python may not work.
-* Decrypted SoAL script files (*.sct). At this time, there is no support for decrypting the script files within SALSA.
+* Python 3.8+
+* Decrypted SoAL script files (*.sct). 
+  * At this time, there is no support for decrypting the script files within SALSA
 
 
 Features
