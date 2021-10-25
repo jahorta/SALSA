@@ -538,11 +538,10 @@ class InstructionDetails(tk.LabelFrame):
 
     def get_inst_fields(self):
         fields = {'Instruction ID': self.currentInstructionID,
-                  'Parameter num': self.inputs['Parameter num'],
-                  'Notes': self.inputs['Notes'].get().rstrip()}
+                  'Parameter num': self.inputs['Parameter num']}
         for key, value in self.inputs.items():
             fields[key] = value.get()
-            if key == 'Description':
+            if key in ('Description', 'Notes'):
                 fields[key] = fields[key].rstrip()
         return fields
 
