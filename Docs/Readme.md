@@ -52,6 +52,7 @@ Hardcoded param 1 and the param1 referred to in some of the instruction notes ar
  
 Credits
 -------
+See credits.md for full credits
 
 License
 -------
