@@ -1,6 +1,6 @@
 SALSA - Skies of Arcadia Legends Script Assistant
 ===================================================
-SALSA is a GUI-based tool to assist in parsing and decoding the script system in Skies of Arcadia Legends. Currently, SALSA features two modes, an Instruction Edit mode and a Script Parsing mode.
+SALSA is a GUI-based tool to assist in parsing and decoding the script system in Skies of Arcadia Legends. Currently, SALSA features two modes, an Instruction Edit mode and a Script Parsing mode. Any instructions annotated in the Instruction Edit mode will be used to parse and annotate script files in the Script Parsing mode.
 
 
 Requirements
