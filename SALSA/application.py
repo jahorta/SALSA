@@ -14,7 +14,7 @@ from SALSA.instruction_model import InstructionModel
 
 
 class Application(tk.Tk):
-    """Controls the links between """
+    """Controls the links between the data models and views"""
     test = True
     title_text = "Skies of Arcadia Legends - Script Assistant"
     about_text = f'{title_text}\nby: Jahorta\n2021'
@@ -47,6 +47,7 @@ class Application(tk.Tk):
 
         self.storedInstructionSet = copy.deepcopy(self.instructionSet)
 
+        # Define callbacks for the different views
         self.instruction_callbacks = {
             'on_select_instruction': self.on_select_instruction,
             'on_instruction_commit': self.on_instruction_commit,
@@ -62,18 +63,13 @@ class Application(tk.Tk):
             'help->instruction': self.on_help_inst,
             'help->notes': self.on_help_notes
             }
-
         self.file_select_callbacks = {
             'on_quit': self.file_select_on_quit,
             'on_load': self.on_move_to_sct
         }
-
         self.about_window_callbacks = {
             'on_close': self.about_window_close
         }
-
-        self.file_select_scalebar_pos = '0.00'
-
         self.script_callbacks = {
             'on_script_display_change': self.on_script_display_change,
             'on_instruction_display_change': self.on_instruction_display_change,
@@ -82,32 +78,35 @@ class Application(tk.Tk):
             'on_set_inst_start': self.on_set_inst_start
         }
 
+        # Initialize popup window variables
+        self.file_select_scalebar_pos = '0.00'
+        self.file_select = None
+        self.help_window = None
+
+        # Setup window parameters
         self.title(self.title_text)
         self.resizable(width=True, height=True)
-
         style = ttk.Style(self)
         style.map("Treeview", background=[('selected', 'focus', 'blue'), ('selected', '!focus', 'blue')])
 
+        # Implement Menu
         menu = v.MainMenu(self, self.instruction_callbacks)
         self.config(menu=menu)
 
+        # Setup script parsing view
         self.ScriptFrame = v.ScriptView(self, self.script_callbacks)
         self.ScriptFrame.grid(row=0, column=0, sticky='NEWS')
 
+        # Initialize instruction edit view
         self.InstructionFrame = v.InstructionView(self, self.instModel.fields,
                                                   self.instModel.parameter_model.getAllFields(),
                                                   self.instruction_callbacks, self.instructionSet)
         self.InstructionFrame.grid(row=0, column=0, sticky='NEWS')
-
         self.populate_instructions(self.instructionSet)
         self.InstructionFrame.tkraise()
-
         self.protocol("WM_DELETE_WINDOW", self.on_quit)
 
-        self.file_select = None
-        self.about_window = None
-
-        print(self.geometry())
+        # print(self.geometry())
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
@@ -141,7 +140,6 @@ class Application(tk.Tk):
     def on_instruction_commit(self, id):
         """Get most recent instruction and param changes"""
         self.on_select_instruction(id)
-
         currentInsts = {}
         for key, value in self.instructionSet.items():
             currentInsts[key] = value.get_all()
@@ -282,20 +280,20 @@ class Application(tk.Tk):
 
     def on_help_about(self):
         position = {'x': self.winfo_x(), 'y': self.winfo_y()}
-        self.about_window = v.HelpPopupView(self, 'About', self.about_text, position, self.about_window_callbacks)
+        self.help_window = v.HelpPopupView(self, 'About', self.about_text, position, self.about_window_callbacks)
 
     def on_help_inst(self):
         position = {'x': self.winfo_x(), 'y': self.winfo_y()}
-        self.about_window = v.HelpPopupView(self, 'Instruction Details', HelpStrings.instruction_descriptions,
-                                            position, self.about_window_callbacks)
+        self.help_window = v.HelpPopupView(self, 'Instruction Details', HelpStrings.instruction_descriptions,
+                                           position, self.about_window_callbacks)
 
     def on_help_notes(self):
         position = {'x': self.winfo_x(), 'y': self.winfo_y()}
-        self.about_window = v.HelpPopupView(self, 'Other Notes', HelpStrings.other_notes,
-                                            position, self.about_window_callbacks)
+        self.help_window = v.HelpPopupView(self, 'Other Notes', HelpStrings.other_notes,
+                                           position, self.about_window_callbacks)
 
     def about_window_close(self):
-        self.about_window.destroy()
+        self.help_window.destroy()
 
     def set_script_directory(self):
         dir = tk.filedialog.askdirectory()
