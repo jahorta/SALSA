@@ -7,7 +7,7 @@ Requirements
 ------------
 * [Python](https://www.python.org/) 3.8+
 * Extracted and Decrypted Skies of Arcadia Legends script files (.sct).
-  * At this time, there is no support for decrypting the script files within SALSA. Information on how to decrypt the .sct files can be found on the [community discord](https://discord.gg/wMnXkhu)
+  * At this time, there is no support for decrypting the script files within SALSA. Information on how to decrypt the .sct files can be found on the [Skies of Arcadia community discord](https://discord.gg/wMnXkhu)
 
 
 Features
