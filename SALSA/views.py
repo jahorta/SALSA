@@ -1270,13 +1270,13 @@ class ScriptView(tk.Frame):
         self.callbacks['on_set_inst_start'](start, self.current_script_id)
 
 
-class AboutView(tk.Toplevel):
+class HelpPopupView(tk.Toplevel):
     offset = {
         'x': 50,
         'y': 50
     }
 
-    def __init__(self, parent, about_text, position, callbacks, *args, **kwargs):
+    def __init__(self, parent, title, about_text, position, callbacks, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.callbacks = callbacks

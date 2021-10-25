@@ -6,6 +6,7 @@ from threading import Timer
 from tkinter import ttk, messagebox, filedialog
 
 from SALSA import views as v
+from SALSA.SALSA_strings import HelpStrings
 from SALSA.script_class import SCTAnalysis
 from SALSA.instruction_class import Instruct
 from SALSA.sct_model import SctModel
@@ -57,7 +58,9 @@ class Application(tk.Tk):
             'view->sct': self.on_move_to_sct,
             'view->inst': self.on_move_to_inst,
             'help->debug': self.on_print_debug,
-            'help->about': self.on_help_about
+            'help->about': self.on_help_about,
+            'help->instruction': self.on_help_inst,
+            'help->notes': self.on_help_notes
             }
 
         self.file_select_callbacks = {
@@ -278,11 +281,18 @@ class Application(tk.Tk):
         print(f'\nWindow Dimensions:\nHeight: {self.winfo_height()}\nWidth: {self.winfo_width()}')
 
     def on_help_about(self):
-        """Display the About window"""
-        file_path = './scripts/'
         position = {'x': self.winfo_x(), 'y': self.winfo_y()}
+        self.about_window = v.HelpPopupView(self, 'About', self.about_text, position, self.about_window_callbacks)
 
-        self.about_window = v.AboutView(self, self.about_text,  position, self.about_window_callbacks)
+    def on_help_inst(self):
+        position = {'x': self.winfo_x(), 'y': self.winfo_y()}
+        self.about_window = v.HelpPopupView(self, 'Instruction Details', HelpStrings.instruction_descriptions,
+                                            position, self.about_window_callbacks)
+
+    def on_help_notes(self):
+        position = {'x': self.winfo_x(), 'y': self.winfo_y()}
+        self.about_window = v.HelpPopupView(self, 'Other Notes', HelpStrings.instruction_descriptions,
+                                            position, self.about_window_callbacks)
 
     def about_window_close(self):
         self.about_window.destroy()
