@@ -291,7 +291,7 @@ class Application(tk.Tk):
 
     def on_help_notes(self):
         position = {'x': self.winfo_x(), 'y': self.winfo_y()}
-        self.about_window = v.HelpPopupView(self, 'Other Notes', HelpStrings.instruction_descriptions,
+        self.about_window = v.HelpPopupView(self, 'Other Notes', HelpStrings.other_notes,
                                             position, self.about_window_callbacks)
 
     def about_window_close(self):

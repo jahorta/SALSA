@@ -27,6 +27,8 @@ class MainMenu(tk.Menu):
 
         help_menu = tk.Menu(self, tearoff=False)
         # help_menu.add_command(label='Print debug to console', command=callbacks['help->debug'])
+        help_menu.add_command(label='Instructions', command=callbacks['help->instruction'])
+        help_menu.add_command(label='Other Notes', command=callbacks['help->notes'])
         help_menu.add_command(label='About', command=callbacks['help->about'])
         self.add_cascade(label='Help', menu=help_menu)
 
