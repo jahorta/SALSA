@@ -19,7 +19,7 @@ Features
 
 Getting Started
 ---------------
-Upon startup, Instruction Edit view will show up first. In order to start parsing scripts, the script directory should be set first (File->Select Script Directory). Then, a script file can be selected to parse in the (File->Select SCT File). While encoded script files are visible in the sct file select window, an error will be produced if they are selected.
+With Python 3.8+ installed, running SALSA.py should run the program. Upon startup, Instruction Edit view will show up first. Here the tree on the left contains a list of instructions which can be annotated, while annotations can be displayed/edited on the right. In order to start parsing scripts, the script directory should be set first (File->Select Script Directory). Then, a script file can be selected to parse in the (File->Select SCT File). While encoded script files are visible in the sct file select window, an error will be produced if they are selected.
 
 Credits
 -------
