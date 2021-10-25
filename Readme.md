@@ -6,8 +6,8 @@ SALSA is a GUI-based tool to assist in parsing and decoding the script system in
 Requirements
 ------------
 * [Python](https://www.python.org/) 3.8+
-* Extracted and Decrypted SoAL script files (*.sct). 
-  * At this time, there is no support for decrypting the script files within SALSA
+* Extracted and Decrypted Skies of Arcadia Legends script files (.sct).
+  * At this time, there is no support for decrypting the script files within SALSA. Information on how to decrypt the .sct files can be found on the [community discord](https://discord.gg/wMnXkhu)
 
 
 Features
