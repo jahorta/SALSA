@@ -26,4 +26,4 @@ See credits.md for full credits
 
 License
 -------
-Copyright (C) 2021 Kenneth Trimmer. SALSA is licensed under the GNU General Public License, Version 3.0. See [LICENSE.md](/LICENSE.md) for full license text
+Copyright (C) 2021. SALSA is licensed under the GNU General Public License, Version 3.0. See [LICENSE.md](/LICENSE.md) for full license text
