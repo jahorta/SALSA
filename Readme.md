@@ -15,6 +15,7 @@ Features
 * Definable instructions
 * Parameter values can be displayed within instruction descriptions
 * Script file parsing using instructions
+* Script file addressing by setting starting memory address for script file for use with Dolphin Emulator.
 
 Getting Started
 ---------------
