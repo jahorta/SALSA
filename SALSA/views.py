@@ -27,8 +27,7 @@ class MainMenu(tk.Menu):
 
         help_menu = tk.Menu(self, tearoff=False)
         # help_menu.add_command(label='Print debug to console', command=callbacks['help->debug'])
-        help_menu.add_command(label='Instructions', command=callbacks['help->instruction'])
-        help_menu.add_command(label='Other Notes', command=callbacks['help->notes'])
+        help_menu.add_command(label='Help', command=callbacks['help->help'])
         help_menu.add_command(label='About', command=callbacks['help->about'])
         self.add_cascade(label='Help', menu=help_menu)
 
@@ -338,7 +337,7 @@ class InstructionDetails(tk.LabelFrame):
         self.param_buttons['Add'].grid(row=0, column=1)
         self.param_buttons['Remove'] = tk.Button(paramSelectTop, text='Remove this Param', command=self.remParameter)
         self.param_buttons['Remove'].grid(row=0, column=2)
-        paramSelectTop.grid(row=2, column=0, sticky=tk.N+tk.S)
+        paramSelectTop.grid(row=2, column=0, sticky=tk.N + tk.S)
         paramSelectTop.rowconfigure(0, weight=1)
         paramSelectTop.rowconfigure(1, weight=1)
         paramSelectTop.columnconfigure(0, weight=1)
@@ -1297,15 +1296,54 @@ class HelpPopupView(tk.Toplevel):
         help_canvas.grid(row=0, column=0)
         help_canvas.create_text((self.text_offset['x'], self.text_offset['y']),
                                 anchor=tk.NW, text=about_text,
-                                width=self.size['width']-self.text_offset['x'])
+                                width=self.size['width'] - self.text_offset['x'])
 
         self.quit = tk.Button(self, text='Cancel', command=self.callbacks['on_close'])
         self.quit.grid(row=1, column=0)
         canvas_scrollbar = tk.Scrollbar(self, orient="vertical", command=help_canvas.yview)
         help_canvas.configure(yscrollcommand=canvas_scrollbar.set)
         help_canvas.config(scrollregion=help_canvas.bbox("all"))
-        canvas_scrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
+        canvas_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
 
+        self.title(title)
+        self.resizable(width=False, height=False)
+        posX = position['x'] + self.window_offset['x']
+        posY = position['y'] + self.window_offset['y']
+        pos = '+{0}+{1}'.format(posX, posY)
+        self.geometry(pos)
+
+
+class TabbedHelpPopupView(tk.Toplevel):
+    window_offset = {
+        'x': 50,
+        'y': 50
+    }
+
+    size = {
+        'width': 400,
+        'height': 400
+    }
+
+    text_offset = {
+        'x': 10,
+        'y': 10
+    }
+
+    def __init__(self, parent, title, about_text, position, callbacks, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+
+        self.callbacks = callbacks
+        notebook = ttk.Notebook(self)
+        notebook.grid(row=0, column=0)
+
+        for i, (k, v) in enumerate(about_text.items()):
+            tab_frame = w.HelpCanvas(notebook, size=self.size, text_offset=self.text_offset,
+                                     text=v)
+            notebook.add(tab_frame)
+            notebook.tab(i, text=k)
+
+        self.quit = tk.Button(self, text='Cancel', command=self.callbacks['on_close'])
+        self.quit.grid(row=1, column=0)
         self.title(title)
         self.resizable(width=False, height=False)
         posX = position['x'] + self.window_offset['x']

@@ -423,3 +423,20 @@ class LabelInput(tk.Frame):
     def config(self, args):
         if 'state' in args:
             self.input.config(state=args['state'])
+
+
+class HelpCanvas(tk.Frame):
+
+    def __init__(self, parent, size: dict, text_offset: dict, text: str):
+        super().__init__(parent)
+
+        help_canvas = tk.Canvas(self, width=size['width'], height=size['height'])
+        help_canvas.grid(row=0, column=0)
+        help_canvas.create_text((text_offset['x'], text_offset['y']),
+                                anchor=tk.NW, text=text,
+                                width=size['width'] - text_offset['x'])
+
+        canvas_scrollbar = tk.Scrollbar(self, orient="vertical", command=help_canvas.yview)
+        help_canvas.configure(yscrollcommand=canvas_scrollbar.set)
+        help_canvas.config(scrollregion=help_canvas.bbox("all"))
+        canvas_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)

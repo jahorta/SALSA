@@ -59,6 +59,7 @@ class Application(tk.Tk):
             'view->sct': self.on_move_to_sct,
             'view->inst': self.on_move_to_inst,
             'help->debug': self.on_print_debug,
+            'help->help': self.show_help,
             'help->about': self.on_help_about,
             'help->instruction': self.on_help_inst,
             'help->notes': self.on_help_notes
@@ -92,6 +93,9 @@ class Application(tk.Tk):
         # Implement Menu
         menu = v.MainMenu(self, self.instruction_callbacks)
         self.config(menu=menu)
+
+        # Load help strings
+        self.help = HelpStrings()
 
         # Setup script parsing view
         self.ScriptFrame = v.ScriptView(self, self.script_callbacks)
@@ -301,8 +305,10 @@ class Application(tk.Tk):
         self.script_dir = dir
         self.sctModel = SctModel(self.script_dir)
 
-
-
+    def show_help(self):
+        position = {'x': self.winfo_x(), 'y': self.winfo_y()}
+        self.help_window = v.TabbedHelpPopupView(self, 'Help', self.help.get_all(),
+                                           position, self.about_window_callbacks)
 
 class Settings:
     filename = './Lib/settings.json'
@@ -348,3 +354,5 @@ class Settings:
 
     def get_script_dir(self):
         return self.settings['script_directory']
+
+
