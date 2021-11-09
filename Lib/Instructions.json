@@ -434,7 +434,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "No dependancy on param1\nFunctional at all times\n\nSets a zero in the current workspace, then advances the pointer and returns. \n\nNo parameters\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "No dependancy on param1\nFunctional at all times\n\nSets a zero in the current workspace, then advances the pointer and returns. \n\nNo parameters",
     "Parameters": {}
   },
   "16": {
@@ -446,7 +446,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Dependancy on param1\nIf param1 & 1 == 1\nset timer based on result of scpt analyze in terms of frames\nIf param1 & 2 == 1\nskip frames until the timer is resolved\n\nIn addition to animations, seems to be used for file loading as well.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependancy on param1\nIf param1 & 1 == 1\nset timer based on result of scpt analyze in terms of frames\nIf param1 & 2 == 1\nskip frames until the timer is resolved\n\nIn addition to animations, seems to be used for file loading as well.",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -476,7 +476,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "No dependancy on param1\nFunctional at all times\n\nFirst, it checks that the next value is not \n7F7FFFFF. If it is, it moves the scpt pointer up two and sets uvar1 to be 0x7FFFFFFF\n\nOtherwise, it enters scptAnalyze to generate uvar1\n\nA byte offset is generated from  the upper 15 bits of uvar1, while the bit to set is generated from masking uVar1 with 0x1f\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "No dependancy on param1\nFunctional at all times\n\nFirst, it checks that the next value is not \n7F7FFFFF. If it is, it moves the scpt pointer up two and sets uvar1 to be 0x7FFFFFFF\n\nOtherwise, it enters scptAnalyze to generate uvar1\n\nA byte offset is generated from  the upper 15 bits of uvar1, while the bit to set is generated from masking uVar1 with 0x1f",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -506,7 +506,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "No dependancy on param1\nFunctional at all times\n\nFirst, it checks that the next value is not \n7F7FFFFF. If it is, it moves the scpt pointer up two and sets uvar1 to be 0x7FFFFFFF\n\nOtherwise, it enters scptAnalyze to generate uvar1\n\nA byte offset is generated from  the upper 15 bits of uvar1, while the bit to unset is generated from masking uVar1 with 0x1f\n\n\n\n\n\n\n\n\n",
+    "Notes": "No dependancy on param1\nFunctional at all times\n\nFirst, it checks that the next value is not \n7F7FFFFF. If it is, it moves the scpt pointer up two and sets uvar1 to be 0x7FFFFFFF\n\nOtherwise, it enters scptAnalyze to generate uvar1\n\nA byte offset is generated from  the upper 15 bits of uvar1, while the bit to unset is generated from masking uVar1 with 0x1f",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -536,7 +536,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "No dependancy on param1\nFunctional at all times\n\nFirst, it checks that the next value is not \n7F7FFFFF. If it is, it moves the scpt pointer up two and sets uvar1 to be 0x7FFFFFFF\n\nOtherwise, it enters scptAnalyze to generate uvar1\n\nA byte offset is generated from  the upper 15 bits of uvar1, while the bit to unset is generated from masking uVar1 with 0x1f\n\n\n\n\n\n\n",
+    "Notes": "No dependancy on param1\nFunctional at all times\n\nFirst, it checks that the next value is not \n7F7FFFFF. If it is, it moves the scpt pointer up two and sets uvar1 to be 0x7FFFFFFF\n\nOtherwise, it enters scptAnalyze to generate uvar1\n\nA byte offset is generated from  the upper 15 bits of uvar1, while the bit to unset is generated from masking uVar1 with 0x1f",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -9094,7 +9094,7 @@
     "Hard parameter two": "0x00020000",
     "Implement": true,
     "Parameter num": 6,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-int\n3: scpt-int\n4: scpt-float\n5: scpt-float\n6: scpt-int\n\n\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-int\n3: scpt-int\n4: scpt-float\n5: scpt-float\n6: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -10235,7 +10235,7 @@
     "Hard parameter two": "0x00050000",
     "Implement": true,
     "Parameter num": 5,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-int\n\n\n\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -10375,7 +10375,7 @@
     "Hard parameter two": "0xfffe0000",
     "Implement": true,
     "Parameter num": 10,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -10558,7 +10558,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "if param1 & 1 == 1:\n\nparam:\n1: scpt-int\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparam:\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -10728,7 +10728,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -10775,7 +10775,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "if param_1 & 1 == 1:\n\n1: scpt-int\n\n\n4030e420 + 4 * (1) = rand(0,9999)\n\n\n\n\n\n\n",
+    "Notes": "if param_1 & 1 == 1:\n\n1: scpt-int\n\n\n4030e420 + 4 * (1) = rand(0,9999)",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -10805,7 +10805,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Only runs if param_1 & 1 == 1:\n\nparam:\n1: scpt-int\n\n\n",
+    "Notes": "Only runs if param_1 & 1 == 1:\n\nparam:\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -10835,7 +10835,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 10,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-byte\n6: scpt-float\n7: scpt-int\n8: scpt-byte\n9: scpt-byte\n10: scpt-int\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-byte\n6: scpt-float\n7: scpt-int\n8: scpt-byte\n9: scpt-byte\n10: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -11018,7 +11018,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 12,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: int\n\nloop ((1) iterations):\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-float\n9: scpt-float\n10: scpt-int\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: int\n\nloop ((1) iterations):\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-float\n9: scpt-float\n10: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -11235,7 +11235,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Only runs if param1 & 1 == 1:\n\nparam:\n1: scpt-int\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\nparam:\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -11538,7 +11538,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -11568,7 +11568,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 3,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
