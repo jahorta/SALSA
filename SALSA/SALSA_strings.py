@@ -1,6 +1,6 @@
 class HelpStrings:
     instruction_descriptions = "Instruction Descriptions\n" \
-                               "------------------------\n" \
+                               "------------------------\n\n" \
                                "Instruction descriptions are flexible, in that certain modifiers can be " \
                                "used to display the result of parameters from the instruction, or even " \
                                "perform basic manipulation of those parameter values.\n" \
@@ -39,6 +39,10 @@ class HelpStrings:
                                "linked data. The position of the offset parameter is used as the start point, " \
                                "with the value of the parameter being the offset itself\n" \
                                "  * e.g. *lnk[offset,<offset>]* -> Target instruction/string.\n" \
+                               "\n\nOther Features:\n\n" \
+                               "* Prefixing an instruction name with '??' will add the instruction ID to the end of the" \
+                               " instruction in script view" \
+
 
     other_notes = "Other Notes\n" \
                   "-----------\n" \
