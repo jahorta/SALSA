@@ -44,20 +44,29 @@ class HelpStrings:
                            " instruction in the script view instruction tree" \
 
 
+    script_notes = "Script Features\n" \
+                   "---------------\n\n" \
+                   "* Setting a memory position for the script\n" \
+                   "The in-game position of each script instruction can be updated by entering the start position for" \
+                   " the script. This start position is the pointer value at 0x8030CEA0."
+
     other_notes = "Other Notes\n" \
-                  "-----------\n" \
+                  "-----------\n\n" \
                   "Hardcoded param 1 and the param1 referred to in some of the instruction notes are " \
                   "different parameters. Since instructions are able to take place over multiple frames, " \
                   "Param1 appears to be sent as a sort of indicator on the state of the instruction so that " \
-                  "the desired function can continue where it left off. Bits within param1 are used to " \
+                  "the desired instruction can continue where it left off. Bits within param1 are used to " \
                   "control this state:\n" \
                   "\n" \
                   "* param1 & 1: initialize instruction\n" \
-                  "* param1 & 2: run function\n" \
-                  "* param1 & 8: terminate function"
+                  "* param1 & 2: run instruction\n" \
+                  "* param1 & 8: terminate instruction"
+
+
 
     def get_all(self):
         return {
             'Instructions': self.instruction_features,
+            'Scripts': self.script_notes,
             'Other': self.other_notes
         }
