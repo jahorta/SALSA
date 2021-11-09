@@ -207,6 +207,7 @@ class SctModel:
         sctEnd = sctStart + prevLength
         ind['Sections'][prevTitle] = sct[sctStart:sctEnd]
         footerStart = sctStart + prevLength
+        footerStartNoIndex = footerStart - indEnd
         footerSCT = sct[footerStart:]
         footerLength = len(footerSCT)
         pos = 0
@@ -215,10 +216,9 @@ class SctModel:
             currFooterStr = getString(footerSCT, pos, replace=False)
             ## test for valid string
             if '\\' in currFooterStr:
-                # TODO
                 currFooterStr = getString(footerSCT, pos, enc='shiftjis', replace=False)
             ind['Footer'][str(index)] = currFooterStr
-            ind['Positions'][str(pos + footerStart)] = 'Footer{}'.format(index)
+            ind['Positions'][pos + footerStartNoIndex] = 'Footer{}'.format(index)
             pos += len(currFooterStr) + 1
             index += 1
         ind['Body Length'] = body_length - footerLength
