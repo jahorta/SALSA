@@ -691,7 +691,8 @@ class ScriptView(tk.Frame):
         'All Instructions': 'all',
         'Only Implemented Instructions': 'implemented',
         'Only Instructions with errors': 'errors',
-        'Exclude Implemented': 'unimplemented'
+        'Exclude Implemented': 'unimplemented',
+        'Set and Decisions only': 'set'
     }
 
     script_start_field = {'req': False, 'type': FT.hex, 'pattern': '^0x8[0-9,a-f]{7}$'}
@@ -936,6 +937,14 @@ class ScriptView(tk.Frame):
                                                               self.on_instruction_display_change(
                                                                   list(options.values())[3]))
         self.instruction_display_select_both.grid(row=3, column=0)
+        self.instruction_display_select_only_options = tk.Radiobutton(instruction_display_select,
+                                                              text=list(options.keys())[4],
+                                                              variable=self.instruction_display_select_variable,
+                                                              value=4,
+                                                              command=lambda:
+                                                              self.on_instruction_display_change(
+                                                                  list(options.values())[4]))
+        self.instruction_display_select_only_options.grid(row=4, column=0)
         self.instruction_display_select_all.select()
         instruction_display_select.grid(row=1, column=1)
         instruction_display_select.rowconfigure(0, weight=1)
@@ -1075,6 +1084,11 @@ class ScriptView(tk.Frame):
         if self.instruction_display_select_current == '3':
             for key, inst in insts.items():
                 if inst['Decoded']:
+                    insts_to_Remove.append(key)
+
+        if self.instruction_display_select_current == '4':
+            for key, inst in insts.items():
+                if not inst['Decision']:
                     insts_to_Remove.append(key)
 
         for i in insts_to_Remove:

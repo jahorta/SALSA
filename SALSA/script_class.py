@@ -93,6 +93,10 @@ class SCTAnalysis:
 
 class SCTSection:
 
+    decision_instruction_IDs = (
+        0, 3, 5, 6, 7, 10, 11, 12, 17, 18, 19, 43, 144, 155
+    )
+
     def __init__(self, sect_dict, name, length, pos):
         self.name = name
         # if name == '_LOSE':
@@ -133,6 +137,10 @@ class SCTSection:
                     current['Code'] = value.name
                 else:
                     current['Code'] = '{0} ({1})'.format(int(code, 16), code)
+                if int(code, 16) in self.decision_instruction_IDs:
+                    current['Decision'] = True
+                else:
+                    current['Decision'] = False
             else:
                 current['Code'] = value.ID
             current['Decoded'] = value.isDecoded
@@ -145,6 +153,8 @@ class SCTSection:
                 pos += self.startPos
                 pos = hex(int(start, 16) + pos)
                 current['pos'] = pos
+            if 'Decision' not in current.keys():
+                current['Decision'] = False
             instruction_tree[key] = current
         if self.hasString:
             next = {
