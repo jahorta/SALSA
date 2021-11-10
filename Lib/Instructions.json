@@ -2,7 +2,7 @@
   "0": {
     "Instruction ID": "0",
     "Name": "JMP: jump if false",
-    "Description": "SCPT Analysis:<SCPT>\n\nJump if False:\n*lnk[Offset,<Offset>]*",
+    "Description": "Jump test: <test>\n\nJump if False:\n*lnk[Offset,<Offset>]*",
     "Location": "0x801f6044",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
@@ -12,7 +12,7 @@
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "SCPT",
+        "Name": "test",
         "Type": "scpt",
         "Override": false,
         "Override condition": "",
@@ -398,7 +398,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "No dependancy on param1\nFunctional at all times\n\n1) Checks whether there are any subscripts left on the stack\n\tif there are subscripts left, sets the pointer to the previous subscript and returns 0\n2) Checks whether 8030ceaa is less than 2\n\tif so, sets 8030e714 to 0, returns 0\n\nIf none of the above, returns 1\n\n",
+    "Notes": "No dependancy on param1\nFunctional at all times\n\n1) Checks whether there are any subscripts left on the stack\n\tif there are subscripts left, sets the pointer to the previous subscript and returns 0\n2) Checks whether 8030ceaa is less than 2\n\tif so, sets 8030e714 to 0, returns 0\n\nIf none of the above, returns 1",
     "Parameters": {}
   },
   "13": {
@@ -11039,7 +11039,7 @@
       },
       "1": {
         "ID": "1",
-        "Name": "unknown1",
+        "Name": "loop",
         "Type": "loop-start",
         "Override": false,
         "Override condition": "",
@@ -17356,26 +17356,44 @@
   "256": {
     "Instruction ID": "256",
     "Name": "no name",
-    "Description": "\n\n",
+    "Description": "",
     "Location": "0x801fdc70",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
     "Implement": false,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   },
   "257": {
     "Instruction ID": "257",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "?? change script w/ gamestate=7",
+    "Description": "goes to: *lnk[offset,<offset>]*",
     "Location": "0x80214908",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 1,
+    "Notes": "",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "offset",
+        "Type": "int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "258": {
     "Instruction ID": "258",
