@@ -664,7 +664,8 @@ class ScriptView(tk.Frame):
     }
 
     instruction_tree_headers = {
-        '#0': {'label': 'Position', 'width': 90, 'stretch': True},
+        '#0': {'label': 'Position', 'width': 50, 'stretch': True},
+        'Addr': {'label': 'Address', 'stretch': True, 'width': 120, 'anchor': tk.W},
         'Code': {'label': 'Code', 'stretch': True, 'width': 200, 'anchor': tk.W},
         'Decoded': {'label': 'Impl', 'width': 40, 'stretch': True},
         'Error': {'label': 'Err', 'width': 40, 'stretch': True},
@@ -1106,8 +1107,7 @@ class ScriptView(tk.Frame):
                 if key == self.current_instruction_id:
                     values.append('>>>')
             pos = key
-            if 'pos' in inst.keys():
-                pos = inst['pos']
+            values.insert(0, inst.get('pos', ''))
             self.instruction_tree.insert('', 'end', iid=key, text=pos, values=values)
 
         # print(self.instruction_tree.get_children())
