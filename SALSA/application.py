@@ -52,10 +52,14 @@ class Application(tk.Tk):
             'on_select_instruction': self.on_select_instruction,
             'on_instruction_commit': self.on_instruction_commit,
             'on_select_parameter': self.on_select_parameter,
-            'on_parameter_num_change': self.on_param_num_change,
+            'on_parameter_num_change': self.on_param_num_change
+            }
+
+        self.menu_callbacks = {
             'file->script_dir': self.set_script_directory,
             'file->select': self.on_file_select,
             'file->quit': self.on_quit,
+            'file->export_data': self.on_data_export,
             'view->sct': self.on_move_to_sct,
             'view->inst': self.on_move_to_inst,
             'help->debug': self.on_print_debug,
@@ -63,7 +67,8 @@ class Application(tk.Tk):
             'help->about': self.on_help_about,
             'help->instruction': self.on_help_inst,
             'help->notes': self.on_help_notes
-            }
+        }
+
         self.file_select_callbacks = {
             'on_quit': self.file_select_on_quit,
             'on_load': self.on_move_to_sct
@@ -91,7 +96,7 @@ class Application(tk.Tk):
         style.map("Treeview", background=[('selected', 'focus', 'blue'), ('selected', '!focus', 'blue')])
 
         # Implement Menu
-        menu = v.MainMenu(self, self.instruction_callbacks)
+        menu = v.MainMenu(self, self.menu_callbacks)
         self.config(menu=menu)
 
         # Load help strings
@@ -150,6 +155,13 @@ class Application(tk.Tk):
 
         self.instModel.save_instructions(currentInsts)
         self.storedInstructionSet = self.instModel.load_instructions()
+
+    # Called when asked to export data
+    def on_data_export(self):
+        # TODO - open view to ask what to export
+        # TODO - create SCT objects for all relevant scripts
+        # TODO - pass to exporter object
+        pass
 
     # Called when a file is selected
 

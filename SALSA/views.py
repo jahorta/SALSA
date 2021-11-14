@@ -17,6 +17,7 @@ class MainMenu(tk.Menu):
         file_menu = tk.Menu(self, tearoff=False)
         file_menu.add_command(label='Select Script Directory', command=callbacks['file->script_dir'])
         file_menu.add_command(label='Select SCT File', command=callbacks['file->select'])
+        file_menu.add_command(label='Export Data', command=callbacks['file->export_data'])
         file_menu.add_command(label='Quit', command=callbacks['file->quit'])
         self.add_cascade(label='File', menu=file_menu)
 
