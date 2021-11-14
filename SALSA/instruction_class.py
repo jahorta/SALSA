@@ -103,7 +103,6 @@ class Instruct:
 
     def adjust_parameter_number(self, newParamNum, paramPos):
 
-
         currentParamNum = self.paramNum
 
         if currentParamNum < newParamNum:
@@ -152,6 +151,13 @@ class Instruct:
             for i in reversed(range(paramToRemove)):
                 ID = str(i + self.paramNum)
                 self.parameters.pop(ID)
+
+    def get_param_names(self, param_list):
+        names = []
+        for param in self.parameters.values():
+            if param.paramID in param_list:
+                names.append(param.name)
+        return names
 
 
 class Parameter:
