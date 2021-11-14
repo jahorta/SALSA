@@ -12147,18 +12147,18 @@
   "165": {
     "Instruction ID": "165",
     "Name": "Load Ship Turn Values",
-    "Description": "Loads a number constants into memory\nTurn Modifiers:\nEnemy Hit: <EHitMod>\nEnemy Damage: <EDmgMod>\nPC Hit: <PHitMod>\nPC Damage: <PDmgMod>",
+    "Description": "Loads a number constants into memory\nTurn Modifiers:\t\t\t\tLost Modifiers:\n\tHit\tDamage\t\tFirst\tSecond\nEnemy: \t<EHitMod>\t<EDmgMod>\t\t<lost_eFirst>\t<lost_eSecond>\nPlayer: <PHitMod>\t\t<PDmgMod>\t\t<lost_pFirst>\t<lost_pSecond>\n\nOther Values:\n0: <unknown0>\t1: <unknown1>\t2: <unknown2>\t3: <unknown3>\t4: <unknown4> 5: <unknown5>\t\n6: <unknown6>\t7: <unknown7>\t8: <unknown8>\n\n17: <unknown17>\t18: <unknown18>",
     "Location": "0x80215590",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 19,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
         "Name": "unknown0",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12175,7 +12175,7 @@
       "1": {
         "ID": "1",
         "Name": "unknown1",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12192,7 +12192,7 @@
       "2": {
         "ID": "2",
         "Name": "unknown2",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12209,7 +12209,7 @@
       "3": {
         "ID": "3",
         "Name": "unknown3",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12226,7 +12226,7 @@
       "4": {
         "ID": "4",
         "Name": "unknown4",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12243,7 +12243,7 @@
       "5": {
         "ID": "5",
         "Name": "unknown5",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12260,7 +12260,7 @@
       "6": {
         "ID": "6",
         "Name": "unknown6",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12277,7 +12277,7 @@
       "7": {
         "ID": "7",
         "Name": "unknown7",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12294,7 +12294,7 @@
       "8": {
         "ID": "8",
         "Name": "unknown8",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12311,7 +12311,7 @@
       "9": {
         "ID": "9",
         "Name": "EHitMod",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12328,7 +12328,7 @@
       "10": {
         "ID": "10",
         "Name": "EDmgMod",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12345,7 +12345,7 @@
       "11": {
         "ID": "11",
         "Name": "PHitMod",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12362,7 +12362,7 @@
       "12": {
         "ID": "12",
         "Name": "PDmgMod",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12378,8 +12378,8 @@
       },
       "13": {
         "ID": "13",
-        "Name": "unknown13",
-        "Type": "scpt",
+        "Name": "lost_pFirst",
+        "Type": "scpt-float",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12395,8 +12395,8 @@
       },
       "14": {
         "ID": "14",
-        "Name": "unknown14",
-        "Type": "scpt",
+        "Name": "lost_pSecond",
+        "Type": "scpt-float",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12412,8 +12412,8 @@
       },
       "15": {
         "ID": "15",
-        "Name": "unknown15",
-        "Type": "scpt",
+        "Name": "lost_eFirst",
+        "Type": "scpt-float",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12429,8 +12429,8 @@
       },
       "16": {
         "ID": "16",
-        "Name": "unknown16",
-        "Type": "scpt",
+        "Name": "lost_eSecond",
+        "Type": "scpt-float",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12447,7 +12447,7 @@
       "17": {
         "ID": "17",
         "Name": "unknown17",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12464,7 +12464,7 @@
       "18": {
         "ID": "18",
         "Name": "unknown18",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -12683,7 +12683,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Only runs if param1 & 1 == 1\n\nCalls scpt variable:\n\n1: int\n\n80148cac((1))\n\n80148cac(p1):\n\nif (DAT_803472c4 != -0x1):\n    DBPrintf(s_sbSceneTableStart_Error_:_sbScen_802b386c,param_1)\n\nif not 0 < p1 < 15 {\n    DBPrintf(s_sbSceneTableStart_Error_:_Scene_N_802b38ac,p1);\n  }\npiVar1 = &DAT_80308fa0 + p1 * 3;\nif (*piVar1 != 0x0) {\n    DBPrintf(s_sbSceneTableStart_Error_:_Scene_D_802b38e0,p1)\n\nDAT_803472c4 = param_1\niVar2 = zzCallocWithFlag(0x1,0x160)\n*piVar1 = iVar2\n(&DAT_80308f9c)[p1 * 0x3] = 0x0\nDAT_80347298 = 0x4\n*(undefined4 *)*piVar1 = 0xffffffff\n*(undefined4 *)(*piVar1 + 0x48) = 0xffffffff\n*(undefined4 *)(*piVar1 + 0x58) = 0xffffffff\n*(undefined4 *)(*piVar1 + 0xa0) = 0xffffffff\n*(undefined4 *)(*piVar1 + 0xb0) = 0xffffffff\n*(undefined4 *)(*piVar1 + 0xf8) = 0xffffffff\n*(undefined4 *)(*piVar1 + 0x108) = 0xfffffff\n*(undefined4 *)(*piVar1 + 0x150) = 0xffffffff\nDAT_803472c8 = DAT_803472c8 + 0x1\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1\n\nCalls scpt variable:\n\n1: int\n\n80148cac((1))\n\n80148cac(p1):\n\nif (DAT_803472c4 != -0x1):\n    DBPrintf(s_sbSceneTableStart_Error_:_sbScen_802b386c,param_1)\n\nif not 0 < p1 < 15 {\n    DBPrintf(s_sbSceneTableStart_Error_:_Scene_N_802b38ac,p1);\n  }\npiVar1 = &DAT_80308fa0 + p1 * 3;\nif (*piVar1 != 0x0) {\n    DBPrintf(s_sbSceneTableStart_Error_:_Scene_D_802b38e0,p1)\n\nDAT_803472c4 = param_1\niVar2 = zzCallocWithFlag(0x1,0x160)\n*piVar1 = iVar2\n(&DAT_80308f9c)[p1 * 0x3] = 0x0\nDAT_80347298 = 0x4\n*(undefined4 *)*piVar1 = 0xffffffff\n*(undefined4 *)(*piVar1 + 0x48) = 0xffffffff\n*(undefined4 *)(*piVar1 + 0x58) = 0xffffffff\n*(undefined4 *)(*piVar1 + 0xa0) = 0xffffffff\n*(undefined4 *)(*piVar1 + 0xb0) = 0xffffffff\n*(undefined4 *)(*piVar1 + 0xf8) = 0xffffffff\n*(undefined4 *)(*piVar1 + 0x108) = 0xfffffff\n*(undefined4 *)(*piVar1 + 0x150) = 0xffffffff\nDAT_803472c8 = DAT_803472c8 + 0x1",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -12743,7 +12743,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "The function it calls:\n801486cc\nhas a debug text \"s_sbSetCurrentScene_Error_:_Scene_T\".format(param1)\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "The function it calls:\n801486cc\nhas a debug text \"s_sbSetCurrentScene_Error_:_Scene_T\".format(param1)",
     "Parameters": {
       "0": {
         "ID": "0",
