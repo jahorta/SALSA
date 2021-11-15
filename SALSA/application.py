@@ -3,10 +3,12 @@ import json
 import os
 import tkinter as tk
 from math import floor
-from threading import Timer, Thread
+import threading
+import multiprocessing
 from tkinter import ttk, messagebox, filedialog
 from pathlib import Path
 import re
+import queue
 
 from SALSA import views as v
 from SALSA.SALSA_strings import HelpStrings
@@ -87,7 +89,7 @@ class Application(tk.Tk):
         }
         self.exporter_callbacks = {
             'on_export': self.on_data_export,
-            'on_close': self.about_window_close
+            'on_close': self.on_export_window_destroy
         }
 
         # Initialize popup window variables
@@ -129,8 +131,13 @@ class Application(tk.Tk):
         self.export_window = None
         self.exporter = SCTExporter()
         self.exporter_out: dict = {}
-        self.scriptAnalyses = []
+        self.scriptAnalyses = {}
         self.export_type = ''
+        self.bind('<<sct_analyzed>>', self.update_export_progress)
+        self.scts_analyzed = 0
+        self.script_num = 0
+        self.script_analysis_queue = queue.Queue()
+        self.update_export_queue = queue.Queue()
 
     def on_select_instruction(self, newID):
         """Save the current instruction details to the current Instruction object"""
@@ -172,8 +179,10 @@ class Application(tk.Tk):
     def on_create_export_window(self):
         self.exporter = SCTExporter()
         self.exporter_out: dict = {}
-        self.scriptAnalyses = []
+        # TODO - test for changes to instruction set to determine whether to redo analyses
+        self.scriptAnalyses = {}
         self.export_type = ''
+        self.script_num = 0
         position = {'x': self.winfo_x(), 'y': self.winfo_y()}
         self.export_window = v.ExporterView(parent=self, title='Export',
                                             export_fields=self.exporter.get_export_fields(), position=position,
@@ -182,38 +191,59 @@ class Application(tk.Tk):
     # Called when asked to export data
     def on_data_export(self, export_type='Ship battle turn data'):
         relevant_script_regex = self.exporter.get_export_scripts(export_type)
-        # TODO - create SCT objects for all relevant scripts
         script_name_list = []
         script_paths = Path(self.script_dir).glob('**/*')
         for path in script_paths:
             if re.search(relevant_script_regex, path.name):
                 script_name_list.append(path.name)
         self.export_type = export_type
-        for i, script in enumerate(script_name_list):
-            args = [i, script, script_name_list]
-            scriptThread = ScriptAnalysisThread(function=self.perform_script_analysis, args=args)
-            scriptThread.run()
+        self.scts_analyzed = 0
+        self.script_num = len(script_name_list)
+        for script in script_name_list:
+            self.script_analysis_queue.put(script)
+        t = threading.Thread(target=self.run_script_analysis_worker, daemon=True)
+        t.start()
 
-    def perform_script_analysis(self, script_index, script, script_name_list):
-        script_num = len(script_name_list)
-        i = script_index
-        sct = script_name_list[i]
-        new_sct_analysis = SCTAnalysis(self.sctModel.load_sct(insts=self.instructionSet, file=sct))
-        print(f'{sct} analyzed: {i + 1}/{script_num}')
-        self.after(100, self.add_analysis_to_export(new_sct_analysis, script_num))
+    def run_script_analysis_worker(self):
+        insts = self.instructionSet
+        sct_dir = self.script_dir
+        my_sct_model = SctModel(sct_dir)
+        while not self.script_analysis_queue.empty():
+            try:
+                sct = self.script_analysis_queue.get()
+            except queue.Empty:
+                break
+            new_sct_analysis = SCTAnalysis(my_sct_model.load_sct(insts=insts, file=sct))
+            self.scriptAnalyses[new_sct_analysis.Name] = new_sct_analysis
+            # print(f'{sct} analyzed')
+            self.script_analysis_queue.task_done()
+            self.update_export_queue.put(new_sct_analysis.Name)
+            self.event_generate('<<sct_analyzed>>', when='tail')
 
-    def add_analysis_to_export(self, sctAnalysis, script_num):
-        self.scriptAnalyses.append(sctAnalysis)
-        scripts_done = len(self.scriptAnalyses)
-        progress = floor(((scripts_done + 1) / script_num) * 100)
-        self.export_window.update_progress(progress, f'{sctAnalysis.Name} analyzed: {scripts_done + 1}/{script_num}')
-        if scripts_done == script_num:
-            self.after(100, self.export_data)
+    def update_export_progress(self, evt):
+        sct_name = self.update_export_queue.get()
+        self.scts_analyzed += 1
+        progress = floor((self.scts_analyzed / self.script_num) * 100)
+        self.export_window.update_progress(percent=progress,
+                                           text=f'{sct_name} analyzed: {self.scts_analyzed}'
+                                                f'/{self.script_num}')
+        self.update_export_queue.task_done()
+        self.update()
+        if self.scts_analyzed == self.script_num:
+            self.export_data()
 
     def export_data(self):
-        self.exporter_out = self.exporter.export(sct_list=self.scriptAnalyses, instruction_list=self.instructionSet,
+        sorted_keys = sorted(self.scriptAnalyses.keys())
+        sorted_scts = []
+        for key in sorted_keys:
+            sorted_scts.append(self.scriptAnalyses[key])
+        self.exporter_out = self.exporter.export(sct_list=sorted_scts,
+                                                 instruction_list=self.instructionSet,
                                                  export_type=self.export_type)
         self.export_window.update_exports(self.exporter_out)
+
+    def on_export_window_destroy(self):
+        self.export_window.destroy()
 
     # Called when a file is selected
     def on_file_select(self):
@@ -224,7 +254,7 @@ class Application(tk.Tk):
         self.file_select = v.FileSelectView(self, self.file_select_last_selected, self.file_select_scalebar_pos,
                                             position, file_path, self.file_select_callbacks)
         self.file_select.populate_files(file_path)
-        t = Timer(0.01, self.set_file_select_scrollbar)
+        t = threading.Timer(0.01, self.set_file_select_scrollbar)
         t.start()
 
     def set_file_select_scrollbar(self):
@@ -418,16 +448,3 @@ class Settings:
 
     def get_script_dir(self):
         return self.settings['script_directory']
-
-
-class ScriptAnalysisThread(Thread):
-
-    def __init__(self, function, args):
-        super().__init__()
-        self.runnable = function
-        self.args = args
-
-    def run(self):
-        self.runnable(*self.args)
-
-

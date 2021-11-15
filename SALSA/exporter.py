@@ -8,7 +8,7 @@ class SCTExporter:
 
     export_options = {
         'Ship battle turn data': {
-            'scripts': '^me50.+sct$',
+            'scripts': '^me5.+sct$',
             'instructions': {
                 165: {
                     'turn bonus': [
