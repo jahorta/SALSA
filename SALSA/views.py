@@ -1435,7 +1435,7 @@ class ExporterView(tk.Toplevel):
             tab_text = w.ScrolledTextCanvas(tab_frame, size=self.size, text_offset=self.text_offset,
                                             text=v)
             tab_text.grid(row=0, column=0)
-            tab_button = tk.Button(tab_frame, text=f'Export {k}', command=lambda: self.send_to_clipboard(k))
+            tab_button = tk.Button(tab_frame, text='Export', command=self.send_to_clipboard)
             tab_button.grid(row=1, column=0)
 
         self.export_notebook.tkraise()
@@ -1447,7 +1447,8 @@ class ExporterView(tk.Toplevel):
             return
         self.callbacks['on_export'](export_type=export_type)
 
-    def send_to_clipboard(self, key):
+    def send_to_clipboard(self):
+        key = self.export_notebook.tab(self.export_notebook.select(), 'text')
         export = self.export_values[key]
         self.clipboard_clear()
         self.clipboard_append(export)
