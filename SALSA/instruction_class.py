@@ -153,10 +153,10 @@ class Instruct:
                 self.parameters.pop(ID)
 
     def get_param_names(self, param_list):
-        names = []
+        names = {}
         for param in self.parameters.values():
-            if param.paramID in param_list:
-                names.append(param.name)
+            if int(param.paramID) in param_list:
+                names[int(param.paramID)] = param.name
         return names
 
 

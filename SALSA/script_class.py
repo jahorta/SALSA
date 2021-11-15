@@ -1,6 +1,7 @@
 from SALSA.byte_array_utils import getTypeFromString, toInt, asStringOfType, toFloat
 import re
 
+
 class SCTAnalysis:
     start_pos = None
 
@@ -90,6 +91,31 @@ class SCTAnalysis:
 
     def set_inst_start(self, start):
         self.start_pos = start
+
+    def get_info_by_group(self, requested_group_list: dict):
+        groups = {}
+        requested_insts = []
+        for inst, group_dict in requested_group_list.items():
+            requested_insts.append(inst)
+            for group_name, param_list in group_dict.items():
+                if group_name not in groups.keys():
+                    groups[group_name] = {}
+
+        for sct in self.Sections.values():
+            i = 0
+            for inst in sct.instructions.values():
+                if not re.search('^0x[a-f,0-9]+$', inst.ID):
+                    continue
+                if int(inst.ID, 16) in requested_insts:
+                    for group_name, group in groups.items():
+                        group_params = inst.get_params(requested_group_list[int(inst.ID, 16)][group_name])
+                        if sct.name not in group.keys():
+                            group[sct.name] = {}
+                        group[sct.name][i] = group_params
+                    i += 1
+
+        return groups
+
 
 class SCTSection:
 
@@ -319,6 +345,14 @@ class SCTInstruct:
             inst_details['Param Tree'] = paramTree
 
         return inst_details
+
+    def get_params(self, param_list):
+        params = {}
+        for param in param_list:
+            params[param] = self.parameters[str(param)].result
+
+        return params
+
 
     def get_error_types(self):
         if self.hasSCPTerror:

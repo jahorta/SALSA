@@ -324,6 +324,7 @@ class NoText(ValidatedMixin, tk.Text):
             value = value[:-1]
         self.insert('1.0', value)
 
+
 class LabelInput(tk.Frame):
     """A widget containing a label and input together."""
 
@@ -425,7 +426,7 @@ class LabelInput(tk.Frame):
             self.input.config(state=args['state'])
 
 
-class HelpCanvas(tk.Frame):
+class ScrolledTextCanvas(tk.Frame):
 
     def __init__(self, parent, size: dict, text_offset: dict, text: str):
         super().__init__(parent)
@@ -440,3 +441,5 @@ class HelpCanvas(tk.Frame):
         help_canvas.configure(yscrollcommand=canvas_scrollbar.set)
         help_canvas.config(scrollregion=help_canvas.bbox("all"))
         canvas_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)

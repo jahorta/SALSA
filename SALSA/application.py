@@ -2,11 +2,15 @@ import copy
 import json
 import os
 import tkinter as tk
-from threading import Timer
+from math import floor
+from threading import Timer, Thread
 from tkinter import ttk, messagebox, filedialog
+from pathlib import Path
+import re
 
 from SALSA import views as v
 from SALSA.SALSA_strings import HelpStrings
+from SALSA.exporter import SCTExporter
 from SALSA.script_class import SCTAnalysis
 from SALSA.instruction_class import Instruct
 from SALSA.sct_model import SctModel
@@ -53,13 +57,12 @@ class Application(tk.Tk):
             'on_instruction_commit': self.on_instruction_commit,
             'on_select_parameter': self.on_select_parameter,
             'on_parameter_num_change': self.on_param_num_change
-            }
-
+        }
         self.menu_callbacks = {
             'file->script_dir': self.set_script_directory,
             'file->select': self.on_file_select,
             'file->quit': self.on_quit,
-            'file->export_data': self.on_data_export,
+            'file->export_data': self.on_create_export_window,
             'view->sct': self.on_move_to_sct,
             'view->inst': self.on_move_to_inst,
             'help->debug': self.on_print_debug,
@@ -68,7 +71,6 @@ class Application(tk.Tk):
             'help->instruction': self.on_help_inst,
             'help->notes': self.on_help_notes
         }
-
         self.file_select_callbacks = {
             'on_quit': self.file_select_on_quit,
             'on_load': self.on_move_to_sct
@@ -82,6 +84,10 @@ class Application(tk.Tk):
             'on_select_script': self.on_select_script,
             'on_select_script_instruction': self.on_select_script_instruction,
             'on_set_inst_start': self.on_set_inst_start
+        }
+        self.exporter_callbacks = {
+            'on_export': self.on_data_export,
+            'on_close': self.about_window_close
         }
 
         # Initialize popup window variables
@@ -118,6 +124,13 @@ class Application(tk.Tk):
         # print(self.geometry())
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
+
+        # initializing exporter
+        self.export_window = None
+        self.exporter = SCTExporter()
+        self.exporter_out: dict = {}
+        self.scriptAnalyses = []
+        self.export_type = ''
 
     def on_select_instruction(self, newID):
         """Save the current instruction details to the current Instruction object"""
@@ -156,15 +169,53 @@ class Application(tk.Tk):
         self.instModel.save_instructions(currentInsts)
         self.storedInstructionSet = self.instModel.load_instructions()
 
+    def on_create_export_window(self):
+        self.exporter = SCTExporter()
+        self.exporter_out: dict = {}
+        self.scriptAnalyses = []
+        self.export_type = ''
+        position = {'x': self.winfo_x(), 'y': self.winfo_y()}
+        self.export_window = v.ExporterView(parent=self, title='Export',
+                                            export_fields=self.exporter.get_export_fields(), position=position,
+                                            callbacks=self.exporter_callbacks)
+
     # Called when asked to export data
-    def on_data_export(self):
-        # TODO - open view to ask what to export
+    def on_data_export(self, export_type='Ship battle turn data'):
+        relevant_script_regex = self.exporter.get_export_scripts(export_type)
         # TODO - create SCT objects for all relevant scripts
-        # TODO - pass to exporter object
-        pass
+        script_name_list = []
+        script_paths = Path(self.script_dir).glob('**/*')
+        for path in script_paths:
+            if re.search(relevant_script_regex, path.name):
+                script_name_list.append(path.name)
+        self.export_type = export_type
+        for i, script in enumerate(script_name_list):
+            args = [i, script, script_name_list]
+            scriptThread = ScriptAnalysisThread(function=self.perform_script_analysis, args=args)
+            scriptThread.run()
+
+    def perform_script_analysis(self, script_index, script, script_name_list):
+        script_num = len(script_name_list)
+        i = script_index
+        sct = script_name_list[i]
+        new_sct_analysis = SCTAnalysis(self.sctModel.load_sct(insts=self.instructionSet, file=sct))
+        print(f'{sct} analyzed: {i + 1}/{script_num}')
+        self.after(100, self.add_analysis_to_export(new_sct_analysis, script_num))
+
+    def add_analysis_to_export(self, sctAnalysis, script_num):
+        self.scriptAnalyses.append(sctAnalysis)
+        scripts_done = len(self.scriptAnalyses)
+        progress = floor(((scripts_done + 1) / script_num) * 100)
+        self.export_window.update_progress(progress, f'{sctAnalysis.Name} analyzed: {scripts_done + 1}/{script_num}')
+        if scripts_done == script_num:
+            self.after(100, self.export_data)
+
+    def export_data(self):
+        self.exporter_out = self.exporter.export(sct_list=self.scriptAnalyses, instruction_list=self.instructionSet,
+                                                 export_type=self.export_type)
+        self.export_window.update_exports(self.exporter_out)
 
     # Called when a file is selected
-
     def on_file_select(self):
         """Initialize the file select window"""
         file_path = self.script_dir
@@ -320,7 +371,8 @@ class Application(tk.Tk):
     def show_help(self):
         position = {'x': self.winfo_x(), 'y': self.winfo_y()}
         self.help_window = v.TabbedHelpPopupView(self, 'Help', self.help.get_all(),
-                                           position, self.about_window_callbacks)
+                                                 position, self.about_window_callbacks)
+
 
 class Settings:
     filename = './Lib/settings.json'
@@ -366,5 +418,16 @@ class Settings:
 
     def get_script_dir(self):
         return self.settings['script_directory']
+
+
+class ScriptAnalysisThread(Thread):
+
+    def __init__(self, function, args):
+        super().__init__()
+        self.runnable = function
+        self.args = args
+
+    def run(self):
+        self.runnable(*self.args)
 
 
