@@ -822,6 +822,8 @@ class ScriptView(tk.Frame):
         self.instruction_code.grid(row=1, column=0)
         self.instruction_name = tk.Label(instructionDetails, text='Instruction Name:')
         self.instruction_name.grid(row=2, column=0)
+        self.instruction_location = tk.Label(instructionDetails, text='Instruction Location:')
+        self.instruction_location.grid(row=3, column=0)
 
         instructionDescription = tk.Frame(instructionDetails)
         self.instruction_description_label = tk.Label(instructionDescription, text="Description")
@@ -1146,6 +1148,7 @@ class ScriptView(tk.Frame):
             'string': '',
             'label-ID': 'Instruction Code:',
             'label-Name': 'Instruction Name:',
+            'label-Location': 'Instruction Location',
             'text': '\n'
         }
 
@@ -1156,6 +1159,7 @@ class ScriptView(tk.Frame):
             self.instruction_decoded.config(text=reset_values['string'])
             self.instruction_code.config(text=reset_values['label-ID'])
             self.instruction_name.config(text=reset_values['label-Name'])
+            self.instruction_location.config(text=reset_values['label-Location'])
 
             self.instruction_description.delete('1.0', tk.END)
             value = reset_values['text']
@@ -1184,11 +1188,13 @@ class ScriptView(tk.Frame):
 
             if decoded in ('This Instruction is Decoded', 'This String is Decoded'):
                 name = 'Instruction Name: {}'.format(details['Name']),
+                location = 'Instruction Location: {}'.format(details['Location'])
                 description = details['Description']
                 # print(description)
                 errors = details['Errors']
                 params = details['Param Tree']
                 self.instruction_name.config(text=name)
+                self.instruction_location.config(text=location)
 
                 self.instruction_description.delete('1.0', tk.END)
                 value = description

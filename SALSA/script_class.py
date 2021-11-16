@@ -5,6 +5,11 @@ import re
 class SCTAnalysis:
     start_pos = None
 
+    special_addresses = {
+        'bit': '0x80310bc',
+        'byte': '0x80310a1c'
+    }
+
     def __init__(self, sct_dict):
         self.Name = sct_dict['Name']
         self.Header = list(sct_dict['Header'].values())
@@ -56,11 +61,11 @@ class SCTAnalysis:
 
     def generate_links(self):
         section_links = {}
-        for key, value in self.Sections.items():
-            tempLinks = value.get_links()
+        for key, section in self.Sections.items():
+            tempLinks = section.get_links()
             if not len(tempLinks) == 0:
                 section_links[key] = tempLinks
-        self.Links = link_results = {}
+        link_results = {}
         for sect_key, sect_link in section_links.items():
             for inst_key, inst_link in sect_link.items():
                 for key, link in inst_link.items():
@@ -73,26 +78,28 @@ class SCTAnalysis:
                         prev_sect = label
                     target_sect = prev_sect
                     # if target_sect == 'Footer44':
-                        # print('stop here')
+                    # print('stop here')
                     if target_pos > self.TotalLength:
                         target_inst_link_info = 'Unable to find link target: target beyond file size'
                     elif target_sect[:6] == "Footer":
                         footer_index = target_sect[6:]
                         target_inst_link_info = 'Links to {0}: {1}'.format(target_sect, self.Footer[int(footer_index)])
                     else:
-                        target_inst_link_info = self.Sections[target_sect].get_instruction_link_info_by_position(target_pos)
+                        target_inst_link_info = self.Sections[target_sect].get_instruction_link_info_by_position(
+                            target_pos)
                     if sect_key not in link_results.keys():
                         link_results[sect_key] = {}
                     if inst_key not in link_results[sect_key].keys():
                         link_results[sect_key][inst_key] = {}
                     link_results[sect_key][inst_key][key] = target_inst_link_info
+        self.Links = link_results
         for key, value in link_results.items():
             self.Sections[key].set_links(value)
 
     def set_inst_start(self, start):
         self.start_pos = start
 
-    def get_info_by_group(self, requested_group_list: dict):
+    def get_params_by_group(self, requested_group_list: dict):
         groups = {}
         requested_insts = []
         for inst, group_dict in requested_group_list.items():
@@ -116,9 +123,23 @@ class SCTAnalysis:
 
         return groups
 
+    def get_script_flow(self, subscripts, important_instructions):
+        # TODO - Get all control bytes and any bytes related to instructions
+            # TODO - check for instruction 155 (choice), and there should be either a switch or jump after it,
+                # TODO - create variable to pair the decision to the choice
+            # TODO - create a flag to detect whether the bit or byte is set within the script
+        # TODO - Make a list of everywhere those bytes are written to
+        # TODO - Starting at init and loop, make a list of root nodes - those subscripts which are not referenced by any other subscripts
+        # TODO -
+        # TODO - Prune the list of subscript trees to those which contain the requested subscripts
+        # TODO - Go through init first and check flow
+        # TODO - Then follow loop and create flows for each
+            # TODO - for those bits and bytes that are set within the script, determine whether they are set first or read first
+
+        pass
+
 
 class SCTSection:
-
     decision_instruction_IDs = (
         0, 3, 5, 6, 7, 10, 11, 12, 17, 18, 19, 43, 144, 155
     )
@@ -209,8 +230,8 @@ class SCTSection:
 
     def get_links(self):
         inst_links = {}
-        for key, value in self.instructions.items():
-            tempLinks = value.get_links()
+        for key, inst in self.instructions.items():
+            tempLinks = inst.get_links()
             if tempLinks is not None:
                 inst_links[key] = tempLinks
         return inst_links
@@ -259,6 +280,7 @@ class SCTInstruct:
             self.ID = inst_dict['data']['word']
         else:
             self.ID = hex(int(inst_dict['instruction']))
+            self.Location = inst_dict['location']
             # if self.ID == '0x87':
             #     print('stop here')
             self.name = inst_dict['name']
@@ -337,6 +359,7 @@ class SCTInstruct:
         else:
             inst_details['Name'] = self.name
             inst_details['Decoded'] = 'This Instruction is Decoded'
+            inst_details['Location'] = self.Location
             inst_details['Description'] = self.description
             inst_details['Errors'] = '{}'.format('{0}: {1}\n'.join(self.errors.keys()).join(self.errors.values()))
             paramTree = {}
@@ -352,7 +375,6 @@ class SCTInstruct:
             params[param] = self.parameters[str(param)].result
 
         return params
-
 
     def get_error_types(self):
         if self.hasSCPTerror:
@@ -383,8 +405,8 @@ class SCTInstruct:
             if currentCode in self.desc_codes:
                 tempCommand = currentSubstring.split(' ')[0]
                 closeBrackets = tempCommand.rfind(']*')
-                currentCommand = currentSubstring[:closeBrackets+2]
-                currentSubstring = currentSubstring[closeBrackets+2:]
+                currentCommand = currentSubstring[:closeBrackets + 2]
+                currentSubstring = currentSubstring[closeBrackets + 2:]
                 result = self.run_desc_func(currentCommand)
                 new_desc += '{} '.format(result)
             else:
@@ -518,7 +540,7 @@ class SCTParam:
             self.result = 'Unknown result'
 
         elif 'loop' in self.type:
-            self.result ='Loop:'
+            self.result = 'Loop:'
             self.loopBypass = False
 
             # TODO-Read loop bypass
@@ -594,7 +616,7 @@ class SCTParam:
             if badList:
                 self.result = '\n Bad Switch, probably a parameter instead \n '
 
-            self.idx[-1] = self.switchLimit-1
+            self.idx[-1] = self.switchLimit - 1
             resultEntries = {}
 
             for i in range(len(self.idx)):
