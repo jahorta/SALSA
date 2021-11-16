@@ -834,11 +834,11 @@ class ScriptView(tk.Frame):
                                                             command=self.instruction_description.yview)
         self.instruction_description.configure(yscrollcommand=self.instruction_description_scroll.set)
         self.instruction_description_scroll.grid(row=1, column=1, sticky='NSEW')
-        instructionDescription.grid(row=3, column=0, sticky='NSEW')
+        instructionDescription.grid(row=4, column=0, sticky='NSEW')
         instructionDescription.grid_columnconfigure(0, weight=1)
 
         self.instruction_parameter_tree_label = tk.Label(instructionDetails, text="Parameters")
-        self.instruction_parameter_tree_label.grid(row=4, column=0, sticky=tk.W)
+        self.instruction_parameter_tree_label.grid(row=5, column=0, sticky=tk.W)
 
         """Parameter Tree Fields"""
         parameterTree = tk.Frame(instructionDetails)
@@ -863,7 +863,7 @@ class ScriptView(tk.Frame):
                                                    command=self.parameter_tree.yview)
         self.parameter_tree.configure(yscrollcommand=self.parameter_tree_scroll.set)
         self.parameter_tree_scroll.grid(row=0, column=1, sticky='NSEW')
-        parameterTree.grid(row=5, column=0, sticky='NSEW')
+        parameterTree.grid(row=6, column=0, sticky='NSEW')
 
         instructionError = tk.Frame(instructionDetails)
         self.instruction_error_label = tk.Label(instructionError, text='Errors')
@@ -874,7 +874,7 @@ class ScriptView(tk.Frame):
                                                       command=self.instruction_error_text.yview)
         self.instruction_error_text.configure(yscrollcommand=self.instruction_error_scroll.set)
         self.instruction_error_scroll.grid(row=1, column=1, sticky='NSEW')
-        instructionError.grid(row=6, column=0, sticky='NSEW')
+        instructionError.grid(row=7, column=0, sticky='NSEW')
         instructionError.grid_columnconfigure(0, weight=1)
 
         instructionDetails.grid(row=0, column=2, sticky='NSEW')
@@ -1148,7 +1148,7 @@ class ScriptView(tk.Frame):
             'string': '',
             'label-ID': 'Instruction Code:',
             'label-Name': 'Instruction Name:',
-            'label-Location': 'Instruction Location',
+            'label-Location': 'Instruction Location:',
             'text': '\n'
         }
 

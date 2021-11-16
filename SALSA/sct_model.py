@@ -73,7 +73,7 @@ class SctModel:
 
     def __init__(self, path=None):
         self.instructionNum = 0
-        self.implementedInstructions = {}
+        self.instructions = {}
         self.implementedInstKeys = []
         self.cursor = 0
         self.indexed_sct = {}
@@ -85,12 +85,11 @@ class SctModel:
 
     def load_sct(self, insts, file: str):
         self.instructionNum = len(insts)
-        self.implementedInstructions = {}
+        self.instructions = insts
         self.implementedInstKeys = []
-        for i in range(0, self.instructionNum):
-            if insts[str(i)].implement:
-                self.implementedInstructions[str(i)] = insts[str(i)]
-                self.implementedInstKeys.append(str(i))
+        for inst in self.instructions.values():
+            if inst.implement:
+                self.implementedInstKeys.append(str(int(inst.instID)))
         out = self.__read_sct_file(file)
         if out is None:
             return None
@@ -293,7 +292,8 @@ class SctModel:
             if currWord == '0x0a000000':
                 insts[str(self.cursor)] = {'decoded': False,
                                            'data': {'word': 'Skip 2', 'length': 2},
-                                           'string': '', 'start location': str(sct_start_pos + (self.cursor * 4))}
+                                           'string': '', 'start location': str(sct_start_pos + (self.cursor * 4)),
+                                           'function': 'None'}
                 self.cursor += 1
 
             # Since 0x04000000 is reserved for SCPTAnalyze more or less, capture any instructions following this code as SCPT parameters
@@ -328,7 +328,8 @@ class SctModel:
                 insts[str(startPos)] = {'decoded': False,
                                         'data': {'word': 'SCPT Parameter', 'length': (self.cursor - startPos)},
                                         'string': '', 'errors': errors,
-                                        'start location': str(sct_start_pos + (self.cursor * 4))}
+                                        'start location': str(sct_start_pos + (self.cursor * 4)),
+                                        'function': 'None'}
 
             # if the current word is not within the instruction number, set a false instruction using the current word
             elif currWord_int >= self.instructionNum or currWord_int < 0:
@@ -336,7 +337,8 @@ class SctModel:
                     print('next instruction: {}'.format(self.cursor))
                     scptErr = False
                 insts[str(self.cursor)] = {'decoded': False, 'data': {'word': currWord, 'length': 1}, 'string': False,
-                                           'start location': str(sct_start_pos + (self.cursor * 4))}
+                                           'start location': str(sct_start_pos + (self.cursor * 4)),
+                                           'function': 'none'}
 
             # if the current word is a valid instruction, resolve said instruction
             else:
@@ -359,12 +361,13 @@ class SctModel:
 
     def __decode_instruction(self, sct, inst, scptErr, sct_start_pos):
         instDict = {}
-        if not str(int(inst, 16)) in self.implementedInstructions.keys():
+        if not str(int(inst, 16)) in self.implementedInstKeys:
             if self.overwriteCheck and scptErr:
                 print('next instruction: {}'.format(self.cursor))
                 scptErr = False
             instDict[str(self.cursor)] = {'decoded': False, 'data': {'word': inst, 'length': 1},
-                                          'start location': str(sct_start_pos + (self.cursor * 4))}
+                                          'start location': str(sct_start_pos + (self.cursor * 4)),
+                                          'function': self.instructions[str(int(inst, 16))].location}
         else:
             inst_loc_str = str(sct_start_pos + (self.cursor * 4))
             inst_start_cursor = str(self.cursor)
@@ -372,11 +375,12 @@ class SctModel:
                 print('next instruction: {}'.format(inst_loc_str))
                 scptErr = False
                 self.overwriteCheck = False
-            inst = self.implementedInstructions[str(int(inst, 16))]
+            inst = self.instructions[str(int(inst, 16))]
             paramNum = inst.get_attribute('param num')
             instDict[inst_start_cursor] = {'decoded': True, 'instruction': inst.instID, 'name': inst.name,
                                            'description': inst.description, 'start location': inst_loc_str,
-                                           'param num': paramNum}
+                                           'param num': paramNum,
+                                           'function': inst.location}
 
             # decode parameters
             parameters = inst.get_attribute('params')

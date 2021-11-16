@@ -280,7 +280,9 @@ class SCTInstruct:
             self.ID = inst_dict['data']['word']
         else:
             self.ID = hex(int(inst_dict['instruction']))
-            self.Location = inst_dict['location']
+            if 'function' not in inst_dict.keys():
+                print('pause here')
+            self.Function = inst_dict['function']
             # if self.ID == '0x87':
             #     print('stop here')
             self.name = inst_dict['name']
@@ -359,7 +361,7 @@ class SCTInstruct:
         else:
             inst_details['Name'] = self.name
             inst_details['Decoded'] = 'This Instruction is Decoded'
-            inst_details['Location'] = self.Location
+            inst_details['Location'] = self.Function
             inst_details['Description'] = self.description
             inst_details['Errors'] = '{}'.format('{0}: {1}\n'.join(self.errors.keys()).join(self.errors.values()))
             paramTree = {}
