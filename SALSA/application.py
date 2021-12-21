@@ -213,6 +213,8 @@ class Application(tk.Tk):
     def export_data(self):
         self.exporter_out = self.exporter.export(sct_list=self.scriptAnalyses, instruction_list=self.instructionSet,
                                                  export_type=self.export_type)
+
+        # Update Exports expects a dictionary of strings. The key becomes the tab name and the string is csv format
         self.export_window.update_exports(self.exporter_out)
 
     # Called when a file is selected
@@ -359,8 +361,11 @@ class Application(tk.Tk):
         self.help_window = v.HelpPopupView(self, 'Other Notes', HelpStrings.other_notes,
                                            position, self.about_window_callbacks)
 
-    def about_window_close(self):
-        self.help_window.destroy()
+    def about_window_close(self, window):
+        if window == 'help':
+            self.help_window.destroy()
+        elif window == 'export':
+            self.export_window.destroy()
 
     def set_script_directory(self):
         dir = tk.filedialog.askdirectory()

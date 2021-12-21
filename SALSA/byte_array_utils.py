@@ -136,22 +136,23 @@ def toInt(string: str):
     """Converts either hex, float, or int string into an int. Performs 'Floor' on floats"""
     if isinstance(string, int):
         return string
+    if not isinstance(string, str):
+        string = str(string)
     if re.search('^0x', string):
         return int(string, 16)
     elif string.find('.') > -1:
         string = string[:string.find('.')]
-    if string == '\n(1)+(':
-        print('pause here')
     return int(string)
+
 
 def toFloat(string: str):
     """Converts either hex, float, or int string into an int. Performs 'Floor' on floats"""
     if isinstance(string, float):
         return string
+    if not isinstance(string, str):
+        string = str(string)
     if re.search('^0x', string):
         return int(string, 16)
-    if string == '\n(1)+(':
-        print('pause here')
     return float(string)
 
 

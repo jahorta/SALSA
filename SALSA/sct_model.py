@@ -402,16 +402,16 @@ class SctModel:
 
                 if 'switch' in paramType:
                     currentParam = parameters[str(currentParamIndex)]
-                    resultDict = self.__decode_switch_param(currentParam, paramResults, sct)
+                    resultDict = self._decode_switch_param(currentParam, paramResults, sct)
                     result['type'] = 'switch'
 
                 elif 'loop' in paramType:
-                    resultDict = self.__decode_param_loop(paramType, paramResults, parameters, currentParamIndex, sct)
+                    resultDict = self._decode_loop_param(paramType, paramResults, parameters, currentParamIndex, sct)
                     result['type'] = 'loop'
 
                 else:
                     currentParam = parameters[str(currentParamIndex)]
-                    resultDict = self.__decode_param(paramType, currentParam, sct)
+                    resultDict = self._decode_param(paramType, currentParam, sct)
                     result['type'] = resultDict['type']
 
                 # Error checking
@@ -441,7 +441,7 @@ class SctModel:
             instDict[inst_start_cursor]['parameters'] = paramResults
         return instDict
 
-    def __decode_switch_param(self, currentParam, paramResults, sct_bytes):
+    def _decode_switch_param(self, currentParam, paramResults, sct_bytes):
 
         entryNumParamID = currentParam.iterationID
         entryLimit = paramResults[entryNumParamID]['result']['result']
@@ -485,7 +485,7 @@ class SctModel:
         switch['Entries'] = switchEntries
         return switch
 
-    def __decode_param_loop(self, paramType, paramResults, params, currentParamNum, sct):
+    def _decode_loop_param(self, paramType, paramResults, params, currentParamNum, sct):
         loopDict = {}
         bypass = False
         loopDict['paramSkipNum'] = 0
@@ -546,7 +546,7 @@ class SctModel:
             for ID in loopParams:
                 param = params[str(ID)]
                 paramType = param.type
-                paramResult = self.__decode_param(paramType, param, sct)
+                paramResult = self._decode_param(paramType, param, sct)
                 loopDict['loop'][str(i)][ID] = {}
                 loopDict['loop'][str(i)][ID]['type'] = paramType
                 loopDict['loop'][str(i)][ID]['result'] = paramResult
@@ -556,7 +556,7 @@ class SctModel:
 
         return loopDict
 
-    def __decode_param(self, paramType: str, currentParam, sct_bytes):
+    def _decode_param(self, paramType: str, currentParam, sct_bytes):
         paramDict = {}
         if 'scpt' in paramType:
             overrideCompare = []
@@ -581,7 +581,7 @@ class SctModel:
                 paramDict['type'] = 'override-SCPT'
                 paramDict['result'] = overrideResult
                 return paramDict
-            paramDict['result'] = self.__SCPT_analyze(currentParam.paramID, sct_bytes)
+            paramDict['result'] = self._SCPT_analyze(currentParam.paramID, sct_bytes)
             paramDict['type'] = 'SCPT'
             if 'error' in paramDict['result'].keys():
                 paramDict['error'] = 'SCPTanalyze did not finish before next sct section param {}'.format(
@@ -608,7 +608,7 @@ class SctModel:
 
         return paramDict
 
-    def __SCPT_analyze(self, paramID, sct_bytes):
+    def _SCPT_analyze(self, paramID, sct_bytes):
         """
         This interprets an SCPTAnalyze section. Mostly implemented, missing the local_ca check.
         :param paramID:
@@ -653,10 +653,10 @@ class SctModel:
         ]
 
         input_cutoffs = {
-            '0x50000000': 'word: *add[0x8030e3e4,',
-            '0x40000000': 'word: *add[0x803e514,',
-            '0x20000000': 'starting from 80310b3c, bit ',
-            '0x10000000': 'byte: *add[0x80310a1c,',
+            '0x50000000': 'Word: *add[0x8030e3e4,',
+            '0x40000000': 'Word: *add[0x803e514,',
+            '0x20000000': 'starting from 80310b3c, Bit: ',
+            '0x10000000': 'Byte: *add[0x80310a1c,',
             '0x08000000': 'decimal: ',
             '0x04000000': 'float: ',
         }
@@ -699,13 +699,13 @@ class SctModel:
 
             # Make sure that the SCPT Stack wouldn't overflow
             if result_stack_index >= result_stack_max:
-                scpt_result['{0}{1}'.format(param_key, roundNum)] = 'SCPT Stack overflow: {}'.format(currentWord)
+                scpt_result[f'{param_key}{roundNum}'] = 'SCPT Stack overflow: {}'.format(currentWord)
                 break
 
             # Check for end of the SCPT Analysis loop
             if currentWord == '0x0000001d':
                 done = True
-                scpt_result['{0}{1}'.format(param_key, roundNum)] = 'return values (0x1d)'
+                scpt_result[f'{param_key}{roundNum}'] = 'return values (0x1d)'
                 break
 
             # Test for values between the highest compare code and the prefix for a float
@@ -738,7 +738,6 @@ class SctModel:
                 else:
                     result_stack[result_stack_index] = currentResult
                 result_stack_index -= 1
-
 
             # If not, current action is to input a value
             else:

@@ -1363,7 +1363,7 @@ class TabbedHelpPopupView(tk.Toplevel):
             notebook.add(tab_frame)
             notebook.tab(i, text=k)
 
-        self.quit = tk.Button(self, text='Cancel', command=self.callbacks['on_close'])
+        self.quit = tk.Button(self, text='Cancel', command=lambda: self.callbacks['on_close'](window='help'))
         self.quit.grid(row=1, column=0)
         self.title(title)
         self.resizable(width=False, height=False)
@@ -1406,7 +1406,7 @@ class ExporterView(tk.Toplevel):
         button_extract_data = tk.Button(self.export_frame, text='Extract Data', command=self.export_selected_data)
         button_extract_data.grid(row=1, column=0)
 
-        self.quit = tk.Button(self, text='Cancel', command=self.callbacks['on_close'])
+        self.quit = tk.Button(self, text='Cancel', command=lambda: self.callbacks['on_close'](window='export'))
         self.quit.grid(row=1, column=0)
         progress_frame = tk.LabelFrame(self, text='Progress')
         progress_frame.grid(row=2, column=0)
