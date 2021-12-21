@@ -70,7 +70,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me547.+sct$',
+                'scripts': '^me500.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -563,146 +563,82 @@ class ScriptPerformer:
         inst = current_sub[inst_pos]
         fallthrough_done = False
         done = False
-        prev_is_choice = False
+        force_branch = False
         force_jump = False
         increment_pointer = True
         hit_requested = False
+        modify = False
         while not done:
             # print(f'current position: {name}:{current_pointer}')
             if 'set' in inst:
                 cur_ram = self._set_memory_pos(inst['set'], cur_ram)
                 self.open_branch_segments[branch_index]['cur_ram'] = cur_ram
+
             elif 'loop' in inst:
                 force_jump = True
                 inst_pos = inst['loop']
                 current_pointer = self._get_ptr(pos=inst_pos, pos_list=current_sub['pos_list'])
                 increment_pointer = False
+
             elif 'goto' in inst:
                 inst_pos = inst['goto']
                 current_pointer = self._get_ptr(pos=inst_pos, pos_list=current_sub['pos_list'])
                 increment_pointer = False
+
             elif 'jumpif' in inst or 'subscript_jumpif' in inst:
                 jump_dict = {'children': {}, 'subscript': current_sub, 'pos': inst_pos}
                 if 'jumpif' in inst:
                     jump_condition = inst['jumpif']['condition']
+                    next_name = name
+                    inst_pos = inst['jumpif']['location']
+                    inst_ptr = self._get_ptr(inst_pos, subscripts[next_name]['pos_list'])
+                    ptrs = [{'name': next_name, 'ptr': inst_ptr}]
                 else:
                     jump_condition = inst['subscript_jumpif']['condition']
+                    next_name = inst['subscript_jumpif']['next']
+                    inst_pos = inst['subscript_jumpif']['location']
+                    inst_ptr = self._get_ptr(inst_pos, subscripts[next_name]['pos_list'])
+                    ptrs = copy.deepcopy(traceback)
+                    ptrs[cur_trace_id]['ptr'] += 1
+                    ptrs.append({'name': next_name, 'ptr': inst_ptr})
+
                 jump_dict['condition'] = jump_condition
 
-                if force_jump:
-                    jump_dict['jumped'] = True
-                    updated_branch = self._branch_append_node(
-                        branch=copy.deepcopy(self.open_branch_segments[branch_index]),
-                        node_key='jumpif', node_value=jump_dict, modify=prev_is_choice)
-                    prev_is_choice = False
-                    self.open_branch_segments[branch_index] = updated_branch
-                    if 'subscript_jumpif' in inst:
-                        next_name = inst['subscript_jumpif']['next']
-                        inst_pos = inst['subscript_jumpif']['location']
-                        inst_ptr = self._get_ptr(pos=inst_pos, pos_list=subscripts[next_name]['pos_list'])
-                        new_ptrs = [*traceback, {'name': next_name, 'ptr': inst_ptr}]
-                        new_ptrs[cur_trace_id]['ptr'] += 1
-                        pre_ram = copy.deepcopy(cur_ram)
-                        hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts,
-                                                                   ram=copy.deepcopy(cur_ram), branch_index=branch_index,
-                                                                   ptrs=new_ptrs, depth=depth+1)
+                can_jump = self._can_jump(jump_condition, copy.deepcopy(cur_ram))
+                if can_jump or force_branch:
+                    should_jump = self._should_not_jump(compare=jump_condition, ram=cur_ram, isBase=True)
+                else:
+                    should_jump = False
 
-                        new_branch_ram = copy.deepcopy(self.open_branch_segments[branch_index]['cur_ram'])
-                        if not hit_requested:
-                            if self._variables_are_equal_recursive(pre_ram, new_branch_ram):
-                                self.false_branches.append(branch_index)
+                new_branch_index = len(self.open_branch_segments)
+                jump_dict['jumped'] = True
+                updated_branch = self._branch_append_node(
+                    branch=copy.deepcopy(self.open_branch_segments[branch_index]),
+                    node_key='jumpif', node_value=copy.deepcopy(jump_dict),
+                    modify=modify)
+                self.open_branch_segments.append(updated_branch)
+                pre_ram = copy.deepcopy(cur_ram)
+                use_ptrs = copy.deepcopy(ptrs)
+                hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts,
+                                                           ram=pre_ram, ptrs=copy.deepcopy(ptrs),
+                                                           branch_index=new_branch_index, depth=depth + 1)
+                new_branch_ram = copy.deepcopy(self.open_branch_segments[new_branch_index]['cur_ram'])
 
-                        force_jump = False
-                        done = True
-                    else:
-                        inst_pos = inst['jumpif']['location']
-                        current_pointer = self._get_ptr(pos=inst_pos, pos_list=current_sub['pos_list'])
-                        increment_pointer = False
+                if not hit_requested:
+                    if self._variables_are_equal_recursive(pre_ram, new_branch_ram):
+                        self.false_branches.append(new_branch_index)
 
-                elif not self._can_jump(jump_condition, copy.deepcopy(cur_ram)) or prev_is_choice:
-
-                    if 'subscript_jumpif' in inst:
-                        next_name = inst['subscript_jumpif']['next']
-                        inst_pos = inst['subscript_jumpif']['location']
-                        inst_ptr = self._get_ptr(inst_pos, subscripts[next_name]['pos_list'])
-                        ptrs = copy.deepcopy(traceback)
-                        ptrs[cur_trace_id]['ptr'] += 1
-                        ptrs.append({'name': next_name, 'ptr': inst_ptr})
-                    else:
-                        next_name = name
-                        inst_pos = inst['jumpif']['location']
-                        inst_ptr = self._get_ptr(inst_pos, subscripts[next_name]['pos_list'])
-                        ptrs = [{'name': next_name, 'ptr': inst_ptr}]
-
-                    new_branch_index = len(self.open_branch_segments)
-                    jump_dict['jumped'] = True
-                    updated_branch = self._branch_append_node(
-                        branch=copy.deepcopy(self.open_branch_segments[branch_index]),
-                        node_key='jumpif', node_value=copy.deepcopy(jump_dict),
-                        modify=prev_is_choice)
-                    self.open_branch_segments.append(updated_branch)
-                    pre_ram = copy.deepcopy(cur_ram)
-                    use_ptrs = copy.deepcopy(ptrs)
-                    hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts,
-                                                               ram=pre_ram, ptrs=copy.deepcopy(ptrs),
-                                                               branch_index=new_branch_index, depth=depth+1)
-                    new_branch_ram = copy.deepcopy(self.open_branch_segments[new_branch_index]['cur_ram'])
-
-                    if not hit_requested:
-                        if self._variables_are_equal_recursive(pre_ram, new_branch_ram):
-                            self.false_branches.append(new_branch_index)
-
-
-                    # if self.debug_verbose:
-                    #     if 'colorama' in sys.modules:
-                    #         suffix = f'{col.Fore.LIGHTBLACK_EX}requested:{hit_requested}{col.Fore.RESET}'
-                    #     else:
-                    #         suffix = f'req:{hit_requested}'
-                    #     print(f'{tabs}\t<-- {suffix}')
-
+                if force_jump or should_jump:
+                    done = True
+                    force_jump = False
+                else:
                     jump_dict['jumped'] = False
                     updated_branch = self._branch_append_node(
                         branch=copy.deepcopy(self.open_branch_segments[branch_index]),
                         node_key='jumpif', node_value=copy.deepcopy(jump_dict),
-                        modify=prev_is_choice)
+                        modify=modify)
                     self.open_branch_segments[branch_index] = updated_branch
-                    prev_is_choice = False
-
-                else:
-                    if not self._should_not_jump(compare=jump_condition, ram=cur_ram, isBase=True):
-                        jump_dict['jumped'] = True
-                        updated_branch = self._branch_append_node(
-                            branch=copy.deepcopy(self.open_branch_segments[branch_index]),
-                            node_key='jumpif', node_value=jump_dict)
-                        self.open_branch_segments[branch_index] = updated_branch
-                        if 'subscript_jumpif' in inst:
-                            next_name = inst['subscript_jumpif']['next']
-                            inst_pos = inst['subscript_jumpif']['location']
-                            inst_ptr = self._get_ptr(inst_pos, subscripts[next_name]['pos_list'])
-                            next_ptrs = [{'name': next_name, 'ptr': inst_ptr}]
-                            hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts,
-                                                                       ram=copy.deepcopy(cur_ram), ptrs=next_ptrs,
-                                                                       branch_index=branch_index,
-                                                                       traceback=copy.deepcopy(traceback), depth=depth+1)
-
-                            # if self.debug_verbose:
-                            #     if 'colorama' in sys.modules:
-                            #         suffix = f'{col.Fore.LIGHTBLACK_EX}requested:{hit_requested}{col.Fore.RESET}'
-                            #     else:
-                            #         suffix = f'req:{hit_requested}'
-                            #     print(f'{tabs}\t<-- {suffix}')
-
-                            done = True
-                        else:
-                            inst_pos = inst['jumpif']['location']
-                            current_pointer = self._get_ptr(pos=inst_pos, pos_list=current_sub['pos_list'])
-                            increment_pointer = False
-                    else:
-                        jump_dict['jumped'] = False
-                        updated_branch = self._branch_append_node(
-                            branch=copy.deepcopy(self.open_branch_segments[branch_index]),
-                            node_key='jumpif', node_value=copy.deepcopy(jump_dict))
-                        self.open_branch_segments[branch_index] = updated_branch
+                    force_branch = False
 
             elif 'requested' in inst:
                 # if inst_pos == 67:
@@ -749,7 +685,7 @@ class ScriptPerformer:
 
             elif 'switch' in inst:
                 switch_all = False
-                if prev_is_choice:
+                if force_branch:
                     switch_all = True
 
                 # check for switch in list of switches, add switch to list if not present
@@ -760,7 +696,7 @@ class ScriptPerformer:
                 # if memory addr has numerical value follow switch, add option: 'internal'
                 switch_addr = inst['switch']['condition']
                 switch_entries = inst['switch']['entries']
-                if self._can_switch(addr=switch_addr, ram=cur_ram) and not prev_is_choice:
+                if self._can_switch(addr=switch_addr, ram=cur_ram) and not force_branch:
                     increment_pointer = False
                     switch_addr_value = self._get_memory_pos(switch_addr, ram, 'control')
                     if switch_addr_value in switch_entries:
@@ -800,7 +736,7 @@ class ScriptPerformer:
                                        'selected_entry': key, 'next_inst_ptr': inst_ptr,
                                        'next_inst_pos': current_sub['pos_list'][inst_ptr], 'children': {}}
                         new_branch = self._branch_append_node(branch=copy.deepcopy(prev_branch), node_key='switch',
-                                                              node_value=switch_dict, modify=prev_is_choice)
+                                                              node_value=switch_dict, modify=modify)
                         new_branch_index = len(self.open_branch_segments)
                         self.open_branch_segments.append(new_branch)
                         hit_requested = self._run_subscript_branch(name=name, subscripts=subscripts,
@@ -820,7 +756,8 @@ class ScriptPerformer:
                     done = True
 
             elif 'choice' in inst:
-                prev_is_choice = True
+                force_branch = True
+                modify = True
                 choice_dict = {'details': inst['choice'], 'children': {}}
                 new_branch = self._branch_append_node(branch=copy.deepcopy(self.open_branch_segments[branch_index]),
                                                       node_key='choice', node_value=copy.deepcopy(choice_dict))
