@@ -523,7 +523,7 @@ class SCTAnalysis:
                                                                                               important_instructions,
                                                                                               next_location)
         else:
-            tree['fallthroughs'].append({'error': 'reached end of script'})
+            pass
         return tree
 
     @staticmethod

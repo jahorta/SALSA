@@ -10,31 +10,6 @@ import importlib.util
 import sys
 import subprocess
 
-module = 'colorama'
-if module in sys.modules:
-    print(f"{module!r} already in sys.modules")
-elif (spec := importlib.util.find_spec(module)) is not None:
-    # If you choose to perform the actual import ...
-    import colorama as col
-
-    print(f"{module!r} has been imported")
-    col.init()
-else:
-    print(f"can't find the {module!r} module")
-    if input(f'Would you like to install the {module!r} module?'):
-        # implement pip as a subprocess:
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install',
-                               'colorama'])
-        # process output with an API in the subprocess module:
-        reqs = subprocess.check_output([sys.executable, '-m', 'pip',
-                                        'freeze'])
-        installed_packages = [r.decode().split('==')[0] for r in reqs.split()]
-        print(installed_packages)
-        import colorama as col
-
-        col.init()
-
-
 class SCTExporter:
     export_option_fields = {'types': {'req': True, 'type': FT.string_list, 'values': []}}
 
@@ -70,7 +45,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me547.+sct$',
+                'scripts': '^me5[0-2]{1}.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -836,10 +811,7 @@ class ScriptPerformer:
                             if self._variables_are_equal_recursive(pre_ram, new_branch_ram):
                                 self.false_branches.append(new_branch_index)
                         # if self.debug_verbose:
-                        #     if 'colorama' in sys.modules:
-                        #         suffix = f'{col.Fore.LIGHTBLACK_EX}requested:{hit_requested}{col.Fore.RESET}'
-                        #     else:
-                        #         suffix = f'req:{hit_requested}'
+                        #     suffix = f'req:{hit_requested}'
                         #     print(f'{tabs}\t<-- {suffix}')
                     switch_addr_value = list(switch_entries.keys())[0]
                 else:
@@ -861,10 +833,7 @@ class ScriptPerformer:
                 current_pointer = inst_ptr
 
                 # if self.debug_verbose:
-                #     if 'colorama' in sys.modules:
-                #         suffix = f'{col.Fore.LIGHTBLACK_EX}requested:{hit_requested}{col.Fore.RESET}'
-                #     else:
-                #         suffix = f'req:{hit_requested}'
+                #     suffix = f'req:{hit_requested}'
                 #     print(f'{tabs}\t<-- {suffix}')
 
             elif 'choice' in inst:
@@ -897,10 +866,7 @@ class ScriptPerformer:
                 #                                           node_key='subscript', node_value=copy.deepcopy(sub_dict))
                 #     self.open_branch_segments[branch_index] = new_branch
                 # if self.debug_verbose:
-                #     if 'colorama' in sys.modules:
-                #         suffix = f'{col.Fore.LIGHTBLACK_EX}requested:{hit_requested}{col.Fore.RESET}'
-                #     else:
-                #         suffix = f'req:{hit_requested}'
+                #     suffix = f'req:{hit_requested}'
                 #     print(f'{tabs}\t<-- {suffix}')
                 lis = 1
 
@@ -943,10 +909,7 @@ class ScriptPerformer:
                                                                    subscripts=subscripts, ram=copy.deepcopy(cur_ram),
                                                                    branch_index=branch_index, depth=depth + 1)
                         # if self.debug_verbose:
-                        #     if 'colorama' in sys.modules:
-                        #         suffix = f'{col.Fore.LIGHTBLACK_EX}requested:{hit_requested}{col.Fore.RESET}'
-                        #     else:
-                        #         suffix = f'req:{hit_requested}'
+                        #     suffix = f'req:{hit_requested}'
                         #     print(f'{tabs}\t<-- {suffix}')
                     done = True
                 else:
