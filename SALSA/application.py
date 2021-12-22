@@ -190,9 +190,14 @@ class Application(tk.Tk):
                 script_name_list.append(path.name)
         self.export_type = export_type
         for i, script in enumerate(script_name_list):
+            # # Threaded Run
+            # args = [i, script, script_name_list]
+            # scriptThread = ScriptAnalysisThread(function=self.perform_script_analysis, args=args)
+            # scriptThread.run()
+
+            # Sequential Run
             args = [i, script, script_name_list]
-            scriptThread = ScriptAnalysisThread(function=self.perform_script_analysis, args=args)
-            scriptThread.run()
+            self.perform_script_analysis(*args)
 
     def perform_script_analysis(self, script_index, script, script_name_list):
         script_num = len(script_name_list)

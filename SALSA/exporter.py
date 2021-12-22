@@ -42,7 +42,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me5[0-2]{1}.+sct$',
+                'scripts': '^me547.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -184,23 +184,21 @@ class SCTExporter:
                     prefix = ',' * level
                     diff_string += f'{prefix}{inst}'
                     level += 1
-                for value, subscripts in values.items():
+                for value, traces in values.items():
                     commas = ',' * level
                     value_prefix = f'\n{commas}{value}'
                     level += 1
-                    for subscript, positions in subscripts.items():
-                        sub_prefix = f'{value_prefix},({subscript}'
-                        for position, diff_dict in positions.items():
-                            pos_prefix = f'{sub_prefix}:{position})'
-                            if diff_dict['has_diff']:
-                                if verbose:
-                                    body_diff = diff_dict['stratified']
-                                else:
-                                    body_diff = diff_dict['condensed']
+                    for trace, diff_dict in traces.items():
+                        trace_prefix = f'{value_prefix},({trace})'
+                        if diff_dict['has_diff']:
+                            if verbose:
+                                body_diff = diff_dict['stratified']
                             else:
-                                body_diff = diff_dict['out']
-                            body = self._format_diff_tree(body_diff, level)
-                            diff_string += f'\n{pos_prefix}{body}'
+                                body_diff = diff_dict['condensed']
+                        else:
+                            body_diff = diff_dict['out']
+                        body = self._format_diff_tree(body_diff, level, diff_dict['trace_level'])
+                        diff_string += f'\n{trace_prefix}{body}'
                     level -= 1
                 if inst_num > 1:
                     level -= 1
@@ -211,17 +209,17 @@ class SCTExporter:
 
         return temp_outs
 
-    def _format_diff_tree(self, diff_dict, level) -> str:
-        level += 1
+    def _format_diff_tree(self, diff_dict, diff_level, trace_lvl) -> str:
+        diff_level += 1
         output = ''
         if 'inst' not in diff_dict:
-            body = f'-> {diff_dict["value"]} ({diff_dict["subscript"]}:{diff_dict["pos"]}) '
+            body = f'-> {diff_dict["value"]} ({ScriptPerformer.get_traceback_string(diff_dict["traceback"], trace_lvl)}) '
             return f',{body}'
         inst = diff_dict['inst']
-        commas = ',' * level
+        commas = ',' * diff_level
         if inst == 'out':
             out_values = diff_dict['out']
-            body = f'-> {out_values["value"]} ({out_values["subscript"]}:{out_values["pos"]}) '
+            body = f'-> {out_values["value"]} ({ScriptPerformer.get_traceback_string(out_values["traceback"], trace_lvl)}) '
             output = f',{body}\n'
         elif inst == 'choice':
             question = diff_dict['question']
@@ -229,7 +227,7 @@ class SCTExporter:
             output += f',{question}'
             for key, option in responses.items():
                 output += f'\n{key}'
-                option_result = self._format_diff_tree(option, level)
+                option_result = self._format_diff_tree(option, diff_level, trace_lvl)
                 output += option_result
         elif inst == 'jumpif':
             condition = diff_dict['condition']
@@ -237,7 +235,7 @@ class SCTExporter:
             output += f',{condition}'
             for key, option in responses.items():
                 output += f'\n{key}'
-                option_result = self._format_diff_tree(option, level)
+                option_result = self._format_diff_tree(option, diff_level, trace_lvl)
                 output += option_result
         elif inst == 'switch':
             switch = f'switch-{diff_dict["condition"]}'
@@ -245,12 +243,12 @@ class SCTExporter:
             output += f',{switch}'
             for key, option in responses.items():
                 output += f'\n{key}'
-                option_result = self._format_diff_tree(option, level)
+                option_result = self._format_diff_tree(option, diff_level, trace_lvl)
                 output += option_result
         else:
             print('Add another segment?')
 
-        level -= 1
+        diff_level -= 1
         return output
 
     @staticmethod
@@ -414,26 +412,26 @@ class ScriptPerformer:
                                     branches_to_remove.append(i)
 
                 # flag for removal completed branches
-                printProgressBar(prefix='Flagging Completed Branches', total=current_open_branch_num, iteration=0)
+                printProgressBar(prefix='Flagging Completed Branches', total=current_open_branch_num, iteration=0, length=124)
                 for i, branch in enumerate(self.open_branch_segments):
                     if i % 500 == 0:
-                        printProgressBar(prefix='Flagging Completed Branches', total=current_open_branch_num, iteration=i)
+                        printProgressBar(prefix='Flagging Completed Branches', total=current_open_branch_num, iteration=i, length=124)
                     if 'out_value' in branch.keys():
                         branches_to_remove.append(i)
                     elif 'new_run' in branch.keys() and remove_old:
                         if branch['new_run']['value'] > (new_run_limit - 1):
                             branches_to_remove.append(i)
                 printProgressBar(prefix='Flagging completed branches', total=current_open_branch_num,
-                                 iteration=len(self.open_branch_segments), printEnd='\r\n')
+                                 iteration=len(self.open_branch_segments), length=124, printEnd='\r')
 
                 # flag for removal identical open branches
                 branches_to_remove = sorted(list(set(branches_to_remove)))
                 checked_branches = []
-                printProgressBar(prefix='Flagging identical open branches', total=current_open_branch_num, iteration=0)
+                printProgressBar(prefix='Flagging identical open branches', total=current_open_branch_num, iteration=0, length=119)
                 for i, open1 in enumerate(self.open_branch_segments):
                     if i % 500 == 0:
                         printProgressBar(prefix='Flagging identical open branches', total=current_open_branch_num,
-                                         iteration=i)
+                                         iteration=i, length=119)
                     checked_branches.append(i)
                     for j, open2 in enumerate(self.open_branch_segments):
                         if j in branches_to_remove:
@@ -443,7 +441,7 @@ class ScriptPerformer:
                         elif self._variables_are_equal_recursive(open1, open2):
                             branches_to_remove.append(j)
                 printProgressBar(prefix='Flagging identical open branches', total=current_open_branch_num,
-                                 iteration=current_open_branch_num, printEnd='\r\n')
+                                 iteration=current_open_branch_num, printEnd='\r', length=119)
 
                 # flag for removal open branches with the same initial conditions as an out branch
                 branches_to_remove = sorted(list(set(branches_to_remove)))
@@ -461,7 +459,7 @@ class ScriptPerformer:
                             branches_to_remove.append(j)
                             repeats.append(j)
                 printProgressBar(prefix='Removing open branches which mirror closed branches', total=len(self.all_outs),
-                                 iteration=len(self.all_outs), printEnd='\r\n')
+                                 iteration=len(self.all_outs), printEnd='\r')
 
                 # Remove flagged branches
                 branches_to_remove = sorted(list(set(branches_to_remove)))
@@ -521,12 +519,12 @@ class ScriptPerformer:
             addr = out_value
             out_value = start_branch['out_value']['address_values'][addr]
         out_dict = {'value': out_value, 'subscript': start_branch['out_value']['subscript'],
-                    'pos': start_branch['out_value']['pos']}
+                    'pos': start_branch['out_value']['pos'], 'traceback': start_branch['out_value']['traceback']}
 
         sorted_summary = {}
         for inst, values in tree_difference_summary.items():
             if inst == start_inst:
-                sorted_summary[inst] = {'Start': {'init': {0: {'has_diff': False, 'out': out_dict}}}}
+                sorted_summary[inst] = {'Start': {'init:0': {'has_diff': False, 'out': out_dict, 'trace_level': 0}}}
             sorted_summary[inst] = {**sorted_summary[inst], **{k: values[k] for k in sorted(list(values))}}
 
         return {'trees_detail': self.all_outs, 'ram_stats': self.addrs, 'summary': sorted_summary}
@@ -550,6 +548,8 @@ class ScriptPerformer:
         hit_requested = False
         if len(ptrs) > 0:
             my_ptr = ptrs.pop(0)
+            if 'ptr' not in my_ptr:
+                print('pause here')
             name = my_ptr['name']
             traceback[-1] = copy.deepcopy(my_ptr)
             if len(ptrs) > 0:
@@ -557,9 +557,9 @@ class ScriptPerformer:
                 hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts, ram=ram,
                                                            branch_index=branch_index, ptrs=copy.deepcopy(ptrs),
                                                            traceback=copy.deepcopy(traceback), depth=depth + 1)
-            if 'ptr' not in my_ptr:
-                print('pause here')
-            current_pointer = my_ptr['ptr']
+                current_pointer = my_ptr['ptr'] + 1
+            else:
+                current_pointer = my_ptr['ptr']
         else:
             current_pointer = 0
 
@@ -656,7 +656,6 @@ class ScriptPerformer:
                     jump = True
 
                 if make_branch:
-                    traceback[cur_trace_id]['ptr'] += 1
                     ptrs = copy.deepcopy(traceback)
                     ptrs.pop()
                     ptrs.append({'name': next_name, 'ptr': inst_ptr})
@@ -685,7 +684,6 @@ class ScriptPerformer:
                         next_name = inst['subscript']['next']
                         next_inst_pos = inst['subscript']['location']
                         next_inst_ptr = self._get_ptr(pos=next_inst_pos, pos_list=subscripts[next_name]['pos_list'])
-                        traceback[-1]['ptr'] = current_pointer + 1
                         traceback.append({'name': next_name, 'ptr': next_inst_ptr})
                         name = next_name
                         current_sub = subscripts[next_name]
@@ -721,8 +719,10 @@ class ScriptPerformer:
                             addr = value
                         param_address_values[value] = self._get_memory_pos(addr, cur_ram, 'important')
 
+                pos_traceback = self.convert_traceback_to_pos(copy.deepcopy(traceback), subscripts)
+
                 req_dict = {**req_dict, 'address_values': param_address_values, 'subscript': name,
-                            'traceback': copy.deepcopy(traceback), 'pos': inst_pos}
+                            'traceback': pos_traceback, 'pos': inst_pos}
 
                 if branch_index is not None:
                     out_branch = self._branch_append_node(branch=self.open_branch_segments[branch_index],
@@ -736,7 +736,7 @@ class ScriptPerformer:
                                      f'{prev_req_dict["address_values"]}'
                 else:
                     out_branch = {'out_value': req_dict, 'end_ram': copy.deepcopy(cur_ram),
-                                  'init_value': {'subscript': name, 'pos': 'Start'}}
+                                  'init_value': {'traceback': [{'name': 'Start', 'pos': 0}]}}
                     self.all_starts.append(out_branch)
                     closing_branch = 'None'
 
@@ -778,7 +778,6 @@ class ScriptPerformer:
 
                 if switch_all:
                     prev_branch = copy.deepcopy(self.open_branch_segments[branch_index])
-                    traceback[cur_trace_id]['ptr'] += 1
                     ptrs = copy.deepcopy(traceback)
                     # if name == 'select_tactics':
                     #     print('pause here')
@@ -848,11 +847,10 @@ class ScriptPerformer:
                 self.open_branch_segments[branch_index] = new_branch
 
             elif 'subscript_load' in inst:
-                back_log.append({'name': name, 'ptr': current_pointer + 1})
+                back_log.append({'name': name, 'ptr': current_pointer})
                 next_name = inst['subscript_load']['next']
                 next_inst_pos = inst['subscript_load']['location']
                 next_inst_ptr = self._get_ptr(pos=next_inst_pos, pos_list=subscripts[next_name]['pos_list'])
-                traceback[-1]['ptr'] = current_pointer + 1
                 traceback.append({'name': next_name, 'ptr': next_inst_ptr})
                 name = next_name
                 current_sub = subscripts[next_name]
@@ -889,7 +887,7 @@ class ScriptPerformer:
                         new_name = checkpoint['name']
                         new_ptr = checkpoint['ptr']
                         name = new_name
-                        current_pointer = new_ptr
+                        current_pointer = new_ptr + 1
                         current_sub = subscripts[new_name]
                         if current_pointer < len(current_sub['pos_list']):
                             inst_pos = current_sub['pos_list'][current_pointer]
@@ -931,111 +929,135 @@ class ScriptPerformer:
                     if p > pos:
                         return i
 
+    def convert_traceback_to_pos(self, traceback, subscripts):
+        new_trace = []
+        for trace in traceback:
+            trace_pos_list = subscripts[trace['name']]['pos_list']
+            ptr = trace.pop('ptr')
+            if ptr < len(trace_pos_list):
+                trace_pos = trace_pos_list[ptr]
+            else:
+                trace_pos = trace_pos_list[-1]
+            new_trace.append({**trace, 'pos': trace_pos})
+
+        return new_trace
+
     def _make_all_out_summary(self, inst_details) -> dict:
         all_branches = self.all_outs
 
         # Group branches by: Inst, Inst_value, Subscript, Position
-        grouped_branches = {}
+        groups = {}
         for branch in all_branches:
 
             inst = branch['init_value']['instruction']
-            if inst not in grouped_branches.keys():
-                grouped_branches[inst] = {}
+            if inst not in groups.keys():
+                groups[inst] = {}
 
             value = branch['init_value']['parameter values'][inst_details[inst]]
             if isinstance(value, str):
                 addr = value
                 value = branch['init_value']['address_values'][addr]
-            if value not in grouped_branches[inst].keys():
+            if value not in groups[inst].keys():
+                groups[inst][value] = []
+
+            groups[inst][value].append(branch)
+
+        grouped_branches = {}
+        all_trace_levels = {}
+        for inst, values in groups.items():
+            grouped_branches[inst] = {}
+            all_trace_levels[inst] = {}
+            for value, branches in values.items():
                 grouped_branches[inst][value] = {}
-
-            subscript = branch['init_value']['subscript']
-            if subscript not in grouped_branches[inst][value].keys():
-                grouped_branches[inst][value][subscript] = {}
-
-            cur_position = branch['init_value']['pos']
-            if cur_position not in grouped_branches[inst][value][subscript].keys():
-                grouped_branches[inst][value][subscript][cur_position] = []
-
-            grouped_branches[inst][value][subscript][cur_position].append(branch)
+                all_trace_levels[inst][value] = {}
+                traceback_level = len(branches[0]['init_value']['traceback']) - 1
+                compared = []
+                for i, branch1 in enumerate(branches):
+                    compared.append(i)
+                    for j, branch2 in enumerate(branches):
+                        if j in compared:
+                            continue
+                        b1_traceback = branch1['init_value']['traceback']
+                        b2_traceback = branch2['init_value']['traceback']
+                        traceback_level = min(traceback_level, self.get_traceback_diff_level(b1_traceback, b2_traceback))
+                all_trace_levels[inst][value] = traceback_level
+                for branch in branches:
+                    diff_traceback = branch['init_value']['traceback']
+                    trace_key = self._get_traceback_string(diff_traceback, traceback_level)
+                    if trace_key not in grouped_branches[inst][value].keys():
+                        grouped_branches[inst][value][trace_key] = []
+                    grouped_branches[inst][value][trace_key].append(branch)
 
         print('\nLooking for branch differences')
         all_differences = {}
         all_outs = {}
-        all_levels = {}
+        all_diff_levels = {}
         all_internals = {}
-        for inst, subscripts in grouped_branches.items():
+        for inst, values in grouped_branches.items():
             all_differences[inst] = {}
             all_outs[inst] = {}
-            all_levels[inst] = {}
+            all_diff_levels[inst] = {}
             all_internals[inst] = {}
-            for value, positions in subscripts.items():
+            for value, traces in values.items():
                 all_differences[inst][value] = {}
                 all_outs[inst][value] = {}
-                all_levels[inst][value] = {}
-                all_internals[inst][value] = {}
-                for subscript, values in positions.items():
-                    all_differences[inst][value][subscript] = {}
-                    all_outs[inst][value][subscript] = {}
-                    all_levels[inst][value][subscript] = {}
-                    all_internals[inst][value][subscript] = []
-                    for position, branches in values.items():
-                        print(f'\tGetting first differences from {inst}:{value}:{subscript}:{position}')
-                        all_differences[inst][value][subscript][position] = []
-                        all_levels[inst][value][subscript][position] = []
+                all_diff_levels[inst][value] = {}
+                all_internals[inst][value] = []
+                for trace, branches in traces.items():
+                    print(f'\tGetting first differences from {inst}:{value}:{trace}')
+                    all_differences[inst][value][trace] = []
+                    all_diff_levels[inst][value][trace] = []
 
-                        # Determine whether this position is internal and get outs for each branch
-                        is_internal = True
-                        branch_outs = []
-                        for branch in branches:
-                            if subscript == 'init' or 'new_run' in branch.keys():
-                                is_internal = False
+                    # Determine whether this position is internal and get outs for each branch
+                    is_internal = True
+                    branch_outs = []
+                    for branch in branches:
+                        if 'init' in trace or 'new_run' in branch.keys():
+                            is_internal = False
 
-                            out_value = branch['out_value']['parameter values'][inst_details[inst]]
-                            if isinstance(out_value, str):
-                                addr = out_value
-                                out_value = branch['out_value']['address_values'][addr]
-                            out_sub = branch['out_value']['subscript']
-                            out_pos = branch['out_value']['pos']
-                            branch_outs.append({'value': out_value, 'subscript': out_sub, 'pos': out_pos})
-                        all_outs[inst][value][subscript][position] = branch_outs
+                        out_value = branch['out_value']['parameter values'][inst_details[inst]]
+                        if isinstance(out_value, str):
+                            addr = out_value
+                            out_value = branch['out_value']['address_values'][addr]
+                        out_trace = branch['out_value']['traceback']
+                        branch_outs.append({'value': out_value, 'traceback': out_trace})
+                    all_outs[inst][value][trace] = branch_outs
 
-                        if is_internal:
-                            all_internals[inst][value][subscript].append(position)
+                    if is_internal:
+                        all_internals[inst][value].append(trace)
 
-                        if len(branches) > 1:
-                            checked_branches = []
-                            for i, branch1 in enumerate(branches):
-                                checked_branches.append(i)
-                                for j, branch2 in enumerate(branches):
-                                    if j in checked_branches:
-                                        continue
-                                    if self.debug_verbose:
-                                        print(f'\tGetting first difference between {i} and {j}')
+                    if len(branches) > 1:
+                        checked_branches = []
+                        for i, branch1 in enumerate(branches):
+                            checked_branches.append(i)
+                            for j, branch2 in enumerate(branches):
+                                if j in checked_branches:
+                                    continue
+                                if self.debug_verbose:
+                                    print(f'\tGetting first difference between {i} and {j}')
 
-                                    temp_difference = self._get_first_difference(copy.deepcopy(branch1),
-                                                                                 copy.deepcopy(branch2),
-                                                                                 top_level=True)
-                                    if len(temp_difference) == 0:
-                                        continue
-                                    diff_level = temp_difference.pop('level')
-                                    deets = temp_difference.pop('diff_deets')
-                                    difference = {'branches': [i, j], 'level': diff_level, 'diff': temp_difference,
-                                                  'diff_details': deets}
-                                    all_differences[inst][value][subscript][position].append(difference)
+                                temp_difference = self._get_first_difference(copy.deepcopy(branch1),
+                                                                             copy.deepcopy(branch2),
+                                                                             top_level=True)
+                                if len(temp_difference) == 0:
+                                    continue
+                                diff_level = temp_difference.pop('level')
+                                deets = temp_difference.pop('diff_deets')
+                                difference = {'branches': [i, j], 'level': diff_level, 'diff': temp_difference,
+                                              'diff_details': deets}
+                                all_differences[inst][value][trace].append(difference)
 
-                            diff_levels = []
-                            for diff in all_differences[inst][value][subscript][position]:
-                                diff_levels.append(diff['level'])
-                            diff_levels = sorted(list(set(diff_levels)))
-                            all_levels[inst][value][subscript][position] = diff_levels
+                        diff_levels = []
+                        for diff in all_differences[inst][value][trace]:
+                            diff_levels.append(diff['level'])
+                        diff_levels = sorted(list(set(diff_levels)))
+                        all_diff_levels[inst][value][trace] = diff_levels
 
         # debug use only [inst, value, subscript, position]
         pause_at = {
             'inst': 174,
             'value': 8.0,
-            'sub': '_SET_PATH',
-            'pos': 4
+            'trace': '_SET_PATH:4'
         }
         print('Making Summary...')
         summary = {}
@@ -1044,109 +1066,152 @@ class ScriptPerformer:
             pause_inst = inst == pause_at['inst']
             if pause_inst:
                 pass
-            for value, subscripts in values.items():
+            for value, traces in values.items():
                 summary[inst][value] = {}
                 pause_value = value == pause_at['value']
                 if pause_value:
                     pass
-                for subscript, positions in subscripts.items():
-                    summary[inst][value][subscript] = {}
-                    pause_sub = subscript == pause_at['sub']
-                    if pause_sub:
+                for trace, branches in traces.items():
+                    pause_trace = trace == pause_at['trace']
+                    if pause_trace:
                         pass
-                    for position, branches in positions.items():
-                        pause_pos = position == pause_at['pos']
-                        if pause_pos:
-                            pass
-                        if pause_pos and pause_sub and pause_value and pause_inst:
-                            # print('pause here')
-                            pass
-                        differences = all_differences[inst][value][subscript][position]
-                        branch_outs = all_outs[inst][value][subscript][position]
-                        if len(branches) > 1:
-                            if len(differences) > 0:
-                                diff_levels = all_levels[inst][value][subscript][position]
-                                stratified_diff_summary = self._get_stratified_differences(
-                                    diffs=copy.deepcopy(differences),
-                                    outs=copy.deepcopy(branch_outs),
-                                    levels=copy.deepcopy(diff_levels))
+                    if pause_trace and pause_value and pause_inst:
+                        # print('pause here')
+                        pass
+                    differences = all_differences[inst][value][trace]
+                    branch_outs = all_outs[inst][value][trace]
+                    if len(branches) > 1:
+                        if len(differences) > 0:
+                            diff_levels = all_diff_levels[inst][value][trace]
+                            stratified_diff_summary = self._get_stratified_differences(
+                                diffs=copy.deepcopy(differences),
+                                outs=copy.deepcopy(branch_outs),
+                                diff_levels=copy.deepcopy(diff_levels))
 
-                                condensed_diff_summary = self._condense_stratified_differences(
-                                    copy.deepcopy(stratified_diff_summary))
+                            condensed_diff_summary = self._condense_stratified_differences(
+                                copy.deepcopy(stratified_diff_summary))
 
-                                temp_summary = {
-                                    'has_diff': True,
-                                    'stratified': stratified_diff_summary,
-                                    'condensed': condensed_diff_summary
-                                }
-                            else:
-                                out = branch_outs[0]
-                                temp_summary = {'has_diff': False, 'out': out, 'unused_trees': True}
+                            temp_summary = {
+                                'has_diff': True,
+                                'stratified': stratified_diff_summary,
+                                'condensed': condensed_diff_summary,
+                                'trace_level': all_trace_levels[inst][value]
+                            }
                         else:
                             out = branch_outs[0]
-                            temp_summary = {'has_diff': False, 'out': out}
+                            temp_summary = {'has_diff': False, 'out': out, 'unused_trees': True,
+                                            'trace_level': all_trace_levels[inst][value]}
+                    else:
+                        out = branch_outs[0]
+                        temp_summary = {'has_diff': False, 'out': out, 'trace_level': all_trace_levels[inst][value]}
 
-                        summary[inst][value][subscript][position] = temp_summary
+                    summary[inst][value][trace] = temp_summary
 
         # Remove internal summaries and append them to external summaries
         appended_summary = {}
         first = True
         for int_inst, int_values in all_internals.items():
-            for int_value, int_subscripts in int_values.items():
-                for int_subscript, int_positions in int_subscripts.items():
-                    for int_position in int_positions:
-                        int_summary = summary[int_inst][int_value][int_subscript][int_position]
-                        if first:
-                            temp_summary = summary
-                            first = False
-                        else:
-                            temp_summary = appended_summary
-                        appended_summary = {}
-                        for sum_inst, sum_values in temp_summary.items():
-                            for sum_value, sum_subscripts in sum_values.items():
-                                for sum_subscript, sum_positions in sum_subscripts.items():
-                                    for sum_position, cur_summary in sum_positions.items():
-                                        same_val = int_value == sum_value
-                                        same_sub = int_subscript == sum_subscript
-                                        same_pos = int_position == sum_position
-                                        if same_pos and same_sub and same_val:
-                                            continue
+            for int_value, int_traces in int_values.items():
+                for int_trace in int_traces:
+                    int_summary = summary[int_inst][int_value][int_trace]
+                    if first:
+                        temp_summary = summary
+                        first = False
+                    else:
+                        temp_summary = appended_summary
+                    appended_summary = {}
+                    for sum_inst, sum_values in temp_summary.items():
+                        for sum_value, sum_traces in sum_values.items():
+                            for sum_trace, cur_summary in sum_traces.items():
+                                same_val = int_value == sum_value
+                                same_trace = int_trace == sum_trace
+                                if same_trace and same_val:
+                                    continue
+                                int_traceback = grouped_branches[int_inst][int_value][int_trace][0]['init_value']['traceback']
+                                keys = ('stratified', 'condensed')
+                                new_sum = {k: v for k, v in cur_summary.items() if k not in keys}
+                                for key in keys:
+                                    if 'out' in int_summary.keys():
+                                        int_sum = copy.deepcopy(int_summary['out'])
+                                    else:
+                                        int_sum = copy.deepcopy(int_summary[key])
 
-                                        int_identifier = {'inst': int_inst, 'val': int_value,
-                                                          'sub': int_subscript, 'pos': int_position}
-                                        keys = ('stratified', 'condensed')
-                                        new_sum = {k: v for k, v in cur_summary.items() if k not in keys}
-                                        for key in keys:
+                                    if 'out' in cur_summary.keys():
+                                        cur_sum = copy.deepcopy(cur_summary['out'])
+                                    else:
+                                        cur_sum = copy.deepcopy(cur_summary[key])
 
-                                            if 'out' in int_summary.keys():
-                                                int_sum = copy.deepcopy(int_summary['out'])
-                                            else:
-                                                int_sum = copy.deepcopy(int_summary[key])
+                                    temp_sum = self._append_int_summary_to_externals(int_sum, cur_sum,
+                                                                                     int_traceback)
+                                    new_sum[key] = temp_sum
 
-                                            if 'out' in cur_summary.keys():
-                                                cur_sum = copy.deepcopy(cur_summary['out'])
-                                            else:
-                                                cur_sum = copy.deepcopy(cur_summary[key])
+                                if sum_inst not in appended_summary.keys():
+                                    appended_summary[sum_inst] = {}
+                                if sum_value not in appended_summary[sum_inst].keys():
+                                    appended_summary[sum_inst][sum_value] = {}
+                                if sum_trace not in appended_summary[sum_inst][sum_value].keys():
+                                    appended_summary[sum_inst][sum_value][sum_trace] = {}
 
-                                            temp_sum = self._append_int_summary_to_externals(int_sum, cur_sum,
-                                                                                             int_identifier)
-                                            new_sum[key] = temp_sum
-
-                                        if sum_inst not in appended_summary.keys():
-                                            appended_summary[sum_inst] = {}
-                                        if sum_value not in appended_summary[sum_inst].keys():
-                                            appended_summary[sum_inst][sum_value] = {}
-                                        if sum_subscript not in appended_summary[sum_inst][sum_value].keys():
-                                            appended_summary[sum_inst][sum_value][sum_subscript] = {}
-                                        if sum_position not in appended_summary[sum_inst][sum_value][
-                                            sum_subscript].keys():
-                                            appended_summary[sum_inst][sum_value][sum_subscript][sum_position] = {}
-
-                                        appended_summary[sum_inst][sum_value][sum_subscript][sum_position] = new_sum
+                                appended_summary[sum_inst][sum_value][sum_trace] = new_sum
 
         if len(appended_summary) == 0:
             appended_summary = summary
-        return appended_summary
+
+        reformatted_summary = {}
+        for inst, values in appended_summary.items():
+            reformatted_summary[inst] = {}
+            for value, traces in values.items():
+                reformatted_summary[inst][value] = {}
+                branches = groups[inst][value]
+                traceback_level = len(branches[0]['init_value']['traceback']) - 1
+                compared = []
+                for i, branch1 in enumerate(branches):
+                    compared.append(i)
+                    for j, branch2 in enumerate(branches):
+                        if j in compared:
+                            continue
+                        b1_traceback = branch1['init_value']['traceback']
+                        b2_traceback = branch2['init_value']['traceback']
+                        traceback_level = min(traceback_level, self.get_traceback_diff_level(b1_traceback, b2_traceback))
+                for key, trace in traces.items():
+                    diff_traceback = grouped_branches[inst][value][key][0]['init_value']['traceback']
+                    new_key = self._get_traceback_string(diff_traceback, traceback_level)
+                    new_trace = trace
+                    new_trace['trace_level'] = traceback_level
+                    reformatted_summary[inst][value][new_key] = new_trace
+
+        return reformatted_summary
+
+    def get_traceback_diff_level(self, traceback1, traceback2):
+        level = len(traceback1) - 1
+        if not self._variables_are_equal_recursive(traceback1, traceback2):
+            for i in reversed(range(len(traceback1)-1)):
+                if not self._variables_are_equal_recursive(traceback1[i], traceback2[i]):
+                    level = i
+        return level
+
+    @classmethod
+    def get_traceback_string(cls, traceback, level):
+        return cls._get_traceback_string(traceback, level)
+
+    @staticmethod
+    def _get_traceback_string(traceback, level):
+        trace_key = ''
+        first_tr = True
+        for trace in traceback[level:]:
+            if first_tr:
+                first_tr = False
+            else:
+                trace_key += '::'
+            first_val = True
+            for trace_value in trace.values():
+                if first_val:
+                    first_val = False
+                else:
+                    trace_key += ':'
+                trace_key = f'{trace_key}{trace_value}'
+
+        return trace_key
 
     def _get_first_difference(self, branch1, branch2, top_level=False, level=0) -> dict:
         if 'children' not in branch1.keys() or 'children' not in branch2.keys():
@@ -1223,10 +1288,10 @@ class ScriptPerformer:
 
         return diff
 
-    def _get_stratified_differences(self, diffs, outs, levels, valid_ids=None) -> dict:
+    def _get_stratified_differences(self, diffs, outs, diff_levels, valid_ids=None) -> dict:
         strat_diff = {}
-        rem_levels = levels[1:]
-        level = levels[0]
+        rem_levels = diff_levels[1:]
+        level = diff_levels[0]
         child_ids = {}
         for diff in diffs:
             if diff['level'] == level:
@@ -1354,7 +1419,7 @@ class ScriptPerformer:
         temp_children = child_ids
         if len(temp_children) == 0:
             if len(rem_levels) > 0:
-                return self._get_stratified_differences(diffs=diffs, outs=outs, levels=rem_levels,
+                return self._get_stratified_differences(diffs=diffs, outs=outs, diff_levels=rem_levels,
                                                         valid_ids=valid_ids)
             else:
                 cur_outs = []
@@ -1368,7 +1433,7 @@ class ScriptPerformer:
         for key, option_list in child_ids.items():
             if not len(option_list) == 1:
                 if len(rem_levels) > 0:
-                    out_dict = self._get_stratified_differences(diffs=diffs, outs=outs, levels=rem_levels,
+                    out_dict = self._get_stratified_differences(diffs=diffs, outs=outs, diff_levels=rem_levels,
                                                                 valid_ids=option_list)
                 else:
                     cur_outs = []
@@ -1461,7 +1526,7 @@ class ScriptPerformer:
 
         return condensed_dict
 
-    def _append_int_summary_to_externals(self, int_sum, cur_sum, int_id):
+    def _append_int_summary_to_externals(self, int_sum, cur_sum, int_traceback):
 
         if not cur_sum['inst'] == 'out':
             if 'options' not in cur_sum.keys():
@@ -1470,17 +1535,15 @@ class ScriptPerformer:
             new_sum = {k: v for k, v in cur_sum.items() if not k == 'options'}
             options = {}
             for option, tree in cur_sum['options'].items():
-                new_option = self._append_int_summary_to_externals(int_sum, tree, int_id)
+                new_option = self._append_int_summary_to_externals(int_sum, tree, int_traceback)
                 options[option] = new_option
             new_sum['options'] = options
 
         else:
             if len(cur_sum) == 0:
                 print('append_error - end is empty')
-            same_val = int_id['val'] == cur_sum['out']['value']
-            same_sub = int_id['sub'] == cur_sum['out']['subscript']
-            same_pos = int_id['pos'] == cur_sum['out']['pos']
-            if same_pos and same_sub and same_val:
+
+            if self._variables_are_equal_recursive(int_traceback, cur_sum['out']['traceback']):
                 new_sum = copy.deepcopy(int_sum)
             else:
                 new_sum = cur_sum
@@ -1535,6 +1598,9 @@ class ScriptPerformer:
         duplicates = []
         checked_outs = []
         for i, out1 in enumerate(outs):
+            if i % 50 == 0:
+                printProgressBar(prefix='Searching for duplicate branches', total=len(outs),
+                                 iteration=i, printEnd='\r')
             checked_outs.append(i)
             for j, out2 in enumerate(outs):
                 if j in checked_outs:
@@ -1542,6 +1608,8 @@ class ScriptPerformer:
                 if self._variables_are_equal_recursive(var1=out1, var2=out2):
                     duplicates.append(j)
         outs_to_remove = [*outs_to_remove, *duplicates]
+        printProgressBar(prefix='Searching for duplicate branches', total=len(outs),
+                         iteration=len(outs), printEnd='\r')
         print(f'({len(duplicates)}) duplicate branches found')
 
         return outs_to_remove
@@ -1865,6 +1933,9 @@ def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=
         fill        - Optional  : bar fill character (Str)
         printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
     """
+    if total == 0:
+        iteration = 1
+        total = 1
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
