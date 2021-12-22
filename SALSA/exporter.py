@@ -70,7 +70,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me500.+sct$',
+                'scripts': '^me506.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -219,7 +219,7 @@ class SCTExporter:
                     for subscript, positions in subscripts.items():
                         sub_prefix = f'{value_prefix},({subscript}'
                         for position, diff_dict in positions.items():
-                            pos_prefix = f'{sub_prefix}:{position}),'
+                            pos_prefix = f'{sub_prefix}:{position})'
                             if diff_dict['has_diff']:
                                 if verbose:
                                     body_diff = diff_dict['stratified']
@@ -254,7 +254,7 @@ class SCTExporter:
         elif inst == 'choice':
             question = diff_dict['question']
             responses = {f'{commas}{k}': v for k, v in diff_dict['options'].items()}
-            output += f'{question}'
+            output += f',{question}'
             for key, option in responses.items():
                 output += f'\n{key}'
                 option_result = self._format_diff_tree(option, level)
