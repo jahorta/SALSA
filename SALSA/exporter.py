@@ -6,9 +6,6 @@ from SALSA.instruction_class import Instruct
 from SALSA.script_class import SCTAnalysis
 from SALSA.constants import FieldTypes as FT
 
-import importlib.util
-import sys
-import subprocess
 
 class SCTExporter:
     export_option_fields = {'types': {'req': True, 'type': FT.string_list, 'values': []}}
