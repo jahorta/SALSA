@@ -70,7 +70,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me515.+sct$',
+                'scripts': '^me500.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -250,11 +250,11 @@ class SCTExporter:
         if inst == 'out':
             out_values = diff_dict['out']
             body = f'-> {out_values["value"]} ({out_values["subscript"]}:{out_values["pos"]}) '
-            output = f',{body}'
+            output = f',{body}\n'
         elif inst == 'choice':
             question = diff_dict['question']
             responses = {f'{commas}{k}': v for k, v in diff_dict['options'].items()}
-            output += f'\n{commas}{question}'
+            output += f'{question}'
             for key, option in responses.items():
                 output += f'\n{key}'
                 option_result = self._format_diff_tree(option, level)
@@ -262,7 +262,7 @@ class SCTExporter:
         elif inst == 'jumpif':
             condition = diff_dict['condition']
             responses = {f'{commas}{k}': v for k, v in diff_dict['options'].items()}
-            output += f'\n{commas}{condition}'
+            output += f',{condition}'
             for key, option in responses.items():
                 output += f'\n{key}'
                 option_result = self._format_diff_tree(option, level)
@@ -270,7 +270,7 @@ class SCTExporter:
         elif inst == 'switch':
             switch = f'switch-{diff_dict["condition"]}'
             responses = {f'{commas}{k}': v for k, v in diff_dict['options'].items()}
-            output += f'\n{commas}{switch}'
+            output += f',{switch}'
             for key, option in responses.items():
                 output += f'\n{key}'
                 option_result = self._format_diff_tree(option, level)
@@ -397,6 +397,19 @@ class ScriptPerformer:
 
                 false_branch_num = len(self.false_branches)
 
+                desired_stats = {'init_value': 1.0, 'init_subscript': '_TURN_CHK'}
+                interesting_branches = []
+                for i, branch in enumerate(self.open_branch_segments):
+                    subscript = branch['init_value']['subscript']
+                    if 'parameter values' in branch:
+                        value_out = branch["parameter values"]["scene"]
+                        if isinstance(value_out, str):
+                            value_out = branch["address_values"][value_out]
+                    if value_out == desired_stats['init_value'] and subscript == desired_stats['init_subscript']:
+                        interesting_branches.append(i)
+
+                sorted_false_branches = sorted(list(set(self.false_branches)))
+
                 branches_to_remove = []
                 if remove_false_branches:
                     branches_to_remove = [*branches_to_remove, *self.false_branches]
@@ -514,7 +527,6 @@ class ScriptPerformer:
         if ptrs is None:
             ptrs: List[Dict] = []
 
-        cur_trace_id = len(traceback)
         traceback.append({'name': name, 'ptr': 0})
 
         if len(traceback) > 10:
@@ -524,7 +536,7 @@ class ScriptPerformer:
         if len(ptrs) > 0:
             my_ptr = ptrs.pop(0)
             name = my_ptr['name']
-            traceback[cur_trace_id] = copy.deepcopy(my_ptr)
+            traceback[-1] = copy.deepcopy(my_ptr)
             if len(ptrs) > 0:
                 next_name = ptrs[0]['name']
                 hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts, ram=ram,
@@ -541,7 +553,7 @@ class ScriptPerformer:
         elif current_pointer >= len(subscripts[name]['pos_list']):
             return hit_requested
 
-        traceback[cur_trace_id]['ptr'] = current_pointer
+        traceback[-1]['ptr'] = current_pointer
 
         tabs = '\t' * len(traceback)
         spaces = ' '*depth
@@ -567,6 +579,7 @@ class ScriptPerformer:
         modify = False
         back_log = []
         while not done:
+            cur_trace_id = len(traceback) - 1
             # print(f'{spaces}depth: {depth} current position: {name}:{current_pointer}')
             if 'set' in inst:
                 cur_ram = self._set_memory_pos(inst['set'], cur_ram)
@@ -623,6 +636,10 @@ class ScriptPerformer:
                 else:
                     make_branch = True
 
+                if force_jump:
+                    make_branch = False
+                    jump = True
+
                 if make_branch:
                     traceback[cur_trace_id]['ptr'] += 1
                     ptrs = copy.deepcopy(traceback)
@@ -653,8 +670,8 @@ class ScriptPerformer:
                         next_name = inst['subscript']['next']
                         next_inst_pos = inst['subscript']['location']
                         next_inst_ptr = self._get_ptr(pos=next_inst_pos, pos_list=subscripts[next_name]['pos_list'])
-                        traceback[cur_trace_id]['ptr'] += 1
-                        traceback.append({'name': name, 'ptr': current_pointer})
+                        traceback[-1]['ptr'] = current_pointer + 1
+                        traceback.append({'name': next_name, 'ptr': next_inst_ptr})
                         name = next_name
                         current_sub = subscripts[next_name]
                         current_pointer = next_inst_ptr
@@ -736,7 +753,7 @@ class ScriptPerformer:
                     switch_all = True
 
                 # check for switch in list of switches, add switch to list if not present
-                switch_ID = f'{current_sub}-{inst_pos}'
+                switch_ID = f'{name}-{inst_pos}'
                 if switch_ID not in self.switches.keys():
                     self.switches[switch_ID] = inst['switch']
 
@@ -789,7 +806,8 @@ class ScriptPerformer:
                                'selected_entry': switch_addr_value, 'next_inst_ptr': inst_ptr,
                                'next_inst_pos': current_sub['pos_list'][inst_ptr], 'children': {}}
                 new_branch = self._branch_append_node(branch=self.open_branch_segments[branch_index],
-                                                      node_key='switch', node_value=copy.deepcopy(switch_dict))
+                                                      node_key='switch', modify=modify
+                                                      , node_value=copy.deepcopy(switch_dict))
                 self.open_branch_segments[branch_index] = new_branch
                 current_pointer = inst_ptr
 
@@ -819,7 +837,8 @@ class ScriptPerformer:
                 next_name = inst['subscript_load']['next']
                 next_inst_pos = inst['subscript_load']['location']
                 next_inst_ptr = self._get_ptr(pos=next_inst_pos, pos_list=subscripts[next_name]['pos_list'])
-                traceback.append({'name': name, 'ptr': current_pointer+1})
+                traceback[-1]['ptr'] = current_pointer+1
+                traceback.append({'name': next_name, 'ptr': next_inst_ptr})
                 name = next_name
                 current_sub = subscripts[next_name]
                 current_pointer = next_inst_ptr
@@ -1089,8 +1108,17 @@ class ScriptPerformer:
                                         keys = ('stratified', 'condensed')
                                         new_sum = {k: v for k, v in cur_summary.items() if k not in keys}
                                         for key in keys:
-                                            int_sum = copy.deepcopy(int_summary[key])
-                                            cur_sum = copy.deepcopy(cur_summary[key])
+
+                                            if 'out' in int_summary.keys():
+                                                int_sum = copy.deepcopy(int_summary['out'])
+                                            else:
+                                                int_sum = copy.deepcopy(int_summary[key])
+
+                                            if 'out' in cur_summary.keys():
+                                                cur_sum = copy.deepcopy(cur_summary['out'])
+                                            else:
+                                                cur_sum = copy.deepcopy(cur_summary[key])
+
                                             temp_sum = self._append_int_summary_to_externals(int_sum, cur_sum,
                                                                                              int_identifier)
                                             new_sum[key] = temp_sum
