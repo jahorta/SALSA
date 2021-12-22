@@ -637,7 +637,7 @@ class SCTAnalysis:
         size += 1
         if isinstance(inp, dict):
             for value in inp.values():
-                size = self._get_dict_depth(value, size)
+                size = max(self._get_dict_depth(value, size), size)
         return size
 
     def _flatten_tree(self, tree, name, flat_dict=None) -> dict:

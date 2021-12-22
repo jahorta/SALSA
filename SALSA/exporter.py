@@ -70,7 +70,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me506.+sct$',
+                'scripts': '^me547.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -393,11 +393,12 @@ class ScriptPerformer:
                     print('Starting branch run:')
                 self._run_subscript_branch(name=name, subscripts=sub_tree,
                                            ram=initial_ram, branch_index=branch_index)
-                change_open_branch_num = len(self.open_branch_segments) - pre_num
+                current_open_branch_num = len(self.open_branch_segments)
+                change_open_branch_num = current_open_branch_num - pre_num
 
                 false_branch_num = len(self.false_branches)
 
-                desired_stats = {'init_value': 1.0, 'init_subscript': '_TURN_CHK'}
+                desired_stats = {'init_value': 3.0, 'init_subscript': '_SET_PATH'}
                 interesting_branches = []
                 for i, branch in enumerate(self.open_branch_segments):
                     subscript = branch['init_value']['subscript']
@@ -411,22 +412,56 @@ class ScriptPerformer:
                 sorted_false_branches = sorted(list(set(self.false_branches)))
 
                 branches_to_remove = []
-                if remove_false_branches:
-                    branches_to_remove = [*branches_to_remove, *self.false_branches]
+                false_branch_copy = [*self.false_branches]
                 self.false_branches = []
+                if remove_false_branches:
+                    branches_to_remove = [*branches_to_remove, *false_branch_copy]
+
+                # If before the remove false branches step, test for the lowest child dict depth with different
+                # init_value and cur_ram
+                else:
+                    checked = []
+                    for i, branch1 in enumerate(self.open_branch_segments):
+                        checked.append(i)
+                        if i in branches_to_remove:
+                            continue
+                        len_1 = self._get_dict_depth(branch1['children'])
+                        for j, branch2 in enumerate(self.open_branch_segments):
+                            if j in checked:
+                                continue
+                            if j in branches_to_remove:
+                                continue
+                            same_cur = self._variables_are_equal_recursive(branch1['cur_ram'], branch2['cur_ram'])
+                            same_init = self._variables_are_equal_recursive(branch1['init_value'],
+                                                                            branch2['init_value'])
+                            if same_cur and same_init:
+                                len_2 = self._get_dict_depth(branch2)
+                                if len_1 <= len_2:
+                                    branches_to_remove.append(j)
+                                if len_1 > len_2:
+                                    branches_to_remove.append(i)
 
                 # flag for removal completed branches
+                printProgressBar(prefix='Flagging Completed Branches', total=current_open_branch_num, iteration=0)
                 for i, branch in enumerate(self.open_branch_segments):
+                    if i % 500 == 0:
+                        printProgressBar(prefix='Flagging Completed Branches', total=current_open_branch_num, iteration=i)
                     if 'out_value' in branch.keys():
                         branches_to_remove.append(i)
                     elif 'new_run' in branch.keys() and remove_old:
                         if branch['new_run']['value'] > (new_run_limit - 1):
                             branches_to_remove.append(i)
+                printProgressBar(prefix='Flagging completed branches', total=current_open_branch_num,
+                                 iteration=len(self.open_branch_segments), printEnd='\r\n')
 
                 # flag for removal identical open branches
                 branches_to_remove = sorted(list(set(branches_to_remove)))
                 checked_branches = []
+                printProgressBar(prefix='Flagging identical open branches', total=current_open_branch_num, iteration=0)
                 for i, open1 in enumerate(self.open_branch_segments):
+                    if i % 500 == 0:
+                        printProgressBar(prefix='Flagging identical open branches', total=current_open_branch_num,
+                                         iteration=i)
                     checked_branches.append(i)
                     for j, open2 in enumerate(self.open_branch_segments):
                         if j in branches_to_remove:
@@ -435,11 +470,17 @@ class ScriptPerformer:
                             continue
                         elif self._variables_are_equal_recursive(open1, open2):
                             branches_to_remove.append(j)
+                printProgressBar(prefix='Flagging identical open branches', total=current_open_branch_num,
+                                 iteration=current_open_branch_num, printEnd='\r\n')
 
                 # flag for removal open branches with the same initial conditions as an out branch
                 branches_to_remove = sorted(list(set(branches_to_remove)))
                 repeats = []
+                printProgressBar(prefix='Removing open branches which mirror closed branches', total=len(self.all_outs), iteration=0)
                 for i, out_branch in enumerate(self.all_outs):
+                    if i % 500 == 0:
+                        printProgressBar(prefix='Removing open branches which mirror closed branches', total=len(self.all_outs),
+                                         iteration=i)
                     for j, open_branch in enumerate(self.open_branch_segments):
                         if j in branches_to_remove:
                             continue
@@ -447,6 +488,8 @@ class ScriptPerformer:
                                                               with_req=True, with_mid=with_mid):
                             branches_to_remove.append(j)
                             repeats.append(j)
+                printProgressBar(prefix='Removing open branches which mirror closed branches', total=len(self.all_outs),
+                                 iteration=len(self.all_outs), printEnd='\r\n')
 
                 # Remove flagged branches
                 branches_to_remove = sorted(list(set(branches_to_remove)))
@@ -541,7 +584,7 @@ class ScriptPerformer:
                 next_name = ptrs[0]['name']
                 hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts, ram=ram,
                                                            branch_index=branch_index, ptrs=copy.deepcopy(ptrs),
-                                                           traceback=copy.deepcopy(traceback), depth=depth+1)
+                                                           traceback=copy.deepcopy(traceback), depth=depth + 1)
             if 'ptr' not in my_ptr:
                 print('pause here')
             current_pointer = my_ptr['ptr']
@@ -556,7 +599,7 @@ class ScriptPerformer:
         traceback[-1]['ptr'] = current_pointer
 
         tabs = '\t' * len(traceback)
-        spaces = ' '*depth
+        spaces = ' ' * depth
         current_sub = subscripts[name]
         if len(current_sub['pos_list']) == 0:
             if self.debug_verbose:
@@ -654,12 +697,12 @@ class ScriptPerformer:
                     self.open_branch_segments.append(new_branch)
                     pre_ram = copy.deepcopy(cur_ram)
 
-                    hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts,
-                                                               ram=pre_ram, ptrs=copy.deepcopy(ptrs),
-                                                               branch_index=new_branch_index, depth=depth + 1)
+                    sub_hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts,
+                                                                   ram=pre_ram, ptrs=copy.deepcopy(ptrs),
+                                                                   branch_index=new_branch_index, depth=depth + 1)
                     new_branch_ram = copy.deepcopy(self.open_branch_segments[new_branch_index]['cur_ram'])
 
-                    if not hit_requested:
+                    if not sub_hit_requested:
                         if self._variables_are_equal_recursive(pre_ram, new_branch_ram):
                             self.false_branches.append(new_branch_index)
 
@@ -683,7 +726,7 @@ class ScriptPerformer:
                     modify=modify)
                 self.open_branch_segments[branch_index] = updated_branch
                 force_branch = False
-                force_jump =False
+                force_jump = False
                 modify = False
 
             elif 'requested' in inst:
@@ -728,10 +771,12 @@ class ScriptPerformer:
                 # start new branch, update branch_index with new branch ID
                 new_branch_index = len(self.open_branch_segments)
 
-                print(f'\tDepth: {depth}, Closing Branch: {closing_branch}, Opening Branch: '
-                      f'{new_branch_index}{req_dict["parameter values"]}-{req_dict["address_values"]}')
-                self.open_branch_segments.append({'init_value': copy.deepcopy(req_dict), 'init_ram': copy.deepcopy(cur_ram),
-                                                  'cur_ram': copy.deepcopy(cur_ram), 'children': {}})
+                if self.debug_verbose:
+                    print(f'\tDepth: {depth}, Closing Branch: {closing_branch}, Opening Branch: '
+                          f'{new_branch_index}{req_dict["parameter values"]}-{req_dict["address_values"]}')
+                self.open_branch_segments.append(
+                    {'init_value': copy.deepcopy(req_dict), 'init_ram': copy.deepcopy(cur_ram),
+                     'cur_ram': copy.deepcopy(cur_ram), 'children': {}})
                 branch_index = new_branch_index
 
             elif 'switch' in inst:
@@ -780,12 +825,16 @@ class ScriptPerformer:
                                                               node_value=switch_dict, modify=modify)
                         new_branch_index = len(self.open_branch_segments)
                         self.open_branch_segments.append(new_branch)
-                        hit_requested = self._run_subscript_branch(name=name, subscripts=subscripts,
-                                                                   ram=copy.deepcopy(cur_ram),
-                                                                   branch_index=new_branch_index,
-                                                                   ptrs=copy.deepcopy(ptrs), depth=depth+1)
-                        if not hit_requested:
-                            self.false_branches.append(new_branch_index)
+                        pre_ram = cur_ram
+                        sub_hit_requested = self._run_subscript_branch(name=name, subscripts=subscripts,
+                                                                       ram=copy.deepcopy(pre_ram),
+                                                                       branch_index=new_branch_index,
+                                                                       ptrs=copy.deepcopy(ptrs), depth=depth + 1)
+
+                        new_branch_ram = copy.deepcopy(self.open_branch_segments[new_branch_index]['cur_ram'])
+                        if not sub_hit_requested:
+                            if self._variables_are_equal_recursive(pre_ram, new_branch_ram):
+                                self.false_branches.append(new_branch_index)
                         # if self.debug_verbose:
                         #     if 'colorama' in sys.modules:
                         #         suffix = f'{col.Fore.LIGHTBLACK_EX}requested:{hit_requested}{col.Fore.RESET}'
@@ -833,11 +882,11 @@ class ScriptPerformer:
                 self.open_branch_segments[branch_index] = new_branch
 
             elif 'subscript_load' in inst:
-                back_log.append({'name': name, 'ptr': current_pointer+1})
+                back_log.append({'name': name, 'ptr': current_pointer + 1})
                 next_name = inst['subscript_load']['next']
                 next_inst_pos = inst['subscript_load']['location']
                 next_inst_ptr = self._get_ptr(pos=next_inst_pos, pos_list=subscripts[next_name]['pos_list'])
-                traceback[-1]['ptr'] = current_pointer+1
+                traceback[-1]['ptr'] = current_pointer + 1
                 traceback.append({'name': next_name, 'ptr': next_inst_ptr})
                 name = next_name
                 current_sub = subscripts[next_name]
@@ -892,7 +941,7 @@ class ScriptPerformer:
                         next_subscript_name = current_sub['fallthrough']
                         hit_requested = self._run_subscript_branch(name=next_subscript_name,
                                                                    subscripts=subscripts, ram=copy.deepcopy(cur_ram),
-                                                                   branch_index=branch_index, depth=depth+1)
+                                                                   branch_index=branch_index, depth=depth + 1)
                         # if self.debug_verbose:
                         #     if 'colorama' in sys.modules:
                         #         suffix = f'{col.Fore.LIGHTBLACK_EX}requested:{hit_requested}{col.Fore.RESET}'
@@ -1243,7 +1292,7 @@ class ScriptPerformer:
                     if 'switch' in diff_dict['modification']:
                         b_diff_value_dict = diff_dict['modification']['switch']['selected_entry']
 
-                    b_diff_values = [b_diff_value_dict['var1'],b_diff_value_dict['var2']]
+                    b_diff_values = [b_diff_value_dict['var1'], b_diff_value_dict['var2']]
 
                     choice_details = diff['diff_details'][0]['details']
                     options = choice_details['choices']
@@ -1284,7 +1333,8 @@ class ScriptPerformer:
                     strat_diff['inst'] = 'jumpif'
                     strat_diff['results'] = options
                     condition_key = list(diff['diff_details'][0]['condition'].keys())[0]
-                    condition = self._generate_condition_string(cond_in=diff['diff_details'][0]['condition'][condition_key])
+                    condition = self._generate_condition_string(
+                        cond_in=diff['diff_details'][0]['condition'][condition_key])
                     strat_diff['condition'] = condition
                     for i, value in enumerate(b_diff_values):
                         if isinstance(value, bool):
@@ -1832,3 +1882,33 @@ class ScriptPerformer:
     @staticmethod
     def _subtract(in_1, in_2):
         return in_1 - in_2
+
+    def _get_dict_depth(self, inp, size=0):
+        size += 1
+        if isinstance(inp, dict):
+            for value in inp.values():
+                size = max(self._get_dict_depth(value, size), size)
+        return size
+
+
+# Print iterations progress
+def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='*', printEnd="\r"):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end=printEnd)
+    # Print New Line on Complete
+    if iteration == total:
+        print()
