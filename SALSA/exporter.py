@@ -11,7 +11,7 @@ from SALSA.constants import FieldTypes as FT
 class SCTExporter:
     export_option_fields = {'types': {'req': True, 'type': FT.string_list, 'values': []}}
 
-    def __init__(self, loc=None, verbose=False):
+    def __init__(self, loc=None, verbose=True):
         self.verbose_out = verbose
         self.dir = loc
         self.script_list: List[SCTAnalysis] = []
@@ -195,7 +195,7 @@ class SCTExporter:
                     commas = ',' * level
                     value_prefix = f'\n{commas}{value}'
                     for trace, diff_dict in traces.items():
-                        trace_prefix = f'{value_prefix},({trace})'
+                        trace_prefix = f'{value_prefix} ({trace})'
                         if diff_dict['has_diff']:
                             if verbose:
                                 body_diff = diff_dict['stratified']
@@ -745,7 +745,7 @@ class ScriptPerformer:
                             addr = value
                         param_address_values[value] = self._get_memory_pos(addr, cur_ram, 'important')
 
-                pos_traceback = self.convert_traceback_to_pos(copy.deepcopy(traceback), subscripts)
+                pos_traceback = self._convert_traceback_to_pos(copy.deepcopy(traceback), subscripts)
 
                 req_dict = {**req_dict, 'address_values': param_address_values, 'subscript': name,
                             'traceback': pos_traceback, 'pos': inst_pos}
@@ -955,7 +955,8 @@ class ScriptPerformer:
                     if p > pos:
                         return i
 
-    def convert_traceback_to_pos(self, traceback, subscripts):
+    @staticmethod
+    def _convert_traceback_to_pos(traceback, subscripts):
         new_trace = []
         for trace in traceback:
             trace_pos_list = subscripts[trace['name']]['pos_list']
@@ -1978,6 +1979,7 @@ def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=
     if total == 0:
         iteration = 1
         total = 1
+        suffix += '(total is set to zero??)'
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
