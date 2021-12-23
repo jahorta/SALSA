@@ -443,8 +443,10 @@ class ScriptPerformer:
                                 if len_1 > len_2:
                                     branches_to_remove.append(i)
 
-                # flag for removal completed branches
+                # flag for removal completed branches and remove any switch or jump states for a fresh run
                 for i, branch in enumerate(self.open_branch_segments):
+                    branch['switch_states'] = []
+                    branch['jump_states'] = []
                     if i % 500 == 0:
                         printProgressBar(prefix='Flagging Completed Branches', total=current_open_branch_num, iteration=i, length=124)
                     if 'out_value' in branch.keys():
@@ -452,6 +454,7 @@ class ScriptPerformer:
                     elif 'new_run' in branch.keys() and remove_old:
                         if branch['new_run']['value'] > (new_run_limit - 1):
                             branches_to_remove.append(i)
+
                 printProgressBar(prefix='Flagging completed branches', total=current_open_branch_num,
                                  iteration=len(self.open_branch_segments), length=124, printEnd='\r')
 
@@ -470,6 +473,7 @@ class ScriptPerformer:
                             continue
                         elif self._variables_are_equal_recursive(open1, open2):
                             branches_to_remove.append(j)
+
                 printProgressBar(prefix='Flagging identical open branches', total=current_open_branch_num,
                                  iteration=current_open_branch_num, printEnd='\r', length=119)
 
