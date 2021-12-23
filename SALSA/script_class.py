@@ -289,17 +289,18 @@ class SCTAnalysis:
             if ID == 12:
                 return tree
             elif ID in current_subscript.change_script_insts:
-                offset_param_id = inst.get_param_id_by_name('offset')
-                if offset_param_id is None:
-                    print('offset parameter is named incorrectly..')
-                    continue
-                offset_param_value = inst.parameters[offset_param_id]
-                link_string = f'*lnk[offset,{offset_param_value}]*'
-                link_desc = inst.resolveDescriptionFuncs(link_string)
-                next_script = link_desc.split(': ')[1].rstrip()
-                tree['end'] = {}
+                if ID == 238:
+                    next_script = 'me099a.sct'
+                else:
+                    offset_param_id = inst.get_param_id_by_name('offset')
+                    if offset_param_id is None:
+                        print('offset parameter is named incorrectly..')
+                        continue
+                    link_string = self.Links[name][str(pos)][list(self.Links[name][str(pos)].keys())[0]]
+                    next_script = link_string.split(': ')[1].rstrip()
+                if 'end' not in tree.keys():
+                    tree['end'] = {}
                 tree['end'][pos] = {'inst': ID, 'script': next_script}
-                pass
             elif ID in current_subscript.change_subscript_insts:  # This is the instruction to load a subscript
                 # if current_name == 'loop':
                 #     print('pause here')
@@ -324,8 +325,8 @@ class SCTAnalysis:
                         tree['subscript_load'] = {}
                     tree['subscript_load'][pos] = {'next': next_scriptID, 'location': next_location}
 
-                    tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(next_script,
-                                                                                            important_instructions)
+                    tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(name=next_script,
+                                                                                            important_instructions=important_instructions)
 
                 elif ID == 0:
                     test = self._format_desc_fxn_dict(inst)
@@ -338,8 +339,8 @@ class SCTAnalysis:
                         tree['subscript_jumpif'][pos] = {'next': next_scriptID,
                                                          'condition': test,
                                                          'location': next_location}
-                        tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(next_script,
-                                                                                                important_instructions)
+                        tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(name=next_script,
+                                                                                            important_instructions=important_instructions)
                     else:
                         if 'jumpif' not in tree.keys():
                             tree['jumpif'] = {}
@@ -365,8 +366,8 @@ class SCTAnalysis:
                         if 'goto' not in tree.keys():
                             tree['goto'] = {}
                         tree['goto'] = {'position': pos, 'next': next_script, 'location': next_location}
-                        tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(next_script,
-                                                                                                important_instructions)
+                        tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(name=next_script,
+                                                                                            important_instructions=important_instructions)
 
             elif ID is current_subscript.choice_inst:
                 description = inst.description
@@ -518,7 +519,6 @@ class SCTAnalysis:
             if script_name == name:
                 script_found = True
 
-        next_location = 0
         if not next_script == '':
             if 'subscript_change' not in tree.keys():
                 tree['subscript_change'] = {}
@@ -526,9 +526,8 @@ class SCTAnalysis:
             if 'fallthroughs' not in tree.keys():
                 tree['fallthroughs'] = []
             tree['fallthroughs'].append({'next': next_scriptID})
-            tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(next_script,
-                                                                                    important_instructions,
-                                                                                    next_location)
+            tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(name=next_script,
+                                                                                    important_instructions=important_instructions)
         else:
             pass
         return tree

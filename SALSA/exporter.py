@@ -11,7 +11,7 @@ from SALSA.constants import FieldTypes as FT
 class SCTExporter:
     export_option_fields = {'types': {'req': True, 'type': FT.string_list, 'values': []}}
 
-    def __init__(self, loc=None, verbose=True):
+    def __init__(self, loc=None, verbose=False):
         self.verbose_out = verbose
         self.dir = loc
         self.script_list: List[SCTAnalysis] = []
@@ -44,7 +44,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me503.+sct$',
+                'scripts': '^me515.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -724,6 +724,35 @@ class ScriptPerformer:
                 force_jump = False
                 modify = False
 
+            elif 'end' in inst:
+                end_dict = copy.deepcopy(inst['end'])
+                pos_traceback = self._convert_traceback_to_pos(copy.deepcopy(traceback), subscripts)
+                pos_traceback.append({'name': end_dict['script'], 'pos': 'start'})
+                end_dict = {**end_dict, 'traceback': pos_traceback}
+
+                if branch_index is not None:
+                    out_branch = self._branch_append_node(branch=self.open_branch_segments[branch_index],
+                                                          node_key='out_value', node_value=end_dict)
+                    out_branch['out_value'] = end_dict
+                    out_branch['end_ram'] = copy.deepcopy(cur_ram)
+                    out_branch['exit'] = True
+                    self.open_branch_segments[branch_index] = out_branch
+                    self.all_outs.append(out_branch)
+                    prev_req_dict = self.open_branch_segments[branch_index]['init_value']
+                    closing_branch = f'{branch_index}:{prev_req_dict["parameter values"]}-' \
+                                     f'{prev_req_dict["address_values"]}'
+
+                else:
+                    out_branch = {'out_value': end_dict, 'end_ram': copy.deepcopy(cur_ram),
+                                  'init_value': {'traceback': [{'name': 'Start', 'pos': 0}]}, 'exit': True}
+                    self.all_starts.append(out_branch)
+                    closing_branch = 'None'
+
+                if self.debug_verbose:
+                    print(f'\tDepth: {depth}, Closing Branch: {closing_branch} (would switch to {inst["end"]["script"]})')
+
+                    return False
+
             elif 'requested' in inst:
                 if inst_pos == 185:
                     # print('pause here')
@@ -956,7 +985,7 @@ class ScriptPerformer:
                         return i
 
     @staticmethod
-    def _convert_traceback_to_pos(traceback, subscripts):
+    def _convert_traceback_to_pos(traceback, subscripts) -> List[Dict]:
         new_trace = []
         for trace in traceback:
             trace_pos_list = subscripts[trace['name']]['pos_list']
@@ -1042,10 +1071,13 @@ class ScriptPerformer:
                         if 'init' in trace or 'new_run' in branch.keys():
                             is_internal = False
 
-                        out_value = branch['out_value']['parameter values'][inst_details[inst]]
-                        if isinstance(out_value, str):
-                            addr = out_value
-                            out_value = branch['out_value']['address_values'][addr]
+                        if 'exit' in branch.keys():
+                            out_value = 'END'
+                        else:
+                            out_value = branch['out_value']['parameter values'][inst_details[inst]]
+                            if isinstance(out_value, str):
+                                addr = out_value
+                                out_value = branch['out_value']['address_values'][addr]
                         out_trace = branch['out_value']['traceback']
                         branch_outs.append({'value': out_value, 'traceback': out_trace})
                     all_outs[inst][value][trace] = branch_outs
@@ -1622,7 +1654,6 @@ class ScriptPerformer:
         progress_prefix = 'Searching for choices without modifiers'
         for i, out in enumerate(outs):
             printProgressBar(prefix=progress_prefix, total=total, iteration=i, printEnd='\r')
-
             if i in outs_to_remove:
                 continue
             elif self._choice_with_no_mod(out):
@@ -1635,16 +1666,10 @@ class ScriptPerformer:
 
         duplicates = []
         checked_outs = []
-        total = math.log2(len(outs))
         progress_prefix = 'Searching for duplicate branches'
         for i, out1 in enumerate(outs):
             if i % 50 == 0:
-
-                if i == 0:
-                    iter = 0
-                else:
-                    iter = math.log2(i)
-                printProgressBar(prefix=progress_prefix, total=total, iteration=iter, printEnd='\r')
+                printProgressBar(prefix=progress_prefix, suffix=f'{i}/{total}', total=total, iteration=i, printEnd='\r')
             checked_outs.append(i)
             for j, out2 in enumerate(outs):
                 if j in checked_outs:
