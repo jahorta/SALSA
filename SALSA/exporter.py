@@ -28,7 +28,7 @@ class SCTExporter:
 
         self.export_options = {
             'Ship battle turn data': {
-                'scripts': '^me501.+sct$',
+                'scripts': '^me5.+sct$',
                 'instructions': {
                     165: {
                         'turn bonus': [
@@ -45,7 +45,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me506.+sct$',
+                'scripts': '^me515.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -523,14 +523,14 @@ class ScriptPerformer:
                         updated_branch['new_run'] = new_run_dict
                         self.open_branch_segments[0] = updated_branch
 
+            print('\n')
             # Remove duplicates and any branch which goes past the out value, and any branch which contains a choice without modification
             outs_to_remove = sorted(list(set(self._flag_outs_for_removal(remove_no_mod=True))))
-            print(f'removing {len(outs_to_remove)} branches with identical children')
             for i in reversed(outs_to_remove):
                 if i >= len(self.all_outs):
                     print(f'Unable to pop all_outs at index {i} ({len(self.all_outs)} entries)')
                 self.all_outs.pop(i)
-            print(f'{len(self.all_outs)} branches remaining')
+            print(f'Removing {len(outs_to_remove)} flagged branches -> {len(self.all_outs)} branches remaining')
 
             # Identify branches which do not exit the subscript
             internal = []
@@ -1071,6 +1071,7 @@ class ScriptPerformer:
         all_branches = self.all_outs
 
         # Group branches by: Inst, Inst_value, Subscript, Position
+        print('Grouping Branches...')
         groups = {}
         for branch in all_branches:
 
@@ -1110,6 +1111,7 @@ class ScriptPerformer:
                     diff_traceback = branch['init_value']['traceback']
                     trace_key = self._get_traceback_string(diff_traceback, traceback_level)
                     if trace_key not in grouped_branches[inst][value].keys():
+                        print(f'Creating trace key: {trace_key}')
                         grouped_branches[inst][value][trace_key] = []
                     grouped_branches[inst][value][trace_key].append(branch)
 
@@ -1180,7 +1182,7 @@ class ScriptPerformer:
                                 difference = {'branches': [i, j], 'level': diff_level, 'diff': temp_difference,
                                               'diff_details': deets}
                                 all_differences[inst][value][trace].append(difference)
-                        progress_suffix = ' \tDONE'
+                        progress_suffix = ' \tDONE\t\t\t\t '
                         printProgressBar(prefix=progress_prefix, suffix=progress_suffix, total=branch_num,
                                          iteration=branch_num, length=progress_bar_length, printEnd='\r')
 
