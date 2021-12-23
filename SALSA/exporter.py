@@ -1,3 +1,4 @@
+import math
 from typing import List, Dict
 import re
 import copy
@@ -1597,10 +1598,11 @@ class ScriptPerformer:
 
         duplicates = []
         checked_outs = []
+        total = math.log2(len(outs))
         for i, out1 in enumerate(outs):
             if i % 50 == 0:
-                printProgressBar(prefix='Searching for duplicate branches', total=len(outs),
-                                 iteration=i, printEnd='\r')
+                printProgressBar(prefix='Searching for duplicate branches', total=total,
+                                 iteration=math.log2(i), printEnd='\r')
             checked_outs.append(i)
             for j, out2 in enumerate(outs):
                 if j in checked_outs:
@@ -1608,8 +1610,8 @@ class ScriptPerformer:
                 if self._variables_are_equal_recursive(var1=out1, var2=out2):
                     duplicates.append(j)
         outs_to_remove = [*outs_to_remove, *duplicates]
-        printProgressBar(prefix='Searching for duplicate branches', total=len(outs),
-                         iteration=len(outs), printEnd='\r')
+        printProgressBar(prefix='Searching for duplicate branches', total=total,
+                         iteration=total, printEnd='\r')
         print(f'({len(duplicates)}) duplicate branches found')
 
         return outs_to_remove
