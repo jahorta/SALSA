@@ -144,9 +144,9 @@ class SCTAnalysis:
                 subscript_roots.append(name)
                 if name not in subscript_parents.keys():
                     subscript_parents[name] = ['external']
-                all_subscript_trees[name] = self._generate_subscript_tree_recursive(name, important_instructions)
+                all_subscript_trees[name] = self._generate_subscript_tree(name, important_instructions)
                 subscript_parents = {**subscript_parents,
-                                     **self._get_subscript_parents_recursive(all_subscript_trees[name], name)}
+                                     **self._get_subscript_parents(all_subscript_trees[name], name)}
                 if self._has_instructions_any(important_instructions, subscript):
                     if name not in important_subscripts:
                         important_subscripts.append(name)
@@ -171,8 +171,8 @@ class SCTAnalysis:
         # Prune trees to those which contain the desired subscript
         trees_to_keep = ['init', 'loop']
         for subscript in [*requested_subscripts, *important_subscripts]:
-            trees_to_keep = [*trees_to_keep, *self._get_roots_recursive(subscript, subscript_parents[subscript],
-                                                                        subscript_parents)]
+            trees_to_keep = [*trees_to_keep, *self._get_roots(subscript, subscript_parents[subscript],
+                                                              subscript_parents)]
 
         pruned_trees = {}
         for tree in trees_to_keep:
@@ -180,7 +180,7 @@ class SCTAnalysis:
 
         ordered_trees = {}
         for name, tree in pruned_trees.items():
-            ordered_trees[name] = self._order_tree_recursive(tree)
+            ordered_trees[name] = self._order_tree(tree)
 
         flat_scripts = {}
         for name, tree in ordered_trees.items():
@@ -274,7 +274,7 @@ class SCTAnalysis:
                 return True
         return False
 
-    def _generate_subscript_tree_recursive(self, name, important_instructions, location=0, tree=None, ):
+    def _generate_subscript_tree(self, name, important_instructions, tree=None):
         inst_IDs_to_skip = ['Skip 2']
         current_subscript = self.Sections[name]
         if current_subscript.hasString:
@@ -286,10 +286,20 @@ class SCTAnalysis:
             if inst.ID in inst_IDs_to_skip:
                 continue
             ID = int(inst.ID, 16)
-            if pos < location:
-                continue
             if ID == 12:
                 return tree
+            elif ID in current_subscript.change_script_insts:
+                offset_param_id = inst.get_param_id_by_name('offset')
+                if offset_param_id is None:
+                    print('offset parameter is named incorrectly..')
+                    continue
+                offset_param_value = inst.parameters[offset_param_id]
+                link_string = f'*lnk[offset,{offset_param_value}]*'
+                link_desc = inst.resolveDescriptionFuncs(link_string)
+                next_script = link_desc.split(': ')[1].rstrip()
+                tree['end'] = {}
+                tree['end'][pos] = {'inst': ID, 'script': next_script}
+                pass
             elif ID in current_subscript.change_subscript_insts:  # This is the instruction to load a subscript
                 # if current_name == 'loop':
                 #     print('pause here')
@@ -314,9 +324,8 @@ class SCTAnalysis:
                         tree['subscript_load'] = {}
                     tree['subscript_load'][pos] = {'next': next_scriptID, 'location': next_location}
 
-                    tree['subscript_change'][next_scriptID] = self._generate_subscript_tree_recursive(next_script,
-                                                                                                      important_instructions,
-                                                                                                      next_location)
+                    tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(next_script,
+                                                                                            important_instructions)
 
                 elif ID == 0:
                     test = self._format_desc_fxn_dict(inst)
@@ -329,9 +338,8 @@ class SCTAnalysis:
                         tree['subscript_jumpif'][pos] = {'next': next_scriptID,
                                                          'condition': test,
                                                          'location': next_location}
-                        tree['subscript_change'][next_scriptID] = self._generate_subscript_tree_recursive(next_script,
-                                                                                                          important_instructions,
-                                                                                                          next_location)
+                        tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(next_script,
+                                                                                                important_instructions)
                     else:
                         if 'jumpif' not in tree.keys():
                             tree['jumpif'] = {}
@@ -357,9 +365,8 @@ class SCTAnalysis:
                         if 'goto' not in tree.keys():
                             tree['goto'] = {}
                         tree['goto'] = {'position': pos, 'next': next_script, 'location': next_location}
-                        tree['subscript_change'][next_scriptID] = self._generate_subscript_tree_recursive(next_script,
-                                                                                                          important_instructions,
-                                                                                                          next_location)
+                        tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(next_script,
+                                                                                                important_instructions)
 
             elif ID is current_subscript.choice_inst:
                 description = inst.description
@@ -519,9 +526,9 @@ class SCTAnalysis:
             if 'fallthroughs' not in tree.keys():
                 tree['fallthroughs'] = []
             tree['fallthroughs'].append({'next': next_scriptID})
-            tree['subscript_change'][next_scriptID] = self._generate_subscript_tree_recursive(next_script,
-                                                                                              important_instructions,
-                                                                                              next_location)
+            tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(next_script,
+                                                                                    important_instructions,
+                                                                                    next_location)
         else:
             pass
         return tree
@@ -535,7 +542,7 @@ class SCTAnalysis:
                 changeID = int(key.split('-')[1]) + 1
         return f'{name}-{changeID}'
 
-    def _get_subscript_parents_recursive(self, tree, parent, parent_dict=None):
+    def _get_subscript_parents(self, tree, parent, parent_dict=None):
         if parent_dict is None:
             parent_dict = {}
         if 'subscript_change' not in tree:
@@ -549,7 +556,7 @@ class SCTAnalysis:
                 parent_dict[name] = []
             parent_dict[name].append(parent)
             if isinstance(node, dict):
-                parent_dict = {**parent_dict, **self._get_subscript_parents_recursive(node, name, parent_dict)}
+                parent_dict = {**parent_dict, **self._get_subscript_parents(node, name, parent_dict)}
 
         return parent_dict
 
@@ -569,26 +576,26 @@ class SCTAnalysis:
                 done = True
         return input_list
 
-    def _get_roots_recursive(self, subscript, parents, subscript_parents):
+    def _get_roots(self, subscript, parents, subscript_parents):
         roots = []
         if len(parents) > 1:
             for parent in subscript_parents[subscript]:
-                roots = [*roots, *self._get_roots_recursive(parent, subscript_parents[parent], subscript_parents)]
+                roots = [*roots, *self._get_roots(parent, subscript_parents[parent], subscript_parents)]
         else:
             if parents[0] == 'external':
                 roots.append(subscript)
                 return roots
-            roots = [*roots, *self._get_roots_recursive(parents[0], subscript_parents[parents[0]], subscript_parents)]
+            roots = [*roots, *self._get_roots(parents[0], subscript_parents[parents[0]], subscript_parents)]
         return roots
 
-    def _order_tree_recursive(self, tree):
+    def _order_tree(self, tree):
         temp_tree = {}
         pos_list = []
         if 'subscript_change' in tree.keys():
             for script_name, script in tree['subscript_change'].items():
                 if 'children' not in temp_tree.keys():
                     temp_tree['children'] = {}
-                temp_tree['children'][script_name] = self._order_tree_recursive(script)
+                temp_tree['children'][script_name] = self._order_tree(script)
             tree.pop('subscript_change')
         temp_tree['pos_list'] = []
         if 'fallthroughs' in tree.keys():
@@ -701,7 +708,7 @@ class SCTSection:
     )
 
     flow_control_insts = (0, 3, 10)
-    change_script_insts = (43, 238)
+    change_script_insts = (43, 238, 257)
     change_subscript_insts = (0, 10, 11)
     choice_inst = 155
     switch_inst = 3
@@ -1073,6 +1080,13 @@ class SCTInstruct:
                 self.description = stringList[0] + value + stringList[1]
             # print('')
 
+    def get_param_id_by_name(self, name):
+        param_id = None
+        for key, param in self.parameters.items():
+            if param.name == name:
+                param_id = key
+                break
+        return param_id
 
 class SCTParam:
     parameter_types = ['int',
