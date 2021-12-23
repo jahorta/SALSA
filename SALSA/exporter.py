@@ -11,7 +11,7 @@ from SALSA.constants import FieldTypes as FT
 class SCTExporter:
     export_option_fields = {'types': {'req': True, 'type': FT.string_list, 'values': []}}
 
-    def __init__(self, loc=None, verbose=True):
+    def __init__(self, loc=None, verbose=False):
         self.verbose_out = verbose
         self.dir = loc
         self.script_list: List[SCTAnalysis] = []
@@ -1257,7 +1257,7 @@ class ScriptPerformer:
                 rest_same = self._variables_are_equal_recursive(ch1_keys, ch2_keys)
 
         if rest_same:
-            next_branch1 = children1[ch2_keys[0]]
+            next_branch1 = children1[ch1_keys[0]]
             next_branch2 = children2[ch2_keys[0]]
             temp_diff = self._get_first_difference(next_branch1, next_branch2, level=(level + 1))
 
@@ -1604,17 +1604,19 @@ class ScriptPerformer:
         return new_branch
 
     def _flag_outs_for_removal(self, remove_no_mod=False):
-        progress_prefix = 'Searching for outs which contain extra children...'
-        outs = copy.deepcopy(self.all_outs)
-        outs_to_remove = []
-        total = len(outs)
-        for i, out in enumerate(outs):
+        progress_prefix = 'Searching for out branch end errors'
+
+        outs_with_children = []
+        total = len(self.all_outs)
+        for i, out in enumerate(self.all_outs):
             printProgressBar(prefix=progress_prefix, total=total, iteration=i, printEnd='\r')
-            if self._goes_past_out(out):
-                outs_to_remove.append(i)
-        progress_suffix = f'{len(outs_to_remove)} branches found'
+            if self._prune_out_children(out):
+                outs_with_children.append(i)
+        progress_suffix = f'{len(outs_with_children)} children removed'
         printProgressBar(prefix=progress_prefix, suffix=progress_suffix, total=total, iteration=total, printEnd='\r')
 
+        outs = copy.deepcopy(self.all_outs)
+        outs_to_remove = []
         no_mod = []
         progress_prefix = 'Searching for choices without modifiers'
         for i, out in enumerate(outs):
@@ -1654,21 +1656,21 @@ class ScriptPerformer:
 
         return outs_to_remove
 
-    def _goes_past_out(self, out):
+    def _prune_out_children(self, out) -> bool:
         goes_past_out = False
-        out_children = out['children']
-        if len(out_children) == 0:
+        if len(out['children']) == 0:
             return False
-        elif 'out_value' in out_children.keys():
-            if 'children' in out_children['out_value'].keys():
+        elif 'out_value' in out['children'].keys():
+            if 'children' in out['children']['out_value'].keys():
+                out['children']['out_value'].pop('children')
                 return True
 
-        for child1 in out_children.values():
+        for child1 in out['children'].values():
             for key in child1.keys():
                 if goes_past_out:
                     break
                 if key == 'children':
-                    goes_past_out = self._goes_past_out(out=child1)
+                    goes_past_out = self._prune_out_children(out=child1)
 
         return goes_past_out
 
