@@ -718,6 +718,7 @@ class SCTSection:
         if not sect_dict['string'] == '':
             self.hasString = True
             self.string = sect_dict['string']
+            self.location = pos
 
         self.instructions = {}
         instCount = 0
@@ -768,7 +769,7 @@ class SCTSection:
             instruction_tree[key] = current
         if self.hasString:
             next = {
-                'Code': 'String',
+                'Code': f'{self.string}',
                 'Decoded': True,
                 'Error': 'None'
             }
@@ -784,7 +785,8 @@ class SCTSection:
                 'Name': self.name,
                 'Errors': {},
                 'Param Tree': {},
-                'Description': self.string
+                'Description': self.string,
+                'Location': self.location
             }
         else:
             inst = self.instructions[instID]

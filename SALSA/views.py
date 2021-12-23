@@ -1187,8 +1187,8 @@ class ScriptView(tk.Frame):
             self.instruction_code.config(text=ID)
 
             if decoded in ('This Instruction is Decoded', 'This String is Decoded'):
-                name = 'Instruction Name: {}'.format(details['Name']),
-                location = 'Instruction Location: {}'.format(details['Location'])
+                name = f'Instruction Name: {details["Name"]}'
+                location = f'Instruction Location: {details["Location"]}'
                 description = details['Description']
                 # print(description)
                 errors = details['Errors']
