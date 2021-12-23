@@ -44,11 +44,11 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me547.+sct$',
+                'scripts': '^me503.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
-                'headers': 'ScriptID,*ID*\n\n*Inst*Starting Value,Subscript:Position, Branches'
+                'headers': 'ScriptID,*ID*\n\n*Inst*Starting Value (Traceback),Branches'
             },
             'Instruction Count': {
                 'scripts': '^me.+sct$',
@@ -194,7 +194,6 @@ class SCTExporter:
                 for value, traces in values.items():
                     commas = ',' * level
                     value_prefix = f'\n{commas}{value}'
-                    level += 1
                     for trace, diff_dict in traces.items():
                         trace_prefix = f'{value_prefix},({trace})'
                         if diff_dict['has_diff']:
@@ -206,7 +205,6 @@ class SCTExporter:
                             body_diff = diff_dict['out']
                         body = self._format_diff_tree(body_diff, level, diff_dict['trace_level'])
                         diff_string += f'\n{trace_prefix}{body}'
-                    level -= 1
                 if inst_num > 1:
                     level -= 1
 
@@ -282,7 +280,7 @@ class SCTExporter:
         row_header_num = 1
         first_sct = True
         for script in self.script_list:
-            name = script.Name[2:5]
+            name = script.Name[2:6]
             insts_used_raw = script.Details['Instructions Used']
             print_header2 += f',{name}'
             for i in range(0, 265):
@@ -1638,7 +1636,12 @@ class ScriptPerformer:
         progress_prefix = 'Searching for duplicate branches'
         for i, out1 in enumerate(outs):
             if i % 50 == 0:
-                printProgressBar(prefix=progress_prefix, total=total, iteration=math.log2(i), printEnd='\r')
+
+                if i == 0:
+                    iter = 0
+                else:
+                    iter = math.log2(i)
+                printProgressBar(prefix=progress_prefix, total=total, iteration=iter, printEnd='\r')
             checked_outs.append(i)
             for j, out2 in enumerate(outs):
                 if j in checked_outs:
