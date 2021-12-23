@@ -143,7 +143,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "This instruction calls the function 801f60f0\n\nThis function just returns a zero and produces a \ncode error. it is likely that this number is \nreserved for something else.\n\n\n\n\n",
+    "Notes": "This instruction calls the function 801f60f0\n\nThis function just returns a zero and produces a \ncode error. it is likely that this number is \nreserved for something else.",
     "Parameters": {}
   },
   "5": {
@@ -368,7 +368,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "No dependancy on param1\nFunctional at all times\n\nIncrements 8030e71a by 1\n\tThis is the counter for the depth of the current substack\n\nAdds a pointer to the current position to the subscript stack\n\nAdds the offset to the current instruction pointer to go to the subscript.\n\n\n",
+    "Notes": "No dependancy on param1\nFunctional at all times\n\nIncrements 8030e71a by 1\n\tThis is the counter for the depth of the current substack\n\nAdds a pointer to the current position to the subscript stack\n\nAdds the offset to the current instruction pointer to go to the subscript.",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -404,13 +404,13 @@
   "13": {
     "Instruction ID": "13",
     "Name": "code_error",
-    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call\n\n\n",
+    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call",
     "Location": "0x801f60f0",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "This instruction calls the function 801f60f0\n\nThis function just returns a zero and produces a \ncode error. it is likely that this number is \nreserved for something else.\n\n\n",
+    "Notes": "This instruction calls the function 801f60f0\n\nThis function just returns a zero and produces a \ncode error. it is likely that this number is \nreserved for something else.\n\n\nIt looks like this instruction is used during cutscenes to force a frame advance before performing the next cutscene.",
     "Parameters": {}
   },
   "14": {
@@ -638,7 +638,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Dependancy on param1\nif param1 & 1 == 1:\n\tLoads the model file from the footer\n\nNot sure what it does yet or when it is called.\n\nWas called just before a cutscene on 103b\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependancy on param1\nif param1 & 1 == 1:\n\tLoads the model file from the footer\n\nNot sure what it does yet or when it is called.\n\nWas called just before a cutscene on 103b",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -1306,13 +1306,13 @@
   "33": {
     "Instruction ID": "33",
     "Name": "??MVCB2",
-    "Description": "Iter: <Iter>",
+    "Description": "Iter: <Iter>\n<Loop>",
     "Location": "0x80203ffc",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0xfffe0000",
     "Implement": true,
     "Parameter num": 10,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nDoes a bunch of memory allocation, then enters a while loop which runs the number of times of the first parameter\nEach loop loads:\n6 floats\n1 int\nAll from SCPT\n\nThese then get passed into two functions:\n8021331c\n\n2: ??\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nDoes a bunch of memory allocation, then enters a while loop which runs the number of times of the first parameter\nEach loop loads:\n6 floats\n1 int\nAll from SCPT\n\nThese then get passed into two functions:\n8021331c\n\n2: ??",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -1495,7 +1495,7 @@
     "Hard parameter two": "0x00050000",
     "Implement": true,
     "Parameter num": 13,
-    "Notes": "If param_1 & 1 == 1:\n\n1: scpt-short\n2: int\n\na parameter while loop using (2) iterations:\n\n1: scpt-float\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-int\n6: scpt-int\n7: scpt-float\n8: scpt-int\n9: scpt-int\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "If param_1 & 1 == 1:\n\n1: scpt-short\n2: int\n\na parameter while loop using (2) iterations:\n\n1: scpt-float\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-int\n6: scpt-int\n7: scpt-float\n8: scpt-int\n9: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -2598,7 +2598,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Seems to pass a pointer to some sort of string, maybe links to the footer?\n\nPoints to script names, and is used at the end of a win/loss condition in ship battles. Probably points to the next script to load\n\n\n\n\n\n\n\n\n",
+    "Notes": "Seems to pass a pointer to some sort of string, maybe links to the footer?\n\nPoints to script names, and is used at the end of a win/loss condition in ship battles. Probably points to the next script to load",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -7841,14 +7841,14 @@
   },
   "109": {
     "Instruction ID": "109",
-    "Name": "??Overworld Setup",
+    "Name": "??no name",
     "Description": "SCPTS:\n<SCPT_0>\n<SCPT_1>\n<SCPT_2>\n<SCPT_3>\n<SCPT_4>\n<SCPT_5>\n<SCPT_6>\n<SCPT_7>\n<SCPT_8>",
     "Location": "0x80200fc4",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 9,
-    "Notes": "\nCalls 4 functions after generating parameters:\n800d2554\n800d25c4\n800d258c\n800d2ca8\n\nThe parameters are adjusted before passing to the funcitons, and I don't know what the functions do either.\n\n\n\n",
+    "Notes": "\nCalls 4 functions after generating parameters:\n800d2554\n800d25c4\n800d258c\n800d2ca8\n\nThe parameters are adjusted before passing to the funcitons, and I don't know what the functions do either.",
     "Parameters": {
       "0": {
         "ID": "0",
