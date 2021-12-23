@@ -2,7 +2,7 @@
   "0": {
     "Instruction ID": "0",
     "Name": "JMP: jump if false",
-    "Description": "Jump test: <test>\n\nJump if False:\n*lnk[Offset,<Offset>]*",
+    "Description": "Jump test: <test>\n\nJump if False:\n*lnk[offset,<offset>]*",
     "Location": "0x801f6044",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
@@ -29,7 +29,7 @@
       },
       "1": {
         "ID": "1",
-        "Name": "Offset",
+        "Name": "offset",
         "Type": "int",
         "Override": false,
         "Override condition": "",
@@ -13673,7 +13673,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Only functions if param1 & 1 == 1:\n\nSCPT:\n1: int\n\n80147eac((1))\n\n---\n80147eac(p1):\n**Has error: \"ShipIs Not Found In sbGetInfo %d\"\n\nif ((p1 == 0) || (p1 == -1)):\n  puVar1 = 803063f0\n  0x8030e4ac = (int)*(short *)(puVar1 + 0x8);\n  puVar1 = puVar1 + 0x238;\n  0x8030e4b0 = FUN_80148024(0x0,p1);\n\nelse:\n  piVar3 = 80308ef8\n  iVar4 = -0x1\n  iVar2 = 0x8034729c\n  if (0x0 < 0x8034729c):\n    while (iVar2 != 0x0):\n      if (p1 == *(ushort *)(*(int *)(*piVar3 + 0x24) + 0x17a)):\n        iVar4 = piVar3[4]\n      piVar3 = piVar3 + 5\n      iVar2 = iVar2 - 1\n  if (iVar4 == -0x1): \n    DBPrintf(s_ShipIs_Not_Found_In_sbGetInfo_%d,param_1)\n  \n  iVar2 = FUN_8013558c()\n  puVar1 = (undefined *)(iVar2 + iVar4 * 0x10c)\n  DAT_8030e4ac = 0x0\n  DAT_8030e4b0 = FUN_80148024(0x1,param_1)\n}\niVar2 = FUN_80129d40(p1);\nDAT_8030e478 = *(undefined4 *)(iVar2 + 0x8);\nDAT_8030e47c = *(undefined4 *)(puVar1 + 0x14);\nDAT_8030e480 = (int)*(short *)(puVar1 + 0x76);\nDAT_8030e484 = (int)*(short *)(puVar1 + 0x98);\nDAT_8030e488 = (int)*(short *)(puVar1 + 0xba);\nDAT_8030e48c = (int)*(short *)(puVar1 + 0xdc);\nDAT_8030e490 = (int)*(short *)(puVar1 + 0x7a);\nDAT_8030e494 = (int)*(short *)(puVar1 + 0x9c);\nDAT_8030e498 = (int)*(short *)(puVar1 + 0xbe);\nDAT_8030e49c = (int)*(short *)(puVar1 + 0xe0);\nDAT_8030e4a0 = (int)*(short *)(puVar1 + 0x1c);\nDAT_8030e4a4 = (int)*(short *)(puVar1 + 0x20);\nDAT_8030e4a8 = (int)*(short *)(puVar1 + 0x24);\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only functions if param1 & 1 == 1:\n\nSCPT:\n1: int\n\n80147eac((1))\n\n---\n80147eac(p1):\n**Has error: \"ShipIs Not Found In sbGetInfo %d\"\n\nif ((p1 == 0) || (p1 == -1)):\n  puVar1 = 803063f0\n  0x8030e4ac = (int)*(short *)(puVar1 + 0x8);\n  puVar1 = puVar1 + 0x238;\n  0x8030e4b0 = FUN_80148024(0x0,p1);\n\nelse:\n  piVar3 = 80308ef8\n  iVar4 = -0x1\n  iVar2 = 0x8034729c\n  if (0x0 < 0x8034729c):\n    while (iVar2 != 0x0):\n      if (p1 == *(ushort *)(*(int *)(*piVar3 + 0x24) + 0x17a)):\n        iVar4 = piVar3[4]\n      piVar3 = piVar3 + 5\n      iVar2 = iVar2 - 1\n  if (iVar4 == -0x1): \n    DBPrintf(s_ShipIs_Not_Found_In_sbGetInfo_%d,param_1)\n  \n  iVar2 = FUN_8013558c()\n  puVar1 = (undefined *)(iVar2 + iVar4 * 0x10c)\n  DAT_8030e4ac = 0x0\n  DAT_8030e4b0 = FUN_80148024(0x1,param_1)\n}\niVar2 = FUN_80129d40(p1);\nDAT_8030e478 = *(undefined4 *)(iVar2 + 0x8);\nDAT_8030e47c = *(undefined4 *)(puVar1 + 0x14);\nDAT_8030e480 = (int)*(short *)(puVar1 + 0x76);\nDAT_8030e484 = (int)*(short *)(puVar1 + 0x98);\nDAT_8030e488 = (int)*(short *)(puVar1 + 0xba);\nDAT_8030e48c = (int)*(short *)(puVar1 + 0xdc);\nDAT_8030e490 = (int)*(short *)(puVar1 + 0x7a);\nDAT_8030e494 = (int)*(short *)(puVar1 + 0x9c);\nDAT_8030e498 = (int)*(short *)(puVar1 + 0xbe);\nDAT_8030e49c = (int)*(short *)(puVar1 + 0xe0);\nDAT_8030e4a0 = (int)*(short *)(puVar1 + 0x1c);\nDAT_8030e4a4 = (int)*(short *)(puVar1 + 0x20);\nDAT_8030e4a8 = (int)*(short *)(puVar1 + 0x24);",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -16517,14 +16517,14 @@
   },
   "238": {
     "Instruction ID": "238",
-    "Name": "??Change Script",
-    "Description": "Sets a new script file (me099a) with the following parameters:\nMaybe positional variables?\nunknown0: <unknown0>\nunknown1: <unknown1>\nunknown2: <unknown2>",
+    "Name": "Return to Overworld",
+    "Description": "Sets a new script file (me099a) with the following parameters:\n\nMaybe positional variables?\nunknown0: <unknown0>\nunknown1: <unknown1>\nunknown2: <unknown2>",
     "Location": "0x802074b0",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 3,
-    "Notes": "Only runs if \n\n\n\n",
+    "Notes": "Only runs if",
     "Parameters": {
       "0": {
         "ID": "0",
