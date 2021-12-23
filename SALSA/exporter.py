@@ -443,10 +443,8 @@ class ScriptPerformer:
                                 if len_1 > len_2:
                                     branches_to_remove.append(i)
 
-                # flag for removal completed branches and remove any switch or jump states for a fresh run
+                # flag for removal completed branches
                 for i, branch in enumerate(self.open_branch_segments):
-                    branch['switch_states'] = []
-                    branch['jump_states'] = []
                     if i % 500 == 0:
                         printProgressBar(prefix='Flagging Completed Branches', total=current_open_branch_num, iteration=i, length=124)
                     if 'out_value' in branch.keys():
@@ -506,6 +504,11 @@ class ScriptPerformer:
                     f'{len(branches_to_remove)} branches pruned - {len(self.open_branch_segments)} open branches '
                     f'remaining - {len(self.all_outs)} closed branches: ')
 
+                # Remove any switch or jump states for a fresh run
+                for branch in self.open_branch_segments:
+                    branch['switch_states'] = []
+                    branch['jump_states'] = []
+
                 if len(self.open_branch_segments) == 0:
                     done = True
                 else:
@@ -522,6 +525,8 @@ class ScriptPerformer:
                             new_run_dict = {'value': 1, 'mid_ram': [mid_ram]}
                         updated_branch['new_run'] = new_run_dict
                         self.open_branch_segments[0] = updated_branch
+
+
 
             print('\n')
             # Remove duplicates and any branch which goes past the out value, and any branch which contains a choice without modification
@@ -769,7 +774,7 @@ class ScriptPerformer:
                     branch=copy.deepcopy(self.open_branch_segments[branch_index]),
                     node_key='jumpif', node_value=copy.deepcopy(jump_dict),
                     modify=modify)
-                if has_condition:
+                if not has_condition:
                     updated_branch['jump_states'].append({'condition': condition_string, 'jumped': jump})
                 self.open_branch_segments[branch_index] = updated_branch
                 force_branch = False
@@ -1322,11 +1327,18 @@ class ScriptPerformer:
         return reformatted_summary
 
     def get_traceback_diff_level(self, traceback1, traceback2):
-        level = len(traceback1) - 1
-        if not self._variables_are_equal_recursive(traceback1, traceback2):
-            for i in reversed(range(len(traceback1)-1)):
-                if not self._variables_are_equal_recursive(traceback1[i], traceback2[i]):
-                    level = i
+        level = 0
+        trace1_range = len(traceback1) - 1
+        trace2_range = len(traceback2) - 1
+        level_found = False
+        if self._variables_are_equal_recursive(traceback1, traceback2):
+            return trace1_range
+        while not level_found:
+            if not self._variables_are_equal_recursive(traceback1[level], traceback2[level]):
+                level_found = True
+            level += 1
+            if trace1_range == level or trace2_range == level:
+                level_found = True
         return level
 
     @classmethod
