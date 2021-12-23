@@ -21,7 +21,8 @@ class SCTExporter:
 
         self.export_functions = {
             'Ship battle turn data': self._ship_battle_turn_parameters,
-            'Ship battle turnID decisions': self._ship_battle_turnID_decisions
+            'Ship battle turnID decisions': self._ship_battle_turnID_decisions,
+            'Instruction Count': self._get_instruction_counts
         }
 
         self.export_options = {
@@ -48,6 +49,11 @@ class SCTExporter:
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
                 'headers': 'ScriptID,*ID*\n\n*Inst*Starting Value,Subscript:Position, Branches'
+            },
+            'Instruction Count': {
+                'scripts': '^me.+sct$',
+                'header1': 'ScriptID',
+                'header2': 'Inst details'
             }
         }
 
@@ -268,6 +274,27 @@ class SCTExporter:
 
         out = f'\n'.join(new_lines)
         return out
+
+    def _get_instruction_counts(self):
+        print_rows = []
+        print_header1 = ',Script IDs'
+        print_header2 = 'Inst'
+        row_header_num = 1
+        first_sct = True
+        for script in self.script_list:
+            name = script.Name[2:5]
+            insts_used_raw = script.Details['Instructions Used']
+            print_header2 += f',{name}'
+            for i in range(0, 265):
+                if first_sct:
+                    print_rows.append(f'{i} - {self.instruction_list[str(i)].name}')
+                print_rows[i] += f',{insts_used_raw.get(i, 0)}'
+            first_sct = False
+        all_rows = [print_header1, print_header2, *print_rows]
+        csv = '\n'.join(all_rows)
+        instruction_count_output = {'Instruction Counts': self._fill_out_commas(csv=csv)}
+
+        return instruction_count_output
 
 
 class ScriptPerformer:
