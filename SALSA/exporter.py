@@ -45,7 +45,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me515.+sct$',
+                'scripts': '^me506.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -1735,24 +1735,6 @@ class ScriptPerformer:
         if remove_no_mod:
             outs_to_remove = [*outs_to_remove, *no_mod]
             progress_suffix += ' (flagged for removal)'
-        printProgressBar(prefix=progress_prefix, suffix=progress_suffix, total=total, iteration=total, printEnd='\r')
-
-        duplicates = []
-        checked_outs = []
-        progress_prefix = 'Searching for duplicate branches'
-        for i, out1 in enumerate(outs):
-            if i % 50 == 0:
-                printProgressBar(prefix=progress_prefix, suffix=f'{i}/{total}', total=total, iteration=i, printEnd='\r')
-            checked_outs.append(i)
-            trace1 = out1['init_value']['traceback']
-            for j, out2 in enumerate(outs):
-                trace2 = out1['init_value']['traceback']
-                if j in checked_outs or not self._variables_are_equal_recursive(trace1, trace2):
-                    continue
-                if self._variables_are_equal_recursive(var1=out1, var2=out2):
-                    duplicates.append(j)
-        outs_to_remove = [*outs_to_remove, *duplicates]
-        progress_suffix = f'({len(duplicates)}) duplicate branches found (flagged for removal)'
         printProgressBar(prefix=progress_prefix, suffix=progress_suffix, total=total, iteration=total, printEnd='\r')
 
         return outs_to_remove
