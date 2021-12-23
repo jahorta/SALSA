@@ -369,18 +369,20 @@ class ScriptPerformer:
 
                 false_branch_num = len(self.false_branches)
 
-                desired_stats = {'init_value': 3.0, 'init_subscript': '_SET_PATH'}
-                interesting_branches = []
-                for i, branch in enumerate(self.open_branch_segments):
-                    subscript = branch['init_value']['subscript']
-                    if 'parameter values' in branch:
-                        value_out = branch["parameter values"]["scene"]
-                        if isinstance(value_out, str):
-                            value_out = branch["address_values"][value_out]
-                    if value_out == desired_stats['init_value'] and subscript == desired_stats['init_subscript']:
-                        interesting_branches.append(i)
+                # # Used for debugging purposes only
+                # desired_stats = {'init_value': 3.0, 'init_subscript': '_SET_PATH'}
+                # interesting_branches = []
+                # for i, branch in enumerate(self.open_branch_segments):
+                #     subscript = branch['init_value']['subscript']
+                #     if 'parameter values' in branch:
+                #         value_out = branch["parameter values"]["scene"]
+                #         if isinstance(value_out, str):
+                #             value_out = branch["address_values"][value_out]
+                #     if value_out == desired_stats['init_value'] and subscript == desired_stats['init_subscript']:
+                #         interesting_branches.append(i)
 
                 sorted_false_branches = sorted(list(set(self.false_branches)))
+                print(f'{change_open_branch_num} branches opened - {false_branch_num} false branches detected and flagged')
 
                 branches_to_remove = []
                 false_branch_copy = [*self.false_branches]
@@ -413,7 +415,6 @@ class ScriptPerformer:
                                     branches_to_remove.append(i)
 
                 # flag for removal completed branches
-                printProgressBar(prefix='Flagging Completed Branches', total=current_open_branch_num, iteration=0, length=124)
                 for i, branch in enumerate(self.open_branch_segments):
                     if i % 500 == 0:
                         printProgressBar(prefix='Flagging Completed Branches', total=current_open_branch_num, iteration=i, length=124)
@@ -428,7 +429,6 @@ class ScriptPerformer:
                 # flag for removal identical open branches
                 branches_to_remove = sorted(list(set(branches_to_remove)))
                 checked_branches = []
-                printProgressBar(prefix='Flagging identical open branches', total=current_open_branch_num, iteration=0, length=119)
                 for i, open1 in enumerate(self.open_branch_segments):
                     if i % 500 == 0:
                         printProgressBar(prefix='Flagging identical open branches', total=current_open_branch_num,
@@ -447,7 +447,6 @@ class ScriptPerformer:
                 # flag for removal open branches with the same initial conditions as an out branch
                 branches_to_remove = sorted(list(set(branches_to_remove)))
                 repeats = []
-                printProgressBar(prefix='Removing open branches which mirror closed branches', total=len(self.all_outs), iteration=0)
                 for i, out_branch in enumerate(self.all_outs):
                     if i % 500 == 0:
                         printProgressBar(prefix='Removing open branches which mirror closed branches', total=len(self.all_outs),
@@ -471,9 +470,8 @@ class ScriptPerformer:
                     self.open_branch_segments.pop(i)
 
                 print(
-                    f'{change_open_branch_num} branches opened - {false_branch_num} false branches detected '
-                    f'(removed?{remove_false_branches}) - {len(branches_to_remove)} branches pruned '
-                    f'- {len(self.open_branch_segments)} open branches remaining - {len(self.all_outs)} closed branches: ')
+                    f'{len(branches_to_remove)} branches pruned - {len(self.open_branch_segments)} open branches '
+                    f'remaining - {len(self.all_outs)} closed branches: ')
 
                 if len(self.open_branch_segments) == 0:
                     done = True
@@ -550,7 +548,8 @@ class ScriptPerformer:
         if len(ptrs) > 0:
             my_ptr = ptrs.pop(0)
             if 'ptr' not in my_ptr:
-                print('pause here')
+                # print('pause here')
+                pass
             name = my_ptr['name']
             traceback[-1] = copy.deepcopy(my_ptr)
             if len(ptrs) > 0:
@@ -702,7 +701,8 @@ class ScriptPerformer:
 
             elif 'requested' in inst:
                 if inst_pos == 185:
-                    print('pause here')
+                    # print('pause here')
+                    pass
                 hit_requested = True
                 req_dict = copy.deepcopy(inst['requested'])
                 params = req_dict['parameter values']
@@ -1428,7 +1428,7 @@ class ScriptPerformer:
                     cur_outs.append(outs[id])
                 output = cur_outs[0]
                 out_dict = {'inst': 'out', 'out': output, 'multiple_outs': True}
-                print('no children here?')
+                # print('no children here?')
                 return out_dict
 
         for key, option_list in child_ids.items():
@@ -1579,30 +1579,39 @@ class ScriptPerformer:
         return new_branch
 
     def _flag_outs_for_removal(self, remove_no_mod=False):
+        progress_prefix = 'Searching for outs which contain extra children...'
         outs = copy.deepcopy(self.all_outs)
         outs_to_remove = []
+        total = len(outs)
         for i, out in enumerate(outs):
+            printProgressBar(prefix=progress_prefix, total=total, iteration=i, printEnd='\r')
             if self._goes_past_out(out):
                 outs_to_remove.append(i)
+        progress_suffix = f'{len(outs_to_remove)} branches found'
+        printProgressBar(prefix=progress_prefix, suffix=progress_suffix, total=total, iteration=total, printEnd='\r')
 
         no_mod = []
+        progress_prefix = 'Searching for choices without modifiers'
         for i, out in enumerate(outs):
+            printProgressBar(prefix=progress_prefix, total=total, iteration=i, printEnd='\r')
+
             if i in outs_to_remove:
                 continue
             elif self._choice_with_no_mod(out):
                 no_mod.append(i)
-        print(f'({len(no_mod)}) branches found with a choice but no modifier')
+        progress_suffix = f'{len(no_mod)} branches found with a choice but no modifier'
         if remove_no_mod:
             outs_to_remove = [*outs_to_remove, *no_mod]
-            print('removed...')
+            progress_suffix += ' (flagged for removal)'
+        printProgressBar(prefix=progress_prefix, suffix=progress_suffix, total=total, iteration=total, printEnd='\r')
 
         duplicates = []
         checked_outs = []
         total = math.log2(len(outs))
+        progress_prefix = 'Searching for duplicate branches'
         for i, out1 in enumerate(outs):
             if i % 50 == 0:
-                printProgressBar(prefix='Searching for duplicate branches', total=total,
-                                 iteration=math.log2(i), printEnd='\r')
+                printProgressBar(prefix=progress_prefix, total=total, iteration=math.log2(i), printEnd='\r')
             checked_outs.append(i)
             for j, out2 in enumerate(outs):
                 if j in checked_outs:
@@ -1610,9 +1619,8 @@ class ScriptPerformer:
                 if self._variables_are_equal_recursive(var1=out1, var2=out2):
                     duplicates.append(j)
         outs_to_remove = [*outs_to_remove, *duplicates]
-        printProgressBar(prefix='Searching for duplicate branches', total=total,
-                         iteration=total, printEnd='\r')
-        print(f'({len(duplicates)}) duplicate branches found')
+        progress_suffix = f'({len(duplicates)}) duplicate branches found (flagged for removal)'
+        printProgressBar(prefix=progress_prefix, suffix=progress_suffix, total=total, iteration=total, printEnd='\r')
 
         return outs_to_remove
 
