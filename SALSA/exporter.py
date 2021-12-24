@@ -1165,7 +1165,6 @@ class ScriptPerformer:
                     branch_num = len(branches)
                     if branch_num > 1:
                         checked_branches = []
-                        progress_suffix = f' \t1/{branch_num}'
                         for i, branch1 in enumerate(branches):
                             progress_suffix = f' \t{i}/{branch_num}'
                             printProgressBar(prefix=progress_prefix, suffix=progress_suffix, length=progress_bar_length,
@@ -1203,7 +1202,7 @@ class ScriptPerformer:
             'value': 8.0,
             'trace': '_SET_PATH:4'
         }
-        print('Making Summary...')
+        print('Making Summaries...')
         summary = {}
         for inst, values in grouped_branches.items():
             summary[inst] = {}
@@ -1224,8 +1223,10 @@ class ScriptPerformer:
                         pass
                     differences = all_differences[inst][value][trace]
                     branch_outs = all_outs[inst][value][trace]
+                    print(f'Summarizing {value}:::{trace}...')
                     if len(branches) > 1:
                         if len(differences) > 0:
+
                             diff_levels = all_diff_levels[inst][value][trace]
                             stratified_diff_summary = self._get_stratified_differences(
                                 diffs=copy.deepcopy(differences),
@@ -1918,10 +1919,10 @@ class ScriptPerformer:
                 comparison = comp
                 if isinstance(param, dict):
                     for sub_param in param.values():
-                        if isinstance(param, dict):
+                        if isinstance(sub_param, dict):
                             params.append(self._should_not_jump(sub_param, ram))
                         else:
-                            params.append(param)
+                            params.append(sub_param)
                 elif isinstance(param, float) or \
                         isinstance(param, int) or \
                         isinstance(param, str):
