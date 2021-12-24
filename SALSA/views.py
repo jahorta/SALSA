@@ -1406,8 +1406,11 @@ class ExporterView(tk.Toplevel):
         button_extract_data = tk.Button(self.export_frame, text='Extract Data', command=self.export_selected_data)
         button_extract_data.grid(row=1, column=0)
 
-        self.quit = tk.Button(self, text='Cancel', command=lambda: self.callbacks['on_close'](window='export'))
-        self.quit.grid(row=1, column=0)
+        button_frame = tk.Frame(self)
+        button_frame.grid(row=1, column=0)
+        self.quit = tk.Button(button_frame, text='Cancel', command=lambda: self.callbacks['on_close'](window='export'))
+        self.quit.grid(row=0, column=1)
+        self.export_all = tk.Button(button_frame, text='Write all to CSVs', command=lambda: self.write_csv('all'))
         progress_frame = tk.LabelFrame(self, text='Progress')
         progress_frame.grid(row=2, column=0)
         self.progress_text = tk.StringVar()
@@ -1441,8 +1444,15 @@ class ExporterView(tk.Toplevel):
             tab_text = w.ScrolledTextCanvas(tab_frame, size=self.size, text_offset=self.text_offset,
                                             text=v)
             tab_text.grid(row=0, column=0)
-            tab_button = tk.Button(tab_frame, text='Export', command=self.send_to_clipboard)
-            tab_button.grid(row=1, column=0)
+
+            button_frame = tk.Frame(tab_frame)
+            button_frame.grid(row=1, column=0)
+            tab_button = tk.Button(button_frame, text='Copy to clipboard', command=self.send_to_clipboard)
+            tab_button.grid(row=0, column=0)
+            tab_button = tk.Button(button_frame, text='Write tab to CSV', command=lambda: self.write_csv('tab'))
+            tab_button.grid(row=0, column=1)
+
+        self.export_all.grid(row=0, column=0)
 
         self.export_notebook.tkraise()
 
@@ -1463,3 +1473,12 @@ class ExporterView(tk.Toplevel):
     def update_progress(self, percent, text):
         self.progress_text.set(text)
         self.progress_bar['value'] = percent
+
+    def write_csv(self, number):
+        if number == 'all':
+            to_csv = self.export_values
+        else:
+            tab_name = self.export_notebook.tab(self.export_notebook.select(), 'text')
+            to_csv = {tab_name:  self.export_values[tab_name]}
+
+        self.callbacks['on_write_to_csv'](to_csv)

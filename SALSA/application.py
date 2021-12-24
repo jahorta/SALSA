@@ -87,7 +87,8 @@ class Application(tk.Tk):
         }
         self.exporter_callbacks = {
             'on_export': self.on_data_export,
-            'on_close': self.about_window_close
+            'on_close': self.about_window_close,
+            'on_write_to_csv': self.export_as_csv
         }
 
         # Initialize popup window variables
@@ -221,6 +222,29 @@ class Application(tk.Tk):
 
         # Update Exports expects a dictionary of strings. The key becomes the tab name and the string is csv format
         self.export_window.update_exports(self.exporter_out)
+
+    def export_as_csv(self, csv_dict):
+        title = 'temp'
+        if len(csv_dict) > 1:
+            title = 'Export all to CSV'
+        elif len(csv_dict) == 1:
+            key = list(csv_dict.keys())[0]
+            title = f'Export {key} to CSV'
+        else:
+            title = 'CSV Write Error'
+            body = 'CSV dict has no entries'
+            tk.messagebox.showerror(title=title, message=body)
+            return
+        out_dir = tk.filedialog.askdirectory(parent=self, title=title, mustexist=True)
+        if not os.path.exists(out_dir):
+            title = 'CSV Write Error'
+            body = 'CSV dict has no entries'
+            tk.messagebox.showerror(title=title, message=body)
+        for key, csv in csv_dict.items():
+            key += '.csv'
+            filename = os.path.join(out_dir, key)
+            with open(filename, 'w') as fh:
+                fh.write(csv)
 
     # Called when a file is selected
     def on_file_select(self):
