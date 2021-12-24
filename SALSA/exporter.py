@@ -45,7 +45,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me515.+sct$',
+                'scripts': '^me50[0-3]+.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -1110,7 +1110,7 @@ class ScriptPerformer:
                             continue
                         b1_traceback = branch1['init_value']['traceback']
                         b2_traceback = branch2['init_value']['traceback']
-                        traceback_level = min(traceback_level, self.get_traceback_diff_level(b1_traceback, b2_traceback))
+                        traceback_level = min(traceback_level, self._get_traceback_diff_level(b1_traceback, b2_traceback))
                 all_trace_levels[inst][value] = traceback_level
                 for branch in branches:
                     diff_traceback = branch['init_value']['traceback']
@@ -1316,7 +1316,7 @@ class ScriptPerformer:
                             continue
                         b1_traceback = branch1['init_value']['traceback']
                         b2_traceback = branch2['init_value']['traceback']
-                        traceback_level = min(traceback_level, self.get_traceback_diff_level(b1_traceback, b2_traceback))
+                        traceback_level = min(traceback_level, self._get_traceback_diff_level(b1_traceback, b2_traceback))
                 for key, trace in traces.items():
                     diff_traceback = grouped_branches[inst][value][key][0]['init_value']['traceback']
                     new_key = self._get_traceback_string(diff_traceback, traceback_level)
@@ -1326,18 +1326,18 @@ class ScriptPerformer:
 
         return reformatted_summary
 
-    def get_traceback_diff_level(self, traceback1, traceback2):
-        level = 0
+    def _get_traceback_diff_level(self, traceback1, traceback2):
         trace1_range = len(traceback1) - 1
         trace2_range = len(traceback2) - 1
+        level = min(trace1_range, trace2_range)
         level_found = False
         if self._variables_are_equal_recursive(traceback1, traceback2):
             return trace1_range
         while not level_found:
             if not self._variables_are_equal_recursive(traceback1[level], traceback2[level]):
                 level_found = True
-            level += 1
-            if trace1_range == level or trace2_range == level:
+            level -= 1
+            if level == 0:
                 level_found = True
         return level
 
