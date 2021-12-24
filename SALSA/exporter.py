@@ -168,7 +168,7 @@ class SCTExporter:
         headers = info_dict.pop('headers')
         script_runs = {}
         for script_name, script in info_dict.items():
-            print(f'---Now running {script_name}---\n')
+            print(f'\n---Now running {script_name}---')
             script_runs[script_name] = self.script_performer.run(script,
                                                                  self.export_options[self.export_type]['instructions'])
 
@@ -279,7 +279,6 @@ class SCTExporter:
         print_rows = []
         print_header1 = ',Script IDs'
         print_header2 = 'Inst'
-        row_header_num = 1
         first_sct = True
         for script in self.script_list:
             name = script.Name[2:6]
@@ -1914,13 +1913,21 @@ class ScriptPerformer:
         params = []
         comparison = ''
         for value in compare.values():
-            for comp, param_list in value.items():
+            for comp, param in value.items():
                 comparison = comp
-                for param in param_list.values():
-                    if isinstance(param, dict):
-                        params.append(self._should_not_jump(param, ram))
-                    else:
-                        params.append(param)
+                if isinstance(param, dict):
+                    for sub_param in param.values():
+                        if isinstance(param, dict):
+                            params.append(self._should_not_jump(sub_param, ram))
+                        else:
+                            params.append(param)
+                elif isinstance(param, float) or \
+                        isinstance(param, int) or \
+                        isinstance(param, str):
+                    params.append(param)
+                else:
+                    print(f'WARNING: unable to process param of type {type(param)}. Not performing jump')
+                    return False
 
         if not len(params) == 2:
             if isBase:
