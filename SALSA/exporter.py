@@ -45,7 +45,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me50[0-3]+.+sct$',
+                'scripts': '^me50[4-9]+.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -1609,6 +1609,8 @@ class ScriptPerformer:
 
     def _generate_condition_string(self, cond_in, top_level=True):
         string = ''
+        if isinstance(cond_in, str) and top_level:
+            return cond_in
         for cond, cond_dict in cond_in.items():
             temp_cond = cond
             values = {}
