@@ -168,6 +168,7 @@ class SCTExporter:
         headers = info_dict.pop('headers')
         script_runs = {}
         for script_name, script in info_dict.items():
+            print(f'---Now running {script_name}---\n')
             script_runs[script_name] = self.script_performer.run(script,
                                                                  self.export_options[self.export_type]['instructions'])
 
@@ -344,6 +345,7 @@ class ScriptPerformer:
         self.all_outs = []
         init_script = input_dict['flat'].pop('init')
         init_ram = self._get_defined_ram()
+        print(f'\nSubscript: init: Iteration 0')
         self._run_subscript_branch(name='init', subscripts=init_script, ram=init_ram)
 
         for i in reversed(list(set(self.false_branches))):
@@ -525,8 +527,6 @@ class ScriptPerformer:
                             new_run_dict = {'value': 1, 'mid_ram': [mid_ram]}
                         updated_branch['new_run'] = new_run_dict
                         self.open_branch_segments[0] = updated_branch
-
-
 
             print('\n')
             # Remove duplicates and any branch which goes past the out value, and any branch which contains a choice without modification
