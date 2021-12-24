@@ -1950,7 +1950,7 @@ class ScriptPerformer:
             if isinstance(value, dict):
                 if not self._can_jump(value, ram):
                     return False
-            else:
+            elif isinstance(value, str):
                 if re.search(': ', value):
                     addr = value.split(': ')[1].rstrip()
                     value = self._get_memory_pos(addr, ram, 'control')
@@ -1958,6 +1958,10 @@ class ScriptPerformer:
                         return True
                     else:
                         return False
+            else:
+                is_number = isinstance(value, int) or isinstance(value, float)
+                if not is_number:
+                    return False
         return True
 
     def _can_switch(self, addr, ram):
