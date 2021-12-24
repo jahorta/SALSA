@@ -45,7 +45,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me50[4-9]+.+sct$',
+                'scripts': '^me51[0-9]+.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -1914,7 +1914,7 @@ class ScriptPerformer:
     def _should_not_jump(self, compare, ram, isBase=False):
         params = []
         comparison = ''
-        for value in compare.values():
+        for short_compare, value in compare.items():
             for comp, param in value.items():
                 comparison = comp
                 if isinstance(param, dict):
@@ -1927,6 +1927,7 @@ class ScriptPerformer:
                         isinstance(param, int) or \
                         isinstance(param, str):
                     params.append(param)
+                    comparison = short_compare
                 else:
                     print(f'WARNING: unable to process param of type {type(param)}. Not performing jump')
                     return False
@@ -1945,8 +1946,11 @@ class ScriptPerformer:
                 param_values.append(value)
             else:
                 param_values.append(param)
+        try:
+            result = self.scpt_codes[comparison](param_values[0], param_values[1])
+        except KeyError as e:
+            print('pause here')
 
-        result = self.scpt_codes[comparison](param_values[0], param_values[1])
         if isBase:
             if result == 1:
                 return True
@@ -1955,23 +1959,22 @@ class ScriptPerformer:
         return result
 
     def _can_jump(self, compare, ram):
+        can_jump = True
         for value in compare.values():
             if isinstance(value, dict):
                 if not self._can_jump(value, ram):
-                    return False
+                    can_jump = False
             elif isinstance(value, str):
                 if re.search(': ', value):
                     addr = value.split(': ')[1].rstrip()
                     value = self._get_memory_pos(addr, ram, 'control')
-                    if value is not None:
-                        return True
-                    else:
-                        return False
+                    if value is None:
+                        can_jump = False
             else:
                 is_number = isinstance(value, int) or isinstance(value, float)
                 if not is_number:
-                    return False
-        return True
+                    can_jump = False
+        return can_jump
 
     def _can_switch(self, addr, ram):
         value = self._get_memory_pos(addr, ram, 'control')
