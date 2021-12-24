@@ -503,7 +503,7 @@ class ScriptPerformer:
 
                 print(
                     f'{len(branches_to_remove)} branches pruned - {len(self.open_branch_segments)} open branches '
-                    f'remaining - {len(self.all_outs)} closed branches: ')
+                    f'remaining - {len(self.all_outs)} closed branches')
 
                 # Remove any switch or jump states for a fresh run
                 for branch in self.open_branch_segments:
@@ -639,7 +639,8 @@ class ScriptPerformer:
         back_log = []
         while not done:
             cur_trace_id = len(traceback) - 1
-            # print(f'{spaces}depth: {depth} current position: {name}:{current_pointer}')
+            if self.debug_verbose:
+                print(f'{spaces}depth: {depth} current position: {name}:{current_pointer}')
             if 'set' in inst:
                 cur_ram = self._set_memory_pos(inst['set'], cur_ram)
                 self.open_branch_segments[branch_index]['cur_ram'] = cur_ram
@@ -1115,7 +1116,7 @@ class ScriptPerformer:
                     diff_traceback = branch['init_value']['traceback']
                     trace_key = self._get_traceback_string(diff_traceback, traceback_level)
                     if trace_key not in grouped_branches[inst][value].keys():
-                        print(f'Creating trace key: {trace_key}')
+                        print(f'Creating group: Value: {value}, Trace: {trace_key}')
                         grouped_branches[inst][value][trace_key] = []
                     grouped_branches[inst][value][trace_key].append(branch)
 
