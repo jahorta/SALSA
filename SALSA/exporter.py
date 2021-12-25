@@ -45,7 +45,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me51[0-9]+.+sct$',
+                'scripts': '^me501+.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -154,7 +154,7 @@ class SCTExporter:
         script_info_list = {'headers': self.export_options[self.export_type]['headers']}
 
         for i, sct in enumerate(self.script_list):
-            # print(f'Getting information for {sct.Name}: {i+1}/{len(self.script_list)}')
+            print(f'Getting information for {sct.Name}: {i+1}/{len(self.script_list)}')
             script_info_out = sct.get_export_script_tree(self.export_options[self.export_type]['subscripts'],
                                                          list(self.export_options[self.export_type][
                                                                   'instructions'].keys()))
@@ -163,7 +163,6 @@ class SCTExporter:
         return script_info_list
 
     def _ship_battle_turnID_decisions(self):
-        verbose = self.verbose_out
         info_dict = self.export_options[self.export_type]['function']()
         headers = info_dict.pop('headers')
         script_runs = {}
@@ -172,7 +171,6 @@ class SCTExporter:
             script_runs[script_name] = self.script_performer.run(script,
                                                                  self.export_options[self.export_type]['instructions'])
 
-        # TODO - implement formatting of decision flow
         temp_outs = {}
         for script, result in script_runs.items():
             if '.' in script:
@@ -183,15 +181,18 @@ class SCTExporter:
             csv = headers
             csv = csv.replace('*ID*', script_num)
 
-            diff_string = ''
+            diff_condensed = ''
+            diff_verbose = ''
             inst_num = len(result['summary'])
             csv = csv.replace('*Inst*', 'Inst,' if inst_num > 1 else '')
+            csv_verbose = csv
+            csv_condensed = csv
             level = 0
             for inst, values in result['summary'].items():
-                diff_string += '\n'
+                diff_condensed += '\n'
                 if inst_num > 1:
                     prefix = ',' * level
-                    diff_string += f'{prefix}{inst}'
+                    diff_condensed += f'{prefix}{inst}'
                     level += 1
                 for value, traces in values.items():
                     commas = ',' * level
@@ -199,20 +200,24 @@ class SCTExporter:
                     for trace, diff_dict in traces.items():
                         trace_prefix = f'{value_prefix} ({trace})'
                         if diff_dict['has_diff']:
-                            if verbose:
-                                body_diff = diff_dict['stratified']
-                            else:
-                                body_diff = diff_dict['condensed']
+                            body_verbose = self._format_diff_tree(diff_dict['stratified'], level, diff_dict['trace_level'])
+                            body_condensed = self._format_diff_tree(diff_dict['condensed'], level, diff_dict['trace_level'])
+                            diff_verbose += f'\n{trace_prefix}{body_verbose}'
+                            diff_condensed += f'\n{trace_prefix}{body_condensed}'
                         else:
-                            body_diff = diff_dict['out']
-                        body = self._format_diff_tree(body_diff, level, diff_dict['trace_level'])
-                        diff_string += f'\n{trace_prefix}{body}'
+                            body_out = self._format_diff_tree(diff_dict['out'], level, diff_dict['trace_level'])
+                            diff_verbose += f'\n{trace_prefix}{body_out}'
+                            diff_condensed += f'\n{trace_prefix}{body_out}'
+
                 if inst_num > 1:
                     level -= 1
 
-            csv += diff_string
-            csv = self._fill_out_commas(csv)
-            temp_outs[key] = csv
+            csv_condensed += diff_condensed
+            csv_verbose += diff_condensed
+            csv_condensed = self._fill_out_commas(csv_condensed)
+            csv_verbose = self._fill_out_commas(csv_verbose)
+            temp_outs[key] = csv_condensed
+            temp_outs[f'{key}_verbose'] = csv_verbose
 
         return temp_outs
 
@@ -336,13 +341,11 @@ class ScriptPerformer:
         self.time = datetime.now()
 
     def run(self, input_dict, inst_details):
-        self.addrs = {}
-        if len(input_dict['addresses']) > 1:
-            self.addrs = input_dict['addresses']
+        self.addrs = input_dict.get('addresses', {})
 
         self.open_branch_segments = []
         self.all_outs = []
-        init_script = input_dict['flat'].pop('init')
+        init_script = input_dict['subscript_groups'].pop('init')
         init_ram = self._get_defined_ram()
         print(f'\nSubscript: init: Iteration 0')
         self._run_subscript_branch(name='init', subscripts=init_script, ram=init_ram)
@@ -354,7 +357,7 @@ class ScriptPerformer:
             self.open_branch_segments.pop(i)
         self.false_branches = []
 
-        for name, sub_tree in input_dict['flat'].items():
+        for name, sub_tree in input_dict['subscript_groups'].items():
             self.time = datetime.now()
             done = False
             if len(self.open_branch_segments) == 0:
@@ -1859,7 +1862,7 @@ class ScriptPerformer:
         addr = details['addr']
         if addr not in ram.keys():
             if addr not in self.addrs.keys():
-                self.addrs[addr] = {'addr_not_init': True, 'size': addr_type}
+                self.addrs[addr] = {'addr_not_init': True, 'types': addr_type}
                 self.addrs[addr]['addr_not_init'] = True
             if 'init_loc' not in self.addrs[addr].keys():
                 self.addrs[addr]['init_loc'] = 'internal'
@@ -1949,7 +1952,8 @@ class ScriptPerformer:
         try:
             result = self.scpt_codes[comparison](param_values[0], param_values[1])
         except KeyError as e:
-            print('pause here')
+            print(f'Error comparison not performed: {e}')
+            return False
 
         if isBase:
             if result == 1:

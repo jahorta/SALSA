@@ -126,143 +126,48 @@ class SCTAnalysis:
         return groups
 
     def get_export_script_tree(self, requested_subscripts, important_instructions):
-        # TODO - Refactor to produce a dictionary of parents and their child subscripts
-
-        # Extract important memory addresses to follow
-        addresses = self._get_desired_address_information(important_instructions)
-
         # Generate subscript trees
+        all_subscript_addresses = {}
         subscript_roots = []
-        all_subscript_trees = {}
-        subscript_parents = {}
+        assessed_children = []
+        all_subscript_groups = {}
         important_subscripts = []
         for subscript in self.Sections.values():
             name = subscript.name
-            if name in subscript_parents.keys():
+            if name in assessed_children:
                 continue
             else:
                 subscript_roots.append(name)
-                if name not in subscript_parents.keys():
-                    subscript_parents[name] = ['external']
-                all_subscript_trees[name] = self._generate_subscript_tree(name, important_instructions)
-                subscript_parents = {**subscript_parents,
-                                     **self._get_subscript_parents(all_subscript_trees[name], name)}
-                if self._has_instructions_any(important_instructions, subscript):
-                    if name not in important_subscripts:
-                        important_subscripts.append(name)
+                result = self._generate_subscript_group(name, important_instructions)
+                all_subscript_groups[name] = copy.deepcopy(result['tree'])
+                all_subscript_addresses[name] = copy.deepcopy(result['addr'])
+                for child in result['tree'].keys():
+                    if self._has_instructions_any(important_instructions, self.Sections[child]):
+                        if name not in important_subscripts:
+                            important_subscripts.append(name)
+                result['tree'].pop(name)
+                assessed_children = [*assessed_children, *list(result['tree'].keys())]
 
-        # remove duplicate parents
-        unique_parents = {}
-        for child, parents in subscript_parents.items():
-            unique_parents[child] = self._remove_list_duplicates(parents)
-
-        # check for any roots which are actually children
-        incorrect_roots = []
-        for child, parents in subscript_parents.items():
-            if len(parents) > 1:
-                if 'external' in parents:
-                    incorrect_roots.append(child)
-                    print(f'Child tree {child} was put in as root')
-
-        # Prune incorrect roots
-        for root in incorrect_roots:
-            all_subscript_trees.pop(root)
+        # removes groups whose parent was called by another subscript
+        for name in subscript_roots:
+            if name in assessed_children:
+                all_subscript_groups.pop(name)
 
         # Prune trees to those which contain the desired subscript
         trees_to_keep = ['init', 'loop']
         for subscript in [*requested_subscripts, *important_subscripts]:
-            trees_to_keep = [*trees_to_keep, *self._get_roots(subscript, subscript_parents[subscript],
-                                                              subscript_parents)]
+            if subscript not in trees_to_keep:
+                trees_to_keep.append(subscript)
 
-        pruned_trees = {}
-        for tree in trees_to_keep:
-            pruned_trees[tree] = all_subscript_trees.get(tree, {})
+        for tree in list(all_subscript_groups.keys()):
+            if tree not in trees_to_keep:
+                all_subscript_groups.pop(tree)
 
-        ordered_trees = {}
-        for name, tree in pruned_trees.items():
-            ordered_trees[name] = self._order_tree(tree)
+        addresses = {}
+        for tree in all_subscript_groups.keys():
+            addresses = {**addresses, **all_subscript_addresses[tree]}
 
-        flat_scripts = {}
-        for name, tree in ordered_trees.items():
-            flat_scripts[name] = self._flatten_tree(tree, name)
-            flat_scripts[name] = {**flat_scripts[name], name: {k: v for k, v in tree.items() if not k == 'children'}}
-            flat_scripts[name] = self._sterilize_subscript_names(flat_scripts[name])
-
-        return {'addresses': addresses, 'tree_details': pruned_trees,
-                'ordered_trees': ordered_trees, 'flat': flat_scripts}
-
-    def _get_desired_address_information(self, important_instructions):
-        memory_ref_prefixes_re = {
-            '[B|b]it:': '[0-9]+',
-            '[B|b]yte:': '0x[0-9,a-f]{8}',
-            '[W|w]ord:': '0x[0-9,a-f]{8}'
-        }
-        inst_IDs_to_skip = ['Skip 2']
-        addresses = {}        # dict {'addr_type': ['address']}
-        choice_flag = False
-        for subscript in self.Sections.values():
-            for inst_pos, inst in subscript.instructions.items():
-                if inst.ID in inst_IDs_to_skip:
-                    continue
-                ID = int(inst.ID, 16)
-                if ID == subscript.choice_inst:
-                    choice_flag = True
-                elif ID in (subscript.flow_control_insts + tuple(important_instructions)):
-                    desc = inst.description
-                    memory_references = {}
-                    desc_lines = desc.splitlines()
-                    desc_parts = []
-                    for line in desc_lines:
-                        desc_parts = [*desc_parts, *line.split()]
-                    prefix_triggered = False
-                    for prefix, reference in memory_ref_prefixes_re.items():
-                        for part in desc_parts:
-                            if prefix_triggered:
-                                if re.fullmatch(reference, part):
-                                    if part not in memory_references:
-                                        addr_type = prefix[3] + prefix[5:-1]
-                                        if addr_type not in memory_references.keys():
-                                            memory_references[addr_type] = []
-                                        memory_references[addr_type].append(part)
-                                prefix_triggered = False
-                            elif re.fullmatch(prefix, part):
-                                prefix_triggered = True
-                    if ID in important_instructions:
-                        for addr_type, addrs in memory_references.items():
-                            for addr in addrs:
-                                if addr in addresses.keys():
-                                    if not re.search('important', addresses[addr]['types']):
-                                        addresses[addr]['types'] += '-important'
-                                else:
-                                    types = 'important'
-                                    curr_addr = {'size': addr_type, 'types': types}
-                                    addresses[addr] = curr_addr
-                    elif choice_flag:
-                        if not 0 < len(memory_references) < 2:
-                            choice_flag = False
-                            continue
-                        for addr_type, addrs in memory_references.items():
-                            for addr in addrs:
-                                if addr in addresses.keys():
-                                    if not re.search('choice', addresses[addr]['types']):
-                                        addresses[addr]['types'] += '-choice'
-                                else:
-                                    types = 'choice'
-                                    curr_addr = {'size': addr_type, 'types': types}
-                                    addresses[addr] = curr_addr
-                        choice_flag = False
-                    else:
-                        for addr_type, addrs in memory_references.items():
-                            for addr in addrs:
-                                if addr in addresses.keys():
-                                    if not re.search('control', addresses[addr]['types']):
-                                        addresses[addr]['types'] += '-control'
-                                else:
-                                    types = 'control'
-                                    curr_addr = {'size': addr_type, 'types': types}
-                                    addresses[addr] = curr_addr
-
-        return addresses
+        return {'addresses': addresses, 'subscript_groups': all_subscript_groups}
 
     @staticmethod
     def _has_instructions_any(instructions, script):
@@ -274,306 +179,214 @@ class SCTAnalysis:
                 return True
         return False
 
-    def _generate_subscript_tree(self, name, important_instructions, tree=None):
+    def _generate_subscript_group(self, name, important_instructions):
+        scripts_to_decode = []
+        decoded_scripts = []
         inst_IDs_to_skip = ['Skip 2']
         current_subscript = self.Sections[name]
         if current_subscript.hasString:
             return {'string': current_subscript.string}
-        if tree is None:
-            tree = {}
-        for pos, inst in current_subscript.instructions.items():
-            pos = int(pos)
-            if inst.ID in inst_IDs_to_skip:
-                continue
-            ID = int(inst.ID, 16)
-            if ID == 12:
-                return tree
-            elif ID in current_subscript.change_script_insts:
-                if ID == 238:
-                    next_script = 'me099a.sct'
-                else:
-                    offset_param_id = inst.get_param_id_by_name('offset')
-                    if offset_param_id is None:
-                        print('offset parameter is named incorrectly..')
-                        continue
-                    link_string = self.Links[name][str(pos)][list(self.Links[name][str(pos)].keys())[0]]
-                    next_script = link_string.split(': ')[1].rstrip()
-                if 'end' not in tree.keys():
-                    tree['end'] = {}
-                tree['end'][pos] = {'inst': ID, 'script': next_script}
-            elif ID in current_subscript.change_subscript_insts:  # This is the instruction to load a subscript
-                # if current_name == 'loop':
-                #     print('pause here')
-                desc = inst.description
-                desc_parts = desc.split('Link to Section: ')
-                if not 1 < len(desc_parts) < 3:
+        tree = {}
+        done = False
+        important_addresses = {}
+        while not done:
+            decoded_scripts.append(name)
+            sub = {}
+            return_hit = False
+            for pos, inst in current_subscript.instructions.items():
+                pos = int(pos)
+                if inst.ID in inst_IDs_to_skip:
                     continue
-                link_target_parts = desc_parts[1].split(', ')
-                next_location = 0
-                if re.search('choice', desc_parts[0]):
-                    next_script = link_target_parts[0].split('\n')[0]
-                else:
-                    next_script = link_target_parts[0]
-                    if not re.search('Start of Section', link_target_parts[1]):
-                        next_location = int(link_target_parts[1].split(' ')[1])
-
-                if ID == 11:
-                    if 'subscript_change' not in tree.keys():
-                        tree['subscript_change'] = {}
-                    next_scriptID = self._generate_next_ID(tree['subscript_change'], next_script)
-                    if 'subscript_load' not in tree.keys():
-                        tree['subscript_load'] = {}
-                    tree['subscript_load'][pos] = {'next': next_scriptID, 'location': next_location}
-
-                    tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(name=next_script,
-                                                                                            important_instructions=important_instructions)
-
-                elif ID == 0:
-                    test = self._format_desc_fxn_dict(inst)
-                    if not name == next_script:
-                        if 'subscript_change' not in tree.keys():
-                            tree['subscript_change'] = {}
-                        next_scriptID = self._generate_next_ID(tree['subscript_change'], next_script)
-                        if 'subscript_jumpif' not in tree.keys():
-                            tree['subscript_jumpif'] = {}
-                        tree['subscript_jumpif'][pos] = {'next': next_scriptID,
-                                                         'condition': test,
-                                                         'location': next_location}
-                        tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(name=next_script,
-                                                                                            important_instructions=important_instructions)
+                ID = int(inst.ID, 16)
+                if ID == 12:
+                    return_hit = True
+                elif ID in current_subscript.change_script_insts:
+                    if ID == 238:
+                        next_script = 'me099a.sct'
                     else:
-                        if 'jumpif' not in tree.keys():
-                            tree['jumpif'] = {}
-                        tree['jumpif'][pos] = {
-                            'location': next_location,
-                            'condition': test
+                        offset_param_id = inst.get_param_id_by_name('offset')
+                        if offset_param_id is None:
+                            print('offset parameter is named incorrectly..')
+                            continue
+                        link_string = self.Links[name][str(pos)][list(self.Links[name][str(pos)].keys())[0]]
+                        next_script = link_string.split(': ')[1].rstrip()
+                    sub[pos] = {'end': {'inst': ID, 'script': next_script}}
+                elif ID in current_subscript.change_subscript_insts:  # This is the instruction to load a subscript
+                    # if current_name == 'loop':
+                    #     print('pause here')
+                    desc = inst.description
+                    desc_parts = desc.split('Link to Section: ')
+                    if not 1 < len(desc_parts) < 3:
+                        continue
+                    link_target_parts = desc_parts[1].split(', ')
+                    next_location = 0
+                    if re.search('choice', desc_parts[0]):
+                        next_script = link_target_parts[0].split('\n')[0]
+                    else:
+                        next_script = link_target_parts[0]
+                        if not re.search('Start of Section', link_target_parts[1]):
+                            next_location = int(link_target_parts[1].split(' ')[1])
+
+                    if ID == 11:
+                        sub[pos] = {'subscript_load': {'next': next_script, 'location': next_location}}
+
+                        if next_script not in decoded_scripts or next_script not in scripts_to_decode:
+                            scripts_to_decode.append(next_script)
+
+                    elif ID == 0:
+                        test = self._format_desc_fxn_dict(inst)
+                        if not name == next_script:
+                            sub[pos] = {
+                                'subscript_jumpif': {'next': next_script, 'condition': test, 'location': next_location}}
+                            if next_script not in decoded_scripts or next_script not in scripts_to_decode:
+                                scripts_to_decode.append(next_script)
+                        else:
+                            sub[pos] = {'jumpif': {'location': next_location, 'condition': test}}
+
+                    elif ID == 10:
+                        if name == next_script:
+                            if next_location <= int(pos):
+                                sub[pos] = {'loop': next_location}
+                            else:
+                                sub[pos] = {'goto': next_location}
+                        else:
+                            sub[pos] = {'goto': {'position': pos, 'next': next_script, 'location': next_location}}
+                            if next_script not in decoded_scripts or next_script not in scripts_to_decode:
+                                scripts_to_decode.append(next_script)
+
+                elif ID is current_subscript.choice_inst:
+                    description = inst.description
+                    choice_num = description.count('[')
+                    question = description.split('<<')[1].split('>>')[0]
+                    desc_choices = description.split('[')[1:]
+                    choices = []
+                    for choice in desc_choices:
+                        choices.append(choice.split(']')[0])
+                    sub[pos] = {'choice': {'choice num': choice_num, 'question': question, 'choices': choices}}
+
+                elif ID is current_subscript.switch_inst:
+                    switch_iter = inst.parameters['1'].result
+                    switch_description = inst.description
+                    desc_lines = switch_description.splitlines()
+                    condition = desc_lines.pop(0).split(': ')[1]
+                    condition_byte = condition.split(' ')[0]
+                    switch_entries = {}
+                    for line in desc_lines:
+                        line_parts = line.split(': ')
+                        key = toInt(line_parts[0])
+                        next_location = toInt(line_parts[-1].rstrip())
+                        switch_entries[key] = next_location
+
+                    sub[pos] = {'switch': {'iterations': switch_iter, 'condition': condition_byte, 'entries': switch_entries}}
+
+                elif ID in current_subscript.set_addr_insts:
+
+                    if ID == 5:
+                        base_address = '0x80310a1c'
+                        offset = inst.parameters['0'].result
+                        address = hex(int(base_address, 16) + int(offset))
+                        value_string = inst.resolveDescriptionFuncs(inst.parameters['1'].result)
+                        value = value_string
+                        if isinstance(value_string, str):
+                            if re.search(': ', value_string):
+                                value = value_string.split(': ')[1]
+                            else:
+                                value = toInt(value_string)
+                        sub[pos] = {'set': {'type': 'byte', 'addr': address, 'value': value}}
+                        if address not in important_addresses.keys():
+                            important_addresses[address] = {'size': 'byte'}
+
+                    if ID == 6:
+                        base_address = '0x8030e514'
+                        offset = inst.parameters['0'].result
+                        address = hex(int(base_address, 16) + (4 * int(offset)))
+                        value_string = inst.resolveDescriptionFuncs(inst.parameters['1'].result)
+                        value = value_string
+                        if isinstance(value_string, str):
+                            if re.search(': ', value_string):
+                                value = value_string.split(': ')[1]
+                            else:
+                                value = toInt(value_string)
+                        sub[pos] = {'set': {'type': 'word', 'addr': address, 'value': value}}
+                        if address not in important_addresses.keys():
+                            important_addresses[address] = {'size': 'word'}
+
+                    if ID == 7:
+                        base_address = '0x8030e514'
+                        offset = inst.parameters['0'].result
+                        address = hex(int(base_address, 16) + (4 * int(offset)))
+                        value_string = inst.resolveDescriptionFuncs(inst.parameters['1'].result)
+                        value = value_string
+                        if isinstance(value_string, str):
+                            if re.search(': ', value_string):
+                                value = value_string.split(': ')[1]
+                            else:
+                                value = toFloat(value_string)
+                        sub[pos] = {'set': {'type': 'float', 'addr': address, 'value': value}}
+                        if address not in important_addresses.keys():
+                            important_addresses[address] = {'size': 'float'}
+
+                    if ID == 17:
+                        address = inst.parameters['0'].result
+                        sub[pos] = {'set': {'type': 'bit', 'addr': address, 'action': 'set'}}
+                        if address not in important_addresses.keys():
+                            important_addresses[address] = {'size': 'bit'}
+
+                    if ID == 18:
+                        address = inst.parameters['0'].result
+                        sub[pos] = {'set': {'type': 'bit', 'addr': address, 'action': 'unset'}}
+                        if address not in important_addresses.keys():
+                            important_addresses[address] = {'size': 'bit'}
+
+                    if ID == 19:
+                        address = inst.parameters['0'].result
+                        sub[pos] = {'set': {'type': 'bit', 'addr': address, 'action': 'invert'}}
+                        if address not in important_addresses.keys():
+                            important_addresses[address] = {'size': 'bit'}
+
+                elif ID in important_instructions:
+                    parameter_tree = {}
+                    if len(inst.parameters) > 0:
+                        parameter_tree['parameter names'] = {
+                            x: y.name for x, y in inst.parameters.items()
+                        }
+                        parameter_tree['parameter values temp'] = {
+                            y.name: y.result for y in inst.parameters.values()
                         }
 
-                elif ID == 10:
-                    if name == next_script:
-                        if next_location <= int(pos):
-                            if 'loop' not in tree.keys():
-                                tree['loop'] = {}
-                            tree['loop'][pos] = next_location
-                        else:
-                            if 'goto' not in tree.keys():
-                                tree['goto'] = {}
-                            tree['goto'][pos] = next_location
-                    else:
-                        if 'subscript_change' not in tree.keys():
-                            tree['subscript_change'] = {}
-                        next_scriptID = self._generate_next_ID(tree['subscript_change'], next_script)
-                        if 'goto' not in tree.keys():
-                            tree['goto'] = {}
-                        tree['goto'] = {'position': pos, 'next': next_script, 'location': next_location}
-                        tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(name=next_script,
-                                                                                            important_instructions=important_instructions)
+                    parameter_tree['parameter values'] = {}
+                    for key, value in parameter_tree['parameter values temp'].items():
+                        new_value = inst.resolveDescriptionFuncs(value)
+                        parameter_tree['parameter values'][key] = new_value
+                    parameter_tree.pop('parameter values temp')
 
-            elif ID is current_subscript.choice_inst:
-                description = inst.description
-                choice_num = description.count('[')
-                question = description.split('<<')[1].split('>>')[0]
-                desc_choices = description.split('[')[1:]
-                choices = []
-                for choice in desc_choices:
-                    choices.append(choice.split(']')[0])
+                    sub[pos] = {'requested': {'name': inst.name, 'instruction': ID, **parameter_tree}}
 
-                if 'choice' not in tree.keys():
-                    tree['choice'] = {}
-                tree['choice'][pos] = {
-                    'choice num': choice_num,
-                    'question': question,
-                    'choices': choices
-                }
+            sorted_keys = sorted(list(sub.keys()))
+            sub = {k: sub[k] for k in sorted_keys}
+            sub['pos_list'] = sorted_keys
 
-            elif ID is current_subscript.switch_inst:
-                switch_iter = inst.parameters['1'].result
-                switch_description = inst.description
-                desc_lines = switch_description.splitlines()
-                condition = desc_lines.pop(0).split(': ')[1]
-                condition_byte = condition.split(' ')[0]
-                switch_entries = {}
-                for line in desc_lines:
-                    line_parts = line.split(': ')
-                    key = toInt(line_parts[0])
-                    next_location = toInt(line_parts[-1].rstrip())
-                    switch_entries[key] = next_location
+            if not return_hit:
+                script_found = False
+                for script_name in self.Index.keys():
+                    if script_found:
+                        next_script = script_name
+                        sub['fallthroughs'] = {'next': next_script}
+                        if next_script not in decoded_scripts or next_script not in scripts_to_decode:
+                            scripts_to_decode.append(next_script)
+                        break
+                    if script_name == name:
+                        script_found = True
 
-                if 'switch' not in tree.keys():
-                    tree['switch'] = {}
-                tree['switch'][pos] = {
-                    'iterations': switch_iter,
-                    'condition': condition_byte,
-                    'entries': switch_entries
-                }
+            tree[name] = sub
 
-            elif ID in current_subscript.set_addr_insts:
-                if 'set' not in tree.keys():
-                    tree['set'] = {}
-
-                if ID == 5:
-                    base_address = '0x80310a1c'
-                    offset = inst.parameters['0'].result
-                    address = hex(int(base_address, 16) + int(offset))
-                    value_string = inst.resolveDescriptionFuncs(inst.parameters['1'].result)
-                    value = value_string
-                    if isinstance(value_string, str):
-                        if re.search(': ', value_string):
-                            value = value_string.split(': ')[1]
-                        else:
-                            value = toInt(value_string)
-                    tree['set'][pos] = {
-                        'type': 'byte',
-                        'addr': address,
-                        'value': value
-                    }
-
-                if ID == 6:
-                    base_address = '0x8030e514'
-                    offset = inst.parameters['0'].result
-                    address = hex(int(base_address, 16) + (4 * int(offset)))
-                    value_string = inst.resolveDescriptionFuncs(inst.parameters['1'].result)
-                    value = value_string
-                    if isinstance(value_string, str):
-                        if re.search(': ', value_string):
-                            value = value_string.split(': ')[1]
-                        else:
-                            value = toInt(value_string)
-                    tree['set'][pos] = {
-                        'type': 'word',
-                        'addr': address,
-                        'value': value
-                    }
-
-                if ID == 7:
-                    base_address = '0x8030e514'
-                    offset = inst.parameters['0'].result
-                    address = hex(int(base_address, 16) + (4 * int(offset)))
-                    value_string = inst.resolveDescriptionFuncs(inst.parameters['1'].result)
-                    value = value_string
-                    if isinstance(value_string, str):
-                        if re.search(': ', value_string):
-                            value = value_string.split(': ')[1]
-                        else:
-                            value = toFloat(value_string)
-                    tree['set'][pos] = {
-                        'type': 'float',
-                        'addr': address,
-                        'value': value
-                    }
-
-                if ID == 17:
-                    address = toInt(inst.parameters['0'].result)
-                    tree['set'][pos] = {
-                        'type': 'bit',
-                        'addr': address,
-                        'action': 'set'
-                    }
-
-                if ID == 18:
-                    address = toInt(inst.parameters['0'].result)
-                    tree['set'][pos] = {
-                        'type': 'bit',
-                        'addr': address,
-                        'action': 'unset'
-                    }
-
-                if ID == 19:
-                    address = toInt(inst.parameters['0'].result)
-                    tree['set'][pos] = {
-                        'type': 'bit',
-                        'addr': address,
-                        'action': 'invert'
-                    }
-
-            elif ID in important_instructions:
-                if 'requested' not in tree.keys():
-                    tree['requested'] = {}
-                parameter_tree = {}
-                if len(inst.parameters) > 0:
-                    parameter_tree['parameter names'] = {
-                        x: y.name for x, y in inst.parameters.items()
-                    }
-                    parameter_tree['parameter values temp'] = {
-                        y.name: y.result for y in inst.parameters.values()
-                    }
-
-                parameter_tree['parameter values'] = {}
-                for key, value in parameter_tree['parameter values temp'].items():
-                    new_value = inst.resolveDescriptionFuncs(value)
-                    parameter_tree['parameter values'][key] = new_value
-                parameter_tree.pop('parameter values temp')
-
-                tree['requested'][pos] = {
-                    'name': inst.name,
-                    'instruction': ID,
-                    **parameter_tree
-                }
-
-        next_script = ''
-        script_found = False
-        for script_name in self.Index.keys():
-            if script_found:
-                next_script = script_name
-                break
-            if script_name == name:
-                script_found = True
-
-        if not next_script == '':
-            if 'subscript_change' not in tree.keys():
-                tree['subscript_change'] = {}
-            next_scriptID = self._generate_next_ID(tree['subscript_change'], next_script)
-            if 'fallthroughs' not in tree.keys():
-                tree['fallthroughs'] = []
-            tree['fallthroughs'].append({'next': next_scriptID})
-            tree['subscript_change'][next_scriptID] = self._generate_subscript_tree(name=next_script,
-                                                                                    important_instructions=important_instructions)
-        else:
-            pass
-        return tree
-
-    @staticmethod
-    def _generate_next_ID(tree, name):
-        changeID = 0
-        pattern = f'{name}-[0,9]'
-        for key in reversed(tree.keys()):
-            if re.search(pattern, key):
-                changeID = int(key.split('-')[1]) + 1
-        return f'{name}-{changeID}'
-
-    def _get_subscript_parents(self, tree, parent, parent_dict=None):
-        if parent_dict is None:
-            parent_dict = {}
-        if 'subscript_change' not in tree:
-            return parent_dict
-        nodes = tree['subscript_change']
-        for node_name, node in nodes.items():
-            name = node_name
-            if re.search('-', node_name):
-                name = node_name.split('-')[0]
-            if name not in parent_dict.keys():
-                parent_dict[name] = []
-            parent_dict[name].append(parent)
-            if isinstance(node, dict):
-                parent_dict = {**parent_dict, **self._get_subscript_parents(node, name, parent_dict)}
-
-        return parent_dict
-
-    @staticmethod
-    def _remove_list_duplicates(input_list):
-        done = False
-        ID = 0
-        while not done:
-            duplicate_IDs = []
-            for i in range(ID + 1, len(input_list)):
-                if input_list[ID] == input_list[i]:
-                    duplicate_IDs.append(i)
-            for i in reversed(duplicate_IDs):
-                input_list.pop(i)
-            ID += 1
-            if ID >= len(input_list):
+            if len(scripts_to_decode) > 0:
+                name = scripts_to_decode.pop()
+                current_subscript = self.Sections[name]
+            else:
                 done = True
-        return input_list
+
+        return {'addr': important_addresses, 'tree': tree}
 
     def _get_roots(self, subscript, parents, subscript_parents):
         roots = []
@@ -586,36 +399,6 @@ class SCTAnalysis:
                 return roots
             roots = [*roots, *self._get_roots(parents[0], subscript_parents[parents[0]], subscript_parents)]
         return roots
-
-    def _order_tree(self, tree):
-        temp_tree = {}
-        pos_list = []
-        if 'subscript_change' in tree.keys():
-            for script_name, script in tree['subscript_change'].items():
-                if 'children' not in temp_tree.keys():
-                    temp_tree['children'] = {}
-                temp_tree['children'][script_name] = self._order_tree(script)
-            tree.pop('subscript_change')
-        temp_tree['pos_list'] = []
-        if 'fallthroughs' in tree.keys():
-            temp_tree['fallthrough'] = tree['fallthroughs'][0]['next']
-            tree.pop('fallthroughs')
-        if len(tree) > 0:
-            for inst_type, inst_dict in tree.items():
-                if isinstance(inst_dict, dict):
-                    for pos, inst in inst_dict.items():
-                        temp_tree[pos] = {inst_type: inst}
-                        pos_list.append(pos)
-        pos_list.sort()
-        temp_tree['pos_list'] = pos_list
-        ordered_tree = {'pos_list': temp_tree['pos_list']}
-        if 'children' in temp_tree:
-            ordered_tree['children'] = temp_tree['children']
-        if 'fallthrough' in temp_tree:
-            ordered_tree['fallthrough'] = temp_tree['fallthrough']
-        for pos in pos_list:
-            ordered_tree[pos] = temp_tree[pos]
-        return ordered_tree
 
     def _format_desc_fxn_dict(self, inst, test=None):
         if test is None:
@@ -690,7 +473,7 @@ class SCTAnalysis:
                 if key == 'pos_list':
                     continue
                 elif key == 'fallthrough':
-                        subscript[key] = subscript[key].split('-')[0]
+                    subscript[key] = subscript[key].split('-')[0]
                 elif isinstance(subscript[key], dict):
                     for k, v in subscript[key].items():
                         if k in ('subscript_load', 'subscript_jumpif'):
@@ -1086,6 +869,7 @@ class SCTInstruct:
                 param_id = key
                 break
         return param_id
+
 
 class SCTParam:
     parameter_types = ['int',
