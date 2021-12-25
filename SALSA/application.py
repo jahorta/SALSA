@@ -224,7 +224,6 @@ class Application(tk.Tk):
         self.export_window.update_exports(self.exporter_out)
 
     def export_as_csv(self, csv_dict):
-        title = 'temp'
         if len(csv_dict) > 1:
             title = 'Export all to CSV'
         elif len(csv_dict) == 1:
@@ -262,11 +261,12 @@ class Application(tk.Tk):
         self.file_select.file_select_tree.yview_moveto(self.file_select_scalebar_pos)
 
     def on_quit(self):
+        self.mainloop()
         """Check for unsaved changes, prompt to save, quit"""
         currentID = self.InstructionFrame.get_current_inst_details()['Instruction ID']
         self.on_instruction_commit(currentID)
         self.settings.save_settings()
-        quit()
+        self.quit()
 
     def get_changes(self):
         changes = set({})
