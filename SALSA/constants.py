@@ -24,3 +24,14 @@ class FieldTypes:
 class OverrideTypes:
     compare_value = 1
     compare_value_offset = 2
+
+
+class KnownMemAddresses:
+    Script_types = {'^me5.+.sct$': 'Ship_battles'}
+    Ship_Battles = {'0x80310b21': 'Player HP (%)',
+                    '0x80310b22': 'Enemy HP (%)',
+                    '0x80310a9d': 'Battle State Control,Is 1 during turn setup',
+                    '0x80310b1d': 'Battle State Control,Is 1 during attacks',
+                    '0x8030e424': 'Rand(0, 9999)',
+                    '0x8030e4ac': 'Ship Stat'
+                    }
