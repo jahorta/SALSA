@@ -2,21 +2,21 @@ import copy
 import json
 import os
 import queue
+import re
 import threading
 import tkinter as tk
 from math import floor
-from threading import Timer, Thread
-from tkinter import ttk, messagebox, filedialog
 from pathlib import Path
-import re
+from threading import Timer
+from tkinter import ttk, messagebox, filedialog
 
 from SALSA import views as v
 from SALSA.SALSA_strings import HelpStrings
 from SALSA.exporter import SCTExporter
-from SALSA.script_class import SCTAnalysis
 from SALSA.instruction_class import Instruct
-from SALSA.sct_model import SctModel
 from SALSA.instruction_model import InstructionModel
+from SALSA.script_class import SCTAnalysis
+from SALSA.sct_model import SctModel
 
 
 class Application(tk.Tk):

@@ -1,8 +1,10 @@
-import tkinter as tk
-from tkinter import ttk
-from decimal import Decimal, InvalidOperation
-from .constants import FieldTypes as FT
 import re
+import tkinter as tk
+from decimal import Decimal, InvalidOperation
+from tkinter import ttk
+
+from .constants import FieldTypes as FT
+
 
 ##################
 # Widget Classes #

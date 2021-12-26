@@ -1,9 +1,10 @@
 import re
 import tkinter as tk
+from pathlib import Path
 from threading import Timer
 from tkinter import ttk
+
 from . import widgets as w
-from pathlib import Path
 from .constants import FieldTypes as FT
 
 

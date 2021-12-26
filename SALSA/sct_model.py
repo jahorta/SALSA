@@ -1,8 +1,9 @@
 import os
-from .constants import FieldTypes as FT
+import re
+
 from .byte_array_utils import getString, getWord, deriveStringLength, word2Float, applyHexMask, padded_hex, \
     word2SignedInt, toInt
-import re
+from .constants import FieldTypes as FT
 
 
 class SctModel:

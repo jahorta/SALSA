@@ -1,6 +1,6 @@
 import math
-import struct
 import re
+import struct
 
 
 def getWord(file: bytearray, pos: int, out='int'):

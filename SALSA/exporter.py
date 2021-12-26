@@ -1,12 +1,14 @@
-import math
-from datetime import datetime, timedelta
-from typing import List, Dict
-import re
 import copy
+import multiprocessing as mp
+import re
+import sys
+from datetime import datetime
+from math import floor
+from typing import List, Dict
 
+from SALSA.constants import FieldTypes as FT, KnownMemAddresses as KA
 from SALSA.instruction_class import Instruct
 from SALSA.script_class import SCTAnalysis
-from SALSA.constants import FieldTypes as FT, KnownMemAddresses as KA
 
 
 class SCTExporter:
@@ -49,7 +51,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me506.+sct$',
+                'scripts': '^me509.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -346,7 +348,9 @@ class ScriptPerformer:
     false_branches = []
     false_switch_entries = []
     debug_verbose = False
-    with_compare_assumption = True
+    with_compare_assumption = False
+    use_multiprocessing = True
+    results = []
 
     def __init__(self):
 
@@ -438,46 +442,10 @@ class ScriptPerformer:
                 print(
                     f'{change_open_branch_num} branches opened - {false_branch_num} false branches detected and flagged')
 
-                # # Used for debugging purposes only
-                # desired_stats = {'init_value': 3.0, 'init_subscript': '_SET_PATH'}
-                # interesting_branches = []
-                # for i, branch in enumerate(self.open_branch_segments):
-                #     subscript = branch['init_value']['subscript']
-                #     if 'parameter values' in branch:
-                #         value_out = branch["parameter values"]["scene"]
-                #         if isinstance(value_out, str):
-                #             value_out = branch["address_values"][value_out]
-                #     if value_out == desired_stats['init_value'] and subscript == desired_stats['init_subscript']:
-                #         interesting_branches.append(i)
-
                 if remove_false_branches:
                     branches_to_remove = [*self.false_branches]
                     for branch in reversed(sorted(list(set(branches_to_remove)))):
                         self.open_branch_segments.pop(branch)
-
-                # If before the remove false branches step, test for the lowest child dict depth with different
-                # init_value and cur_ram
-                # else:
-                #     checked = []
-                #     for i, branch1 in enumerate(self.open_branch_segments):
-                #         checked.append(i)
-                #         if i in branches_to_remove:
-                #             continue
-                #         len_1 = self._get_dict_depth(branch1['children'])
-                #         for j, branch2 in enumerate(self.open_branch_segments):
-                #             if j in checked:
-                #                 continue
-                #             if j in branches_to_remove:
-                #                 continue
-                #             same_cur = self._variables_are_equal_recursive(branch1['cur_ram'], branch2['cur_ram'])
-                #             same_init = self._variables_are_equal_recursive(branch1['init_value'],
-                #                                                             branch2['init_value'])
-                #             if same_cur and same_init:
-                #                 len_2 = self._get_dict_depth(branch2)
-                #                 if len_1 <= len_2:
-                #                     branches_to_remove.append(j)
-                #                 if len_1 > len_2:
-                #                     branches_to_remove.append(i)
 
                 current_open_branch_num = len(self.open_branch_segments)
 
@@ -496,39 +464,63 @@ class ScriptPerformer:
                                  iteration=len(self.open_branch_segments), length=124, printEnd='\r')
 
                 # flag for removal identical open branches
-                branches_to_remove = sorted(list(set(branches_to_remove)))
-                checked_branches = []
-                for i, open1 in enumerate(self.open_branch_segments):
-                    printProgressBar(prefix='Flagging identical open branches', total=current_open_branch_num,
-                                     iteration=i, length=119)
-                    checked_branches.append(i)
-                    for j, open2 in enumerate(self.open_branch_segments):
-                        if j in branches_to_remove:
-                            continue
-                        if j in checked_branches:
-                            continue
-                        elif self._variables_are_equal_recursive(open1, open2):
-                            branches_to_remove.append(j)
+                if self.use_multiprocessing:
+                    cpus = mp.cpu_count()
+                    last_index = None
+                    total_open = len(self.open_branch_segments)
+                    segments = []
+                    for i in range(cpus):
+                        if last_index is None:
+                            index_start = 0
+                        else:
+                            index_start = last_index + 1
+                        last_index = floor(total_open * ((i + 1) / cpus))
+                        branches = copy.deepcopy(self.open_branch_segments[index_start:last_index])
+                        segments.append({'branches': branches,
+                                         'all_branches': copy.deepcopy(self.open_branch_segments),
+                                         'start_index': index_start, 'branches_to_remove': branches_to_remove})
+                    pool = mp.Pool(mp.cpu_count())
+                    results = pool.map(self._open_branch_duplicate_flagging, segments)
+                    pool.close()
+                    pool.join()
+                    for result in results:
+                        branches_to_remove = [*branches_to_remove, *result]
+                    print()
+                else:
+                    results = self._open_branch_duplicate_flagging(
+                        args_in={'branches': self.open_branch_segments,
+                                 'all_branches': copy.deepcopy(self.open_branch_segments), 'start_index': 0})
 
-                printProgressBar(prefix='Flagging identical open branches', total=current_open_branch_num,
-                                 iteration=current_open_branch_num, printEnd='\r', length=119)
+                    branches_to_remove = [*branches_to_remove, *results]
 
-                # flag for removal open branches with the same initial conditions as an out branch
-                branches_to_remove = sorted(list(set(branches_to_remove)))
-                repeats = []
-                for i, out_branch in enumerate(self.all_outs):
-                    printProgressBar(prefix='Removing open branches which mirror closed branches',
-                                     total=len(self.all_outs),
-                                     iteration=i)
-                    for j, open_branch in enumerate(self.open_branch_segments):
-                        if j in branches_to_remove:
-                            continue
-                        elif self._branch_has_same_conditions(out_branch=out_branch, open_branch=open_branch,
-                                                              with_req=True, with_mid=with_mid):
-                            branches_to_remove.append(j)
-                            repeats.append(j)
-                printProgressBar(prefix='Removing open branches which mirror closed branches', total=len(self.all_outs),
-                                 iteration=len(self.all_outs), printEnd='\r')
+                # flag for removal open branches with the same conditions as an out branch
+                if self.use_multiprocessing:
+                    cpus = mp.cpu_count()
+                    last_index = None
+                    total_open = len(self.all_outs)
+                    segments = []
+                    for i in range(cpus):
+                        if last_index is None:
+                            index_start = 0
+                        else:
+                            index_start = last_index + 1
+                        last_index = floor(total_open * ((i + 1) / cpus))
+                        branches = copy.deepcopy(self.all_outs[index_start:last_index])
+                        segments.append({'branches': branches, 'all_branches': copy.deepcopy(self.open_branch_segments),
+                                         'start_index': index_start, 'with_mid': with_mid,
+                                         'branches_to_remove': branches_to_remove})
+                    pool = mp.Pool(mp.cpu_count())
+                    results = pool.map(self._closed_branch_duplicate_flagging, segments)
+                    pool.close()
+                    pool.join()
+                    for result in results:
+                        branches_to_remove = [*branches_to_remove, *result]
+                    print()
+                else:
+                    results = self._closed_branch_duplicate_flagging(
+                        args_in={'branches': self.all_outs, 'all_branches': self.open_branch_segments,
+                                 'start_index': 0, 'with_mid': with_mid})
+                    branches_to_remove = [*branches_to_remove, *results]
 
                 # Remove flagged branches
                 branches_to_remove = sorted(list(set(branches_to_remove)))
@@ -608,6 +600,55 @@ class ScriptPerformer:
         print('Time to complete this subscript: ', time_difference)
 
         return {'trees_detail': self.all_outs, 'ram_stats': self.addrs, 'summary': sorted_summary}
+
+    def _open_branch_duplicate_flagging(self, args_in):
+        branches = args_in['branches']
+        all_branches = args_in['all_branches']
+        start_index = args_in['start_index']
+        branches_to_remove = args_in['branches_to_remove']
+        checked_branches = []
+        current_open_branch_num = len(branches)
+        for i, open1 in enumerate(branches):
+            printProgressBar(prefix='Flagging identical open branches', suffix=f'total_branches: {current_open_branch_num}',
+                             total=current_open_branch_num, iteration=i, length=119)
+            sys.stdout.flush()
+            checked_branches.append(i)
+            for j, open2 in enumerate(all_branches):
+                if j in branches_to_remove:
+                    continue
+                if j in checked_branches:
+                    continue
+                elif self._variables_are_equal_recursive(open1, open2):
+                    branches_to_remove.append(j)
+        printProgressBar(prefix='Flagging identical open branches', suffix=f'total_branches: {current_open_branch_num}',
+                         total=current_open_branch_num, iteration=current_open_branch_num, length=119)
+
+        return branches_to_remove
+
+    def _closed_branch_duplicate_flagging(self, args_in):
+        repeats = []
+        branches_to_remove = args_in['branches_to_remove']
+        out_branches = args_in['branches']
+        all_branches = args_in['all_branches']
+        start_index = args_in['start_index']
+        with_mid = args_in['with_mid']
+        for i, out_branch in enumerate(out_branches):
+            printProgressBar(prefix='Removing open branches which mirror closed branches',
+                             total=len(self.all_outs),
+                             iteration=i + start_index)
+            for j, open_branch in enumerate(all_branches):
+                if j in branches_to_remove:
+                    continue
+                elif self._branch_has_same_conditions(out_branch=out_branch, open_branch=open_branch,
+                                                      with_req=True, with_mid=with_mid):
+                    branches_to_remove.append(j)
+                    repeats.append(j)
+
+        printProgressBar(prefix='Removing open branches which mirror closed branches',
+                         total=len(self.all_outs),
+                         iteration=len(self.all_outs))
+
+        return branches_to_remove
 
     def _run_subscript_branch(self, name, subscripts, ram=None, branch_index=None,
                               ptrs=None, traceback=None, depth=0) -> bool:
@@ -1124,6 +1165,11 @@ class ScriptPerformer:
 
     def _make_all_out_summary(self, inst_details) -> dict:
         all_branches = self.all_outs
+        num_branches = len(all_branches)
+
+        parallel_processes = False
+        if num_branches > 500:
+            parallel_processes = self.use_multiprocessing
 
         # Group branches by: Inst, Inst_value, Subscript, Position
         print('Grouping Branches...')
@@ -1142,41 +1188,41 @@ class ScriptPerformer:
                 groups[inst][value] = []
 
             groups[inst][value].append(branch)
+
         grouped_branches = {}
         all_trace_levels = {}
+        all_args = []
         for inst, values in groups.items():
             grouped_branches[inst] = {}
             all_trace_levels[inst] = {}
-            for value, branches in values.items():
-                grouped_branches[inst][value] = {}
-                all_trace_levels[inst][value] = {}
-                traceback_level = len(branches[0]['init_value']['traceback']) - 1
-                compared = []
-                branch_num = len(branches)
-                progress_prefix = f'Creating Groups for {inst}:{value}'
-                progress_bar_length = 150 - len(progress_prefix)
-                for i, branch1 in enumerate(branches):
-                    print_suffix = f'{i}/{branch_num}'
-                    printProgressBar(prefix=progress_prefix, suffix=print_suffix, length=progress_bar_length,
-                                     total=branch_num, iteration=i)
-                    compared.append(i)
-                    for j, branch2 in enumerate(branches):
-                        if j in compared:
-                            continue
-                        b1_traceback = branch1['init_value']['traceback']
-                        b2_traceback = branch2['init_value']['traceback']
-                        new_trace_level = self._get_traceback_diff_level(b1_traceback, b2_traceback)
-                        traceback_level = min(traceback_level, new_trace_level)
-                all_trace_levels[inst][value] = traceback_level
-                for branch in branches:
-                    diff_traceback = branch['init_value']['traceback']
-                    trace_key = self._get_traceback_string(diff_traceback, traceback_level)
-                    if trace_key not in grouped_branches[inst][value].keys():
-                        print(f'Created group: Value: {value}, Trace: {trace_key}{" "*150}')
-                        grouped_branches[inst][value][trace_key] = []
-                    grouped_branches[inst][value][trace_key].append(branch)
+            if not parallel_processes:
+                for value, branches in values.items():
+                    args_in = {'inst': inst, 'value': value, 'branches': branches}
+                    result = self._get_traceback_groups(args_in=args_in)
+                    grouped_branches[inst][value] = result['groups']
+                    all_trace_levels[inst][value] = result['trace_level']
+            else:
+                # place holder for debugging multiprocessing, not formatted for multiprocessing
+                for value, branches in values.items():
+                    grouped_branches[inst][value] = {}
+                    all_args.append({'inst': inst, 'value': value, 'branches': branches})
+
+        if parallel_processes:
+            total_print_rows = len(all_args)
+            for arg in all_args:
+                arg['total_print_rows'] = total_print_rows
+            pool = mp.Pool(mp.cpu_count())
+            results = pool.map(self._get_traceback_groups, all_args)
+            pool.close()
+            pool.join()
+
+            for out in results:
+                grouped_branches[out['inst']][out['value']] = out['groups']
+                all_trace_levels[out['inst']][out['value']] = out['trace_level']
 
         print('\nLooking for branch differences')
+        all_args = []
+        row = 0
         all_differences = {}
         all_outs = {}
         all_diff_levels = {}
@@ -1191,122 +1237,74 @@ class ScriptPerformer:
                 all_outs[inst][value] = {}
                 all_diff_levels[inst][value] = {}
                 all_internals[inst][value] = []
-                for trace, branches in traces.items():
+                if not parallel_processes:
+                    for trace, branches in traces.items():
+                        args_in = {'inst': inst, 'value': value, 'branches': branches,
+                                   'trace': trace, 'inst_details': inst_details[inst]}
+                        result = self._get_traceback_group_details(args_in=args_in)
+                        all_differences[inst][value][trace] = result['diffs']
+                        all_outs[inst][value][trace] = result['all_outs']
+                        all_diff_levels[inst][value][trace] = result['diff_levels']
+                        if result['internal']:
+                            all_internals[inst][value].append(trace)
+                else:
+                    for trace, branches in traces.items():
+                        all_args.append({'print_row': row, 'inst': inst, 'value': value,
+                                         'branches': branches, 'trace': trace, 'inst_details': inst_details[inst]})
+                        row += 1
 
-                    all_differences[inst][value][trace] = []
-                    all_diff_levels[inst][value][trace] = []
-                    progress_prefix = f'Getting first differences from {inst}:{value}:{trace}'
-                    progress_bar_length = 154 - len(progress_prefix)
-                    # Determine whether this position is internal and get outs for each branch
-                    is_internal = True
-                    branch_outs = []
-                    for branch in branches:
-                        if 'init' in trace or 'new_run' in branch.keys():
-                            is_internal = False
+        if parallel_processes:
+            total_print_rows = len(all_args)
+            for arg in all_args:
+                arg['total_print_rows'] = total_print_rows
+            pool = mp.Pool(mp.cpu_count())
+            results = pool.map(self._get_traceback_group_details, all_args)
+            pool.close()
+            pool.join()
 
-                        if 'exit' in branch.keys():
-                            out_value = 'END'
-                        else:
-                            out_value = branch['out_value']['parameter values'][inst_details[inst]]
-                            if isinstance(out_value, str):
-                                addr = out_value
-                                out_value = branch['out_value']['address_values'][addr]
-                        out_trace = branch['out_value']['traceback']
-                        branch_outs.append({'value': out_value, 'traceback': out_trace})
-                    all_outs[inst][value][trace] = branch_outs
+            for out in results:
+                all_differences[out['inst']][out['value']][out['trace']] = out['diffs']
+                all_outs[out['inst']][out['value']][out['trace']] = out['all_outs']
+                all_diff_levels[out['inst']][out['value']][out['trace']] = out['diff_levels']
+                if out['internal']:
+                    all_internals[out['inst']][out['value']].append(out['trace'])
 
-                    if is_internal:
-                        all_internals[inst][value].append(trace)
-
-                    branch_num = len(branches)
-                    if branch_num > 1:
-                        checked_branches = []
-                        for i, branch1 in enumerate(branches):
-                            progress_suffix = f' \t{i}/{branch_num}'
-                            printProgressBar(prefix=progress_prefix, suffix=progress_suffix, length=progress_bar_length,
-                                             total=branch_num, iteration=i, printEnd='\r')
-                            checked_branches.append(i)
-                            for j, branch2 in enumerate(branches):
-                                if j in checked_branches:
-                                    continue
-                                if self.debug_verbose:
-                                    print(f'\tGetting first difference between {i} and {j}')
-
-                                temp_difference = self._get_first_difference(copy.deepcopy(branch1),
-                                                                             copy.deepcopy(branch2),
-                                                                             top_level=True)
-                                if len(temp_difference) == 0:
-                                    continue
-                                diff_level = temp_difference.pop('level')
-                                deets = temp_difference.pop('diff_deets')
-                                difference = {'branches': [i, j], 'level': diff_level, 'diff': temp_difference,
-                                              'diff_details': deets}
-                                all_differences[inst][value][trace].append(difference)
-                        progress_suffix = ' \tDONE\t\t\t\t '
-                        printProgressBar(prefix=progress_prefix, suffix=progress_suffix, total=branch_num,
-                                         iteration=branch_num, length=progress_bar_length, printEnd='\r')
-
-                        diff_levels = []
-                        for diff in all_differences[inst][value][trace]:
-                            diff_levels.append(diff['level'])
-                        diff_levels = sorted(list(set(diff_levels)))
-                        all_diff_levels[inst][value][trace] = diff_levels
-
-        # debug use only [inst, value, subscript, position]
-        pause_at = {
-            'inst': 174,
-            'value': 8.0,
-            'trace': '_SET_PATH:4'
-        }
         print('Making Summaries...')
         summary = {}
+        all_args = []
         for inst, values in grouped_branches.items():
             summary[inst] = {}
-            pause_inst = inst == pause_at['inst']
-            if pause_inst:
-                pass
             for value, traces in values.items():
                 summary[inst][value] = {}
-                pause_value = value == pause_at['value']
-                if pause_value:
-                    pass
-                for trace, branches in traces.items():
-                    pause_trace = trace == pause_at['trace']
-                    if pause_trace:
-                        pass
-                    if pause_trace and pause_value and pause_inst:
-                        # print('pause here')
-                        pass
-                    differences = all_differences[inst][value][trace]
-                    branch_outs = all_outs[inst][value][trace]
-                    print(f'Summarizing {value}:::{trace}...')
-                    if len(branches) > 1:
-                        if len(differences) > 0:
+                if not parallel_processes:
+                    for trace, branches in traces.items():
+                        args_in = {'value': value, 'branches': branches,
+                                   'trace': trace, 'diff_levels': all_diff_levels[inst][value][trace],
+                                   'diffs': all_differences[inst][value][trace],
+                                   'outs': all_outs[inst][value][trace], 'trace_level': all_trace_levels,
+                                   'inst': inst}
 
-                            diff_levels = all_diff_levels[inst][value][trace]
-                            stratified_diff_summary = self._get_stratified_differences(
-                                diffs=copy.deepcopy(differences),
-                                outs=copy.deepcopy(branch_outs),
-                                diff_levels=copy.deepcopy(diff_levels))
-
-                            condensed_diff_summary = self._condense_stratified_differences(
-                                copy.deepcopy(stratified_diff_summary))
-
-                            temp_summary = {
-                                'has_diff': True,
-                                'stratified': stratified_diff_summary,
-                                'condensed': condensed_diff_summary,
-                                'trace_level': all_trace_levels[inst][value]
-                            }
-                        else:
-                            out = branch_outs[0]
-                            temp_summary = {'has_diff': False, 'out': out, 'unused_trees': True,
-                                            'trace_level': all_trace_levels[inst][value]}
-                    else:
-                        out = branch_outs[0]
-                        temp_summary = {'has_diff': False, 'out': out, 'trace_level': all_trace_levels[inst][value]}
-
-                    summary[inst][value][trace] = temp_summary
+                        result = [self._generate_difference_summaries(args_in=args_in)]
+                        for out in result:
+                            summary[out['inst']][out['value']][out['trace']] = out['summary']
+                else:
+                    # place holder for debugging multiprocessing, not formatted for multiprocessing
+                    for trace, branches in traces.items():
+                        all_args.append({'value': value, 'branches': branches,
+                                         'trace': trace, 'diff_levels': all_diff_levels[inst][value][trace],
+                                         'diffs': all_differences[inst][value][trace],
+                                         'outs': all_outs[inst][value][trace], 'trace_level': all_trace_levels,
+                                         'inst': inst})
+        if parallel_processes:
+            total_print_rows = len(all_args)
+            for arg in all_args:
+                arg['total_print_rows'] = total_print_rows
+            pool = mp.Pool(mp.cpu_count())
+            results = pool.map(self._generate_difference_summaries, all_args)
+            pool.close()
+            pool.join()
+            for out in results:
+                summary[out['inst']][out['value']][out['trace']] = out['summary']
 
         # Remove internal summaries and append them to external summaries
         appended_summary = {}
@@ -1385,6 +1383,39 @@ class ScriptPerformer:
 
         return reformatted_summary
 
+    def _get_traceback_groups(self, args_in):
+        inst = args_in['inst']
+        value = args_in['value']
+        branches = args_in['branches']
+        grouped_values = {}
+        traceback_level = len(branches[0]['init_value']['traceback']) - 1
+        compared = []
+        branch_num = len(branches)
+        progress_prefix = f'Creating Groups for {inst}:{value}'
+        progress_bar_length = 150 - len(progress_prefix)
+        for i, branch1 in enumerate(branches):
+            print_suffix = f'{i}/{branch_num}'
+            printProgressBar(prefix=progress_prefix, suffix=print_suffix, length=progress_bar_length,
+                             total=branch_num, iteration=i)
+            sys.stdout.flush()
+            compared.append(i)
+            for j, branch2 in enumerate(branches):
+                if j in compared:
+                    continue
+                b1_traceback = branch1['init_value']['traceback']
+                b2_traceback = branch2['init_value']['traceback']
+                new_trace_level = self._get_traceback_diff_level(b1_traceback, b2_traceback)
+                traceback_level = min(traceback_level, new_trace_level)
+        for branch in branches:
+            diff_traceback = branch['init_value']['traceback']
+            trace_key = self._get_traceback_string(diff_traceback, traceback_level)
+            if trace_key not in grouped_values.keys():
+                print(f'Created group: Value: {value}, Trace: {trace_key}{" " * 150}')
+                grouped_values[trace_key] = []
+            grouped_values[trace_key].append(branch)
+
+        return {'groups': grouped_values, 'trace_level': traceback_level, 'inst': inst, 'value': value}
+
     def _get_traceback_diff_level(self, traceback1, traceback2):
         trace1_range = len(traceback1) - 1
         trace2_range = len(traceback2) - 1
@@ -1428,6 +1459,74 @@ class ScriptPerformer:
                 trace_key = f'{trace_key}{trace_value}'
 
         return trace_key
+
+    def _get_traceback_group_details(self, args_in) -> dict:
+        inst = args_in['inst']
+        value = args_in['value']
+        trace = args_in['trace']
+        param_name = args_in['inst_details']
+        branches = args_in['branches']
+
+        branch_num = len(branches)
+        progress_prefix = f'\rGetting first differences from {inst}:{value}:{trace}'
+        progress_bar_length = 200 - len(progress_prefix)
+
+        # Determine whether this position is internal and get outs for each branch
+        is_internal = True
+        branch_outs = []
+        for branch in branches:
+            if 'init' in trace or 'new_run' in branch.keys():
+                is_internal = False
+
+            if 'exit' in branch.keys():
+                out_value = 'END'
+            else:
+                out_value = branch['out_value']['parameter values'][param_name]
+                if isinstance(out_value, str):
+                    addr = out_value
+                    out_value = branch['out_value']['address_values'][addr]
+            out_trace = branch['out_value']['traceback']
+            branch_outs.append({'value': out_value, 'traceback': out_trace})
+
+        diff_levels = []
+        all_differences = []
+
+        if branch_num > 1:
+            checked_branches = []
+            for i, branch1 in enumerate(branches):
+                progress_suffix = f' \t{i}/{branch_num}'
+                printProgressBar(prefix=f'{progress_prefix}', suffix=f'{progress_suffix}',
+                                 length=progress_bar_length, total=branch_num, iteration=i, printEnd='\r')
+                sys.stdout.flush()
+                checked_branches.append(i)
+                for j, branch2 in enumerate(branches):
+                    if j in checked_branches:
+                        continue
+                    if self.debug_verbose:
+                        print(f'\tGetting first difference between {i} and {j}')
+
+                    temp_difference = self._get_first_difference(copy.deepcopy(branch1),
+                                                                 copy.deepcopy(branch2),
+                                                                 top_level=True)
+                    if len(temp_difference) == 0:
+                        continue
+                    diff_level = temp_difference.pop('level')
+                    deets = temp_difference.pop('diff_deets')
+                    difference = {'branches': [i, j], 'level': diff_level, 'diff': temp_difference,
+                                  'diff_details': deets}
+                    all_differences.append(difference)
+
+            progress_suffix = ' \tDONE\t\t\t\t '
+            printProgressBar(prefix=f'{progress_prefix}', suffix=f'{progress_suffix}',
+                             total=branch_num, iteration=branch_num, length=progress_bar_length, printEnd='\r')
+            sys.stdout.flush()
+
+            for diff in all_differences:
+                diff_levels.append(diff['level'])
+            diff_levels = sorted(list(set(diff_levels)))
+
+        return {'diffs': all_differences, 'all_outs': branch_outs, 'diff_levels': diff_levels, 'internal': is_internal,
+                'inst': inst, 'value': value, 'trace': trace}
 
     def _get_first_difference(self, branch1, branch2, top_level=False, level=0) -> dict:
         if 'children' not in branch1.keys() or 'children' not in branch2.keys():
@@ -1503,6 +1602,41 @@ class ScriptPerformer:
                 return {}
 
         return diff
+
+    def _generate_difference_summaries(self, args_in) -> dict:
+        diff_levels = args_in['diff_levels']
+        differences = args_in['diffs']
+        branch_outs = args_in['outs']
+        trace_level = args_in['trace_level']
+        branches = args_in['branches']
+        inst = args_in['inst']
+        value = args_in['value']
+        trace = args_in['trace']
+
+        print(f'Summarizing {value}-{trace}...')
+        if len(branches) > 1:
+            if len(differences) > 0:
+
+                stratified_diff_summary = self._get_stratified_differences(
+                    diffs=copy.deepcopy(differences),
+                    outs=copy.deepcopy(branch_outs),
+                    diff_levels=copy.deepcopy(diff_levels))
+
+                condensed_diff_summary = self._condense_stratified_differences(
+                    copy.deepcopy(stratified_diff_summary))
+
+                summary = {'has_diff': True, 'stratified': stratified_diff_summary,
+                           'condensed': condensed_diff_summary, 'trace_level': trace_level}
+
+            else:
+                out = branch_outs[0]
+                summary = {'has_diff': False, 'out': out, 'unused_trees': True,
+                           'trace_level': trace_level}
+        else:
+            out = branch_outs[0]
+            summary = {'has_diff': False, 'out': out, 'trace_level': trace_level}
+
+        return {'summary': summary, 'inst': inst, 'value': value, 'trace': trace}
 
     def _get_stratified_differences(self, diffs, outs, diff_levels, valid_ids=None) -> dict:
         strat_diff = {}

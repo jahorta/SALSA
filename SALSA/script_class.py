@@ -1,7 +1,7 @@
 import copy
+import re
 
 from SALSA.byte_array_utils import getTypeFromString, toInt, asStringOfType, toFloat
-import re
 
 
 class SCTAnalysis:
