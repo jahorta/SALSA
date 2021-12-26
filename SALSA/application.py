@@ -1,6 +1,8 @@
 import copy
 import json
 import os
+import queue
+import threading
 import tkinter as tk
 from math import floor
 from threading import Timer, Thread
@@ -23,6 +25,7 @@ class Application(tk.Tk):
     title_text = "Skies of Arcadia Legends - Script Assistant"
     about_text = f'{title_text}\nby: Jahorta\n2021'
     default_sct_file = 'me005b.sct'
+    export_thread: threading.Thread
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -129,9 +132,12 @@ class Application(tk.Tk):
         # initializing exporter
         self.export_window = None
         self.exporter = SCTExporter()
-        self.exporter_out: dict = {}
-        self.scriptAnalyses = []
         self.export_type = ''
+        self.script_exports = {}
+        self.export_script_names = []
+        self.export_thread = threading.Thread(target=self.perform_script_analysis)
+        self.queue_to_exporter: queue.Queue = queue.Queue()
+        self.queue_from_exporter: queue.Queue = queue.Queue()
 
     def on_select_instruction(self, newID):
         """Save the current instruction details to the current Instruction object"""
@@ -172,8 +178,7 @@ class Application(tk.Tk):
 
     def on_create_export_window(self):
         self.exporter = SCTExporter()
-        self.exporter_out: dict = {}
-        self.scriptAnalyses = []
+        self.script_exports = []
         self.export_type = ''
         position = {'x': self.winfo_x(), 'y': self.winfo_y()}
         self.export_window = v.ExporterView(parent=self, title='Export',
@@ -182,46 +187,69 @@ class Application(tk.Tk):
 
     # Called when asked to export data
     def on_data_export(self, export_type='Ship battle turn data'):
+        self.script_exports = {}
         relevant_script_regex = self.exporter.get_export_scripts(export_type)
         # TODO - create SCT objects for all relevant scripts
-        script_name_list = []
+        self.export_script_names = []
         script_paths = Path(self.script_dir).glob('**/*')
         for path in script_paths:
             if re.search(relevant_script_regex, path.name):
-                script_name_list.append(path.name)
+                self.export_script_names.append(path.name)
         self.export_type = export_type
-        for i, script in enumerate(script_name_list):
-            # # Threaded Run
-            # args = [i, script, script_name_list]
-            # scriptThread = ScriptAnalysisThread(function=self.perform_script_analysis, args=args)
-            # scriptThread.run()
 
-            # Sequential Run
-            args = [i, script, script_name_list]
-            self.perform_script_analysis(*args)
+        # Start background thread
+        self.export_thread.start()
 
-    def perform_script_analysis(self, script_index, script, script_name_list):
-        script_num = len(script_name_list)
-        i = script_index
-        sct = script_name_list[i]
-        new_sct_analysis = SCTAnalysis(self.sctModel.load_sct(insts=self.instructionSet, file=sct))
-        print(f'{sct} analyzed: {i + 1}/{script_num}')
-        self.after(100, self.add_analysis_to_export(new_sct_analysis, script_num))
+        # Add script names to the queue for the export thread
+        script_num = len(self.export_script_names)
+        for i, script in enumerate(self.export_script_names):
+                pkg = {'index': i + 1, 'script': script, 'script_num': script_num}
+                self.queue_to_exporter.put(pkg)
 
-    def add_analysis_to_export(self, sctAnalysis, script_num):
-        self.scriptAnalyses.append(sctAnalysis)
-        scripts_done = len(self.scriptAnalyses)
-        progress = floor(((scripts_done + 1) / script_num) * 100)
-        self.export_window.update_progress(progress, f'{sctAnalysis.Name} analyzed: {scripts_done + 1}/{script_num}')
-        if scripts_done == script_num:
-            self.after(100, self.export_data)
+        # After adding all script names, add a signal that exporting is finished
+        self.queue_to_exporter.put({'done': True})
 
-    def export_data(self):
-        self.exporter_out = self.exporter.export(sct_list=self.scriptAnalyses, instruction_list=self.instructionSet,
-                                                 export_type=self.export_type)
+        # Start polling for completed analyses
+        self.add_analysis_to_export()
+
+    def perform_script_analysis(self):
+        done = False
+        while not done:
+            # Get the next package of script information
+            in_pkg = self.queue_to_exporter.get()
+            self.queue_to_exporter.task_done()
+
+            # Check if no more analyses to perform
+            if 'done' not in in_pkg.keys():
+                i = in_pkg['index']
+                sct = in_pkg['script']
+                script_num = in_pkg['script_num']
+                new_sct_analysis = SCTAnalysis(self.sctModel.load_sct(insts=self.instructionSet, file=sct))
+                print(f'{sct} analyzed: {i}/{script_num}')
+                new_sct_export = self.exporter.export(sct_list=[new_sct_analysis], instruction_list=self.instructionSet,
+                                                      export_type=self.export_type)
+                out_pkg = {'analysis': new_sct_export}
+                self.queue_from_exporter.put(out_pkg)
+            else:
+                done = True
 
         # Update Exports expects a dictionary of strings. The key becomes the tab name and the string is csv format
-        self.export_window.update_exports(self.exporter_out)
+
+    def add_analysis_to_export(self):
+        script_num = len(self.export_script_names)
+        if not self.queue_from_exporter.empty():
+            in_pkg = self.queue_from_exporter.get()
+            self.queue_from_exporter.task_done()
+            self.script_exports = {**self.script_exports, **in_pkg['analysis']}
+            progress = floor(((len(self.script_exports)) / script_num) * 100)
+            self.export_window.update_progress(progress, f'{list(in_pkg["analysis"].keys())[0]} analyzed: '
+                                                         f'{len(self.script_exports)}/{script_num}')
+
+        if len(self.script_exports) >= script_num:
+            self.export_window.update_exports(self.script_exports)
+            self.export_thread.join()
+        else:
+            self.after(100, self.add_analysis_to_export)
 
     def export_as_csv(self, csv_dict):
         if len(csv_dict) > 1:
@@ -261,7 +289,6 @@ class Application(tk.Tk):
         self.file_select.file_select_tree.yview_moveto(self.file_select_scalebar_pos)
 
     def on_quit(self):
-        self.mainloop()
         """Check for unsaved changes, prompt to save, quit"""
         currentID = self.InstructionFrame.get_current_inst_details()['Instruction ID']
         self.on_instruction_commit(currentID)
@@ -452,16 +479,3 @@ class Settings:
 
     def get_script_dir(self):
         return self.settings['script_directory']
-
-
-class ScriptAnalysisThread(Thread):
-
-    def __init__(self, function, args):
-        super().__init__()
-        self.runnable = function
-        self.args = args
-
-    def run(self):
-        self.runnable(*self.args)
-
-

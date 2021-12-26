@@ -229,8 +229,7 @@ class SCTAnalysis:
 
                     if ID == 11:
                         sub[pos] = {'subscript_load': {'next': next_script, 'location': next_location}}
-
-                        if next_script not in decoded_scripts or next_script not in scripts_to_decode:
+                        if next_script not in [*decoded_scripts, *scripts_to_decode]:
                             scripts_to_decode.append(next_script)
 
                     elif ID == 0:
@@ -238,7 +237,7 @@ class SCTAnalysis:
                         if not name == next_script:
                             sub[pos] = {
                                 'subscript_jumpif': {'next': next_script, 'condition': test, 'location': next_location}}
-                            if next_script not in decoded_scripts or next_script not in scripts_to_decode:
+                            if next_script not in [*decoded_scripts, *scripts_to_decode]:
                                 scripts_to_decode.append(next_script)
                         else:
                             sub[pos] = {'jumpif': {'location': next_location, 'condition': test}}
@@ -251,7 +250,7 @@ class SCTAnalysis:
                                 sub[pos] = {'goto': next_location}
                         else:
                             sub[pos] = {'goto': {'position': pos, 'next': next_script, 'location': next_location}}
-                            if next_script not in decoded_scripts or next_script not in scripts_to_decode:
+                            if next_script not in [*decoded_scripts, *scripts_to_decode]:
                                 scripts_to_decode.append(next_script)
 
                 elif ID is current_subscript.choice_inst:
@@ -372,7 +371,7 @@ class SCTAnalysis:
                     if script_found:
                         next_script = script_name
                         sub['fallthroughs'] = {'next': next_script}
-                        if next_script not in decoded_scripts or next_script not in scripts_to_decode:
+                        if next_script not in [*decoded_scripts, *scripts_to_decode]:
                             scripts_to_decode.append(next_script)
                         break
                     if script_name == name:

@@ -1403,8 +1403,8 @@ class ExporterView(tk.Toplevel):
         self.export_selector = w.LabelInput(self.export_frame, 'Name', field_spec=export_fields['types'])
         self.export_selector.set(export_fields['types']['values'][0])
         self.export_selector.grid(row=0, column=0)
-        button_extract_data = tk.Button(self.export_frame, text='Extract Data', command=self.export_selected_data)
-        button_extract_data.grid(row=1, column=0)
+        self.button_extract_data = tk.Button(self.export_frame, text='Extract Data', command=self.export_selected_data)
+        self.button_extract_data.grid(row=1, column=0)
 
         button_frame = tk.Frame(self)
         button_frame.grid(row=1, column=0)
@@ -1457,6 +1457,7 @@ class ExporterView(tk.Toplevel):
         self.export_notebook.tkraise()
 
     def export_selected_data(self):
+        self.button_extract_data['state'] = 'disabled'
         export_type = self.export_selector.get()
         if export_type == '':
             self.update_progress(0, 'No Export Value Selected...')
