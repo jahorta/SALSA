@@ -464,7 +464,8 @@ class ScriptPerformer:
                                  iteration=len(self.open_branch_segments), length=124, printEnd='\r')
 
                 # flag for removal identical open branches
-                if self.use_multiprocessing:
+                if self.use_multiprocessing and False:
+                    # TODO-this does not work correctly yet
                     cpus = mp.cpu_count()
                     last_index = None
                     total_open = len(self.open_branch_segments)
@@ -489,7 +490,8 @@ class ScriptPerformer:
                 else:
                     results = self._open_branch_duplicate_flagging(
                         args_in={'branches': self.open_branch_segments,
-                                 'all_branches': copy.deepcopy(self.open_branch_segments), 'start_index': 0})
+                                 'all_branches': copy.deepcopy(self.open_branch_segments), 'start_index': 0,
+                                 'branches_to_remove': branches_to_remove})
 
                     branches_to_remove = [*branches_to_remove, *results]
 
@@ -519,7 +521,7 @@ class ScriptPerformer:
                 else:
                     results = self._closed_branch_duplicate_flagging(
                         args_in={'branches': self.all_outs, 'all_branches': self.open_branch_segments,
-                                 'start_index': 0, 'with_mid': with_mid})
+                                 'start_index': 0, 'with_mid': with_mid, 'branches_to_remove': branches_to_remove})
                     branches_to_remove = [*branches_to_remove, *results]
 
                 # Remove flagged branches
