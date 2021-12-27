@@ -1,5 +1,7 @@
 import copy
+import json
 import multiprocessing as mp
+import os
 import re
 import sys
 from datetime import datetime
@@ -18,7 +20,11 @@ class SCTExporter:
         'Ship_battles': KA.Ship_Battles
     }
 
-    def __init__(self, loc=None, verbose=False):
+    temp_dir = 'E:\\temp'
+
+    def __init__(self, loc=None, verbose=False, temp_dir=None):
+        if temp_dir is not None:
+            self.temp_dir = temp_dir
         self.verbose_out = verbose
         self.dir = loc
         self.script_list: List[SCTAnalysis] = []
@@ -175,7 +181,8 @@ class SCTExporter:
         for script_name, script in info_dict.items():
             print(f'\n---Now running {script_name}---')
             script_runs[script_name] = self.script_performer.run(script,
-                                                                 self.export_options[self.export_type]['instructions'])
+                                                                 self.export_options[self.export_type]['instructions'],
+                                                                 temp_dir=self.temp_dir)
 
         temp_outs = {}
         for script, result in script_runs.items():
@@ -376,7 +383,7 @@ class ScriptPerformer:
 
         self.time = datetime.now()
 
-    def run(self, input_dict, inst_details):
+    def run(self, input_dict, inst_details, temp_dir):
         self.addrs = input_dict.get('addresses', {})
 
         self.open_branch_segments = []
@@ -477,7 +484,8 @@ class ScriptPerformer:
                         else:
                             index_start = last_index + 1
                         last_index = floor(current_open_branch_num * ((i + 1) / cpus))
-                        segments.append({'start_index': index_start, 'last_index': last_index, 'branches_to_remove': branches_to_remove})
+                        segments.append({'start_index': index_start, 'last_index': last_index,
+                                         'branches_to_remove': branches_to_remove})
                     pool = mp.Pool(mp.cpu_count())
                     results = pool.map(self._open_branch_duplicate_flagging, segments)
                     pool.close()
@@ -487,7 +495,7 @@ class ScriptPerformer:
                     print()
                 else:
                     results = self._open_branch_duplicate_flagging(
-                        args_in={'start_index': 0, 'last_index': len(self.all_outs)-1,
+                        args_in={'start_index': 0, 'last_index': len(self.all_outs) - 1,
                                  'branches_to_remove': branches_to_remove})
 
                     branches_to_remove = [*branches_to_remove, *results]
@@ -516,7 +524,8 @@ class ScriptPerformer:
                     print()
                 else:
                     results = self._closed_branch_duplicate_flagging(
-                        args_in={'start_index': 0, 'last_index': len(self.all_outs)-1, 'with_mid': with_mid, 'branches_to_remove': branches_to_remove})
+                        args_in={'start_index': 0, 'last_index': len(self.all_outs) - 1, 'with_mid': with_mid,
+                                 'branches_to_remove': branches_to_remove})
                     branches_to_remove = [*branches_to_remove, *results]
 
                 # Remove flagged branches
@@ -569,7 +578,7 @@ class ScriptPerformer:
                     internal.append(i)
             print(f'Found {len(internal)} branches which were created without exiting the subscript')
 
-        tree_difference_summary = self._make_all_out_summary(inst_details=inst_details)
+        tree_difference_summary = self._make_all_out_summary(inst_details=inst_details, temp_dir=temp_dir)
         print('Done with tree summary')
 
         # Sort summaries by value and add start to the beginning
@@ -605,11 +614,12 @@ class ScriptPerformer:
         checked_branches = []
         current_open_branch_num = last_index - start_index
         for i, open1 in enumerate(self.open_branch_segments[start_index:last_index]):
-            printProgressBar(prefix='Flagging identical open branches', suffix=f'total_branches: {current_open_branch_num}',
+            printProgressBar(prefix='Flagging identical open branches',
+                             suffix=f'total_branches: {current_open_branch_num}',
                              total=current_open_branch_num, iteration=i, length=119)
             sys.stdout.flush()
             checked_branches.append(i)
-            for j, open2 in enumerate(self.open_branch_segments[start_index+1:]):
+            for j, open2 in enumerate(self.open_branch_segments[start_index + 1:]):
                 if j in branches_to_remove:
                     continue
                 if j in checked_branches:
@@ -1037,8 +1047,8 @@ class ScriptPerformer:
                                'selected_entry': switch_addr_value, 'next_inst_ptr': inst_ptr,
                                'next_inst_pos': current_sub['pos_list'][inst_ptr], 'children': {}}
                 new_branch = self._branch_append_node(branch=self.open_branch_segments[branch_index],
-                                                      node_key='switch', modify=modify
-                                                      , node_value=copy.deepcopy(switch_dict))
+                                                      node_key='switch', modify=modify,
+                                                      node_value=copy.deepcopy(switch_dict))
 
                 if self.with_compare_assumption:
                     if force_branch:
@@ -1158,7 +1168,7 @@ class ScriptPerformer:
 
         return new_trace
 
-    def _make_all_out_summary(self, inst_details) -> dict:
+    def _make_all_out_summary(self, inst_details, temp_dir) -> dict:
         all_branches = self.all_outs
         num_branches = len(all_branches)
 
@@ -1218,34 +1228,34 @@ class ScriptPerformer:
         print('\nLooking for branch differences')
         all_args = []
         row = 0
-        all_differences = {}
+        difference_dicts = {}
         all_outs = {}
         all_diff_levels = {}
         all_internals = {}
         for inst, values in grouped_branches.items():
-            all_differences[inst] = {}
+            difference_dicts[inst] = {}
             all_outs[inst] = {}
             all_diff_levels[inst] = {}
             all_internals[inst] = {}
             for value, traces in values.items():
-                all_differences[inst][value] = {}
+                difference_dicts[inst][value] = {}
                 all_outs[inst][value] = {}
                 all_diff_levels[inst][value] = {}
                 all_internals[inst][value] = []
                 if not parallel_processes:
                     for trace, branches in traces.items():
                         args_in = {'inst': inst, 'value': value, 'branches': branches,
-                                   'trace': trace, 'inst_details': inst_details[inst]}
-                        result = self._get_traceback_group_details(args_in=args_in)
-                        all_differences[inst][value][trace] = result['diffs']
-                        all_outs[inst][value][trace] = result['all_outs']
-                        all_diff_levels[inst][value][trace] = result['diff_levels']
-                        if result['internal']:
+                                   'trace': trace, 'inst_details': inst_details[inst],
+                                   'temp_dir': temp_dir}
+                        out = self._get_traceback_group_details(args_in=args_in)
+                        difference_dicts[out['inst']][out['value']][out['trace']] = out
+                        if out['internal']:
                             all_internals[inst][value].append(trace)
                 else:
                     for trace, branches in traces.items():
                         all_args.append({'print_row': row, 'inst': inst, 'value': value,
-                                         'branches': branches, 'trace': trace, 'inst_details': inst_details[inst]})
+                                         'branches': branches, 'trace': trace, 'inst_details': inst_details[inst],
+                                         'temp_dir': temp_dir})
                         row += 1
 
         if parallel_processes:
@@ -1258,9 +1268,7 @@ class ScriptPerformer:
             pool.join()
 
             for out in results:
-                all_differences[out['inst']][out['value']][out['trace']] = out['diffs']
-                all_outs[out['inst']][out['value']][out['trace']] = out['all_outs']
-                all_diff_levels[out['inst']][out['value']][out['trace']] = out['diff_levels']
+                difference_dicts[out['inst']][out['value']][out['trace']] = out
                 if out['internal']:
                     all_internals[out['inst']][out['value']].append(out['trace'])
 
@@ -1273,11 +1281,8 @@ class ScriptPerformer:
                 summary[inst][value] = {}
                 if not parallel_processes:
                     for trace, branches in traces.items():
-                        args_in = {'value': value, 'branches': branches,
-                                   'trace': trace, 'diff_levels': all_diff_levels[inst][value][trace],
-                                   'diffs': all_differences[inst][value][trace],
-                                   'outs': all_outs[inst][value][trace], 'trace_level': all_trace_levels,
-                                   'inst': inst}
+                        args_in = {**difference_dicts[inst][value][trace], 'branches': branches, 'temp_dir': temp_dir,
+                                   'trace_level': all_trace_levels[inst][value]}
 
                         result = [self._generate_difference_summaries(args_in=args_in)]
                         for out in result:
@@ -1285,11 +1290,8 @@ class ScriptPerformer:
                 else:
                     # place holder for debugging multiprocessing, not formatted for multiprocessing
                     for trace, branches in traces.items():
-                        all_args.append({'value': value, 'branches': branches,
-                                         'trace': trace, 'diff_levels': all_diff_levels[inst][value][trace],
-                                         'diffs': all_differences[inst][value][trace],
-                                         'outs': all_outs[inst][value][trace], 'trace_level': all_trace_levels,
-                                         'inst': inst})
+                        all_args.append({**difference_dicts[inst][value][trace], 'branches': branches,
+                                         'temp_dir': temp_dir, 'trace_level': all_trace_levels[inst][value]})
         if parallel_processes:
             total_print_rows = len(all_args)
             for arg in all_args:
@@ -1300,6 +1302,10 @@ class ScriptPerformer:
             pool.join()
             for out in results:
                 summary[out['inst']][out['value']][out['trace']] = out['summary']
+
+        # Clean up any temp files
+        for f in os.listdir(temp_dir):
+            os.remove(os.path.join(temp_dir, f))
 
         # Remove internal summaries and append them to external summaries
         appended_summary = {}
@@ -1454,13 +1460,13 @@ class ScriptPerformer:
             if first_tr:
                 first_tr = False
             else:
-                trace_key += '::'
+                trace_key += '_'
             first_val = True
             for trace_value in trace.values():
                 if first_val:
                     first_val = False
                 else:
-                    trace_key += ':'
+                    trace_key += '-'
                 trace_key = f'{trace_key}{trace_value}'
 
         return trace_key
@@ -1471,7 +1477,7 @@ class ScriptPerformer:
         trace = args_in['trace']
         param_name = args_in['inst_details']
         branches = args_in['branches']
-        used_temp_file = False
+        temp_dir = args_in['temp_dir']
 
         branch_num = len(branches)
         progress_prefix = f'\rGetting first differences from {inst}:{value}:{trace}'
@@ -1494,9 +1500,10 @@ class ScriptPerformer:
             out_trace = branch['out_value']['traceback']
             branch_outs.append({'value': out_value, 'traceback': out_trace})
 
+        diffs_file_name = f'{inst}-{value}-{trace}.tmp'
+        file = open(os.path.join(temp_dir, diffs_file_name), 'w')
         diff_levels = []
-        all_differences = []
-        no_diff_targets = []
+        has_differences = False
         if branch_num > 1:
             checked_branches = []
             for i, branch1 in enumerate(branches):
@@ -1510,34 +1517,30 @@ class ScriptPerformer:
                         continue
                     if self.debug_verbose:
                         print(f'\tGetting first difference between {i} and {j}')
-
                     temp_difference = self._get_first_difference(branch1=branch1,
                                                                  branch2=branch2,
                                                                  top_level=True)
                     if len(temp_difference) == 0:
                         continue
                     diff_level = temp_difference.pop('level')
+                    diff_levels.append(diff_level)
                     deets = temp_difference.pop('diff_deets')
                     difference = {'branches': [i, j], 'level': diff_level, 'diff': temp_difference,
                                   'diff_details': deets}
-                    all_differences.append(difference)
+                    file.write(f'{json.dumps(difference)}\n')
+                    has_differences = True
 
             progress_suffix = ' \tDONE\t\t\t\t '
             printProgressBar(prefix=f'{progress_prefix}', suffix=f'{progress_suffix}',
                              total=branch_num, iteration=branch_num, length=progress_bar_length, printEnd='\r')
             sys.stdout.flush()
 
-            for diff in all_differences:
-                diff_levels.append(diff['level'])
             diff_levels = sorted(list(set(diff_levels)))
 
-        output = {'all_outs': branch_outs, 'diff_levels': diff_levels, 'internal': is_internal,
-            'inst': inst, 'value': value, 'trace': trace}
+        file.close()
 
-        if used_temp_file:
-            output['diffs_fn'] = ''
-        else:
-            output['diffs'] = all_differences
+        output = {'outs': branch_outs, 'diff_levels': diff_levels, 'internal': is_internal, 'inst': inst,
+                  'value': value, 'trace': trace, 'diffs_file_name': diffs_file_name, 'has_differences': has_differences}
 
         return output
 
@@ -1563,6 +1566,9 @@ class ScriptPerformer:
             next_branch2 = branch2['children'][ch2_keys[0]]
             temp_diff = self._get_first_difference(next_branch1, next_branch2, level=(level + 1))
 
+            if 'children' in temp_diff.keys():
+                temp_diff.pop('children')
+
             if 'insert_key' in temp_diff.keys():
                 temp_diff.pop('insert_key')
                 level = temp_diff.pop('level')
@@ -1574,7 +1580,9 @@ class ScriptPerformer:
         else:
             difference = self._get_difference_details(branch1, branch2)
             difference['level'] = level
-            difference['diff_deets'] = [copy.deepcopy(branch1), copy.deepcopy(branch2)]
+            deets1 = {k: branch1[k] for k in branch1.keys() if not k == 'children'}
+            deets2 = {k: branch2[k] for k in branch2.keys() if not k == 'children'}
+            difference['diff_deets'] = [deets1, deets2]
             difference['insert_key'] = True
 
         return difference
@@ -1618,22 +1626,22 @@ class ScriptPerformer:
 
     def _generate_difference_summaries(self, args_in) -> dict:
         diff_levels = args_in['diff_levels']
-        differences = args_in['diffs']
+        dif_file_name = args_in['diffs_file_name']
         branch_outs = args_in['outs']
         trace_level = args_in['trace_level']
         branches = args_in['branches']
         inst = args_in['inst']
         value = args_in['value']
         trace = args_in['trace']
+        has_differences = args_in['has_differences']
 
         print(f'Summarizing {value}-{trace}...')
         if len(branches) > 1:
-            if len(differences) > 0:
+            if has_differences:
 
                 stratified_diff_summary = self._get_stratified_differences(
-                    diffs=copy.deepcopy(differences),
-                    outs=copy.deepcopy(branch_outs),
-                    diff_levels=copy.deepcopy(diff_levels))
+                    dif_file_name=dif_file_name, outs=copy.deepcopy(branch_outs),
+                    diff_levels=copy.deepcopy(diff_levels), temp_dir=args_in['temp_dir'])
 
                 condensed_diff_summary = self._condense_stratified_differences(
                     copy.deepcopy(stratified_diff_summary))
@@ -1651,137 +1659,147 @@ class ScriptPerformer:
 
         return {'summary': summary, 'inst': inst, 'value': value, 'trace': trace}
 
-    def _get_stratified_differences(self, diffs, outs, diff_levels, valid_ids=None) -> dict:
+    def _get_stratified_differences(self, outs, diff_levels, temp_dir, dif_file_name, valid_ids=None) -> dict:
         strat_diff = {}
         rem_levels = diff_levels[1:]
         level = diff_levels[0]
         child_ids = {}
-        for diff in diffs:
-            if diff['level'] == level:
-                b_keys = diff['branches']
-                invalid_id_detected = False
-                if valid_ids is not None:
-                    for key in b_keys:
-                        if key not in valid_ids:
-                            invalid_id_detected = True
+        diff_path = os.path.join(temp_dir, dif_file_name)
+        file = open(diff_path, 'r')
+        while True:
+            line = file.readline()
+            if not line:
+                break
+            diff: dict = json.loads(line)
+            if not diff['level'] == level:
+                continue
+            b_keys = diff['branches']
+            invalid_id_detected = False
+            if valid_ids is not None:
+                for key in b_keys:
+                    if key not in valid_ids:
+                        invalid_id_detected = True
 
-                if len(b_keys) < 2:
-                    print('Stratification Error: Invalid number of branches to form a difference')
-                    continue
-                if invalid_id_detected:
-                    continue
+            if len(b_keys) < 2:
+                print('Stratification Error: Invalid number of branches to form a difference')
+                continue
+            if invalid_id_detected:
+                continue
 
-                diff_inst = list(diff['diff'].keys())[0]
-                diff_dict = diff['diff'][diff_inst]
+            diff_inst = list(diff['diff'].keys())[0]
+            diff_dict = diff['diff'][diff_inst]
 
-                if diff_inst == 'choice':
-                    if 'jumpif' in diff_dict['modification']:
-                        b_diff_value_dict = diff_dict['modification']['jumpif']['jumped']
-                    if 'switch' in diff_dict['modification']:
-                        b_diff_value_dict = diff_dict['modification']['switch']['selected_entry']
+            if diff_inst == 'choice':
+                if 'jumpif' in diff_dict['modification']:
+                    b_diff_value_dict = diff_dict['modification']['jumpif']['jumped']
+                if 'switch' in diff_dict['modification']:
+                    b_diff_value_dict = diff_dict['modification']['switch']['selected_entry']
 
-                    b_diff_values = [b_diff_value_dict['var1'], b_diff_value_dict['var2']]
+                b_diff_values = [b_diff_value_dict['var1'], b_diff_value_dict['var2']]
 
-                    choice_details = diff['diff_details'][0]['details']
-                    options = choice_details['choices']
-                    strat_diff['inst'] = 'choice'
-                    strat_diff['question'] = choice_details['question']
-                    for i, value in enumerate(b_diff_values):
-                        if isinstance(value, bool):
-                            if value:
-                                entry = 0
-                            else:
-                                entry = 1
+                choice_details = diff['diff_details'][0]['details']
+                options = choice_details['choices']
+                strat_diff['inst'] = 'choice'
+                strat_diff['question'] = choice_details['question']
+                for i, value in enumerate(b_diff_values):
+                    if isinstance(value, bool):
+                        if value:
+                            entry = 0
                         else:
-                            entry = int(value)
-                        if not options[entry] in child_ids.keys():
-                            child_ids[options[entry]] = []
-                        b_id = b_keys[i]
-                        if b_id not in child_ids[options[entry]]:
-                            child_ids[options[entry]].append(b_id)
-
-                elif diff_inst == 'jumpif':
-                    details = diff['diff_details'][0]
-                    b_diff_value_dict = diff_dict['jumped']
-                    found_values = True
-                    for ind in ('var1', 'var2'):
-                        if ind not in b_diff_value_dict.keys():
-                            found_values = False
-
-                    b_diff_values = []
-                    if not found_values:
-                        continue
+                            entry = 1
                     else:
-                        b_diff_values.append(b_diff_value_dict['var1'])
-                        b_diff_values.append(b_diff_value_dict['var2'])
+                        entry = int(value)
+                    if not options[entry] in child_ids.keys():
+                        child_ids[options[entry]] = []
+                    b_id = b_keys[i]
+                    if b_id not in child_ids[options[entry]]:
+                        child_ids[options[entry]].append(b_id)
 
-                    if 'jumped' in details.keys():
-                        details.pop('jumped')
-                    options = [True, False]
-                    strat_diff['inst'] = 'jumpif'
-                    strat_diff['results'] = options
-                    condition_key = list(diff['diff_details'][0]['condition'].keys())[0]
-                    condition = self._generate_condition_string(
-                        cond_in=diff['diff_details'][0]['condition'][condition_key])
-                    strat_diff['condition'] = condition
-                    for i, value in enumerate(b_diff_values):
-                        if isinstance(value, bool):
-                            if value:
-                                entry = 0
-                            else:
-                                entry = 1
-                        else:
-                            print('\t\tjump w/o a boolean???')
-                            entry = int(value)
-                        if not options[entry] in child_ids.keys():
-                            child_ids[options[entry]] = []
-                        b_id = b_keys[i]
-                        if b_id not in child_ids[options[entry]]:
-                            child_ids[options[entry]].append(b_id)
+            elif diff_inst == 'jumpif':
+                details = diff['diff_details'][0]
+                b_diff_value_dict = diff_dict['jumped']
+                found_values = True
+                for ind in ('var1', 'var2'):
+                    if ind not in b_diff_value_dict.keys():
+                        found_values = False
 
-                elif diff_inst == 'switch':
-                    details = diff['diff_details'][0]
-                    b_diff_value_dict = diff_dict['selected_entry']
-                    found_values = True
-                    for ind in ('var1', 'var2'):
-                        if ind not in b_diff_value_dict.keys():
-                            found_values = False
-
-                    b_diff_values = []
-                    if not found_values:
-                        continue
-                    else:
-                        b_diff_values.append(b_diff_value_dict['var1'])
-                        b_diff_values.append(b_diff_value_dict['var2'])
-
-                    strat_diff['inst'] = 'switch'
-                    condition = details['condition']
-                    strat_diff['condition'] = condition
-                    for i, value in enumerate(b_diff_values):
-                        if isinstance(value, bool):
-                            if value:
-                                entry = 0
-                            else:
-                                entry = 1
-                            print('\t\tswitch w/ a boolean???')
-                        else:
-                            entry = int(value)
-                        if entry not in child_ids.keys():
-                            child_ids[entry] = []
-                        b_id = b_keys[i]
-                        if b_id not in child_ids[entry]:
-                            child_ids[entry].append(b_id)
-                    for child_list in child_ids.values():
-                        if len(child_list) == 0:
-                            print('error')
+                b_diff_values = []
+                if not found_values:
+                    continue
                 else:
-                    print(f'make new category: {diff_inst}')
+                    b_diff_values.append(b_diff_value_dict['var1'])
+                    b_diff_values.append(b_diff_value_dict['var2'])
+
+                if 'jumped' in details.keys():
+                    details.pop('jumped')
+                options = [True, False]
+                strat_diff['inst'] = 'jumpif'
+                strat_diff['results'] = options
+                condition_key = list(diff['diff_details'][0]['condition'].keys())[0]
+                condition = self._generate_condition_string(
+                    cond_in=diff['diff_details'][0]['condition'][condition_key])
+                strat_diff['condition'] = condition
+                for i, value in enumerate(b_diff_values):
+                    if isinstance(value, bool):
+                        if value:
+                            entry = 0
+                        else:
+                            entry = 1
+                    else:
+                        print('\t\tjump w/o a boolean???')
+                        entry = int(value)
+                    if not options[entry] in child_ids.keys():
+                        child_ids[options[entry]] = []
+                    b_id = b_keys[i]
+                    if b_id not in child_ids[options[entry]]:
+                        child_ids[options[entry]].append(b_id)
+
+            elif diff_inst == 'switch':
+                details = diff['diff_details'][0]
+                b_diff_value_dict = diff_dict['selected_entry']
+                found_values = True
+                for ind in ('var1', 'var2'):
+                    if ind not in b_diff_value_dict.keys():
+                        found_values = False
+
+                b_diff_values = []
+                if not found_values:
+                    continue
+                else:
+                    b_diff_values.append(b_diff_value_dict['var1'])
+                    b_diff_values.append(b_diff_value_dict['var2'])
+
+                strat_diff['inst'] = 'switch'
+                condition = details['condition']
+                strat_diff['condition'] = condition
+                for i, value in enumerate(b_diff_values):
+                    if isinstance(value, bool):
+                        if value:
+                            entry = 0
+                        else:
+                            entry = 1
+                        print('\t\tswitch w/ a boolean???')
+                    else:
+                        entry = int(value)
+                    if entry not in child_ids.keys():
+                        child_ids[entry] = []
+                    b_id = b_keys[i]
+                    if b_id not in child_ids[entry]:
+                        child_ids[entry].append(b_id)
+                for child_list in child_ids.values():
+                    if len(child_list) == 0:
+                        print('error')
+            else:
+                print(f'make new category: {diff_inst}')
+
+        file.close()
 
         temp_children = child_ids
         if len(temp_children) == 0:
             if len(rem_levels) > 0:
-                return self._get_stratified_differences(diffs=diffs, outs=outs, diff_levels=rem_levels,
-                                                        valid_ids=valid_ids)
+                return self._get_stratified_differences(outs=outs, diff_levels=rem_levels,
+                                                        valid_ids=valid_ids, temp_dir=temp_dir,
+                                                        dif_file_name=dif_file_name)
             else:
                 cur_outs = []
                 for id in valid_ids:
@@ -1794,8 +1812,9 @@ class ScriptPerformer:
         for key, option_list in child_ids.items():
             if not len(option_list) == 1:
                 if len(rem_levels) > 0:
-                    out_dict = self._get_stratified_differences(diffs=diffs, outs=outs, diff_levels=rem_levels,
-                                                                valid_ids=option_list)
+                    out_dict = self._get_stratified_differences(outs=outs, diff_levels=rem_levels,
+                                                                valid_ids=option_list, temp_dir=temp_dir,
+                                                                dif_file_name=dif_file_name)
                 else:
                     cur_outs = []
                     for option in option_list:
