@@ -135,7 +135,6 @@ class Application(tk.Tk):
         self.export_type = ''
         self.script_exports = {}
         self.export_script_names = []
-        self.export_thread = threading.Thread(target=self.perform_script_analysis)
         self.queue_to_exporter: queue.Queue = queue.Queue()
         self.queue_from_exporter: queue.Queue = queue.Queue()
 
@@ -197,7 +196,8 @@ class Application(tk.Tk):
                 self.export_script_names.append(path.name)
         self.export_type = export_type
 
-        # Start background thread
+        # Start a background thread
+        self.export_thread = threading.Thread(target=self.perform_script_analysis)
         self.export_thread.start()
 
         # Add script names to the queue for the export thread
