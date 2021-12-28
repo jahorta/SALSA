@@ -57,7 +57,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me513.+sct$',
+                'scripts': '^me51[5-9].+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -212,11 +212,14 @@ class SCTExporter:
                 used_addr_clean[addr] = stats
             used_addr = {k: used_addr_clean[k] for k in sorted(list(used_addr_clean))}
             for addr, stats in used_addr.items():
-                csv += f'\n{addr},{stats["init_loc"]}'
-                if type_known:
-                    for s_addr, value in script_addr_type.items():
-                        if addr == s_addr:
-                            csv += f',{value}'
+                if 'init_loc' in stats.keys():
+                    csv += f'\n{addr},{stats["init_loc"]}'
+                    if type_known:
+                        for s_addr, value in script_addr_type.items():
+                            if addr == s_addr:
+                                csv += f',{value}'
+                else:
+                    print(f'no init location entered for {addr}')
             inst_num = len(result['summary'])
             csv = csv.replace('*Inst*', 'Inst,' if inst_num > 1 else '')
             csv_verbose = csv
@@ -234,7 +237,7 @@ class SCTExporter:
                     commas = ',' * level
                     value_prefix = f'\n{commas}{value}'
                     for trace, diff_dict in traces.items():
-                        trace_prefix = f'{value_prefix} ({trace})'
+                        trace_prefix = f'{value_prefix} ({trace.replace(",", ":")})'
                         if diff_dict['has_diff']:
                             body_verbose = self._format_diff_tree(diff_dict['stratified'], level,
                                                                   diff_dict['trace_level'])
@@ -264,13 +267,13 @@ class SCTExporter:
         diff_level += 1
         output = ''
         if 'inst' not in diff_dict:
-            body = f'-> {diff_dict["value"]} ({ScriptPerformer.get_traceback_string(diff_dict["traceback"], trace_lvl)}) '
+            body = f'-> {diff_dict["value"]} ({ScriptPerformer.get_traceback_string(diff_dict["traceback"], trace_lvl).replace(",", ":")}) '
             return f',{body}'
         inst = diff_dict['inst']
         commas = ',' * diff_level
         if inst == 'out':
             out_values = diff_dict['out']
-            body = f'-> {out_values["value"]} ({ScriptPerformer.get_traceback_string(out_values["traceback"], trace_lvl)}) '
+            body = f'-> {out_values["value"]} ({ScriptPerformer.get_traceback_string(out_values["traceback"], trace_lvl).replace(",", ":")}) '
             output = f',{body}\n'
         elif inst == 'choice':
             question = diff_dict['question']
@@ -642,6 +645,7 @@ class ScriptPerformer:
         for i, out_branch in enumerate(self.all_outs[start_index:last_index]):
             printProgressBar(prefix='Removing open branches which mirror closed branches',
                              total=current_outs, iteration=i)
+            sys.stdout.flush()
             for j, open_branch in enumerate(self.open_branch_segments):
                 if j in branches_to_remove:
                     continue
@@ -1726,9 +1730,9 @@ class ScriptPerformer:
                 for i, value in enumerate(b_diff_values):
                     if isinstance(value, bool):
                         if value:
-                            entry = 0
-                        else:
                             entry = 1
+                        else:
+                            entry = 0
                     else:
                         entry = int(value)
                     if not options[entry] in child_ids.keys():
@@ -1754,7 +1758,7 @@ class ScriptPerformer:
 
                 if 'jumped' in details.keys():
                     details.pop('jumped')
-                options = [True, False]
+                options = [False, True]
                 strat_diff['inst'] = 'jumpif'
                 strat_diff['results'] = options
                 condition_key = list(diff['diff_details'][0]['condition'].keys())[0]
@@ -1821,7 +1825,7 @@ class ScriptPerformer:
         file.close()
 
         printProgressBar(prefix=progress_prefix, suffix=f'\tDONE{" "*25}', length=progressbar_length,
-                         total=file_sizes[level], iteration=file_sizes[level], printEnd='\r')
+                         total=file_sizes[level], iteration=file_sizes[level], printEnd='')
         sys.stdout.flush()
 
         temp_children = child_ids
@@ -2362,7 +2366,8 @@ def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
+    if iteration == total:
+        printEnd += '\n'
     print(f'\r{prefix} |{bar}| {percent}% {suffix}', end=printEnd)
     # Print New Line on Complete
-    if iteration == total:
-        print()
+
