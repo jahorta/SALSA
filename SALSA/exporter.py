@@ -57,7 +57,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me509.+sct$',
+                'scripts': '^me501.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -197,10 +197,10 @@ class SCTExporter:
             csv += '\nMemory Addresses,Set Location,Address Value'
             type_known = False
             script_addr_type = None
-            for type, key in KA.Script_types.items():
-                if re.match(type, script):
+            for script_type, type_key in KA.Script_types.items():
+                if re.match(script_type, script):
                     type_known = True
-                    script_addr_type = self.known_addr[key]
+                    script_addr_type = self.known_addr[type_key]
 
             used_addr = result['ram_stats']
             used_addr_clean = {}
