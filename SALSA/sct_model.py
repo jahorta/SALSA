@@ -140,8 +140,8 @@ class SctModel:
                     self.decoded_sct['Errors'].append(key)
             elif self.test_for_string(value):
                 encoding = 'shiftjis'
-                if re.search('^M.{8}$', key):
-                    encoding = 'UTF-8'
+                # if re.search('^M.{8}$', key):
+                #     encoding = 'UTF-8'
                 labelLength = 16
                 data = self.__decode_sct_section(value[:16], int(self.indexed_sct['Index'][key]['pos'], 16))
                 string = getString(value, labelLength, encoding)
