@@ -1314,6 +1314,7 @@ class ScriptPerformer:
             os.remove(os.path.join(temp_dir, f))
 
         # Remove internal summaries and append them to external summaries
+        print('Appending internal summaries to their external counterparts...')
         appended_summary = {}
         first = True
         for int_inst, int_values in all_internals.items():
@@ -1364,6 +1365,7 @@ class ScriptPerformer:
         if len(appended_summary) == 0:
             appended_summary = summary
 
+        print('reformatting traceback values for each summary...')
         reformatted_summary = {}
         for inst, values in appended_summary.items():
             reformatted_summary[inst] = {}
