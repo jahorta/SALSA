@@ -57,7 +57,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me501.+sct$',
+                'scripts': '^me500.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -1652,7 +1652,7 @@ class ScriptPerformer:
         trace = args_in['trace']
         has_differences = args_in['has_differences']
 
-        print(f'Summarizing {value}-{trace}...')
+        # print(f'Summarizing {value}-{trace}...')
         if len(branches) > 1:
             if has_differences:
 
@@ -1682,7 +1682,7 @@ class ScriptPerformer:
         rem_levels = diff_levels[1:]
         level = diff_levels[0]
         child_ids = {}
-        progress_prefix = f'Summarizing {value}:{trace}:{level}'
+        progress_prefix = f'Summarizing {dif_header}:{level}'
         progressbar_length = 200 - len(progress_prefix)
         cur_line = 0
         dif_file_name = f'{dif_header}-{level}{self.temp_ext}'
