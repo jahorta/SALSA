@@ -359,6 +359,7 @@ class ScriptPerformer:
     use_multiprocessing = True
     mp_cutoff = 500
     results = []
+    temp_ext = '.tmp'
 
     def __init__(self):
 
@@ -1171,6 +1172,7 @@ class ScriptPerformer:
     def _make_all_out_summary(self, inst_details, temp_dir) -> dict:
         all_branches = self.all_outs
         num_branches = len(all_branches)
+        self.all_outs = []
 
         parallel_processes = False
         if num_branches > 500:
@@ -1460,7 +1462,7 @@ class ScriptPerformer:
             if first_tr:
                 first_tr = False
             else:
-                trace_key += '_'
+                trace_key += ','
             first_val = True
             for trace_value in trace.values():
                 if first_val:
@@ -1486,6 +1488,7 @@ class ScriptPerformer:
         # Determine whether this position is internal and get outs for each branch
         is_internal = True
         branch_outs = []
+
         for branch in branches:
             if 'init' in trace or 'new_run' in branch.keys():
                 is_internal = False
@@ -1500,10 +1503,12 @@ class ScriptPerformer:
             out_trace = branch['out_value']['traceback']
             branch_outs.append({'value': out_value, 'traceback': out_trace})
 
-        diffs_file_name = f'{inst}-{value}-{trace}.tmp'
-        file = open(os.path.join(temp_dir, diffs_file_name), 'w')
+        diffs_file_header = f'{inst}-{value}-{trace}'
         diff_levels = []
         has_differences = False
+        level_index = {}
+        files = []
+        level_sizes = {}
         if branch_num > 1:
             checked_branches = []
             for i, branch1 in enumerate(branches):
@@ -1524,10 +1529,19 @@ class ScriptPerformer:
                         continue
                     diff_level = temp_difference.pop('level')
                     diff_levels.append(diff_level)
+
+                    if diff_level not in level_sizes.keys():
+                        diffs_file_name = f'{diffs_file_header}-{diff_level}{self.temp_ext}'
+                        new_file_index = len(files)
+                        level_index[diff_level] = new_file_index
+                        files.append(open(os.path.join(temp_dir, diffs_file_name), 'w'))
+                        level_sizes[diff_level] = 0
+
                     deets = temp_difference.pop('diff_deets')
                     difference = {'branches': [i, j], 'level': diff_level, 'diff': temp_difference,
                                   'diff_details': deets}
-                    file.write(f'{json.dumps(difference)}\n')
+                    files[level_index[diff_level]].write(f'{json.dumps(difference)}\n')
+                    level_sizes[diff_level] += 1
                     has_differences = True
 
             progress_suffix = ' \tDONE\t\t\t\t '
@@ -1537,10 +1551,12 @@ class ScriptPerformer:
 
             diff_levels = sorted(list(set(diff_levels)))
 
-        file.close()
+        for file in files:
+            file.close()
 
         output = {'outs': branch_outs, 'diff_levels': diff_levels, 'internal': is_internal, 'inst': inst,
-                  'value': value, 'trace': trace, 'diffs_file_name': diffs_file_name, 'has_differences': has_differences}
+                  'value': value, 'trace': trace, 'diffs_header': diffs_file_header, 'has_differences': has_differences,
+                  'file_sizes': level_sizes}
 
         return output
 
@@ -1626,7 +1642,8 @@ class ScriptPerformer:
 
     def _generate_difference_summaries(self, args_in) -> dict:
         diff_levels = args_in['diff_levels']
-        dif_file_name = args_in['diffs_file_name']
+        dif_header = args_in['diffs_header']
+        file_sizes = args_in['file_sizes']
         branch_outs = args_in['outs']
         trace_level = args_in['trace_level']
         branches = args_in['branches']
@@ -1640,8 +1657,8 @@ class ScriptPerformer:
             if has_differences:
 
                 stratified_diff_summary = self._get_stratified_differences(
-                    dif_file_name=dif_file_name, outs=copy.deepcopy(branch_outs),
-                    diff_levels=copy.deepcopy(diff_levels), temp_dir=args_in['temp_dir'])
+                    dif_header=dif_header, outs=copy.deepcopy(branch_outs), value=value, trace=trace,
+                    diff_levels=copy.deepcopy(diff_levels), temp_dir=args_in['temp_dir'], file_sizes=file_sizes)
 
                 condensed_diff_summary = self._condense_stratified_differences(
                     copy.deepcopy(stratified_diff_summary))
@@ -1659,11 +1676,16 @@ class ScriptPerformer:
 
         return {'summary': summary, 'inst': inst, 'value': value, 'trace': trace}
 
-    def _get_stratified_differences(self, outs, diff_levels, temp_dir, dif_file_name, valid_ids=None) -> dict:
+    def _get_stratified_differences(self, outs, diff_levels, temp_dir, dif_header, file_sizes, value, trace,
+                                    valid_ids=None) -> dict:
         strat_diff = {}
         rem_levels = diff_levels[1:]
         level = diff_levels[0]
         child_ids = {}
+        progress_prefix = f'Summarizing {value}:{trace}:{level}'
+        progressbar_length = 200 - len(progress_prefix)
+        cur_line = 0
+        dif_file_name = f'{dif_header}-{level}{self.temp_ext}'
         diff_path = os.path.join(temp_dir, dif_file_name)
         file = open(diff_path, 'r')
         while True:
@@ -1792,14 +1814,22 @@ class ScriptPerformer:
             else:
                 print(f'make new category: {diff_inst}')
 
+            printProgressBar(prefix=progress_prefix, suffix=f'{cur_line}/{file_sizes[level]}',
+                             length=progressbar_length, total=file_sizes[level], iteration=cur_line, printEnd='\r')
+            sys.stdout.flush()
+            cur_line += 1
         file.close()
+
+        printProgressBar(prefix=progress_prefix, suffix=f'\tDONE{" "*25}', length=progressbar_length,
+                         total=file_sizes[level], iteration=file_sizes[level], printEnd='\r')
+        sys.stdout.flush()
 
         temp_children = child_ids
         if len(temp_children) == 0:
             if len(rem_levels) > 0:
-                return self._get_stratified_differences(outs=outs, diff_levels=rem_levels,
-                                                        valid_ids=valid_ids, temp_dir=temp_dir,
-                                                        dif_file_name=dif_file_name)
+                return self._get_stratified_differences(outs=outs, diff_levels=rem_levels, valid_ids=valid_ids,
+                                                        temp_dir=temp_dir, dif_header=dif_header, file_sizes=file_sizes,
+                                                        value=value, trace=trace)
             else:
                 cur_outs = []
                 for id in valid_ids:
@@ -1814,7 +1844,8 @@ class ScriptPerformer:
                 if len(rem_levels) > 0:
                     out_dict = self._get_stratified_differences(outs=outs, diff_levels=rem_levels,
                                                                 valid_ids=option_list, temp_dir=temp_dir,
-                                                                dif_file_name=dif_file_name)
+                                                                dif_header=dif_header, file_sizes=file_sizes,
+                                                                value=value, trace=trace)
                 else:
                     cur_outs = []
                     for option in option_list:
