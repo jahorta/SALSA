@@ -57,7 +57,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me513.+sct$',
+                'scripts': '^me527.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -354,8 +354,8 @@ class ScriptPerformer:
     requested_hit = False
     false_branches = []
     false_switch_entries = []
-    debug_verbose = False
-    with_compare_assumption = False
+    debug_verbose = True
+    with_compare_assumption = True
     use_multiprocessing = True
     mp_cutoff = 500
     results = []
@@ -2195,11 +2195,18 @@ class ScriptPerformer:
                 if not self._can_jump(value, ram):
                     can_jump = False
             elif isinstance(value, str):
-                if re.search(': ', value):
-                    addr = value.split(': ')[1].rstrip()
+                done = False
+                while not done:
+                    if re.search(': ', value):
+                        addr = value.split(': ')[1].rstrip()
+                    else:
+                        addr = value
                     value = self._get_memory_pos(addr, ram, 'control')
                     if value is None:
                         can_jump = False
+                        done = True
+                    elif not isinstance(value, str):
+                        done = True
             else:
                 is_number = isinstance(value, int) or isinstance(value, float)
                 if not is_number:
