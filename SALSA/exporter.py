@@ -57,7 +57,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me523.+sct$',
+                'scripts': '^me524.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -661,15 +661,15 @@ class ScriptPerformer:
         return branches_to_remove
 
     def _run_subscript_branch(self, name, subscripts, ram=None, branch_index=None,
-                              ptrs=None, traceback=None, depth=0) -> bool:
+                              back_log=None, ptr=None, traceback=None, depth=0) -> bool:
 
         if depth > 30:
             print('Lots of recursion...')
 
         if traceback is None:
             traceback: List[Dict] = []
-        if ptrs is None:
-            ptrs: List[Dict] = []
+        if back_log is None:
+            back_log: List[Dict] = []
 
         traceback.append({'name': name, 'ptr': 0})
 
@@ -677,24 +677,8 @@ class ScriptPerformer:
             print('recursion...')
 
         hit_requested = False
-        if len(ptrs) > 0:
-            my_ptr = ptrs.pop(0)
-            if 'ptr' not in my_ptr:
-                # print('pause here')
-                pass
-            name = my_ptr['name']
-            traceback[-1] = copy.deepcopy(my_ptr)
-            if len(ptrs) > 0:
-                next_name = ptrs[0]['name']
-                hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts, ram=ram,
-                                                           branch_index=branch_index, ptrs=copy.deepcopy(ptrs),
-                                                           traceback=copy.deepcopy(traceback), depth=depth + 1)
-                current_pointer = my_ptr['ptr'] + 1
-            else:
-                current_pointer = my_ptr['ptr']
-        else:
-            current_pointer = 0
 
+        current_pointer = ptr
         if current_pointer is None:
             return False
         elif current_pointer >= len(subscripts[name]['pos_list']):
@@ -724,7 +708,7 @@ class ScriptPerformer:
         force_jump = False
         increment_pointer = True
         modify = False
-        back_log = []
+
         while not done:
             cur_trace_id = len(traceback) - 1
             if self.debug_verbose:
@@ -833,9 +817,9 @@ class ScriptPerformer:
                         jump = True
 
                 if make_branch:
-                    ptrs = copy.deepcopy(traceback)
-                    ptrs.pop()
-                    ptrs.append({'name': next_name, 'ptr': inst_ptr})
+                    back_log = copy.deepcopy(traceback)
+                    if len(back_log) > 0:
+                        back_log.pop()
                     new_branch_index = len(self.open_branch_segments)
                     jump_dict['jumped'] = True
                     new_branch = self._branch_append_node(
@@ -848,8 +832,8 @@ class ScriptPerformer:
                     self.open_branch_segments.append(new_branch)
                     pre_ram = copy.deepcopy(cur_ram)
 
-                    sub_hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts,
-                                                                   ram=pre_ram, ptrs=copy.deepcopy(ptrs),
+                    sub_hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts, ptr=inst_ptr,
+                                                                   ram=pre_ram, back_log=copy.deepcopy(back_log),
                                                                    branch_index=new_branch_index, depth=depth + 1)
                     new_branch_ram = copy.deepcopy(self.open_branch_segments[new_branch_index]['cur_ram'])
 
@@ -1008,7 +992,9 @@ class ScriptPerformer:
                 # If entry cannot be selected, produce a branch for each entry
                 if switch_all:
                     prev_branch = copy.deepcopy(self.open_branch_segments[branch_index])
-                    ptrs = copy.deepcopy(traceback)
+                    back_log = copy.deepcopy(traceback)
+                    if len(back_log) > 0:
+                        back_log.pop()
                     # if name == 'select_tactics':
                     #     print('pause here')
                     first = True
@@ -1018,7 +1004,6 @@ class ScriptPerformer:
                             continue
                         inst_pos = offset
                         inst_ptr = self._get_ptr(pos=offset, pos_list=current_sub['pos_list'])
-                        ptrs[cur_trace_id]['ptr'] = inst_ptr
                         switch_dict = {'branched_all': switch_all, 'entries': switch_entries, 'condition': switch_addr,
                                        'selected_entry': key, 'next_inst_ptr': inst_ptr,
                                        'next_inst_pos': current_sub['pos_list'][inst_ptr], 'children': {}}
@@ -1030,10 +1015,10 @@ class ScriptPerformer:
                         new_branch_index = len(self.open_branch_segments)
                         self.open_branch_segments.append(new_branch)
                         pre_ram = cur_ram
-                        sub_hit_requested = self._run_subscript_branch(name=name, subscripts=subscripts,
-                                                                       ram=copy.deepcopy(pre_ram),
+                        sub_hit_requested = self._run_subscript_branch(name=name, subscripts=subscripts, ptr=inst_ptr,
+                                                                       ram=copy.deepcopy(pre_ram), depth=depth + 1,
                                                                        branch_index=new_branch_index,
-                                                                       ptrs=copy.deepcopy(ptrs), depth=depth + 1)
+                                                                       back_log=copy.deepcopy(back_log))
 
                         new_branch_ram = copy.deepcopy(self.open_branch_segments[new_branch_index]['cur_ram'])
                         if not sub_hit_requested:
