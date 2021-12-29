@@ -57,7 +57,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me524.+sct$',
+                'scripts': '^me500.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -668,23 +668,22 @@ class ScriptPerformer:
 
         if traceback is None:
             traceback: List[Dict] = []
+
         if back_log is None:
             back_log: List[Dict] = []
-
-        traceback.append({'name': name, 'ptr': 0})
-
-        if len(traceback) > 10:
-            print('recursion...')
-
-        hit_requested = False
+        else:
+            traceback = copy.deepcopy(back_log)
 
         current_pointer = ptr
         if current_pointer is None:
-            return False
+            current_pointer = 0
         elif current_pointer >= len(subscripts[name]['pos_list']):
-            return hit_requested
+            return False
 
-        traceback[-1]['ptr'] = current_pointer
+        traceback.append({'name': name, 'ptr': current_pointer})
+
+        if len(traceback) > 10:
+            print('recursion...')
 
         tabs = '\t' * len(traceback)
         spaces = ' ' * depth
@@ -708,7 +707,7 @@ class ScriptPerformer:
         force_jump = False
         increment_pointer = True
         modify = False
-
+        hit_requested = False
         while not done:
             cur_trace_id = len(traceback) - 1
             if self.debug_verbose:
