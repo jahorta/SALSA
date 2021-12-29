@@ -359,6 +359,7 @@ class ScriptPerformer:
     false_switch_entries = []
     debug_verbose = False
     with_compare_assumption = False
+    reset_cond_states_between_runs = False
     use_multiprocessing = True
     mp_cutoff = 500
     results = []
@@ -546,9 +547,10 @@ class ScriptPerformer:
                     f'remaining - {len(self.all_outs)} closed branches')
 
                 # Remove any switch or jump states for a fresh run
-                for branch in self.open_branch_segments:
-                    branch['switch_states'] = []
-                    branch['jump_states'] = []
+                if self.reset_cond_states_between_runs:
+                    for branch in self.open_branch_segments:
+                        branch['switch_states'] = []
+                        branch['jump_states'] = []
 
                 if len(self.open_branch_segments) == 0:
                     done = True
@@ -661,7 +663,7 @@ class ScriptPerformer:
 
         return branches_to_remove
 
-    def _run_subscript_branch(self, name, subscripts, ram=None, branch_index=None,
+    def _run_subscript_branch(self, name, subscripts, ram=None, branch_index=None, hit_requested=False,
                               back_log=None, ptr=None, traceback=None, depth=0) -> bool:
 
         if depth > 30:
@@ -702,25 +704,25 @@ class ScriptPerformer:
             print('error: current pointer outside position list length')
         inst_pos = current_sub['pos_list'][current_pointer]
         inst = current_sub[inst_pos]
-        fallthrough_done = False
         done = False
         force_branch = False
         force_jump = False
         increment_pointer = True
         modify = False
-        hit_requested = False
         while not done:
             cur_trace_id = len(traceback) - 1
             if self.debug_verbose:
                 print(f'{spaces}depth: {depth} current position: {name}:{current_pointer}-{inst_pos}')
             if 'set' in inst:
-                cur_ram = self._set_memory_pos(inst['set'], cur_ram)
+                new_ram = copy.deepcopy(cur_ram)
+                new_ram = self._set_memory_pos(inst['set'], new_ram)
                 if branch_index is None:
-                    new_branch = {'init_ram': {}, 'cur_ram': copy.deepcopy(cur_ram), 'switch_states': [], 'actions': [],
+                    new_branch = {'init_ram': {}, 'cur_ram': copy.deepcopy(new_ram), 'switch_states': [], 'actions': [],
                                   'jump_states': [], 'init_value': {'traceback': [{'name': 'Start', 'pos': 0}]}}
                     self.open_branch_segments.append(new_branch)
                     branch_index = 0
-                self.open_branch_segments[branch_index]['cur_ram'] = cur_ram
+                self.open_branch_segments[branch_index]['cur_ram'] = new_ram
+                cur_ram = new_ram
 
                 switch_states_to_remove = []
                 for i, state in enumerate(self.open_branch_segments[branch_index]['switch_states']):
@@ -743,7 +745,7 @@ class ScriptPerformer:
                     self.open_branch_segments[branch_index]['jump_states'].pop(state)
 
             elif 'loop' in inst:
-                return False
+                return hit_requested
 
             elif 'goto' in inst or 'goto_subscript' in inst:
                 inst_name = list(inst.keys())[0]
@@ -756,7 +758,7 @@ class ScriptPerformer:
                     inst_pos = inst['goto']
                 current_pointer = self._get_ptr(pos=inst_pos, pos_list=current_sub['pos_list'])
                 if 'subscript' in inst_name:
-                    traceback.append({'name': name, 'ptr': current_pointer})
+                    traceback[-1] = {'name': name, 'ptr': current_pointer}
                 increment_pointer = False
 
             elif 'jumpif' in inst or 'subscript_jumpif' in inst:
@@ -787,12 +789,13 @@ class ScriptPerformer:
                 has_condition = False
                 condition_index = None
                 condition_string = self._generate_condition_string(jump_condition[list(jump_condition.keys())[0]])
+
                 for i, state in enumerate(self.open_branch_segments[branch_index]['jump_states']):
                     if state['condition'] == condition_string:
                         has_condition = True
                         condition_index = i
 
-                if has_condition:
+                if has_condition and self.with_compare_assumption:
                     make_branch = False
                     jump = self.open_branch_segments[branch_index]['jump_states'][condition_index]['jumped']
                 else:
@@ -836,16 +839,14 @@ class ScriptPerformer:
 
                     self.open_branch_segments.append(new_branch)
 
-                    pre_ram = copy.deepcopy(cur_ram)
+                    new_ram = self.open_branch_segments[new_branch_index]['cur_ram']
 
                     sub_hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts, ptr=inst_ptr,
-                                                                   ram=pre_ram, back_log=copy.deepcopy(back_log),
+                                                                   ram=new_ram, back_log=copy.deepcopy(back_log), hit_requested=hit_requested,
                                                                    branch_index=new_branch_index, depth=depth + 1)
-                    new_branch_ram = copy.deepcopy(self.open_branch_segments[new_branch_index]['cur_ram'])
 
                     if not sub_hit_requested:
-                        if self._variables_are_equal_recursive(pre_ram, new_branch_ram):
-                            self.false_branches.append(new_branch_index)
+                        self.false_branches.append(new_branch_index)
 
                 if jump:
                     current_pointer = inst_ptr
@@ -854,7 +855,7 @@ class ScriptPerformer:
                         next_name = inst['subscript_jumpif']['next']
                         next_inst_pos = inst['subscript_jumpif']['location']
                         next_inst_ptr = self._get_ptr(pos=next_inst_pos, pos_list=subscripts[next_name]['pos_list'])
-                        traceback.append({'name': next_name, 'ptr': next_inst_ptr})
+                        traceback[-1] = {'name': next_name, 'ptr': next_inst_ptr}
                         name = next_name
                         current_sub = subscripts[next_name]
                         current_pointer = next_inst_ptr
@@ -1036,16 +1037,14 @@ class ScriptPerformer:
 
                         new_branch_index = len(self.open_branch_segments)
                         self.open_branch_segments.append(new_branch)
+                        new_ram = copy.deepcopy(self.open_branch_segments[new_branch_index]['cur_ram'])
 
-                        pre_ram = copy.deepcopy(cur_ram)
                         sub_hit_requested = self._run_subscript_branch(name=name, subscripts=subscripts, ptr=inst_ptr,
-                                                                       ram=copy.deepcopy(pre_ram), depth=depth + 1,
-                                                                       branch_index=new_branch_index,
+                                                                       ram=new_ram, depth=depth + 1,
+                                                                       branch_index=new_branch_index, hit_requested=hit_requested,
                                                                        back_log=copy.deepcopy(back_log))
 
-                        new_branch_ram = copy.deepcopy(self.open_branch_segments[new_branch_index]['cur_ram'])
                         if not sub_hit_requested:
-                            if self._variables_are_equal_recursive(pre_ram, new_branch_ram):
                                 self.false_branches.append(new_branch_index)
                         # if self.debug_verbose:
                         #     suffix = f'req:{hit_requested}'
@@ -1100,6 +1099,7 @@ class ScriptPerformer:
                 next_name = inst['subscript_load']['next']
                 next_inst_pos = inst['subscript_load']['location']
                 next_inst_ptr = self._get_ptr(pos=next_inst_pos, pos_list=subscripts[next_name]['pos_list'])
+                traceback[-1]['ptr'] = current_pointer
                 traceback.append({'name': next_name, 'ptr': next_inst_ptr})
                 name = next_name
                 current_sub = subscripts[next_name]
@@ -1196,7 +1196,7 @@ class ScriptPerformer:
         # Group branches by: Inst, Inst_value, Subscript, Position
         print('Grouping Branches...')
         groups = {}
-        for branch in all_branches:
+        for i, branch in enumerate(all_branches):
 
             inst = branch['init_value']['instruction']
             if inst not in groups.keys():
@@ -2138,7 +2138,7 @@ class ScriptPerformer:
             if 'init_loc' not in self.addrs[addr].keys():
                 self.addrs[addr]['init_loc'] = 'internal'
             ram[addr] = self.addrs[addr]
-        cur_value = self.addrs[addr].get('value', None)
+        cur_value = ram[addr].get('value', None)
         if ram[addr]['init_loc'] == 'external':
             ram[addr]['init_loc'] += '->internal'
         if addr_type == 'bit':
