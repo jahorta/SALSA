@@ -264,7 +264,7 @@ class SCTAnalysis:
 
                     choice_bounds = ['[', ']']
                     if '「' in description:
-                        choice_bounds = ['「', '']
+                        choice_bounds = ['「', '」']
                     desc_choices = description.split(choice_bounds[0])[1:]
                     choices = []
                     for choice in desc_choices:
