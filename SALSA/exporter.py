@@ -57,7 +57,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me535.+sct$',
+                'scripts': '^me504.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -1612,8 +1612,8 @@ class ScriptPerformer:
     def _get_difference_details(self, var1, var2):
         diff = {}
         if not type(var1) == type(var2):
-            type1 = type(var1)
-            type2 = type(var2)
+            type1 = type(var1).__name__
+            type2 = type(var2).__name__
             diff = {'var1': copy.deepcopy(var1), 'var2': copy.deepcopy(var2), 'var1_type': copy.deepcopy(type1),
                     'var2_type': copy.deepcopy(type2)}
 
