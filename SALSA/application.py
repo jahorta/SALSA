@@ -270,7 +270,7 @@ class Application(tk.Tk):
         for key, csv in csv_dict.items():
             key += '.csv'
             filename = os.path.join(out_dir, key)
-            with open(filename, 'w') as fh:
+            with open(filename, 'w', encoding='shiftjis') as fh:
                 fh.write(csv)
 
     # Called when a file is selected
