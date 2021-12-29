@@ -57,7 +57,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me525.+sct$',
+                'scripts': '^me523.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -728,7 +728,7 @@ class ScriptPerformer:
         while not done:
             cur_trace_id = len(traceback) - 1
             if self.debug_verbose:
-                print(f'{spaces}depth: {depth} current position: {name}:{current_pointer}')
+                print(f'{spaces}depth: {depth} current position: {name}:{current_pointer}-{inst_pos}')
             if 'set' in inst:
                 cur_ram = self._set_memory_pos(inst['set'], cur_ram)
                 if branch_index is None:
@@ -759,14 +759,20 @@ class ScriptPerformer:
                     self.open_branch_segments[branch_index]['jump_states'].pop(state)
 
             elif 'loop' in inst:
-                force_jump = True
-                inst_pos = inst['loop']
-                current_pointer = self._get_ptr(pos=inst_pos, pos_list=current_sub['pos_list'])
-                increment_pointer = False
+                return False
 
-            elif 'goto' in inst:
-                inst_pos = inst['goto']
+            elif 'goto' in inst or 'goto_subscript' in inst:
+                inst_name = list(inst.keys())[0]
+                if 'subscript' in inst_name:
+                    name = inst['goto_subscript']['next']
+                    current_sub = subscripts[name]
+                    inst_pos = inst['goto_subscript']['location']
+
+                else:
+                    inst_pos = inst['goto']
                 current_pointer = self._get_ptr(pos=inst_pos, pos_list=current_sub['pos_list'])
+                if 'subscript' in inst_name:
+                    traceback.append({'name': name, 'ptr': current_pointer})
                 increment_pointer = False
 
             elif 'jumpif' in inst or 'subscript_jumpif' in inst:
@@ -904,7 +910,7 @@ class ScriptPerformer:
                     print(
                         f'\tDepth: {depth}, Closing Branch: {closing_branch} (would switch to {inst["end"]["script"]})')
 
-                return hit_requested
+                return False
 
             elif 'requested' in inst:
                 if inst_pos == 185:
@@ -1720,7 +1726,7 @@ class ScriptPerformer:
             if diff_inst == 'choice':
                 if 'jumpif' in diff_dict['modification']:
                     b_diff_value_dict = diff_dict['modification']['jumpif']['jumped']
-                if 'switch' in diff_dict['modification']:
+                elif 'switch' in diff_dict['modification']:
                     b_diff_value_dict = diff_dict['modification']['switch']['selected_entry']
 
                 b_diff_values = [b_diff_value_dict['var1'], b_diff_value_dict['var2']]
@@ -1857,12 +1863,12 @@ class ScriptPerformer:
                     for option in option_list:
                         cur_outs.append(outs[option])
                     output = cur_outs[0]
-                    out_dict = {'inst': 'out', 'out': output, 'multiple_outs': True}
+                    out_dict: dict = {'inst': 'out', 'out': output, 'multiple_outs': True}
             else:
                 if len(option_list) < 1 or len(outs) < option_list[0]:
                     print('stop here')
                 output = outs[option_list[0]]
-                out_dict = {'inst': 'out', 'out': output}
+                out_dict: dict = {'inst': 'out', 'out': output}
 
             if out_dict is None:
                 print('out dict wasnt made??')
@@ -1881,12 +1887,12 @@ class ScriptPerformer:
         for cond, cond_dict in cond_in.items():
             temp_cond = cond
             values = {}
-            for id, value in cond_dict.items():
+            for cond_id, value in cond_dict.items():
                 if isinstance(value, dict):
                     substring = self._generate_condition_string(cond_in=value, top_level=False)
-                    values[id] = substring
+                    values[cond_id] = substring
                 else:
-                    values[id] = value
+                    values[cond_id] = value
 
             for key, value in values.items():
                 if isinstance(value, str):
@@ -2217,7 +2223,7 @@ class ScriptPerformer:
                     value = self._get_memory_pos(addr, ram, 'control')
                     if value is None:
                         done = True
-                    elif isinstance(value, str):
+                    elif not isinstance(value, str):
                         done = True
                 param_values.append(value)
             else:

@@ -249,13 +249,12 @@ class SCTAnalysis:
                             else:
                                 sub[pos] = {'goto': next_location}
                         else:
-                            sub[pos] = {'goto': {'position': pos, 'next': next_script, 'location': next_location}}
+                            sub[pos] = {'goto_subscript': {'next': next_script, 'location': next_location}}
                             if next_script not in [*decoded_scripts, *scripts_to_decode]:
                                 scripts_to_decode.append(next_script)
 
                 elif ID is current_subscript.choice_inst:
                     description = inst.description
-
 
                     question_bounds = ['<<', '>>']
                     if '《' in description:

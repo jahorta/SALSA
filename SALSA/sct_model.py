@@ -91,7 +91,7 @@ class SctModel:
         for inst in self.instructions.values():
             if inst.implement:
                 self.implementedInstKeys.append(str(int(inst.instID)))
-        out = self.__read_sct_file(file)
+        out = self._read_sct_file(file)
         if out is None:
             return None
         name = out[0]
@@ -99,10 +99,10 @@ class SctModel:
         if sct_raw[0:4].decode(errors='backslashreplace') == 'AKLZ':
             print('file is AKLZ encrypted. Decryption is not yet implemented. Please decrypt file before use.')
             return None
-        sct_dict = self.__decode_sct(name, sct_raw)
+        sct_dict = self._decode_sct(name, sct_raw)
         return sct_dict
 
-    def __read_sct_file(self, file: str):
+    def _read_sct_file(self, file: str):
         filename = os.path.join(self.path, file)
         if os.path.exists(filename):
             with open(filename, 'rb') as fh:
@@ -113,8 +113,8 @@ class SctModel:
 
         return [file, ba]
 
-    def __decode_sct(self, name, sct_raw):
-        self.indexed_sct = self.__generate_indexed_sct(sct_raw)
+    def _decode_sct(self, name, sct_raw):
+        self.indexed_sct = self._generate_indexed_sct(sct_raw)
         self.decoded_sct = {
             'Name': name, 'Header': self.indexed_sct['Header'], 'Footer': self.indexed_sct['Footer'],
             'Index': self.indexed_sct['Index'], 'Positions': self.indexed_sct['Positions'],
@@ -174,7 +174,7 @@ class SctModel:
 
         return self.decoded_sct
 
-    def __generate_indexed_sct(self, sct):
+    def _generate_indexed_sct(self, sct):
         index_length = getWord(sct, 8)
         head = 12
         entryLength = 20
@@ -201,7 +201,7 @@ class SctModel:
                 ind['Sections'][prevTitle] = sct[sctStart:sctEnd]
             prevTitle = title
             prevPos = pos
-        prevLength = self.__find_length_of_last_section(sct[(prevPos + indEnd):])
+        prevLength = self._find_length_of_last_section(sct[(prevPos + indEnd):])
         ind['Index'][prevTitle]['length'] = padded_hex(prevLength, 8)
         sctStart = prevPos + indEnd
         sctEnd = sctStart + prevLength
@@ -225,7 +225,7 @@ class SctModel:
         ind['Footer Length'] = footerLength
         return ind
 
-    def __find_length_of_last_section(self, sct):
+    def _find_length_of_last_section(self, sct):
         """Takes in the amount of sct from the beginning of the last section until the end of the file"""
         endBytes = [0, 255]
         sectLength = 0
