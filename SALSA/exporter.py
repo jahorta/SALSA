@@ -57,7 +57,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me500.+sct$',
+                'scripts': '^me525.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -2139,6 +2139,8 @@ class ScriptPerformer:
                 self.addrs[addr]['init_loc'] = 'internal'
             ram[addr] = self.addrs[addr]
         cur_value = self.addrs[addr].get('value', None)
+        if ram[addr]['init_loc'] == 'external':
+            ram[addr]['init_loc'] += '->internal'
         if addr_type == 'bit':
             if details['action'] == 'set':
                 ram[addr]['value'] = 1
