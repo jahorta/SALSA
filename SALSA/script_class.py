@@ -255,16 +255,15 @@ class SCTAnalysis:
 
                 elif ID is current_subscript.choice_inst:
                     description = inst.description
-
+                    choice_num = description.count('[')
 
                     question_bounds = ['<<', '>>']
                     if '《' in description:
                         question_bounds = ['《', '》']
                     question = description.split(question_bounds[0])[1].split(question_bounds[1])[0]
-                    choice_num = description.count('[')
+
                     choice_bounds = ['[', ']']
                     if '「' in description:
-                        choice_num = description.count('「')
                         choice_bounds = ['「', '」']
                     desc_choices = description.split(choice_bounds[0])[1:]
                     choices = []
