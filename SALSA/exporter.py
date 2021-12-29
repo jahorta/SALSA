@@ -22,7 +22,7 @@ class SCTExporter:
 
     temp_dir = 'E:\\temp'
 
-    def __init__(self, loc=None, verbose=True, temp_dir=None):
+    def __init__(self, loc=None, verbose=False, temp_dir=None):
         if temp_dir is not None:
             self.temp_dir = temp_dir
         self.verbose_out = verbose
@@ -363,6 +363,7 @@ class ScriptPerformer:
     mp_cutoff = 500
     results = []
     temp_ext = '.tmp'
+    use_actions = True
 
     def __init__(self):
 
@@ -715,7 +716,7 @@ class ScriptPerformer:
             if 'set' in inst:
                 cur_ram = self._set_memory_pos(inst['set'], cur_ram)
                 if branch_index is None:
-                    new_branch = {'init_ram': {}, 'cur_ram': copy.deepcopy(cur_ram), 'switch_states': [],
+                    new_branch = {'init_ram': {}, 'cur_ram': copy.deepcopy(cur_ram), 'switch_states': [], 'actions': [],
                                   'jump_states': [], 'init_value': {'traceback': [{'name': 'Start', 'pos': 0}]}}
                     self.open_branch_segments.append(new_branch)
                     branch_index = 0
@@ -764,7 +765,7 @@ class ScriptPerformer:
                     self.all_starts.append({'end_ram': copy.deepcopy(cur_ram),
                                             'init_value': {'inst': 'jumpif', 'subscript': name, 'pos': 'Start'}})
                     self.open_branch_segments.append({'init_value': None, 'init_ram': copy.deepcopy(cur_ram),
-                                                      'cur_ram': copy.deepcopy(cur_ram)})
+                                                      'cur_ram': copy.deepcopy(cur_ram), 'actions': []})
                     branch_index = 0
 
                 if 'subscript' in inst_name:
@@ -772,17 +773,21 @@ class ScriptPerformer:
                     next_name = inst['subscript_jumpif']['next']
                     inst_pos = inst['subscript_jumpif']['location']
                     jump_dict = {'children': {}, 'subscript': next_name, 'pos': inst_pos}
+                    action_jump_dict = {'subscript': next_name, 'pos': inst_pos}
                     inst_ptr = self._get_ptr(inst_pos, subscripts[next_name]['pos_list'])
                 else:
                     jump_condition = inst['jumpif']['condition']
                     next_name = name
                     inst_pos = inst['jumpif']['location']
                     jump_dict = {'children': {}, 'subscript': name, 'pos': inst_pos}
+                    action_jump_dict = {'subscript': next_name, 'pos': inst_pos}
                     inst_ptr = self._get_ptr(inst_pos, subscripts[next_name]['pos_list'])
 
                 jump_dict['condition'] = jump_condition
+                action_jump_dict['condition'] = jump_condition
 
                 jump_dict['traceback'] = copy.deepcopy(traceback)
+                action_jump_dict['traceback'] = copy.deepcopy(traceback)
 
                 has_condition = False
                 condition_index = None
@@ -821,6 +826,7 @@ class ScriptPerformer:
                         back_log.pop()
                     new_branch_index = len(self.open_branch_segments)
                     jump_dict['jumped'] = True
+                    action_jump_dict['jumped'] = True
                     new_branch = self._branch_append_node(
                         branch=copy.deepcopy(self.open_branch_segments[branch_index]),
                         node_key='jumpif', node_value=copy.deepcopy(jump_dict),
@@ -828,7 +834,16 @@ class ScriptPerformer:
 
                     if self.with_compare_assumption:
                         new_branch['jump_states'].append({'condition': condition_string, 'jumped': True})
+
                     self.open_branch_segments.append(new_branch)
+
+                    if modify:
+                        mod_key = list(self.open_branch_segments[new_branch_index]['actions'][-1])[0]
+                        self.open_branch_segments[new_branch_index]['actions'][-1][mod_key]['modification'] = {
+                            'jumpif': copy.deepcopy(action_jump_dict)}
+                    else:
+                        self.open_branch_segments[new_branch_index]['actions'].append({'jumpif': copy.deepcopy(action_jump_dict)})
+
                     pre_ram = copy.deepcopy(cur_ram)
 
                     sub_hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts, ptr=inst_ptr,
@@ -853,14 +868,24 @@ class ScriptPerformer:
                         current_pointer = next_inst_ptr
 
                 jump_dict['jumped'] = jump
+                action_jump_dict['jumped'] = jump
                 updated_branch = self._branch_append_node(
                     branch=copy.deepcopy(self.open_branch_segments[branch_index]),
                     node_key='jumpif', node_value=copy.deepcopy(jump_dict),
                     modify=modify)
+
                 if self.with_compare_assumption:
                     if not has_condition:
                         updated_branch['jump_states'].append({'condition': condition_string, 'jumped': jump})
                 self.open_branch_segments[branch_index] = updated_branch
+
+                if modify:
+                    mod_key = list(self.open_branch_segments[branch_index]['actions'][-1])[0]
+                    self.open_branch_segments[branch_index]['actions'][-1][mod_key]['modification'] = {
+                        'jumpif': action_jump_dict}
+                else:
+                    self.open_branch_segments[branch_index]['actions'].append({'jumpif': action_jump_dict})
+
                 force_branch = False
                 force_jump = False
                 modify = False
@@ -878,6 +903,7 @@ class ScriptPerformer:
                     out_branch['end_ram'] = copy.deepcopy(cur_ram)
                     out_branch['exit'] = True
                     self.open_branch_segments[branch_index] = out_branch
+                    self.open_branch_segments[branch_index]['actions'].append({'out_value': copy.deepcopy(end_dict)})
                     self.all_outs.append(out_branch)
                     prev_req_dict = self.open_branch_segments[branch_index]['init_value']
                     closing_branch = f'{branch_index}:{prev_req_dict["parameter values"]}-' \
@@ -927,6 +953,7 @@ class ScriptPerformer:
                     out_branch['out_value'] = req_dict
                     out_branch['end_ram'] = copy.deepcopy(cur_ram)
                     self.open_branch_segments[branch_index] = out_branch
+                    self.open_branch_segments[branch_index]['actions'].append({'out_value': copy.deepcopy(req_dict)})
                     prev_req_dict = self.open_branch_segments[branch_index]['init_value']
                     if prev_req_dict['traceback'][0]['name'] == 'Start':
                         self.all_starts.append(out_branch)
@@ -949,7 +976,7 @@ class ScriptPerformer:
                     print(f'\tDepth: {depth}, Closing Branch: {closing_branch}, Opening Branch: '
                           f'{new_branch_index}{req_dict["parameter values"]}-{req_dict["address_values"]}')
                 self.open_branch_segments.append(
-                    {'init_value': copy.deepcopy(req_dict), 'init_ram': copy.deepcopy(cur_ram),
+                    {'init_value': copy.deepcopy(req_dict), 'init_ram': copy.deepcopy(cur_ram), 'actions': [],
                      'cur_ram': copy.deepcopy(cur_ram), 'switch_states': [], 'jump_states': [], 'children': {}})
                 branch_index = new_branch_index
 
@@ -958,7 +985,7 @@ class ScriptPerformer:
                     self.all_starts.append({'end_ram': copy.deepcopy(cur_ram),
                                             'init_value': {'inst': 'jumpif', 'subscript': name, 'pos': 'Start'}})
                     self.open_branch_segments.append({'init_value': None, 'init_ram': copy.deepcopy(cur_ram),
-                                                      'cur_ram': copy.deepcopy(cur_ram)})
+                                                      'cur_ram': copy.deepcopy(cur_ram), 'actions': []})
                     branch_index = 0
 
                 switch_all = False
@@ -1006,6 +1033,10 @@ class ScriptPerformer:
                         switch_dict = {'branched_all': switch_all, 'entries': switch_entries, 'condition': switch_addr,
                                        'selected_entry': key, 'next_inst_ptr': inst_ptr,
                                        'next_inst_pos': current_sub['pos_list'][inst_ptr], 'children': {}}
+                        action_switch_dict = {'branched_all': switch_all, 'entries': switch_entries,
+                                              'condition': switch_addr,
+                                              'selected_entry': key, 'next_inst_ptr': inst_ptr,
+                                              'next_inst_pos': current_sub['pos_list'][inst_ptr]}
                         new_branch = self._branch_append_node(branch=copy.deepcopy(prev_branch), node_key='switch',
                                                               node_value=switch_dict, modify=modify)
                         if self.with_compare_assumption:
@@ -1013,6 +1044,15 @@ class ScriptPerformer:
 
                         new_branch_index = len(self.open_branch_segments)
                         self.open_branch_segments.append(new_branch)
+
+                        if modify:
+                            mod_key = list(self.open_branch_segments[new_branch_index]['actions'][-1])[0]
+                            self.open_branch_segments[new_branch_index]['actions'][-1][mod_key]['modification'] = {
+                                'switch': copy.deepcopy(action_switch_dict)}
+                        else:
+                            self.open_branch_segments[new_branch_index]['actions'].append(
+                                {'switch': copy.deepcopy(action_switch_dict)})
+
                         pre_ram = cur_ram
                         sub_hit_requested = self._run_subscript_branch(name=name, subscripts=subscripts, ptr=inst_ptr,
                                                                        ram=copy.deepcopy(pre_ram), depth=depth + 1,
@@ -1041,9 +1081,19 @@ class ScriptPerformer:
                 switch_dict = {'branched_all': switch_all, 'entries': switch_entries, 'condition': switch_addr,
                                'selected_entry': switch_addr_value, 'next_inst_ptr': inst_ptr,
                                'next_inst_pos': current_sub['pos_list'][inst_ptr], 'children': {}}
+                action_switch_dict = {'branched_all': switch_all, 'entries': switch_entries, 'condition': switch_addr,
+                                      'selected_entry': switch_addr_value, 'next_inst_ptr': inst_ptr,
+                                      'next_inst_pos': current_sub['pos_list'][inst_ptr]}
                 new_branch = self._branch_append_node(branch=self.open_branch_segments[branch_index],
                                                       node_key='switch', modify=modify,
                                                       node_value=copy.deepcopy(switch_dict))
+
+                if modify:
+                    mod_key = list(self.open_branch_segments[branch_index]['actions'][-1])[0]
+                    self.open_branch_segments[branch_index]['actions'][-1][mod_key]['modification'] = {
+                        'switch': action_switch_dict}
+                else:
+                    self.open_branch_segments[branch_index]['actions'].append({'switch': action_switch_dict})
 
                 if self.with_compare_assumption:
                     if force_branch:
@@ -1052,16 +1102,16 @@ class ScriptPerformer:
                 self.open_branch_segments[branch_index] = new_branch
                 current_pointer = inst_ptr
 
-                # if self.debug_verbose:
-                #     suffix = f'req:{hit_requested}'
-                #     print(f'{tabs}\t<-- {suffix}')
+                if self.debug_verbose:
+                    suffix = f'req:{hit_requested}'
+                    print(f'{tabs}\t<-- {suffix}')
 
             elif 'choice' in inst:
                 if branch_index is None:
                     self.all_starts.append({'end_ram': copy.deepcopy(cur_ram),
                                             'init_value': {'inst': 'jumpif', 'subscript': name, 'pos': 'Start'}})
                     self.open_branch_segments.append({'init_value': None, 'init_ram': copy.deepcopy(cur_ram),
-                                                      'cur_ram': copy.deepcopy(cur_ram)})
+                                                      'cur_ram': copy.deepcopy(cur_ram), 'acions': []})
                     branch_index = 0
                 force_branch = True
                 modify = True
@@ -1069,6 +1119,7 @@ class ScriptPerformer:
                 new_branch = self._branch_append_node(branch=copy.deepcopy(self.open_branch_segments[branch_index]),
                                                       node_key='choice', node_value=copy.deepcopy(choice_dict))
                 self.open_branch_segments[branch_index] = new_branch
+                self.open_branch_segments[branch_index]['actions'].append({'choice': choice_dict})
 
             elif 'subscript_load' in inst:
                 back_log.append({'name': name, 'ptr': current_pointer})
@@ -1553,45 +1604,64 @@ class ScriptPerformer:
         return output
 
     def _get_first_difference(self, branch1, branch2, top_level=False, level=0) -> dict:
-        if 'children' not in branch1.keys() or 'children' not in branch2.keys():
-            if self.debug_verbose:
-                print('\t\tNo children or difference present...')
-            return {}
+        if self.use_actions:
+            difference = {}
+            for i, action1 in enumerate(branch1['actions']):
+                if i >= len(branch2['actions']):
+                    return {}
+                action2 = branch2['actions'][i]
+                action1_key = list(action1.keys())[0]
+                action2_key = list(action2.keys())[0]
 
-        ch1_keys = list(branch1['children'].keys())
-        ch2_keys = list(branch2['children'].keys())
-        rest1 = {k: branch1[k] for k in branch1.keys() if not k == 'children'}
-        rest2 = {k: branch2[k] for k in branch2.keys() if not k == 'children'}
-        if top_level:
-            rest_same = True
+                action_is_same = self._variables_are_equal_recursive(action1, action2)
+
+                if not action_is_same:
+                    sub_difference = self._get_difference_details(action1, action2)
+                    deets1 = action1[action1_key]
+                    deets2 = action2[action2_key]
+                    difference = {'level': i, 'diff_deets': [deets1, deets2], **sub_difference}
+                    break
+
         else:
-            rest_same = self._variables_are_equal_recursive(rest1, rest2)
-            if rest_same:
-                rest_same = self._variables_are_equal_recursive(ch1_keys, ch2_keys)
+            if 'children' not in branch1.keys() or 'children' not in branch2.keys():
+                if self.debug_verbose:
+                    print('\t\tNo children or difference present...')
+                return {}
 
-        if rest_same:
-            next_branch1 = branch1['children'][ch1_keys[0]]
-            next_branch2 = branch2['children'][ch2_keys[0]]
-            temp_diff = self._get_first_difference(next_branch1, next_branch2, level=(level + 1))
-
-            if 'children' in temp_diff.keys():
-                temp_diff.pop('children')
-
-            if 'insert_key' in temp_diff.keys():
-                temp_diff.pop('insert_key')
-                level = temp_diff.pop('level')
-                deets = temp_diff.pop('diff_deets')
-                difference = {ch2_keys[0]: temp_diff, 'level': level, 'diff_deets': deets}
+            ch1_keys = list(branch1['children'].keys())
+            ch2_keys = list(branch2['children'].keys())
+            rest1 = {k: branch1[k] for k in branch1.keys() if not k == 'children'}
+            rest2 = {k: branch2[k] for k in branch2.keys() if not k == 'children'}
+            if top_level:
+                action_is_same = True
             else:
-                difference = temp_diff
+                action_is_same = self._variables_are_equal_recursive(rest1, rest2)
+                if action_is_same:
+                    action_is_same = self._variables_are_equal_recursive(ch1_keys, ch2_keys)
 
-        else:
-            difference = self._get_difference_details(branch1, branch2)
-            difference['level'] = level
-            deets1 = {k: branch1[k] for k in branch1.keys() if not k == 'children'}
-            deets2 = {k: branch2[k] for k in branch2.keys() if not k == 'children'}
-            difference['diff_deets'] = [deets1, deets2]
-            difference['insert_key'] = True
+            if action_is_same:
+                next_branch1 = branch1['children'][ch1_keys[0]]
+                next_branch2 = branch2['children'][ch2_keys[0]]
+                temp_diff = self._get_first_difference(next_branch1, next_branch2, level=(level + 1))
+
+                if 'children' in temp_diff.keys():
+                    temp_diff.pop('children')
+
+                if 'insert_key' in temp_diff.keys():
+                    temp_diff.pop('insert_key')
+                    level = temp_diff.pop('level')
+                    deets = temp_diff.pop('diff_deets')
+                    difference = {ch2_keys[0]: temp_diff, 'level': level, 'diff_deets': deets}
+                else:
+                    difference = temp_diff
+
+            else:
+                difference = self._get_difference_details(branch1, branch2)
+                difference['level'] = level
+                deets1 = {k: branch1[k] for k in branch1.keys() if not k == 'children'}
+                deets2 = {k: branch2[k] for k in branch2.keys() if not k == 'children'}
+                difference['diff_deets'] = [deets1, deets2]
+                difference['insert_key'] = True
 
         return difference
 
@@ -1812,7 +1882,7 @@ class ScriptPerformer:
             cur_line += 1
         file.close()
 
-        printProgressBar(prefix=progress_prefix, suffix=f'\tDONE{" "*25}', length=progressbar_length,
+        printProgressBar(prefix=progress_prefix, suffix=f'\tDONE{" " * 25}', length=progressbar_length,
                          total=file_sizes[level], iteration=file_sizes[level], printEnd='')
         sys.stdout.flush()
 
@@ -2375,4 +2445,3 @@ def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=
         printEnd += '\n'
     print(f'\r{prefix} |{bar}| {percent}% {suffix}', end=printEnd)
     # Print New Line on Complete
-
