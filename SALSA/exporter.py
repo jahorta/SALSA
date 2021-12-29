@@ -57,7 +57,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me525.+sct$',
+                'scripts': '^me503.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -478,10 +478,9 @@ class ScriptPerformer:
                                  iteration=len(self.open_branch_segments), length=124, printEnd='\r')
 
                 # flag for removal identical open branches
-                if self.use_multiprocessing and current_open_branch_num > self.mp_cutoff and False:
-                    # TODO-this does not work correctly yet
+                if self.use_multiprocessing:
                     print('Preparing Workers to flag identical open branches...')
-                    cpus = mp.cpu_count()
+                    cpus = min(mp.cpu_count(), len(self.open_branch_segments))
                     last_index = None
                     segments = []
                     for i in range(cpus):
@@ -489,7 +488,7 @@ class ScriptPerformer:
                             index_start = 0
                         else:
                             index_start = last_index + 1
-                        last_index = floor(current_open_branch_num * ((i + 1) / cpus))
+                        last_index = floor(current_open_branch_num * ((i+1) / cpus))
                         segments.append({'start_index': index_start, 'last_index': last_index,
                                          'branches_to_remove': branches_to_remove})
                     pool = mp.Pool(mp.cpu_count())
@@ -501,7 +500,7 @@ class ScriptPerformer:
                     print()
                 else:
                     results = self._open_branch_duplicate_flagging(
-                        args_in={'start_index': 0, 'last_index': len(self.all_outs) - 1,
+                        args_in={'start_index': 0, 'last_index': len(self.open_branch_segments) - 1,
                                  'branches_to_remove': branches_to_remove})
 
                     branches_to_remove = [*branches_to_remove, *results]
@@ -521,7 +520,7 @@ class ScriptPerformer:
                         last_index = floor(total_closed * ((i + 1) / cpus))
                         segments.append({'start_index': index_start, 'last_index': last_index, 'with_mid': with_mid,
                                          'branches_to_remove': branches_to_remove})
-                    pool = mp.Pool(mp.cpu_count())
+                    pool = mp.Pool(cpus)
                     results = pool.map(self._closed_branch_duplicate_flagging, segments)
                     pool.close()
                     pool.join()
@@ -619,17 +618,15 @@ class ScriptPerformer:
         last_index = args_in['last_index']
         branches_to_remove = args_in['branches_to_remove']
         checked_branches = []
-        current_open_branch_num = last_index - start_index
+        current_open_branch_num = last_index - start_index + 1
         for i, open1 in enumerate(self.open_branch_segments[start_index:last_index]):
             printProgressBar(prefix='Flagging identical open branches',
                              suffix=f'total_branches: {current_open_branch_num}',
                              total=current_open_branch_num, iteration=i, length=119)
             sys.stdout.flush()
             checked_branches.append(i)
-            for j, open2 in enumerate(self.open_branch_segments[start_index + 1:]):
+            for j, open2 in enumerate(self.open_branch_segments[start_index + i + 1:]):
                 if j in branches_to_remove:
-                    continue
-                if j in checked_branches:
                     continue
                 elif self._variables_are_equal_recursive(open1, open2):
                     branches_to_remove.append(j)
@@ -1087,7 +1084,7 @@ class ScriptPerformer:
                     self.all_starts.append({'end_ram': copy.deepcopy(cur_ram),
                                             'init_value': {'inst': 'jumpif', 'subscript': name, 'pos': 'Start'}})
                     self.open_branch_segments.append({'init_value': None, 'init_ram': copy.deepcopy(cur_ram),
-                                                      'cur_ram': copy.deepcopy(cur_ram), 'acions': []})
+                                                      'cur_ram': copy.deepcopy(cur_ram), 'actions': []})
                     branch_index = 0
                 force_branch = True
                 modify = True
