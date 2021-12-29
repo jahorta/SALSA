@@ -772,21 +772,16 @@ class ScriptPerformer:
                     jump_condition = inst['subscript_jumpif']['condition']
                     next_name = inst['subscript_jumpif']['next']
                     inst_pos = inst['subscript_jumpif']['location']
-                    jump_dict = {'children': {}, 'subscript': next_name, 'pos': inst_pos}
                     action_jump_dict = {'subscript': next_name, 'pos': inst_pos}
                     inst_ptr = self._get_ptr(inst_pos, subscripts[next_name]['pos_list'])
                 else:
                     jump_condition = inst['jumpif']['condition']
                     next_name = name
                     inst_pos = inst['jumpif']['location']
-                    jump_dict = {'children': {}, 'subscript': name, 'pos': inst_pos}
                     action_jump_dict = {'subscript': next_name, 'pos': inst_pos}
                     inst_ptr = self._get_ptr(inst_pos, subscripts[next_name]['pos_list'])
 
-                jump_dict['condition'] = jump_condition
                 action_jump_dict['condition'] = jump_condition
-
-                jump_dict['traceback'] = copy.deepcopy(traceback)
                 action_jump_dict['traceback'] = copy.deepcopy(traceback)
 
                 has_condition = False
@@ -825,24 +820,21 @@ class ScriptPerformer:
                     if len(back_log) > 0:
                         back_log.pop()
                     new_branch_index = len(self.open_branch_segments)
-                    jump_dict['jumped'] = True
                     action_jump_dict['jumped'] = True
-                    new_branch = self._branch_append_node(
-                        branch=copy.deepcopy(self.open_branch_segments[branch_index]),
-                        node_key='jumpif', node_value=copy.deepcopy(jump_dict),
-                        modify=modify)
+                    new_branch = copy.deepcopy(self.open_branch_segments[branch_index])
+
+                    if modify:
+                        mod_key = list(new_branch['actions'][-1])[0]
+                        new_branch['actions'][-1][mod_key]['modification'] = {
+                            'jumpif': copy.deepcopy(action_jump_dict)}
+                    else:
+                        new_branch['actions'].append(
+                            {'jumpif': copy.deepcopy(action_jump_dict)})
 
                     if self.with_compare_assumption:
                         new_branch['jump_states'].append({'condition': condition_string, 'jumped': True})
 
                     self.open_branch_segments.append(new_branch)
-
-                    if modify:
-                        mod_key = list(self.open_branch_segments[new_branch_index]['actions'][-1])[0]
-                        self.open_branch_segments[new_branch_index]['actions'][-1][mod_key]['modification'] = {
-                            'jumpif': copy.deepcopy(action_jump_dict)}
-                    else:
-                        self.open_branch_segments[new_branch_index]['actions'].append({'jumpif': copy.deepcopy(action_jump_dict)})
 
                     pre_ram = copy.deepcopy(cur_ram)
 
@@ -867,24 +859,20 @@ class ScriptPerformer:
                         current_sub = subscripts[next_name]
                         current_pointer = next_inst_ptr
 
-                jump_dict['jumped'] = jump
                 action_jump_dict['jumped'] = jump
-                updated_branch = self._branch_append_node(
-                    branch=copy.deepcopy(self.open_branch_segments[branch_index]),
-                    node_key='jumpif', node_value=copy.deepcopy(jump_dict),
-                    modify=modify)
+                updated_branch = self.open_branch_segments[branch_index]
+
+                if modify:
+                    mod_key = list(updated_branch['actions'][-1])[0]
+                    updated_branch['actions'][-1][mod_key]['modification'] = {
+                        'jumpif': action_jump_dict}
+                else:
+                    updated_branch['actions'].append({'jumpif': action_jump_dict})
 
                 if self.with_compare_assumption:
                     if not has_condition:
                         updated_branch['jump_states'].append({'condition': condition_string, 'jumped': jump})
                 self.open_branch_segments[branch_index] = updated_branch
-
-                if modify:
-                    mod_key = list(self.open_branch_segments[branch_index]['actions'][-1])[0]
-                    self.open_branch_segments[branch_index]['actions'][-1][mod_key]['modification'] = {
-                        'jumpif': action_jump_dict}
-                else:
-                    self.open_branch_segments[branch_index]['actions'].append({'jumpif': action_jump_dict})
 
                 force_branch = False
                 force_jump = False
@@ -897,8 +885,7 @@ class ScriptPerformer:
                 end_dict = {**end_dict, 'traceback': pos_traceback}
 
                 if branch_index is not None:
-                    out_branch = self._branch_append_node(branch=self.open_branch_segments[branch_index],
-                                                          node_key='out_value', node_value=end_dict)
+                    out_branch = self.open_branch_segments[branch_index]
                     out_branch['out_value'] = end_dict
                     out_branch['end_ram'] = copy.deepcopy(cur_ram)
                     out_branch['exit'] = True
@@ -948,8 +935,7 @@ class ScriptPerformer:
                             'traceback': pos_traceback, 'pos': inst_pos}
 
                 if branch_index is not None:
-                    out_branch = self._branch_append_node(branch=self.open_branch_segments[branch_index],
-                                                          node_key='out_value', node_value=req_dict)
+                    out_branch = self.open_branch_segments[branch_index]
                     out_branch['out_value'] = req_dict
                     out_branch['end_ram'] = copy.deepcopy(cur_ram)
                     self.open_branch_segments[branch_index] = out_branch
@@ -1030,30 +1016,28 @@ class ScriptPerformer:
                             continue
                         inst_pos = offset
                         inst_ptr = self._get_ptr(pos=offset, pos_list=current_sub['pos_list'])
-                        switch_dict = {'branched_all': switch_all, 'entries': switch_entries, 'condition': switch_addr,
-                                       'selected_entry': key, 'next_inst_ptr': inst_ptr,
-                                       'next_inst_pos': current_sub['pos_list'][inst_ptr], 'children': {}}
                         action_switch_dict = {'branched_all': switch_all, 'entries': switch_entries,
                                               'condition': switch_addr,
                                               'selected_entry': key, 'next_inst_ptr': inst_ptr,
                                               'next_inst_pos': current_sub['pos_list'][inst_ptr]}
-                        new_branch = self._branch_append_node(branch=copy.deepcopy(prev_branch), node_key='switch',
-                                                              node_value=switch_dict, modify=modify)
+
+                        new_branch = copy.deepcopy(self.open_branch_segments[branch_index])
+
+                        if modify:
+                            mod_key = list(new_branch['actions'][-1])[0]
+                            new_branch['actions'][-1][mod_key]['modification'] = {
+                                'switch': copy.deepcopy(action_switch_dict)}
+                        else:
+                            new_branch['actions'].append(
+                                {'switch': copy.deepcopy(action_switch_dict)})
+
                         if self.with_compare_assumption:
                             new_branch['switch_states'].append({'address': switch_addr, 'entry': key})
 
                         new_branch_index = len(self.open_branch_segments)
                         self.open_branch_segments.append(new_branch)
 
-                        if modify:
-                            mod_key = list(self.open_branch_segments[new_branch_index]['actions'][-1])[0]
-                            self.open_branch_segments[new_branch_index]['actions'][-1][mod_key]['modification'] = {
-                                'switch': copy.deepcopy(action_switch_dict)}
-                        else:
-                            self.open_branch_segments[new_branch_index]['actions'].append(
-                                {'switch': copy.deepcopy(action_switch_dict)})
-
-                        pre_ram = cur_ram
+                        pre_ram = copy.deepcopy(cur_ram)
                         sub_hit_requested = self._run_subscript_branch(name=name, subscripts=subscripts, ptr=inst_ptr,
                                                                        ram=copy.deepcopy(pre_ram), depth=depth + 1,
                                                                        branch_index=new_branch_index,
@@ -1078,15 +1062,9 @@ class ScriptPerformer:
                 else:
                     entry = switch_entries[-1]
                 inst_ptr = self._get_ptr(pos=entry, pos_list=current_sub['pos_list'])
-                switch_dict = {'branched_all': switch_all, 'entries': switch_entries, 'condition': switch_addr,
-                               'selected_entry': switch_addr_value, 'next_inst_ptr': inst_ptr,
-                               'next_inst_pos': current_sub['pos_list'][inst_ptr], 'children': {}}
                 action_switch_dict = {'branched_all': switch_all, 'entries': switch_entries, 'condition': switch_addr,
                                       'selected_entry': switch_addr_value, 'next_inst_ptr': inst_ptr,
                                       'next_inst_pos': current_sub['pos_list'][inst_ptr]}
-                new_branch = self._branch_append_node(branch=self.open_branch_segments[branch_index],
-                                                      node_key='switch', modify=modify,
-                                                      node_value=copy.deepcopy(switch_dict))
 
                 if modify:
                     mod_key = list(self.open_branch_segments[branch_index]['actions'][-1])[0]
@@ -1097,9 +1075,8 @@ class ScriptPerformer:
 
                 if self.with_compare_assumption:
                     if force_branch:
-                        new_branch['switch_states'].append({'address': switch_addr, 'entry': switch_addr_value})
+                        self.open_branch_segments[branch_index]['switch_states'].append({'address': switch_addr, 'entry': switch_addr_value})
 
-                self.open_branch_segments[branch_index] = new_branch
                 current_pointer = inst_ptr
 
                 if self.debug_verbose:
@@ -1116,9 +1093,6 @@ class ScriptPerformer:
                 force_branch = True
                 modify = True
                 choice_dict = {'details': inst['choice'], 'children': {}}
-                new_branch = self._branch_append_node(branch=copy.deepcopy(self.open_branch_segments[branch_index]),
-                                                      node_key='choice', node_value=copy.deepcopy(choice_dict))
-                self.open_branch_segments[branch_index] = new_branch
                 self.open_branch_segments[branch_index]['actions'].append({'choice': choice_dict})
 
             elif 'subscript_load' in inst:
@@ -2029,29 +2003,6 @@ class ScriptPerformer:
     # Branch manipulation functions #
     # ----------------------------- #
 
-    def _branch_append_node(self, branch, node_key, node_value, modify=False) -> dict:
-        if isinstance(branch, str):
-            print('Branch is a string?')
-            return branch
-        if 'children' not in branch.keys():
-            # print('No children entry, adding entry')
-            old_children = {}
-        else:
-            old_children = branch.pop('children')
-        new_branch = branch
-        if len(old_children) > 0:
-            next_level_key = list(old_children.keys())[0]
-            next_level = old_children[next_level_key]
-            new_children = {next_level_key: self._branch_append_node(branch=next_level, node_key=node_key,
-                                                                     node_value=node_value, modify=modify)}
-        elif modify:
-            new_branch['modification'] = {node_key: node_value}
-            new_children = old_children
-        else:
-            new_children = {node_key: node_value}
-        new_branch['children'] = new_children
-        return new_branch
-
     def _flag_outs_for_removal(self, remove_no_mod=False):
         progress_prefix = 'Searching for out branch end errors'
 
@@ -2083,6 +2034,7 @@ class ScriptPerformer:
         return outs_to_remove
 
     def _prune_out_children(self, out) -> bool:
+        # TODO - adjust this for using 'actions' list instead of nested children
         goes_past_out = False
         if len(out['children']) == 0:
             return False
