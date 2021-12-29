@@ -22,7 +22,7 @@ class SCTExporter:
 
     temp_dir = 'E:\\temp'
 
-    def __init__(self, loc=None, verbose=False, temp_dir=None):
+    def __init__(self, loc=None, verbose=True, temp_dir=None):
         if temp_dir is not None:
             self.temp_dir = temp_dir
         self.verbose_out = verbose
@@ -57,7 +57,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me513.+sct$',
+                'scripts': '^me525.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -2207,8 +2207,18 @@ class ScriptPerformer:
         param_values = []
         for param in params:
             if isinstance(param, str):
-                addr = param.split(': ')[1].rstrip()
-                value = self._get_memory_pos(addr, ram, 'control')
+                done = False
+                value = param
+                while not done:
+                    if re.search(': ', value):
+                        addr = value.split(': ')[1].rstrip()
+                    else:
+                        addr = value
+                    value = self._get_memory_pos(addr, ram, 'control')
+                    if value is None:
+                        done = True
+                    elif isinstance(value, str):
+                        done = True
                 param_values.append(value)
             else:
                 param_values.append(param)
@@ -2232,11 +2242,18 @@ class ScriptPerformer:
                 if not self._can_jump(value, ram):
                     can_jump = False
             elif isinstance(value, str):
-                if re.search(': ', value):
-                    addr = value.split(': ')[1].rstrip()
+                done = False
+                while not done:
+                    if re.search(': ', value):
+                        addr = value.split(': ')[1].rstrip()
+                    else:
+                        addr = value
                     value = self._get_memory_pos(addr, ram, 'control')
                     if value is None:
                         can_jump = False
+                        done = True
+                    elif not isinstance(value, str):
+                        done = True
             else:
                 is_number = isinstance(value, int) or isinstance(value, float)
                 if not is_number:
