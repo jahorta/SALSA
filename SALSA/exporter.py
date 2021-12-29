@@ -20,7 +20,7 @@ class SCTExporter:
         'Ship_battles': KA.Ship_Battles
     }
 
-    temp_dir = 'C:\\temp'
+    temp_dir = 'E:\\temp'
 
     def __init__(self, loc=None, verbose=False, temp_dir=None):
         if temp_dir is not None:
@@ -57,7 +57,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me504.+sct$',
+                'scripts': '^me535.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -197,10 +197,10 @@ class SCTExporter:
             csv += '\nMemory Addresses,Set Location,Address Value'
             type_known = False
             script_addr_type = None
-            for type, key in KA.Script_types.items():
-                if re.match(type, script):
+            for script_type, type_key in KA.Script_types.items():
+                if re.match(script_type, script):
                     type_known = True
-                    script_addr_type = self.known_addr[key]
+                    script_addr_type = self.known_addr[type_key]
 
             used_addr = result['ram_stats']
             used_addr_clean = {}
@@ -212,11 +212,14 @@ class SCTExporter:
                 used_addr_clean[addr] = stats
             used_addr = {k: used_addr_clean[k] for k in sorted(list(used_addr_clean))}
             for addr, stats in used_addr.items():
-                csv += f'\n{addr},{stats["init_loc"]}'
-                if type_known:
-                    for s_addr, value in script_addr_type.items():
-                        if addr == s_addr:
-                            csv += f',{value}'
+                if 'init_loc' in stats.keys():
+                    csv += f'\n{addr},{stats["init_loc"]}'
+                    if type_known:
+                        for s_addr, value in script_addr_type.items():
+                            if addr == s_addr:
+                                csv += f',{value}'
+                else:
+                    print(f'no init location entered for {addr}')
             inst_num = len(result['summary'])
             csv = csv.replace('*Inst*', 'Inst,' if inst_num > 1 else '')
             csv_verbose = csv
@@ -234,7 +237,7 @@ class SCTExporter:
                     commas = ',' * level
                     value_prefix = f'\n{commas}{value}'
                     for trace, diff_dict in traces.items():
-                        trace_prefix = f'{value_prefix} ({trace})'
+                        trace_prefix = f'{value_prefix} ({trace.replace(",", ":")})'
                         if diff_dict['has_diff']:
                             body_verbose = self._format_diff_tree(diff_dict['stratified'], level,
                                                                   diff_dict['trace_level'])
@@ -264,13 +267,13 @@ class SCTExporter:
         diff_level += 1
         output = ''
         if 'inst' not in diff_dict:
-            body = f'-> {diff_dict["value"]} ({ScriptPerformer.get_traceback_string(diff_dict["traceback"], trace_lvl)}) '
+            body = f'-> {diff_dict["value"]} ({ScriptPerformer.get_traceback_string(diff_dict["traceback"], trace_lvl).replace(",", ":")}) '
             return f',{body}'
         inst = diff_dict['inst']
         commas = ',' * diff_level
         if inst == 'out':
             out_values = diff_dict['out']
-            body = f'-> {out_values["value"]} ({ScriptPerformer.get_traceback_string(out_values["traceback"], trace_lvl)}) '
+            body = f'-> {out_values["value"]} ({ScriptPerformer.get_traceback_string(out_values["traceback"], trace_lvl).replace(",", ":")}) '
             output = f',{body}\n'
         elif inst == 'choice':
             question = diff_dict['question']
@@ -359,6 +362,7 @@ class ScriptPerformer:
     use_multiprocessing = True
     mp_cutoff = 500
     results = []
+    temp_ext = '.tmp'
 
     def __init__(self):
 
@@ -641,6 +645,7 @@ class ScriptPerformer:
         for i, out_branch in enumerate(self.all_outs[start_index:last_index]):
             printProgressBar(prefix='Removing open branches which mirror closed branches',
                              total=current_outs, iteration=i)
+            sys.stdout.flush()
             for j, open_branch in enumerate(self.open_branch_segments):
                 if j in branches_to_remove:
                     continue
@@ -1171,6 +1176,7 @@ class ScriptPerformer:
     def _make_all_out_summary(self, inst_details, temp_dir) -> dict:
         all_branches = self.all_outs
         num_branches = len(all_branches)
+        self.all_outs = []
 
         parallel_processes = False
         if num_branches > 500:
@@ -1308,6 +1314,7 @@ class ScriptPerformer:
             os.remove(os.path.join(temp_dir, f))
 
         # Remove internal summaries and append them to external summaries
+        print('Appending internal summaries to their external counterparts...')
         appended_summary = {}
         first = True
         for int_inst, int_values in all_internals.items():
@@ -1358,6 +1365,7 @@ class ScriptPerformer:
         if len(appended_summary) == 0:
             appended_summary = summary
 
+        print('reformatting traceback values for each summary...')
         reformatted_summary = {}
         for inst, values in appended_summary.items():
             reformatted_summary[inst] = {}
@@ -1460,7 +1468,7 @@ class ScriptPerformer:
             if first_tr:
                 first_tr = False
             else:
-                trace_key += '_'
+                trace_key += ','
             first_val = True
             for trace_value in trace.values():
                 if first_val:
@@ -1486,6 +1494,7 @@ class ScriptPerformer:
         # Determine whether this position is internal and get outs for each branch
         is_internal = True
         branch_outs = []
+
         for branch in branches:
             if 'init' in trace or 'new_run' in branch.keys():
                 is_internal = False
@@ -1500,10 +1509,12 @@ class ScriptPerformer:
             out_trace = branch['out_value']['traceback']
             branch_outs.append({'value': out_value, 'traceback': out_trace})
 
-        diffs_file_name = f'{inst}-{value}-{trace}.tmp'
-        file = open(os.path.join(temp_dir, diffs_file_name), 'w')
+        diffs_file_header = f'{inst}-{value}-{trace}'
         diff_levels = []
         has_differences = False
+        level_index = {}
+        files = []
+        level_sizes = {}
         if branch_num > 1:
             checked_branches = []
             for i, branch1 in enumerate(branches):
@@ -1524,10 +1535,19 @@ class ScriptPerformer:
                         continue
                     diff_level = temp_difference.pop('level')
                     diff_levels.append(diff_level)
+
+                    if diff_level not in level_sizes.keys():
+                        diffs_file_name = f'{diffs_file_header}-{diff_level}{self.temp_ext}'
+                        new_file_index = len(files)
+                        level_index[diff_level] = new_file_index
+                        files.append(open(os.path.join(temp_dir, diffs_file_name), 'w'))
+                        level_sizes[diff_level] = 0
+
                     deets = temp_difference.pop('diff_deets')
                     difference = {'branches': [i, j], 'level': diff_level, 'diff': temp_difference,
                                   'diff_details': deets}
-                    file.write(f'{json.dumps(difference)}\n')
+                    files[level_index[diff_level]].write(f'{json.dumps(difference)}\n')
+                    level_sizes[diff_level] += 1
                     has_differences = True
 
             progress_suffix = ' \tDONE\t\t\t\t '
@@ -1537,10 +1557,12 @@ class ScriptPerformer:
 
             diff_levels = sorted(list(set(diff_levels)))
 
-        file.close()
+        for file in files:
+            file.close()
 
         output = {'outs': branch_outs, 'diff_levels': diff_levels, 'internal': is_internal, 'inst': inst,
-                  'value': value, 'trace': trace, 'diffs_file_name': diffs_file_name, 'has_differences': has_differences}
+                  'value': value, 'trace': trace, 'diffs_header': diffs_file_header, 'has_differences': has_differences,
+                  'file_sizes': level_sizes}
 
         return output
 
@@ -1590,8 +1612,8 @@ class ScriptPerformer:
     def _get_difference_details(self, var1, var2):
         diff = {}
         if not type(var1) == type(var2):
-            type1 = type(var1).__name__
-            type2 = type(var2).__name__
+            type1 = type(var1)
+            type2 = type(var2)
             diff = {'var1': copy.deepcopy(var1), 'var2': copy.deepcopy(var2), 'var1_type': copy.deepcopy(type1),
                     'var2_type': copy.deepcopy(type2)}
 
@@ -1626,7 +1648,8 @@ class ScriptPerformer:
 
     def _generate_difference_summaries(self, args_in) -> dict:
         diff_levels = args_in['diff_levels']
-        dif_file_name = args_in['diffs_file_name']
+        dif_header = args_in['diffs_header']
+        file_sizes = args_in['file_sizes']
         branch_outs = args_in['outs']
         trace_level = args_in['trace_level']
         branches = args_in['branches']
@@ -1635,13 +1658,13 @@ class ScriptPerformer:
         trace = args_in['trace']
         has_differences = args_in['has_differences']
 
-        print(f'Summarizing {value}-{trace}...')
+        # print(f'Summarizing {value}-{trace}...')
         if len(branches) > 1:
             if has_differences:
 
                 stratified_diff_summary = self._get_stratified_differences(
-                    dif_file_name=dif_file_name, outs=copy.deepcopy(branch_outs),
-                    diff_levels=copy.deepcopy(diff_levels), temp_dir=args_in['temp_dir'])
+                    dif_header=dif_header, outs=copy.deepcopy(branch_outs), value=value, trace=trace,
+                    diff_levels=copy.deepcopy(diff_levels), temp_dir=args_in['temp_dir'], file_sizes=file_sizes)
 
                 condensed_diff_summary = self._condense_stratified_differences(
                     copy.deepcopy(stratified_diff_summary))
@@ -1659,11 +1682,16 @@ class ScriptPerformer:
 
         return {'summary': summary, 'inst': inst, 'value': value, 'trace': trace}
 
-    def _get_stratified_differences(self, outs, diff_levels, temp_dir, dif_file_name, valid_ids=None) -> dict:
+    def _get_stratified_differences(self, outs, diff_levels, temp_dir, dif_header, file_sizes, value, trace,
+                                    valid_ids=None) -> dict:
         strat_diff = {}
         rem_levels = diff_levels[1:]
         level = diff_levels[0]
         child_ids = {}
+        progress_prefix = f'Summarizing {dif_header}:{level}'
+        progressbar_length = 200 - len(progress_prefix)
+        cur_line = 0
+        dif_file_name = f'{dif_header}-{level}{self.temp_ext}'
         diff_path = os.path.join(temp_dir, dif_file_name)
         file = open(diff_path, 'r')
         while True:
@@ -1704,9 +1732,9 @@ class ScriptPerformer:
                 for i, value in enumerate(b_diff_values):
                     if isinstance(value, bool):
                         if value:
-                            entry = 0
-                        else:
                             entry = 1
+                        else:
+                            entry = 0
                     else:
                         entry = int(value)
                     if not options[entry] in child_ids.keys():
@@ -1732,7 +1760,7 @@ class ScriptPerformer:
 
                 if 'jumped' in details.keys():
                     details.pop('jumped')
-                options = [True, False]
+                options = [False, True]
                 strat_diff['inst'] = 'jumpif'
                 strat_diff['results'] = options
                 condition_key = list(diff['diff_details'][0]['condition'].keys())[0]
@@ -1792,14 +1820,22 @@ class ScriptPerformer:
             else:
                 print(f'make new category: {diff_inst}')
 
+            printProgressBar(prefix=progress_prefix, suffix=f'{cur_line}/{file_sizes[level]}',
+                             length=progressbar_length, total=file_sizes[level], iteration=cur_line, printEnd='\r')
+            sys.stdout.flush()
+            cur_line += 1
         file.close()
+
+        printProgressBar(prefix=progress_prefix, suffix=f'\tDONE{" "*25}', length=progressbar_length,
+                         total=file_sizes[level], iteration=file_sizes[level], printEnd='')
+        sys.stdout.flush()
 
         temp_children = child_ids
         if len(temp_children) == 0:
             if len(rem_levels) > 0:
-                return self._get_stratified_differences(outs=outs, diff_levels=rem_levels,
-                                                        valid_ids=valid_ids, temp_dir=temp_dir,
-                                                        dif_file_name=dif_file_name)
+                return self._get_stratified_differences(outs=outs, diff_levels=rem_levels, valid_ids=valid_ids,
+                                                        temp_dir=temp_dir, dif_header=dif_header, file_sizes=file_sizes,
+                                                        value=value, trace=trace)
             else:
                 cur_outs = []
                 for id in valid_ids:
@@ -1814,7 +1850,8 @@ class ScriptPerformer:
                 if len(rem_levels) > 0:
                     out_dict = self._get_stratified_differences(outs=outs, diff_levels=rem_levels,
                                                                 valid_ids=option_list, temp_dir=temp_dir,
-                                                                dif_file_name=dif_file_name)
+                                                                dif_header=dif_header, file_sizes=file_sizes,
+                                                                value=value, trace=trace)
                 else:
                     cur_outs = []
                     for option in option_list:
@@ -2331,7 +2368,8 @@ def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
+    if iteration == total:
+        printEnd += '\n'
     print(f'\r{prefix} |{bar}| {percent}% {suffix}', end=printEnd)
     # Print New Line on Complete
-    if iteration == total:
-        print()
+
