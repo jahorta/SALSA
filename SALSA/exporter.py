@@ -1115,18 +1115,14 @@ class ScriptPerformer:
                     elif len(back_log) == 0:
                         done = True
                         backtrack_successful = True
-            elif not fallthrough_done:
-                fallthrough_done = True
-                if 'fallthrough' in current_sub.keys():
-                    next_subscript_name = current_sub['fallthrough']
-                    hit_requested = self._run_subscript_branch(name=next_subscript_name,
-                                                               subscripts=subscripts,
-                                                               ram=copy.deepcopy(cur_ram),
-                                                               branch_index=branch_index, depth=depth + 1)
-                    # if self.debug_verbose:
-                    #     suffix = f'req:{hit_requested}'
-                    #     print(f'{tabs}\t<-- {suffix}')
-                done = True
+            elif 'fallthrough' in current_sub.keys():
+                name = current_sub['fallthrough']
+                current_sub = subscripts[name]
+                current_pointer = 0
+                traceback[-1] = {'name': name, 'ptr': current_pointer}
+                # if self.debug_verbose:
+                #     suffix = f'req:{hit_requested}'
+                #     print(f'{tabs}\t<-- {suffix}')
             else:
                 done = True
 
