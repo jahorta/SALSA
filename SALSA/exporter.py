@@ -1229,9 +1229,6 @@ class ScriptPerformer:
                     all_args.append({'inst': inst, 'value': value, 'branches': branches})
 
         if parallel_processes:
-            total_print_rows = len(all_args)
-            for arg in all_args:
-                arg['total_print_rows'] = total_print_rows
             pool = mp.Pool(mp.cpu_count())
             results = pool.map(self._get_traceback_groups, all_args)
             pool.close()
@@ -1268,8 +1265,10 @@ class ScriptPerformer:
                 if not parallel_processes:
                     for trace, branches in traces.items():
                         i = 0
-                        args_in = {'inst': inst, 'value': value, 'branches': branches,
-                                   'trace': trace, 'inst_details': inst_details[inst],
+                        first_index = 0
+                        last_index = len(branches) - 1
+                        args_in = {'inst': inst, 'value': value, 'branches': branches, 'first_index': first_index,
+                                   'trace': trace, 'inst_details': inst_details[inst], 'last_index': last_index,
                                    'temp_dir': temp_dir, 'file_index': i}
                         out = self._get_traceback_group_details(args_in=args_in)
                         difference_dicts[out['inst']][out['value']][out['trace']] = out
@@ -1277,26 +1276,45 @@ class ScriptPerformer:
                             all_internals[inst][value].append(trace)
                 else:
                     for trace, branches in traces.items():
-                        chunks = floor(len(branches) / 500)
+                        chunks = floor(len(branches) / 10) + 1
+                        last_index = -1
                         for i in range(chunks):
-                            all_args.append({'print_row': row, 'inst': inst, 'value': value,
-                                             'branches': branches, 'trace': trace, 'inst_details': inst_details[inst],
-                                             'temp_dir': temp_dir, 'file_index': i})
-                            row += 1
+                            first_index = last_index + 1
+                            last_index = floor(chunks * (i + 1) / 10)
+                            all_args.append({'inst': inst, 'value': value, 'branches': branches, 'trace': trace,
+                                             'inst_details': inst_details[inst], 'temp_dir': temp_dir, 'file_index': i,
+                                             'first_index': first_index, 'last_index': last_index})
+                        all_args[-1]['last_index'] = len(branches) - 1
 
         if parallel_processes:
-            total_print_rows = len(all_args)
-            for arg in all_args:
-                arg['total_print_rows'] = total_print_rows
             pool = mp.Pool(mp.cpu_count())
             results = pool.map(self._get_traceback_group_details, all_args)
             pool.close()
             pool.join()
 
-            for out in results:
-                difference_dicts[out['inst']][out['value']][out['trace']] = out
-                if out['internal']:
-                    all_internals[out['inst']][out['value']].append(out['trace'])
+            for i, out in enumerate(results):
+                if out['trace'] not in difference_dicts[out['inst']][out['value']].keys():
+                    difference_dicts[out['inst']][out['value']][out['trace']] = copy.deepcopy(out)
+                else:
+                    cur_out = difference_dicts[out['inst']][out['value']][out['trace']]
+                    cur_out['diff_levels'] = sorted(list({*cur_out['diff_levels'], *out['diff_levels']}))
+                    if not cur_out['has_differences']:
+                        cur_out['has_differences'] = out['has_differences']
+                    if cur_out['internal']:
+                        cur_out['internal'] = out['internal']
+                    for level in out['file_sizes']:
+                        if level not in cur_out['file_sizes'].keys():
+                            cur_out['file_sizes'][level] = out['file_sizes'][level]
+                        else:
+                            cur_out['file_sizes'][level] += out['file_sizes'][level]
+                    difference_dicts[out['inst']][out['value']][out['trace']] = cur_out
+
+            for inst in difference_dicts.keys():
+                for value in difference_dicts[inst].keys():
+                    for trace in difference_dicts[inst][value].keys():
+                        if difference_dicts[inst][value][trace]['internal']:
+                            all_internals[inst][value].append(trace)
+
 
         # Combine Temp Files - d includes the inst, value, trace, and level
         files = []
@@ -1341,9 +1359,6 @@ class ScriptPerformer:
                         all_args.append({**difference_dicts[inst][value][trace], 'branches': branches,
                                          'temp_dir': temp_dir, 'trace_level': all_trace_levels[inst][value]})
         if parallel_processes:
-            total_print_rows = len(all_args)
-            for arg in all_args:
-                arg['total_print_rows'] = total_print_rows
             pool = mp.Pool(mp.cpu_count())
             results = pool.map(self._generate_difference_summaries, all_args)
             pool.close()
@@ -1529,6 +1544,8 @@ class ScriptPerformer:
         branches = args_in['branches']
         temp_dir = args_in['temp_dir']
         index = args_in['file_index']
+        first_index = args_in['first_index']
+        last_index = args_in['last_index']
 
         branch_num = len(branches)
         progress_prefix = f'\rGetting first differences from {inst}:{value}:{trace}'
@@ -1559,16 +1576,12 @@ class ScriptPerformer:
         files = []
         level_sizes = {}
         if branch_num > 1:
-            checked_branches = []
-            for i, branch1 in enumerate(branches):
+            for i, branch1 in enumerate(branches[first_index: last_index]):
                 progress_suffix = f' \t{i}/{branch_num}'
                 printProgressBar(prefix=f'{progress_prefix}', suffix=f'{progress_suffix}',
                                  length=progress_bar_length, total=branch_num, iteration=i, printEnd='\r')
                 sys.stdout.flush()
-                checked_branches.append(i)
-                for j, branch2 in enumerate(branches):
-                    if j in checked_branches:
-                        continue
+                for j, branch2 in enumerate(branches[first_index + i + 1: last_index]):
                     if self.debug_verbose:
                         print(f'\tGetting first difference between {i} and {j}')
                     temp_difference = self._get_first_difference(branch1=branch1,
