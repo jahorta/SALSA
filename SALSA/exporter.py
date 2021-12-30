@@ -504,8 +504,7 @@ class ScriptPerformer:
                         last_index = first_index + index_num_for_chunk
                         if last_index >= len(self.open_branch_segments):
                             break
-                        segments.append({'start_index': first_index, 'last_index': last_index,
-                                         'branches_to_remove': branches_to_remove})
+                        segments.append({'start_index': first_index, 'last_index': last_index})
                         branch_num_for_index_calc -= (last_index - first_index) + 1
                     segments[-1]['last_index'] = (len(self.open_branch_segments) - 1)
                     pool = mp.Pool(cpus)
@@ -517,8 +516,7 @@ class ScriptPerformer:
                     print()
                 else:
                     results = self._open_branch_duplicate_flagging(
-                        args_in={'start_index': 0, 'last_index': (len(self.open_branch_segments) - 1),
-                                 'branches_to_remove': branches_to_remove})
+                        args_in={'start_index': 0, 'last_index': (len(self.open_branch_segments) - 1)})
 
                     branches_to_remove = [*branches_to_remove, *results]
 
@@ -637,7 +635,7 @@ class ScriptPerformer:
     def _open_branch_duplicate_flagging(self, args_in):
         start_index = args_in['start_index']
         last_index = args_in['last_index']
-        branches_to_remove = args_in['branches_to_remove']
+        branches_to_remove = []
         current_open_branch_num = last_index - start_index + 1
         if last_index == -1:
             current_open_branch_num = len(self.open_branch_segments) - start_index
