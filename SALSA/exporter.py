@@ -3,6 +3,7 @@ import json
 import multiprocessing as mp
 import os
 import re
+import shutil
 import sys
 from datetime import datetime
 from math import floor
@@ -57,7 +58,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me503.+sct$',
+                'scripts': '^me500.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -1074,6 +1075,7 @@ class ScriptPerformer:
                         self.open_branch_segments[branch_index]['switch_states'].append({'address': switch_addr, 'entry': switch_addr_value})
 
                 current_pointer = inst_ptr
+                modify = False
 
                 if self.debug_verbose:
                     suffix = f'req:{hit_requested}'
@@ -1186,7 +1188,7 @@ class ScriptPerformer:
         num_branches = len(all_branches)
         self.all_outs = []
 
-        parallel_processes = False
+        parallel_processes = True
         if num_branches > 500:
             parallel_processes = self.use_multiprocessing
 
@@ -1239,6 +1241,13 @@ class ScriptPerformer:
                 grouped_branches[out['inst']][out['value']] = out['groups']
                 all_trace_levels[out['inst']][out['value']] = out['trace_level']
 
+        for d in os.listdir(temp_dir):
+            path = os.path.join(temp_dir, d)
+            if os.path.isdir(path):
+                shutil.rmtree(path)
+            else:
+                os.remove(path)
+
         print('\nLooking for branch differences')
         all_args = []
         row = 0
@@ -1258,19 +1267,22 @@ class ScriptPerformer:
                 all_internals[inst][value] = []
                 if not parallel_processes:
                     for trace, branches in traces.items():
+                        i = 0
                         args_in = {'inst': inst, 'value': value, 'branches': branches,
                                    'trace': trace, 'inst_details': inst_details[inst],
-                                   'temp_dir': temp_dir}
+                                   'temp_dir': temp_dir, 'file_index': i}
                         out = self._get_traceback_group_details(args_in=args_in)
                         difference_dicts[out['inst']][out['value']][out['trace']] = out
                         if out['internal']:
                             all_internals[inst][value].append(trace)
                 else:
                     for trace, branches in traces.items():
-                        all_args.append({'print_row': row, 'inst': inst, 'value': value,
-                                         'branches': branches, 'trace': trace, 'inst_details': inst_details[inst],
-                                         'temp_dir': temp_dir})
-                        row += 1
+                        chunks = floor(len(branches) / 500)
+                        for i in range(chunks):
+                            all_args.append({'print_row': row, 'inst': inst, 'value': value,
+                                             'branches': branches, 'trace': trace, 'inst_details': inst_details[inst],
+                                             'temp_dir': temp_dir, 'file_index': i})
+                            row += 1
 
         if parallel_processes:
             total_print_rows = len(all_args)
@@ -1285,6 +1297,28 @@ class ScriptPerformer:
                 difference_dicts[out['inst']][out['value']][out['trace']] = out
                 if out['internal']:
                     all_internals[out['inst']][out['value']].append(out['trace'])
+
+        # Combine Temp Files - d includes the inst, value, trace, and level
+        files = []
+        for d in os.listdir(temp_dir):
+            dir_path = os.path.join(temp_dir, d)
+            files = []
+            filenames = {}
+            for f in os.listdir(dir_path):
+                new_filename = f'{d}{self.temp_ext}'
+                path = os.path.join(temp_dir, new_filename)
+                if not os.path.exists(path):
+                    new_index = len(files)
+                    filenames[new_filename] = new_index
+                    files.append(open(path, 'w', encoding='shiftjis'))
+                old_file = open(os.path.join(dir_path, f))
+                lines = old_file.readlines()
+                files[filenames[new_filename]].writelines(lines)
+                old_file.close()
+            for file in files:
+                file.close()
+
+            shutil.rmtree(dir_path)
 
         print('Making Summaries...')
         summary = {}
@@ -1494,6 +1528,7 @@ class ScriptPerformer:
         param_name = args_in['inst_details']
         branches = args_in['branches']
         temp_dir = args_in['temp_dir']
+        index = args_in['file_index']
 
         branch_num = len(branches)
         progress_prefix = f'\rGetting first differences from {inst}:{value}:{trace}'
@@ -1520,7 +1555,7 @@ class ScriptPerformer:
         diffs_file_header = f'{inst}-{value}-{trace}'
         diff_levels = []
         has_differences = False
-        level_index = {}
+        dir_index = {}
         files = []
         level_sizes = {}
         if branch_num > 1:
@@ -1543,18 +1578,21 @@ class ScriptPerformer:
                         continue
                     diff_level = temp_difference.pop('level')
                     diff_levels.append(diff_level)
+                    dir_name = f'{diffs_file_header}-{diff_level}'
+                    dir_path = os.path.join(temp_dir, dir_name)
 
                     if diff_level not in level_sizes.keys():
-                        diffs_file_name = f'{diffs_file_header}-{diff_level}{self.temp_ext}'
+                        os.mkdir(dir_path)
+                        diffs_file_name = f'{dir_name}-{index}{self.temp_ext}'
                         new_file_index = len(files)
-                        level_index[diff_level] = new_file_index
-                        files.append(open(os.path.join(temp_dir, diffs_file_name), 'w'))
+                        dir_index[diff_level] = new_file_index
+                        files.append(open(os.path.join(dir_path, diffs_file_name), 'w'))
                         level_sizes[diff_level] = 0
 
                     deets = temp_difference.pop('diff_deets')
                     difference = {'branches': [i, j], 'level': diff_level, 'diff': temp_difference,
                                   'diff_details': deets}
-                    files[level_index[diff_level]].write(f'{json.dumps(difference)}\n')
+                    files[dir_index[diff_level]].write(f'{json.dumps(difference)}\n')
                     level_sizes[diff_level] += 1
                     has_differences = True
 
