@@ -59,7 +59,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me50[0-8].+sct$',
+                'scripts': '^me51[5-9].+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -363,8 +363,8 @@ class ScriptPerformer:
     with_compare_assumption = False
     reset_cond_states_between_runs = False
     use_multiprocessing = True
-    mp_cutoff = 500
-    chunk_compare_num = 500
+    chunk_compare_num = 5000
+    max_chunks = 50
     results = []
     temp_ext = '.tmp'
     use_actions = True
@@ -481,20 +481,34 @@ class ScriptPerformer:
                                  iteration=len(self.open_branch_segments), length=124, printEnd='\r')
 
                 # flag for removal identical open branches
-                if self.use_multiprocessing:
+                should_parallel_open = ((current_open_branch_num * current_open_branch_num) / 2) > self.chunk_compare_num
+                if self.use_multiprocessing and should_parallel_open:
                     print('Preparing Workers to flag identical open branches...')
-                    cpus = min(mp.cpu_count(), len(self.open_branch_segments))
-                    last_index = None
                     segments = []
+                    branch_num_for_index_calc = len(self.open_branch_segments) - 1
+                    branch_num_for_chunk_calc = len(self.open_branch_segments)
+                    branch_num_sq = branch_num_for_chunk_calc * branch_num_for_chunk_calc
+                    compare_num = branch_num_sq / 2
+                    chunks = floor(compare_num / self.chunk_compare_num) + 1
+                    cpus = min(chunks, mp.cpu_count())
+                    compares_per_chunk = floor(compare_num / cpus)
+                    last_index = -1
                     for i in range(cpus):
-                        if last_index is None:
-                            index_start = 0
-                        else:
-                            index_start = last_index + 1
-                        last_index = floor(current_open_branch_num * ((i+1) / cpus))
-                        segments.append({'start_index': index_start, 'last_index': last_index,
+                        first_index = last_index + 1
+                        quadratic_sqrt = math.sqrt((branch_num_for_index_calc * branch_num_for_index_calc) - (
+                                    4 * (-1 / 2) * compares_per_chunk))
+                        numerator = abs((branch_num_for_index_calc * -1) + quadratic_sqrt)
+                        if numerator == 0:
+                            numerator = abs((branch_num_for_index_calc * -1) - quadratic_sqrt)
+                        index_num_for_chunk = math.ceil(abs(numerator / (2 * (-1 / 2))))
+                        last_index = first_index + index_num_for_chunk
+                        if last_index >= len(self.open_branch_segments):
+                            break
+                        segments.append({'start_index': first_index, 'last_index': last_index,
                                          'branches_to_remove': branches_to_remove})
-                    pool = mp.Pool(mp.cpu_count())
+                        branch_num_for_index_calc -= (last_index - first_index) + 1
+                    segments[-1]['last_index'] = (len(self.open_branch_segments) - 1)
+                    pool = mp.Pool(cpus)
                     results = pool.map(self._open_branch_duplicate_flagging, segments)
                     pool.close()
                     pool.join()
@@ -503,26 +517,29 @@ class ScriptPerformer:
                     print()
                 else:
                     results = self._open_branch_duplicate_flagging(
-                        args_in={'start_index': 0, 'last_index': len(self.open_branch_segments) - 1,
+                        args_in={'start_index': 0, 'last_index': (len(self.open_branch_segments) - 1),
                                  'branches_to_remove': branches_to_remove})
 
                     branches_to_remove = [*branches_to_remove, *results]
 
                 # flag for removal open branches with the same conditions as an out branch
                 total_closed = len(self.all_outs)
-                if self.use_multiprocessing and total_closed > self.mp_cutoff:
-                    print('Preparing Workers to flag identical open branches...')
-                    cpus = mp.cpu_count()
-                    last_index = None
+                should_parallel_closed = (total_closed * len(self.open_branch_segments)) > self.chunk_compare_num
+                if self.use_multiprocessing and should_parallel_closed:
+                    print('Preparing Workers to flag mirrored open branches...')
                     segments = []
+                    branch_num = len(self.all_outs)
+                    cpus = mp.cpu_count()
+                    last_index = -1
                     for i in range(cpus):
-                        if last_index is None:
-                            index_start = 0
-                        else:
-                            index_start = last_index + 1
-                        last_index = floor(total_closed * ((i + 1) / cpus))
-                        segments.append({'start_index': index_start, 'last_index': last_index, 'with_mid': with_mid,
+                        first_index = last_index + 1
+                        last_index = floor(branch_num * ((i + 1) / cpus))
+                        if last_index >= branch_num:
+                            break
+                        segments.append({'start_index': first_index, 'last_index': last_index, 'with_mid': with_mid,
                                          'branches_to_remove': branches_to_remove})
+                    if not len(segments) == 0:
+                        segments[-1]['last_index'] = (len(self.all_outs) - 1)
                     pool = mp.Pool(cpus)
                     results = pool.map(self._closed_branch_duplicate_flagging, segments)
                     pool.close()
@@ -531,8 +548,9 @@ class ScriptPerformer:
                         branches_to_remove = [*branches_to_remove, *result]
                     print()
                 else:
+                    print('Flagging mirrored open branches...')
                     results = self._closed_branch_duplicate_flagging(
-                        args_in={'start_index': 0, 'last_index': len(self.all_outs) - 1, 'with_mid': with_mid,
+                        args_in={'start_index': 0, 'last_index': (len(self.all_outs) - 1), 'with_mid': with_mid,
                                  'branches_to_remove': branches_to_remove})
                     branches_to_remove = [*branches_to_remove, *results]
 
@@ -620,14 +638,14 @@ class ScriptPerformer:
         start_index = args_in['start_index']
         last_index = args_in['last_index']
         branches_to_remove = args_in['branches_to_remove']
-        checked_branches = []
         current_open_branch_num = last_index - start_index + 1
+        if last_index == -1:
+            current_open_branch_num = len(self.open_branch_segments) - start_index
         for i, open1 in enumerate(self.open_branch_segments[start_index:last_index]):
             printProgressBar(prefix='Flagging identical open branches',
                              suffix=f'total_branches: {current_open_branch_num}',
                              total=current_open_branch_num, iteration=i, length=119)
             sys.stdout.flush()
-            checked_branches.append(i)
             for j, open2 in enumerate(self.open_branch_segments[start_index + i + 1:]):
                 ind2 = start_index + i + 1 + j
                 if self._variables_are_equal_recursive(open1, open2):
@@ -643,9 +661,9 @@ class ScriptPerformer:
         start_index = args_in['start_index']
         last_index = args_in['last_index']
         with_mid = args_in['with_mid']
-        current_outs = last_index - start_index
+        current_outs = last_index - start_index + 1
         for i, out_branch in enumerate(self.all_outs[start_index:last_index]):
-            printProgressBar(prefix='Removing open branches which mirror closed branches',
+            printProgressBar(prefix='Removing open branches which mirror closed branches', length=97,
                              total=current_outs, iteration=i)
             sys.stdout.flush()
             for j, open_branch in enumerate(self.open_branch_segments):
@@ -657,8 +675,9 @@ class ScriptPerformer:
                     repeats.append(j)
 
         printProgressBar(prefix='Removing open branches which mirror closed branches',
-                         total=current_outs,
+                         total=current_outs, length=97,
                          iteration=current_outs)
+        sys.stdout.flush()
 
         return branches_to_remove
 
@@ -1239,6 +1258,23 @@ class ScriptPerformer:
                 grouped_branches[out['inst']][out['value']] = out['groups']
                 all_trace_levels[out['inst']][out['value']] = out['trace_level']
 
+
+        # calculate the number of calcs per worker
+        total_calc_num = 0
+        group_calc_num = {}
+        for inst in grouped_branches:
+            group_calc_num[inst] = {}
+            for value in grouped_branches[inst]:
+                group_calc_num[inst][value] = {}
+                for trace, branches in grouped_branches[inst][value].items():
+                    branch_num = len(branches)
+                    cur_calc_num = (branch_num * branch_num) / 2
+                    group_calc_num[inst][value][trace] = cur_calc_num
+                    total_calc_num += cur_calc_num
+
+        calcs_per_worker = math.ceil(total_calc_num / self.max_chunks)
+
+        # Remove anything that is in the temporary directory in case anything was left over from a previous run
         for d in os.listdir(temp_dir):
             path = os.path.join(temp_dir, d)
             if os.path.isdir(path):
@@ -1278,10 +1314,8 @@ class ScriptPerformer:
                 else:
                     for trace, branches in traces.items():
                         branch_num_for_index_calc = len(branches) - 1
-                        branch_num_for_chunk_calc = len(branches)
-                        branch_num_sq = branch_num_for_chunk_calc * branch_num_for_chunk_calc
-                        compare_num = branch_num_sq / 2
-                        chunks = round(compare_num / self.chunk_compare_num) + 1
+                        compare_num = group_calc_num[inst][value][trace]
+                        chunks = floor(compare_num / calcs_per_worker) + 1
                         compares_per_chunk = round(compare_num / chunks)
                         last_index = -1
                         for i in range(chunks):
@@ -1327,9 +1361,7 @@ class ScriptPerformer:
                         if difference_dicts[inst][value][trace]['internal']:
                             all_internals[inst][value].append(trace)
 
-
         # Combine Temp Files - d includes the inst, value, trace, and level
-        files = []
         for d in os.listdir(temp_dir):
             dir_path = os.path.join(temp_dir, d)
             files = []
@@ -1559,7 +1591,9 @@ class ScriptPerformer:
         first_index = args_in['first_index']
         last_index = args_in['last_index']
 
-        branch_num = len(branches)
+        branch_num = last_index - first_index + 1
+        if last_index == -1:
+            branch_num = len(branches) - first_index
         progress_prefix = f'\rGetting first differences from {inst}:{value}:{trace}'
         progress_bar_length = 200 - len(progress_prefix)
 
@@ -1610,7 +1644,10 @@ class ScriptPerformer:
 
                     if diff_level not in level_sizes.keys():
                         if not os.path.exists(dir_path):
-                            os.mkdir(dir_path)
+                            try:
+                                os.mkdir(dir_path)
+                            except FileExistsError as e:
+                                print(f'Tried to make dir but already exists {e}')
                         diffs_file_name = f'{dir_name}-{index}{self.temp_ext}'
                         new_file_index = len(files)
                         dir_index[diff_level] = new_file_index
