@@ -59,7 +59,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me51[5-9].+sct$',
+                'scripts': '^me52[0-5].+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -354,7 +354,7 @@ class ScriptPerformer:
     switches = {}
     open_branch_segments = []
     all_init_ram_conditions = []
-    all_outs = []
+    all_closed = []
     all_starts = []
     requested_hit = False
     false_branches = []
@@ -396,7 +396,7 @@ class ScriptPerformer:
         self.addrs = input_dict.get('addresses', {})
 
         self.open_branch_segments = []
-        self.all_outs = []
+        self.all_closed = []
         init_script = input_dict['subscript_groups'].pop('init')
         init_ram = self._get_defined_ram()
         print(f'\nSubscript: init: Iteration 0')
@@ -520,13 +520,13 @@ class ScriptPerformer:
 
                     branches_to_remove = [*branches_to_remove, *results]
 
-                # flag for removal open branches with the same conditions as an out branch
-                total_closed = len(self.all_outs)
+                # flag for removal open branches with the same conditions as a closed branch
+                total_closed = len(self.all_closed)
                 should_parallel_closed = (total_closed * len(self.open_branch_segments)) > self.chunk_compare_num
                 if self.use_multiprocessing and should_parallel_closed:
                     print('Preparing Workers to flag mirrored open branches...')
                     segments = []
-                    branch_num = len(self.all_outs)
+                    branch_num = len(self.all_closed)
                     cpus = mp.cpu_count()
                     last_index = -1
                     for i in range(cpus):
@@ -537,7 +537,7 @@ class ScriptPerformer:
                         segments.append({'start_index': first_index, 'last_index': last_index, 'with_mid': with_mid,
                                          'branches_to_remove': branches_to_remove})
                     if not len(segments) == 0:
-                        segments[-1]['last_index'] = (len(self.all_outs) - 1)
+                        segments[-1]['last_index'] = (len(self.all_closed) - 1)
                     pool = mp.Pool(cpus)
                     results = pool.map(self._closed_branch_duplicate_flagging, segments)
                     pool.close()
@@ -548,7 +548,7 @@ class ScriptPerformer:
                 else:
                     print('Flagging mirrored open branches...')
                     results = self._closed_branch_duplicate_flagging(
-                        args_in={'start_index': 0, 'last_index': (len(self.all_outs) - 1), 'with_mid': with_mid,
+                        args_in={'start_index': 0, 'last_index': (len(self.all_closed) - 1), 'with_mid': with_mid,
                                  'branches_to_remove': branches_to_remove})
                     branches_to_remove = [*branches_to_remove, *results]
 
@@ -562,7 +562,7 @@ class ScriptPerformer:
 
                 print(
                     f'{len(branches_to_remove)} branches pruned - {len(self.open_branch_segments)} open branches '
-                    f'remaining - {len(self.all_outs)} closed branches')
+                    f'remaining - {len(self.all_closed)} closed branches')
 
                 # Remove any switch or jump states for a fresh run
                 if self.reset_cond_states_between_runs:
@@ -591,15 +591,15 @@ class ScriptPerformer:
             # Remove duplicates and any branch which goes past the out value, and any branch which contains a choice without modification
             outs_to_remove = sorted(list(set(self._flag_outs_for_removal(remove_no_mod=True))))
             for i in reversed(outs_to_remove):
-                if i >= len(self.all_outs):
-                    print(f'Unable to pop all_outs at index {i} ({len(self.all_outs)} entries)')
-                self.all_outs.pop(i)
-            print(f'Removing {len(outs_to_remove)} flagged branches -> {len(self.all_outs)} branches remaining')
+                if i >= len(self.all_closed):
+                    print(f'Unable to pop all_outs at index {i} ({len(self.all_closed)} entries)')
+                self.all_closed.pop(i)
+            print(f'Removing {len(outs_to_remove)} flagged branches -> {len(self.all_closed)} branches remaining')
 
             # Identify branches which do not exit the subscript
             internal = []
-            for i in reversed(range(len(self.all_outs))):
-                if 'new_run' not in self.all_outs[i].keys():
+            for i in reversed(range(len(self.all_closed))):
+                if 'new_run' not in self.all_closed[i].keys():
                     internal.append(i)
             print(f'Found {len(internal)} branches which were created without exiting the subscript')
 
@@ -630,7 +630,7 @@ class ScriptPerformer:
         time_difference = "{days} days {hours}:{minutes}:{seconds}".format(**d)
         print('Time to complete this subscript: ', time_difference)
 
-        return {'trees_detail': self.all_outs, 'ram_stats': self.addrs, 'summary': sorted_summary}
+        return {'trees_detail': self.all_closed, 'ram_stats': self.addrs, 'summary': sorted_summary}
 
     def _open_branch_duplicate_flagging(self, args_in):
         start_index = args_in['start_index']
@@ -660,8 +660,8 @@ class ScriptPerformer:
         last_index = args_in['last_index']
         with_mid = args_in['with_mid']
         current_outs = last_index - start_index + 1
-        for i, out_branch in enumerate(self.all_outs[start_index:last_index]):
-            printProgressBar(prefix='Removing open branches which mirror closed branches', length=97,
+        for i, out_branch in enumerate(self.all_closed[start_index:last_index]):
+            printProgressBar(prefix='Removing open branches which mirror closed branches', length=100,
                              total=current_outs, iteration=i)
             sys.stdout.flush()
             for j, open_branch in enumerate(self.open_branch_segments):
@@ -673,7 +673,7 @@ class ScriptPerformer:
                     repeats.append(j)
 
         printProgressBar(prefix='Removing open branches which mirror closed branches',
-                         total=current_outs, length=97,
+                         total=current_outs, length=100,
                          iteration=current_outs)
         sys.stdout.flush()
 
@@ -908,7 +908,7 @@ class ScriptPerformer:
                     out_branch['exit'] = True
                     self.open_branch_segments[branch_index] = out_branch
                     self.open_branch_segments[branch_index]['actions'].append({'out_value': copy.deepcopy(end_dict)})
-                    self.all_outs.append(out_branch)
+                    self.all_closed.append(out_branch)
                     prev_req_dict = self.open_branch_segments[branch_index]['init_value']
                     closing_branch = f'{branch_index}:{prev_req_dict["parameter values"]}-' \
                                      f'{prev_req_dict["address_values"]}'
@@ -962,7 +962,7 @@ class ScriptPerformer:
                         self.all_starts.append(out_branch)
                         closing_branch = f'{branch_index}:Start'
                     else:
-                        self.all_outs.append(out_branch)
+                        self.all_closed.append(out_branch)
                         closing_branch = f'{branch_index}:{prev_req_dict["parameter values"]}-' \
                                          f'{prev_req_dict["address_values"]}'
 
@@ -1202,9 +1202,9 @@ class ScriptPerformer:
         return new_trace
 
     def _make_all_out_summary(self, inst_details, temp_dir) -> dict:
-        all_branches = self.all_outs
+        all_branches = self.all_closed
         num_branches = len(all_branches)
-        self.all_outs = []
+        self.all_closed = []
 
         parallel_processes = False
         if ((num_branches * num_branches) / 2) > self.chunk_compare_num:
@@ -1464,32 +1464,7 @@ class ScriptPerformer:
         if len(appended_summary) == 0:
             appended_summary = summary
 
-        print('reformatting traceback values for each summary...')
-        reformatted_summary = {}
-        for inst, values in appended_summary.items():
-            reformatted_summary[inst] = {}
-            for value, traces in values.items():
-                reformatted_summary[inst][value] = {}
-                branches = groups[inst][value]
-                traceback_level = len(branches[0]['init_value']['traceback']) - 1
-                compared = []
-                for i, branch1 in enumerate(branches):
-                    compared.append(i)
-                    for j, branch2 in enumerate(branches):
-                        if j in compared:
-                            continue
-                        b1_traceback = branch1['init_value']['traceback']
-                        b2_traceback = branch2['init_value']['traceback']
-                        traceback_level = min(traceback_level,
-                                              self._get_traceback_diff_level(b1_traceback, b2_traceback))
-                for key, trace in traces.items():
-                    diff_traceback = grouped_branches[inst][value][key][0]['init_value']['traceback']
-                    new_key = self._get_traceback_string(diff_traceback, traceback_level)
-                    new_trace = trace
-                    new_trace['trace_level'] = traceback_level
-                    reformatted_summary[inst][value][new_key] = new_trace
-
-        return reformatted_summary
+        return appended_summary
 
     def _get_traceback_groups(self, args_in):
         inst = args_in['inst']
@@ -2105,15 +2080,15 @@ class ScriptPerformer:
         progress_prefix = 'Searching for out branch end errors'
 
         outs_with_children = []
-        total = len(self.all_outs)
-        for i, out in enumerate(self.all_outs):
+        total = len(self.all_closed)
+        for i, out in enumerate(self.all_closed):
             printProgressBar(prefix=progress_prefix, total=total, iteration=i, printEnd='\r')
             if self._prune_out_children(out):
                 outs_with_children.append(i)
         progress_suffix = f'{len(outs_with_children)} children removed'
         printProgressBar(prefix=progress_prefix, suffix=progress_suffix, total=total, iteration=total, printEnd='\r')
 
-        outs = copy.deepcopy(self.all_outs)
+        outs = copy.deepcopy(self.all_closed)
         outs_to_remove = []
         no_mod = []
         progress_prefix = 'Searching for choices without modifiers'
