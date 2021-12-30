@@ -59,7 +59,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me52[0-5].+sct$',
+                'scripts': '^me501.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -727,6 +727,7 @@ class ScriptPerformer:
         modify = False
         while not done:
             cur_trace_id = len(traceback) - 1
+            traceback[-1]['ptr'] = current_pointer
             if self.debug_verbose:
                 print(f'{spaces}depth: {depth} current position: {name}:{current_pointer}-{inst_pos}')
             if 'set' in inst:
@@ -761,7 +762,7 @@ class ScriptPerformer:
                     self.open_branch_segments[branch_index]['jump_states'].pop(state)
 
             elif 'loop' in inst:
-                return hit_requested
+                return False
 
             elif 'goto' in inst or 'goto_subscript' in inst:
                 inst_name = list(inst.keys())[0]
@@ -952,7 +953,7 @@ class ScriptPerformer:
                             'traceback': pos_traceback, 'pos': inst_pos}
 
                 if branch_index is not None:
-                    out_branch = self.open_branch_segments[branch_index]
+                    out_branch = copy.deepcopy(self.open_branch_segments[branch_index])
                     out_branch['out_value'] = req_dict
                     out_branch['end_ram'] = copy.deepcopy(cur_ram)
                     self.open_branch_segments[branch_index] = out_branch
@@ -1255,7 +1256,6 @@ class ScriptPerformer:
             for out in results:
                 grouped_branches[out['inst']][out['value']] = out['groups']
                 all_trace_levels[out['inst']][out['value']] = out['trace_level']
-
 
         # calculate the number of calcs per worker
         total_calc_num = 0
@@ -1596,13 +1596,14 @@ class ScriptPerformer:
         level_sizes = {}
         if branch_num > 1:
             for i, branch1 in enumerate(branches[first_index: last_index]):
+                ind1 = i + first_index
                 progress_suffix = f' \t{i}/{branch_num}'
                 printProgressBar(prefix=f'{progress_prefix}', suffix=f'{progress_suffix}',
                                  length=progress_bar_length, total=branch_num, iteration=i, printEnd='\r')
                 sys.stdout.flush()
                 j_first_index = first_index + i + 1
-                for j, branch2 in enumerate(branches[first_index + i + 1:]):
-                    ind2 = j + first_index + i + 1
+                for j, branch2 in enumerate(branches[j_first_index:]):
+                    ind2 = j_first_index + j
                     if self.debug_verbose:
                         print(f'\tGetting first difference between {i} and {j}')
                     temp_difference = self._get_first_difference(branch1=branch1,
@@ -1628,7 +1629,7 @@ class ScriptPerformer:
                         level_sizes[diff_level] = 0
 
                     deets = temp_difference.pop('diff_deets')
-                    difference = {'branches': [i, ind2], 'level': diff_level, 'diff': temp_difference,
+                    difference = {'branches': [ind1, ind2], 'level': diff_level, 'diff': temp_difference,
                                   'diff_details': deets}
                     files[dir_index[diff_level]].write(f'{json.dumps(difference)}\n')
                     level_sizes[diff_level] += 1
