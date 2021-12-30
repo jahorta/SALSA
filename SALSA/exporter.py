@@ -1,5 +1,6 @@
 import copy
 import json
+import math
 import multiprocessing as mp
 import os
 import re
@@ -58,7 +59,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me500.+sct$',
+                'scripts': '^me50[0-8].+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -363,6 +364,7 @@ class ScriptPerformer:
     reset_cond_states_between_runs = False
     use_multiprocessing = True
     mp_cutoff = 500
+    chunk_compare_num = 500
     results = []
     temp_ext = '.tmp'
     use_actions = True
@@ -627,10 +629,9 @@ class ScriptPerformer:
             sys.stdout.flush()
             checked_branches.append(i)
             for j, open2 in enumerate(self.open_branch_segments[start_index + i + 1:]):
-                if j in branches_to_remove:
-                    continue
-                elif self._variables_are_equal_recursive(open1, open2):
-                    branches_to_remove.append(j)
+                ind2 = start_index + i + 1 + j
+                if self._variables_are_equal_recursive(open1, open2):
+                    branches_to_remove.append(ind2)
         printProgressBar(prefix='Flagging identical open branches', suffix=f'total_branches: {current_open_branch_num}',
                          total=current_open_branch_num, iteration=current_open_branch_num, length=119)
 
@@ -1188,8 +1189,8 @@ class ScriptPerformer:
         num_branches = len(all_branches)
         self.all_outs = []
 
-        parallel_processes = True
-        if num_branches > 500:
+        parallel_processes = False
+        if ((num_branches * num_branches) / 2) > self.chunk_compare_num:
             parallel_processes = self.use_multiprocessing
 
         # Group branches by: Inst, Inst_value, Subscript, Position
@@ -1276,15 +1277,26 @@ class ScriptPerformer:
                             all_internals[inst][value].append(trace)
                 else:
                     for trace, branches in traces.items():
-                        chunks = floor(len(branches) / 10) + 1
+                        branch_num_for_index_calc = len(branches) - 1
+                        branch_num_for_chunk_calc = len(branches)
+                        branch_num_sq = branch_num_for_chunk_calc * branch_num_for_chunk_calc
+                        compare_num = branch_num_sq / 2
+                        chunks = round(compare_num / self.chunk_compare_num) + 1
+                        compares_per_chunk = round(compare_num / chunks)
                         last_index = -1
                         for i in range(chunks):
                             first_index = last_index + 1
-                            last_index = floor(chunks * (i + 1) / 10)
+                            quadratic_sqrt = math.sqrt((branch_num_for_index_calc * branch_num_for_index_calc) - (4 * (-1 / 2) * compares_per_chunk))
+                            numerator = abs((branch_num_for_index_calc * -1) + quadratic_sqrt)
+                            if numerator == 0:
+                                numerator = abs((branch_num_for_index_calc * -1) - quadratic_sqrt)
+                            index_num_for_chunk = math.ceil(abs(numerator / (2 * (-1 / 2))))
+                            last_index = first_index + index_num_for_chunk
                             all_args.append({'inst': inst, 'value': value, 'branches': branches, 'trace': trace,
                                              'inst_details': inst_details[inst], 'temp_dir': temp_dir, 'file_index': i,
                                              'first_index': first_index, 'last_index': last_index})
-                        all_args[-1]['last_index'] = len(branches) - 1
+                            branch_num_for_index_calc -= (last_index - first_index) + 1
+                        all_args[-1]['last_index'] = -1
 
         if parallel_processes:
             pool = mp.Pool(mp.cpu_count())
@@ -1581,7 +1593,9 @@ class ScriptPerformer:
                 printProgressBar(prefix=f'{progress_prefix}', suffix=f'{progress_suffix}',
                                  length=progress_bar_length, total=branch_num, iteration=i, printEnd='\r')
                 sys.stdout.flush()
-                for j, branch2 in enumerate(branches[first_index + i + 1: last_index]):
+                j_first_index = first_index + i + 1
+                for j, branch2 in enumerate(branches[first_index + i + 1:]):
+                    ind2 = j + first_index + i + 1
                     if self.debug_verbose:
                         print(f'\tGetting first difference between {i} and {j}')
                     temp_difference = self._get_first_difference(branch1=branch1,
@@ -1595,7 +1609,8 @@ class ScriptPerformer:
                     dir_path = os.path.join(temp_dir, dir_name)
 
                     if diff_level not in level_sizes.keys():
-                        os.mkdir(dir_path)
+                        if not os.path.exists(dir_path):
+                            os.mkdir(dir_path)
                         diffs_file_name = f'{dir_name}-{index}{self.temp_ext}'
                         new_file_index = len(files)
                         dir_index[diff_level] = new_file_index
@@ -1603,7 +1618,7 @@ class ScriptPerformer:
                         level_sizes[diff_level] = 0
 
                     deets = temp_difference.pop('diff_deets')
-                    difference = {'branches': [i, j], 'level': diff_level, 'diff': temp_difference,
+                    difference = {'branches': [i, ind2], 'level': diff_level, 'diff': temp_difference,
                                   'diff_details': deets}
                     files[dir_index[diff_level]].write(f'{json.dumps(difference)}\n')
                     level_sizes[diff_level] += 1
