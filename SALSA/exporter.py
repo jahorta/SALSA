@@ -59,7 +59,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me501.+sct$',
+                'scripts': '^me53[0-9].+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -731,8 +731,7 @@ class ScriptPerformer:
             if self.debug_verbose:
                 print(f'{spaces}depth: {depth} current position: {name}:{current_pointer}-{inst_pos}')
             if 'set' in inst:
-                new_ram = copy.deepcopy(cur_ram)
-                new_ram = self._set_memory_pos(inst['set'], new_ram)
+                new_ram = self._set_memory_pos(inst['set'], cur_ram)
                 if branch_index is None:
                     new_branch = {'init_ram': {}, 'cur_ram': copy.deepcopy(new_ram), 'switch_states': [], 'actions': [],
                                   'jump_states': [], 'init_value': {'traceback': [{'name': 'Start', 'pos': 0}]}}
@@ -856,10 +855,11 @@ class ScriptPerformer:
 
                     self.open_branch_segments.append(new_branch)
 
-                    new_ram = self.open_branch_segments[new_branch_index]['cur_ram']
+                    new_ram = copy.deepcopy(self.open_branch_segments[new_branch_index]['cur_ram'])
 
                     sub_hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts, ptr=inst_ptr,
-                                                                   ram=new_ram, back_log=copy.deepcopy(back_log), hit_requested=hit_requested,
+                                                                   ram=new_ram, back_log=copy.deepcopy(back_log),
+                                                                   hit_requested=hit_requested,
                                                                    branch_index=new_branch_index, depth=depth + 1)
 
                     if not sub_hit_requested:
@@ -910,7 +910,7 @@ class ScriptPerformer:
                     self.open_branch_segments[branch_index] = out_branch
                     self.open_branch_segments[branch_index]['actions'].append({'out_value': copy.deepcopy(end_dict)})
                     self.all_closed.append(out_branch)
-                    prev_req_dict = self.open_branch_segments[branch_index]['init_value']
+                    prev_req_dict = copy.deepcopy(self.open_branch_segments[branch_index]['init_value'])
                     closing_branch = f'{branch_index}:{prev_req_dict["parameter values"]}-' \
                                      f'{prev_req_dict["address_values"]}'
 
@@ -975,13 +975,16 @@ class ScriptPerformer:
 
                 # start new branch, update branch_index with new branch ID
                 new_branch_index = len(self.open_branch_segments)
+                new_cur_ram = copy.deepcopy(cur_ram)
+                new_init_ram = copy.deepcopy(cur_ram)
+                cur_req_dict = copy.deepcopy(req_dict)
 
                 if self.debug_verbose:
                     print(f'\tDepth: {depth}, Closing Branch: {closing_branch}, Opening Branch: '
                           f'{new_branch_index}{req_dict["parameter values"]}-{req_dict["address_values"]}')
                 self.open_branch_segments.append(
-                    {'init_value': copy.deepcopy(req_dict), 'init_ram': copy.deepcopy(cur_ram), 'actions': [],
-                     'cur_ram': copy.deepcopy(cur_ram), 'switch_states': [], 'jump_states': [], 'children': {}})
+                    {'init_value': cur_req_dict, 'init_ram': new_init_ram, 'actions': [],
+                     'cur_ram': new_cur_ram, 'switch_states': [], 'jump_states': [], 'children': {}})
                 branch_index = new_branch_index
 
             elif 'switch' in inst:
