@@ -59,7 +59,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me547.+sct$',
+                'scripts': '^me506.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -1275,6 +1275,73 @@ class ScriptPerformer:
 
         calcs_per_worker = math.ceil(total_calc_num / self.max_chunks)
 
+        # Remove any duplicate closed branches
+        duplicates = {}
+        all_args = []
+        for inst, values in grouped_branches.items():
+            duplicates[inst] = {}
+            for value, traces in values.items():
+                duplicates[inst][value] = {}
+                if not parallel_processes:
+                    for trace, branches in traces.items():
+                        first_index = 0
+                        last_index = len(branches) - 1
+                        args_in = {'inst': inst, 'value': value, 'branches': branches, 'start_index': first_index,
+                                   'trace': trace, 'last_index': last_index}
+                        out = self._remove_traceback_duplicate_branches(args_in=args_in)
+                        duplicates[inst][value][trace] = out
+                else:
+                    for trace, branches in traces.items():
+                        branch_num_for_index_calc = len(branches) - 1
+                        compare_num = group_calc_num[inst][value][trace]
+                        chunks = floor(compare_num / calcs_per_worker) + 1
+                        compares_per_chunk = round(compare_num / chunks)
+                        last_index = -1
+                        for i in range(chunks):
+                            first_index = last_index + 1
+                            quadratic_sqrt = math.sqrt((branch_num_for_index_calc * branch_num_for_index_calc) - (4 * (-1 / 2) * compares_per_chunk))
+                            numerator = abs((branch_num_for_index_calc * -1) + quadratic_sqrt)
+                            if numerator == 0:
+                                numerator = abs((branch_num_for_index_calc * -1) - quadratic_sqrt)
+                            index_num_for_chunk = math.ceil(abs(numerator / (2 * (-1 / 2))))
+                            last_index = first_index + index_num_for_chunk
+                            all_args.append({'inst': inst, 'value': value, 'branches': branches, 'trace': trace,
+                                             'start_index': first_index, 'last_index': last_index})
+                            branch_num_for_index_calc -= (last_index - first_index) + 1
+                        all_args[-1]['last_index'] = len(branches) - 1
+                        duplicates[inst][value][trace] = []
+
+        if parallel_processes:
+            pool = mp.Pool(mp.cpu_count())
+            results = pool.map(self._remove_traceback_duplicate_branches, all_args)
+            pool.close()
+            pool.join()
+
+            for i, out in enumerate(results):
+                duplicates[out['inst']][out['value']][out['trace']] = [*duplicates[out['inst']][out['value']][out['trace']],
+                                                                       *out['duplicates']]
+
+        for inst in duplicates.keys():
+            for value in duplicates[inst].keys():
+                for trace, dups in duplicates[inst][value].items():
+                    dups = sorted(list(set(dups)))
+                    for dup in reversed(dups):
+                        grouped_branches[inst][value][trace].pop(dup)
+
+
+        # recalculate the number of calcs per worker with duplicates removed
+        total_calc_num = 0
+        group_calc_num = {}
+        for inst in grouped_branches:
+            group_calc_num[inst] = {}
+            for value in grouped_branches[inst]:
+                group_calc_num[inst][value] = {}
+                for trace, branches in grouped_branches[inst][value].items():
+                    branch_num = len(branches)
+                    cur_calc_num = (branch_num * branch_num) / 2
+                    group_calc_num[inst][value][trace] = cur_calc_num
+                    total_calc_num += cur_calc_num
+
         # Remove anything that is in the temporary directory in case anything was left over from a previous run
         for d in os.listdir(temp_dir):
             path = os.path.join(temp_dir, d)
@@ -1331,7 +1398,7 @@ class ScriptPerformer:
                                              'inst_details': inst_details[inst], 'temp_dir': temp_dir, 'file_index': i,
                                              'first_index': first_index, 'last_index': last_index})
                             branch_num_for_index_calc -= (last_index - first_index) + 1
-                        all_args[-1]['last_index'] = -1
+                        all_args[-1]['last_index'] = len(branches) - 1
 
         if parallel_processes:
             pool = mp.Pool(mp.cpu_count())
@@ -1555,6 +1622,36 @@ class ScriptPerformer:
                 trace_key = f'{trace_key}{trace_value}'
 
         return trace_key
+
+    def _remove_traceback_duplicate_branches(self, args_in) -> dict:
+        inst = args_in['inst']
+        value = args_in['value']
+        trace = args_in['trace']
+        start_index = args_in['start_index']
+        last_index = args_in['last_index']
+        branches = args_in['branches']
+        branches_to_remove = []
+        current_open_branch_num = last_index - start_index + 1
+        print_prefix = 'Flagging identical open branches'
+        print_suffix = f'total_branches: {current_open_branch_num}'
+        print_length = 200 - len(print_prefix)
+        if last_index == -1:
+            current_open_branch_num = len(branches) - start_index
+        for i, open1 in enumerate(branches[start_index:last_index]):
+            printProgressBar(prefix=print_prefix,
+                             suffix=print_suffix,
+                             total=current_open_branch_num, iteration=i, length=print_length)
+            sys.stdout.flush()
+            actions1 = open1['actions']
+            for j, open2 in enumerate(branches[start_index + i + 1:]):
+                ind2 = start_index + i + 1 + j
+                actions2 = open2['actions']
+                if self._variables_are_equal_recursive(actions1, actions2):
+                    branches_to_remove.append(ind2)
+        printProgressBar(prefix=print_prefix, suffix=print_suffix,
+                         total=current_open_branch_num, iteration=current_open_branch_num, length=print_length)
+
+        return {'duplicates': branches_to_remove, 'inst': inst, 'value': value, 'trace': trace}
 
     def _get_traceback_group_details(self, args_in) -> dict:
         inst = args_in['inst']
