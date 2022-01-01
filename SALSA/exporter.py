@@ -59,7 +59,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me506.+sct$',
+                'scripts': '^me500.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -806,6 +806,18 @@ class ScriptPerformer:
                 condition_index = None
                 condition_string = self._generate_condition_string(jump_condition[list(jump_condition.keys())[0]])
 
+                addresses = re.findall('0x[0-9,a-d]{8}', condition_string)
+                compare_address_dict = {}
+                for address in addresses:
+                    value = self._get_memory_pos(address, cur_ram)
+                    if value is not None:
+                        compare_address_dict[address] = value
+                        new_string = f'{address}({value})'
+                        condition_string = condition_string.replace(address, new_string)
+
+                if len(compare_address_dict) > 0:
+                    action_jump_dict['address_dict'] = compare_address_dict
+
                 for i, state in enumerate(self.open_branch_segments[branch_index]['jump_states']):
                     if state['condition'] == condition_string:
                         has_condition = True
@@ -1327,7 +1339,6 @@ class ScriptPerformer:
                     dups = sorted(list(set(dups)))
                     for dup in reversed(dups):
                         grouped_branches[inst][value][trace].pop(dup)
-
 
         # recalculate the number of calcs per worker with duplicates removed
         total_calc_num = 0
@@ -1923,11 +1934,11 @@ class ScriptPerformer:
 
             if diff_inst == 'choice':
                 if 'jumpif' in diff_dict['modification']:
-                    b_diff_value_dict = diff_dict['modification']['jumpif']['jumped']
+                    b_diff_jmp_value_dict = diff_dict['modification']['jumpif']['jumped']
                 elif 'switch' in diff_dict['modification']:
-                    b_diff_value_dict = diff_dict['modification']['switch']['selected_entry']
+                    b_diff_jmp_value_dict = diff_dict['modification']['switch']['selected_entry']
 
-                b_diff_values = [b_diff_value_dict['var1'], b_diff_value_dict['var2']]
+                b_diff_values = [b_diff_jmp_value_dict['var1'], b_diff_jmp_value_dict['var2']]
 
                 choice_details = diff['diff_details'][0]['details']
                 options = choice_details['choices']
@@ -1948,58 +1959,62 @@ class ScriptPerformer:
                         child_ids[options[entry]].append(b_id)
 
             elif diff_inst == 'jumpif':
-                details = diff['diff_details'][0]
-                b_diff_value_dict = diff_dict['jumped']
-                found_values = True
-                for ind in ('var1', 'var2'):
-                    if ind not in b_diff_value_dict.keys():
-                        found_values = False
+                details1 = diff['diff_details'][0]
+                details2 = diff['diff_details'][1]
 
-                b_diff_values = []
-                if not found_values:
-                    continue
-                else:
-                    b_diff_values.append(b_diff_value_dict['var1'])
-                    b_diff_values.append(b_diff_value_dict['var2'])
+                jumped1 = details1['jumped']
+                option1 = f'{not jumped1}'
+                if 'address_dict' in details1:
+                    for addr, value in details1['address_dict'].items():
+                        option1 += f'-{addr}:{value}'
 
-                if 'jumped' in details.keys():
-                    details.pop('jumped')
-                options = [False, True]
+                jumped2 = details2['jumped']
+                option2 = f'{not jumped2}'
+                if 'address_dict' in details2:
+                    for addr, value in details2['address_dict'].items():
+                        option2 += f'-{addr}:{value}'
+
                 strat_diff['inst'] = 'jumpif'
-                strat_diff['results'] = options
+
+                if 'results' not in strat_diff:
+                    strat_diff['results'] = []
+                if option1 not in strat_diff['results']:
+                    strat_diff['results'].append(option1)
+                if option2 not in strat_diff['results']:
+                    strat_diff['results'].append(option2)
                 condition_key = list(diff['diff_details'][0]['condition'].keys())[0]
-                condition = self._generate_condition_string(
-                    cond_in=diff['diff_details'][0]['condition'][condition_key])
+                if re.match('0x', condition_key):
+                    condition = self._generate_condition_string( cond_in=details1['condition'][condition_key])
+                else:
+                    condition = self._generate_condition_string(cond_in=details1['condition'])
                 strat_diff['condition'] = condition
-                for i, value in enumerate(b_diff_values):
-                    if isinstance(value, bool):
-                        if value:
-                            entry = 0
-                        else:
-                            entry = 1
-                    else:
-                        print('\t\tjump w/o a boolean???')
-                        entry = int(value)
-                    if not options[entry] in child_ids.keys():
-                        child_ids[options[entry]] = []
-                    b_id = b_keys[i]
-                    if b_id not in child_ids[options[entry]]:
-                        child_ids[options[entry]].append(b_id)
+
+                if option1 not in child_ids.keys():
+                    child_ids[option1] = []
+                b_id = b_keys[0]
+                if b_id not in child_ids[option1]:
+                    child_ids[option1].append(b_id)
+
+                if option2 not in child_ids.keys():
+                    child_ids[option2] = []
+                b_id = b_keys[1]
+                if b_id not in child_ids[option2]:
+                    child_ids[option2].append(b_id)
 
             elif diff_inst == 'switch':
                 details = diff['diff_details'][0]
-                b_diff_value_dict = diff_dict['selected_entry']
+                b_diff_jmp_value_dict = diff_dict['selected_entry']
                 found_values = True
                 for ind in ('var1', 'var2'):
-                    if ind not in b_diff_value_dict.keys():
+                    if ind not in b_diff_jmp_value_dict.keys():
                         found_values = False
 
                 b_diff_values = []
                 if not found_values:
                     continue
                 else:
-                    b_diff_values.append(b_diff_value_dict['var1'])
-                    b_diff_values.append(b_diff_value_dict['var2'])
+                    b_diff_values.append(b_diff_jmp_value_dict['var1'])
+                    b_diff_values.append(b_diff_jmp_value_dict['var2'])
 
                 strat_diff['inst'] = 'switch'
                 condition = details['condition']
@@ -2328,21 +2343,24 @@ class ScriptPerformer:
             ram[addr]['value'] = details['value']
         return ram
 
-    def _get_memory_pos(self, addr, ram, addr_type):
+    def _get_memory_pos(self, addr, ram, addr_type=None):
         if addr not in ram.keys():
             if addr not in self.addrs.keys():
-                self.addrs[addr] = {'addr_not_init': True, 'types': addr_type}
+                self.addrs[addr] = {'addr_not_init': True}
+                if addr_type is not None:
+                    self.addrs[addr]['types'] = addr_type
             self.addrs[addr]['init_loc'] = 'external'
             cur_value = None
         else:
             cur_value = ram[addr]['value']
 
-        if 'types' not in self.addrs[addr].keys():
-            self.addrs[addr]['types'] = addr_type
-        else:
-            cur_type = self.addrs[addr]['types']
-            if addr_type not in cur_type:
-                cur_type += f'-{addr_type}'
+        if addr_type is not None:
+            if 'types' not in self.addrs[addr].keys():
+                self.addrs[addr]['types'] = addr_type
+            else:
+                cur_type = self.addrs[addr]['types']
+                if addr_type not in cur_type:
+                    cur_type += f'-{addr_type}'
 
         return cur_value
 
