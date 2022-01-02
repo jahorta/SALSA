@@ -59,7 +59,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me519.+sct$',
+                'scripts': '^me5[0-3][0-9].+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -539,7 +539,7 @@ class ScriptPerformer:
                         first_index = last_index + 1
                         last_index = floor(branch_num * ((i + 1) / cpus))
                         if last_index >= branch_num:
-                            break
+                            last_index = branch_num - 1
                         segments.append({'start_index': first_index, 'last_index': last_index, 'with_mid': with_mid,
                                          'branches_to_remove': branches_to_remove,
                                          'closed_branches': all_closed[first_index:last_index]})
