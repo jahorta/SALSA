@@ -59,7 +59,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me5[5-9][0-9].+sct$',
+                'scripts': '^me510.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -697,7 +697,7 @@ class ScriptPerformer:
         if current_pointer is None:
             current_pointer = 0
         elif current_pointer >= len(subscripts[name]['pos_list']):
-            return False
+            return hit_requested
 
         traceback.append({'name': name, 'ptr': current_pointer})
 
@@ -710,7 +710,7 @@ class ScriptPerformer:
         if len(current_sub['pos_list']) == 0:
             if self.debug_verbose:
                 print(f'{tabs}{name}: no actions')
-            return False
+            return hit_requested
         else:
             if self.debug_verbose:
                 print(f'{tabs}{name}')
