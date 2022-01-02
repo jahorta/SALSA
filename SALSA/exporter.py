@@ -59,7 +59,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me510.+sct$',
+                'scripts': '^me519.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -1309,7 +1309,7 @@ class ScriptPerformer:
                         args_in = {'inst': inst, 'value': value, 'branches': branches, 'start_index': first_index,
                                    'trace': trace, 'last_index': last_index}
                         out = self._remove_traceback_duplicate_branches(args_in=args_in)
-                        duplicates[inst][value][trace] = out
+                        duplicates[inst][value][trace] = out['duplicates']
                 else:
                     for trace, branches in traces.items():
                         branch_num_for_index_calc = len(branches) - 1
