@@ -59,11 +59,14 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me5[0-3][0-9].+sct$',
+                'scripts': '^me514.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
-                'headers': 'ScriptID,*ID*\n\n*Inst*Starting Value (Traceback),Branches'
+                'headers': 'ScriptID,*ID*\n\n*Inst*Starting Value (Traceback),Branches',
+                'subscript_change_blacklist': {
+                    '_WAIT_LOOP': '_BT_DBG'
+                }
             },
             'Instruction Count': {
                 'scripts': '^me.+sct$',
@@ -180,11 +183,12 @@ class SCTExporter:
         info_dict = self.export_options[self.export_type]['function']()
         headers = info_dict.pop('headers')
         script_runs = {}
+        blacklist = self.export_options[self.export_type].get('subscript_change_blacklist', None)
         for script_name, script in info_dict.items():
             print(f'\n---Now running {script_name}---')
             script_runs[script_name] = self.script_performer.run(script,
                                                                  self.export_options[self.export_type]['instructions'],
-                                                                 temp_dir=self.temp_dir)
+                                                                 temp_dir=self.temp_dir, blacklist=blacklist)
 
         temp_outs = {}
         for script, result in script_runs.items():
@@ -275,7 +279,11 @@ class SCTExporter:
         commas = ',' * diff_level
         if inst == 'out':
             out_values = diff_dict['out']
-            body = f'-> {out_values["value"]} ({ScriptPerformer.get_traceback_string(out_values["traceback"], trace_lvl).replace(",", ":")}) '
+            if 'exit' in out_values:
+                level = 0
+            else:
+                level = trace_lvl
+            body = f'-> {out_values["value"]} ({ScriptPerformer.get_traceback_string(out_values["traceback"], level).replace(",", ":")}) '
             output = f',{body}\n'
         elif inst == 'choice':
             question = diff_dict['question']
@@ -352,7 +360,7 @@ class ScriptPerformer:
     addrs = {}
     out = {}
     switches = {}
-    open_branch_segments = []
+    new_opens = []
     all_init_ram_conditions = []
     new_closed = []
     all_starts = []
@@ -392,53 +400,58 @@ class ScriptPerformer:
 
         self.time = datetime.now()
 
-    def run(self, input_dict, inst_details, temp_dir):
+    def run(self, input_dict, inst_details, temp_dir, blacklist=None):
         self.addrs = input_dict.get('addresses', {})
-
-        self.open_branch_segments = []
+        temp_addrs = {}
+        for key, value in self.addrs.items():
+            if isinstance(key, float):
+                key = int(key)
+            if isinstance(key, int):
+                key = str(key)
+            temp_addrs[key] = value
+        self.addrs = temp_addrs
+        self.all_starts = []
+        self.new_opens = []
         self.new_closed = []
         init_script = input_dict['subscript_groups'].pop('init')
         init_ram = self._get_defined_ram()
         print(f'\nSubscript: init: Iteration 0')
-        self._run_subscript_branch(name='init', subscripts=init_script, ram=init_ram)
+        self._run_subscript_branch(name='init', subscripts=init_script, ram=init_ram, blacklist=blacklist)
 
         all_closed = self.new_closed
         self.new_closed = []
 
-        branches_to_remove = []
-        for i, branch in enumerate(self.open_branch_segments):
-            if 'out_value' in branch.keys():
-                branches_to_remove.append(i)
-
-        for i in reversed(list(set(branches_to_remove))):
-            self.open_branch_segments.pop(i)
+        all_open = self.new_opens
+        self.new_opens = []
+        if len(all_open) > 0:
+            self.new_opens.append(all_open.pop(0))
 
         for name, sub_tree in input_dict['subscript_groups'].items():
             self.time = datetime.now()
             done = False
-            if len(self.open_branch_segments) == 0:
+            if len(self.new_opens) == 0:
                 initial_ram = self._get_defined_ram()
                 branch_index = None
             else:
                 branch_index = 0
-                initial_ram = self.open_branch_segments[branch_index]['cur_ram']
+                initial_ram = copy.deepcopy(self.new_opens[branch_index]['cur_ram'])
 
             iteration = 0
             with_mid = True
-            remove_old = False
-            remove_false_branches = False
-            new_run_limit = 1
             while not done:
                 iteration += 1
 
                 self.false_branches = []
 
                 if branch_index is not None:
-                    current_branch_init = self.open_branch_segments[branch_index]['init_value']
-                    if 'parameter values' in current_branch_init:
-                        value_out = current_branch_init["parameter values"]["scene"]
-                        if isinstance(value_out, str):
-                            value_out = current_branch_init["address_values"][value_out]
+                    current_branch_init: dict = self.new_opens[0]['init_value']
+                    if current_branch_init is not None:
+                        if 'parameter values' in current_branch_init:
+                            value_out = current_branch_init["parameter values"]["scene"]
+                            if isinstance(value_out, str):
+                                value_out = current_branch_init["address_values"][value_out]
+                        else:
+                            value_out = 'None'
                     else:
                         value_out = 'None'
                 else:
@@ -446,73 +459,101 @@ class ScriptPerformer:
 
                 print(f'\nSubscript: {name}: Iteration {iteration}: Init Value:{value_out}')
 
-                if iteration == 2:
-                    remove_old = True
-                    remove_false_branches = True
-
-                pre_num = len(self.open_branch_segments)
                 if self.debug_verbose:
                     print('Starting branch run:')
                 self._run_subscript_branch(name=name, subscripts=sub_tree,
-                                           ram=initial_ram, branch_index=branch_index)
-                current_open_branch_num = len(self.open_branch_segments)
-                change_open_branch_num = current_open_branch_num - pre_num
+                                           ram=initial_ram, branch_index=branch_index, blacklist=blacklist)
 
-                all_closed = [*all_closed, *self.new_closed]
-                self.new_closed = []
+                new_open_num = len(self.new_opens)
 
                 false_branch_num = len(self.false_branches)
                 print(
-                    f'{change_open_branch_num} branches opened - {false_branch_num} false branches detected and flagged')
+                    f'{new_open_num} branches opened - {false_branch_num} false branches detected and flagged')
 
-                if remove_false_branches:
-                    branches_to_remove = [*self.false_branches]
-                    for branch in reversed(sorted(list(set(branches_to_remove)))):
-                        self.open_branch_segments.pop(branch)
+                branches_to_remove = [*self.false_branches]
+                for branch in reversed(sorted(list(set(branches_to_remove)))):
+                    self.new_opens.pop(branch)
 
-                current_open_branch_num = len(self.open_branch_segments)
+                # transfer completed branches to new closed, add closed branches to all_open
+                branches_to_transfer = []
+                ends = []
+                for i, branch in enumerate(self.new_opens):
+                    printProgressBar(prefix='Transferring Completed Branches', total=new_open_num,
+                                     iteration=i, length=124)
+                    b_actions = branch['actions']
+                    has_req = False
+                    has_end = False
+                    for action in reversed(b_actions):
+                        if list(action.keys())[0] == 'requested':
+                            has_req = True
+                            branch['out_value'] = copy.deepcopy(action['requested'])
+                            break
+                        elif list(action.keys())[0] == 'end':
+                            has_end = True
+                            branch['out_value'] = copy.deepcopy(action['end'])
+                            branch['exit'] = True
+                            ends.append(i)
+                            break
+                    if has_req or has_end:
+                        branches_to_transfer.append(i)
+                printProgressBar(prefix='Transferring Completed Branches', total=new_open_num,
+                                 iteration=new_open_num, length=124)
 
-                # flag for removal completed branches
-                branches_to_remove = []
-                for i, branch in enumerate(self.open_branch_segments):
-                    printProgressBar(prefix='Flagging Completed Branches', total=current_open_branch_num, iteration=i,
-                                     length=124)
-                    if 'out_value' in branch.keys():
-                        branches_to_remove.append(i)
-                    elif 'new_run' in branch.keys() and remove_old:
-                        if branch['new_run']['value'] > (new_run_limit - 1):
-                            branches_to_remove.append(i)
+                for b in reversed(sorted(list(set(branches_to_transfer)))):
+                    old_branch = self.new_opens.pop(b)
+                    if 'init_ram' not in old_branch:
+                        old_branch['init_ram'] = {}
+                    old_branch['end_ram'] = copy.deepcopy(old_branch['cur_ram'])
+                    self.new_closed.append(copy.deepcopy(old_branch))
+                    if b not in ends:
+                        new_branch = {'init_value': old_branch['out_value'],
+                                      'init_ram': copy.deepcopy(old_branch['cur_ram']),
+                                      'cur_ram': copy.deepcopy(old_branch['cur_ram']),
+                                      'actions': [], 'switch_states': [], 'jump_states': []}
+                        all_open.append(new_branch)
 
-                printProgressBar(prefix='Flagging completed branches', total=current_open_branch_num,
-                                 iteration=len(self.open_branch_segments), length=124, printEnd='\r')
+                all_open = [*all_open, *self.new_opens]
+                self.new_opens = []
+                all_closed = [*all_closed, *self.new_closed]
+                self.new_closed = []
+
+                open_num = len(all_open)
 
                 # flag for removal identical open branches
-                should_parallel_open = ((current_open_branch_num * current_open_branch_num) / 2) > self.chunk_compare_num
+                branches_to_remove = []
+                should_parallel_open = ((open_num * open_num) / 2) > self.chunk_compare_num
                 if self.use_multiprocessing and should_parallel_open:
                     print('Preparing Workers to flag identical open branches...')
                     segments = []
-                    branch_num_for_index_calc = len(self.open_branch_segments) - 1
-                    branch_num_for_chunk_calc = len(self.open_branch_segments)
+                    branch_num_for_chunk_calc = len(all_open)
+                    branch_num_for_index_calc = branch_num_for_chunk_calc - 1
                     branch_num_sq = branch_num_for_chunk_calc * branch_num_for_chunk_calc
                     compare_num = branch_num_sq / 2
                     chunks = floor(compare_num / self.chunk_compare_num) + 1
                     cpus = min(chunks, mp.cpu_count())
                     compares_per_chunk = floor(compare_num / cpus)
                     last_index = -1
+                    is_last_segment = False
                     for i in range(cpus):
                         first_index = last_index + 1
                         quadratic_sqrt = math.sqrt((branch_num_for_index_calc * branch_num_for_index_calc) - (
-                                    4 * (-1 / 2) * compares_per_chunk))
+                                4 * (-1 / 2) * compares_per_chunk))
                         numerator = abs((branch_num_for_index_calc * -1) + quadratic_sqrt)
                         if numerator == 0:
                             numerator = abs((branch_num_for_index_calc * -1) - quadratic_sqrt)
                         index_num_for_chunk = math.ceil(abs(numerator / (2 * (-1 / 2))))
                         last_index = first_index + index_num_for_chunk
-                        if last_index >= len(self.open_branch_segments):
+                        if last_index >= len(all_open):
+                            is_last_segment = True
+                            last_index = open_num - 1
+                        segments.append({'start_index': first_index, 'last_index': last_index, 'branches': all_open})
+                        if is_last_segment:
                             break
-                        segments.append({'start_index': first_index, 'last_index': last_index})
                         branch_num_for_index_calc -= (last_index - first_index) + 1
-                    segments[-1]['last_index'] = (len(self.open_branch_segments) - 1)
+                    if len(segments) == 0:
+                        segments.append({'start_index': 0, 'last_index': open_num - 1, 'branches': all_open})
+                    else:
+                        segments[-1]['last_index'] = open_num - 1
                     pool = mp.Pool(cpus)
                     results = pool.map(self._open_branch_duplicate_flagging, segments)
                     pool.close()
@@ -522,13 +563,13 @@ class ScriptPerformer:
                     print()
                 else:
                     results = self._open_branch_duplicate_flagging(
-                        args_in={'start_index': 0, 'last_index': (len(self.open_branch_segments) - 1)})
+                        args_in={'start_index': 0, 'last_index': (len(all_open) - 1), 'branches': all_open})
 
                     branches_to_remove = [*branches_to_remove, *results]
 
                 # flag for removal open branches with the same conditions as a closed branch
                 total_closed = len(all_closed)
-                should_parallel_closed = (total_closed * len(self.open_branch_segments)) > self.chunk_compare_num
+                should_parallel_closed = (total_closed * open_num) > self.chunk_compare_num
                 if self.use_multiprocessing and should_parallel_closed:
                     print('Preparing Workers to flag mirrored open branches...')
                     segments = []
@@ -541,7 +582,7 @@ class ScriptPerformer:
                         if last_index >= branch_num:
                             last_index = branch_num - 1
                         segments.append({'start_index': first_index, 'last_index': last_index, 'with_mid': with_mid,
-                                         'branches_to_remove': branches_to_remove,
+                                         'branches_to_remove': branches_to_remove, 'branches': all_open,
                                          'closed_branches': all_closed[first_index:last_index]})
                     if not len(segments) == 0:
                         segments[-1]['last_index'] = (len(all_closed) - 1)
@@ -557,79 +598,72 @@ class ScriptPerformer:
                     results = self._closed_branch_duplicate_flagging(
                         args_in={'start_index': 0, 'last_index': (len(all_closed) - 1), 'with_mid': with_mid,
                                  'branches_to_remove': branches_to_remove,
-                                 'closed_branches': all_closed})
+                                 'closed_branches': all_closed, 'branches': all_open})
                     branches_to_remove = [*branches_to_remove, *results]
 
                 # Remove flagged branches
                 branches_to_remove = sorted(list(set(branches_to_remove)))
                 for i in reversed(branches_to_remove):
-                    if i >= len(self.open_branch_segments):
+                    if i >= len(all_open):
                         print(f'branch_remove_error: index {i} out of range')
                         continue
-                    self.open_branch_segments.pop(i)
+                    all_open.pop(i)
 
                 print(
-                    f'{len(branches_to_remove)} branches pruned - {len(self.open_branch_segments)} open branches '
+                    f'{len(branches_to_remove)} branches pruned - {len(all_open)} open branches '
                     f'remaining - {len(all_closed)} closed branches')
 
                 # Remove any switch or jump states for a fresh run
                 if self.reset_cond_states_between_runs:
-                    for branch in self.open_branch_segments:
+                    for branch in all_open:
                         branch['switch_states'] = []
                         branch['jump_states'] = []
 
-                if len(self.open_branch_segments) == 0:
+                if len(all_open) == 0:
                     done = True
                 else:
                     branch_index = 0
-                    initial_ram = self.open_branch_segments[branch_index]['cur_ram']
-                    if iteration > 1:
-                        updated_branch = copy.deepcopy(self.open_branch_segments[0])
-                        mid_ram = copy.deepcopy(initial_ram)
-                        if 'new_run' in updated_branch.keys():
-                            new_run_dict = updated_branch['new_run']
-                            new_run_dict['value'] = new_run_dict['value'] + 1
-                            new_run_dict['mid_ram'].append(mid_ram)
-                        else:
-                            new_run_dict = {'value': 1, 'mid_ram': [mid_ram]}
-                        updated_branch['new_run'] = new_run_dict
-                        self.open_branch_segments[0] = updated_branch
+                    updated_branch = all_open.pop(0)
+                    mid_ram = copy.deepcopy(updated_branch['cur_ram'])
+                    initial_ram = copy.deepcopy(mid_ram)
+                    if 'new_run' in updated_branch.keys():
+                        new_run_dict = updated_branch['new_run']
+                        new_run_dict['value'] = new_run_dict['value'] + 1
+                        new_run_dict['mid_ram'].append(mid_ram)
+                    else:
+                        new_run_dict = {'value': 1, 'mid_ram': [mid_ram]}
+                    updated_branch['new_run'] = new_run_dict
+                    self.new_opens.append(updated_branch)
 
             print('\n')
             # Remove duplicates and any branch which goes past the out value, and any branch which contains a choice without modification
-            outs_to_remove = sorted(list(set(self._flag_outs_for_removal(remove_no_mod=True))))
-            for i in reversed(outs_to_remove):
-                if i >= len(all_closed):
-                    print(f'Unable to pop all_outs at index {i} ({len(all_closed)} entries)')
-                all_closed.pop(i)
-            print(f'Removing {len(outs_to_remove)} flagged branches -> {len(all_closed)} branches remaining')
-
-            # Identify branches which do not exit the subscript
-            internal = []
-            for i in reversed(range(len(all_closed))):
-                if 'new_run' not in all_closed[i].keys():
-                    internal.append(i)
-            print(f'Found {len(internal)} branches which were created without exiting the subscript')
 
         tree_difference_summary = self._make_all_out_summary(inst_details=inst_details, temp_dir=temp_dir,
                                                              all_branches=all_closed)
         print('Done with tree summary')
 
-        # Sort summaries by value and add start to the beginning
+        # Extract start from values
+        has_starts = {}
+        for inst, values in tree_difference_summary.items():
+            has_start = False
+            for value in values:
+                if isinstance(value, str):
+                    if value == 'Start':
+                        has_start = True
+            has_starts[inst] = has_start
+        starts = {}
+        for inst, has_start in has_starts.items():
+            if has_start:
+                starts[inst] = {'Start': tree_difference_summary[inst].pop('Start')}
 
-        start_branch = self.all_starts[0]
-        start_inst = start_branch['out_value']['instruction']
-        out_value = start_branch['out_value']['parameter values'][inst_details[start_inst]]
-        if isinstance(out_value, str):
-            addr = out_value
-            out_value = start_branch['out_value']['address_values'][addr]
-        out_dict = {'value': out_value, 'subscript': start_branch['out_value']['subscript'],
-                    'pos': start_branch['out_value']['pos'], 'traceback': start_branch['out_value']['traceback']}
+        # Sort summaries by value and add start to the beginning
 
         sorted_summary = {}
         for inst, values in tree_difference_summary.items():
-            if inst == start_inst:
-                sorted_summary[inst] = {'Start': {'init:0': {'has_diff': False, 'out': out_dict, 'trace_level': 0}}}
+            if has_starts[inst]:
+                sorted_summary[inst] = starts[inst]
+            else:
+                sorted_summary[inst] = {}
             sorted_summary[inst] = {**sorted_summary[inst], **{k: values[k] for k in sorted(list(values))}}
 
         d_time = datetime.now() - self.time
@@ -644,16 +678,17 @@ class ScriptPerformer:
     def _open_branch_duplicate_flagging(self, args_in):
         start_index = args_in['start_index']
         last_index = args_in['last_index']
+        branches = args_in['branches']
         branches_to_remove = []
         current_open_branch_num = last_index - start_index + 1
         if last_index == -1:
-            current_open_branch_num = len(self.open_branch_segments) - start_index
-        for i, open1 in enumerate(self.open_branch_segments[start_index:last_index]):
+            current_open_branch_num = len(branches) - start_index
+        for i, open1 in enumerate(branches[start_index:last_index]):
             printProgressBar(prefix='Flagging identical open branches',
                              suffix=f'total_branches: {current_open_branch_num}',
                              total=current_open_branch_num, iteration=i, length=119)
             sys.stdout.flush()
-            for j, open2 in enumerate(self.open_branch_segments[start_index + i + 1:]):
+            for j, open2 in enumerate(branches[start_index + i + 1:]):
                 ind2 = start_index + i + 1 + j
                 if self._variables_are_equal_recursive(open1, open2):
                     branches_to_remove.append(ind2)
@@ -669,12 +704,13 @@ class ScriptPerformer:
         last_index = args_in['last_index']
         with_mid = args_in['with_mid']
         closed_branches = args_in['closed_branches']
+        branches = args_in['branches']
         current_outs = last_index - start_index + 1
         for i, out_branch in enumerate(closed_branches):
             printProgressBar(prefix='Removing open branches which mirror closed branches', length=100,
                              total=current_outs, iteration=i)
             sys.stdout.flush()
-            for j, open_branch in enumerate(self.open_branch_segments):
+            for j, open_branch in enumerate(branches):
                 if j in branches_to_remove:
                     continue
                 elif self._branch_has_same_conditions(out_branch=out_branch, open_branch=open_branch,
@@ -690,7 +726,7 @@ class ScriptPerformer:
         return branches_to_remove
 
     def _run_subscript_branch(self, name, subscripts, ram=None, branch_index=None, hit_requested=False,
-                              back_log=None, ptr=None, traceback=None, depth=0) -> bool:
+                              back_log=None, ptr=None, traceback=None, depth=0, blacklist=None) -> bool:
 
         if depth > 30:
             print('Lots of recursion...')
@@ -744,23 +780,23 @@ class ScriptPerformer:
                 new_ram = self._set_memory_pos(inst['set'], cur_ram)
                 if branch_index is None:
                     new_branch = {'init_ram': {}, 'cur_ram': copy.deepcopy(new_ram), 'switch_states': [], 'actions': [],
-                                  'jump_states': [], 'init_value': {'traceback': [{'name': 'Start', 'pos': 0}]}}
-                    self.open_branch_segments.append(new_branch)
+                                  'jump_states': [], 'init_value': {'instruction': 'all', 'traceback': [{'name': 'Start', 'pos': 0}]}}
+                    self.new_opens.append(new_branch)
                     branch_index = 0
-                self.open_branch_segments[branch_index]['cur_ram'] = new_ram
+                self.new_opens[branch_index]['cur_ram'] = new_ram
                 cur_ram = new_ram
 
                 switch_states_to_remove = []
-                for i, state in enumerate(self.open_branch_segments[branch_index]['switch_states']):
+                for i, state in enumerate(self.new_opens[branch_index]['switch_states']):
                     if state['address'] == inst['set']['addr']:
                         switch_states_to_remove.append(i)
 
                 switch_states_to_remove = reversed(sorted(list(set(switch_states_to_remove))))
                 for state in switch_states_to_remove:
-                    self.open_branch_segments[branch_index]['switch_states'].pop(state)
+                    self.new_opens[branch_index]['switch_states'].pop(state)
 
                 jump_states_to_remove = []
-                for i, state in enumerate(self.open_branch_segments[branch_index]['jump_states']):
+                for i, state in enumerate(self.new_opens[branch_index]['jump_states']):
                     addr = inst['set']['addr']
                     addr = addr if isinstance(addr, str) else str(addr)
                     if addr in state['condition']:
@@ -768,7 +804,7 @@ class ScriptPerformer:
 
                 jump_states_to_remove = reversed(sorted(list(set(jump_states_to_remove))))
                 for state in jump_states_to_remove:
-                    self.open_branch_segments[branch_index]['jump_states'].pop(state)
+                    self.new_opens[branch_index]['jump_states'].pop(state)
 
             elif 'loop' in inst:
                 return False
@@ -790,10 +826,8 @@ class ScriptPerformer:
             elif 'jumpif' in inst or 'subscript_jumpif' in inst:
                 inst_name = list(inst.keys())[0]
                 if branch_index is None:
-                    self.all_starts.append({'end_ram': copy.deepcopy(cur_ram),
-                                            'init_value': {'inst': 'jumpif', 'subscript': name, 'pos': 'Start'}})
-                    self.open_branch_segments.append({'init_value': None, 'init_ram': copy.deepcopy(cur_ram),
-                                                      'cur_ram': copy.deepcopy(cur_ram), 'actions': []})
+                    self.new_opens.append({'init_value': {'instruction': 'all', 'traceback': [{'name': 'Start', 'pos': 0}]}, 'init_ram': copy.deepcopy(cur_ram), 'switch_states': [],
+                                           'actions': [], 'jump_states': [], 'cur_ram': copy.deepcopy(cur_ram)})
                     branch_index = 0
 
                 if 'subscript' in inst_name:
@@ -828,14 +862,14 @@ class ScriptPerformer:
                 if len(compare_address_dict) > 0:
                     action_jump_dict['address_dict'] = compare_address_dict
 
-                for i, state in enumerate(self.open_branch_segments[branch_index]['jump_states']):
+                for i, state in enumerate(self.new_opens[branch_index]['jump_states']):
                     if state['condition'] == condition_string:
                         has_condition = True
                         condition_index = i
 
                 if has_condition and self.with_compare_assumption:
                     make_branch = False
-                    jump = self.open_branch_segments[branch_index]['jump_states'][condition_index]['jumped']
+                    jump = self.new_opens[branch_index]['jump_states'][condition_index]['jumped']
                 else:
                     can_jump = self._can_jump(jump_condition, copy.deepcopy(cur_ram))
 
@@ -860,9 +894,9 @@ class ScriptPerformer:
                     back_log = copy.deepcopy(traceback)
                     if len(back_log) > 0:
                         back_log.pop()
-                    new_branch_index = len(self.open_branch_segments)
+                    new_branch_index = len(self.new_opens)
                     action_jump_dict['jumped'] = True
-                    new_branch = copy.deepcopy(self.open_branch_segments[branch_index])
+                    new_branch = copy.deepcopy(self.new_opens[branch_index])
 
                     if modify:
                         mod_key = list(new_branch['actions'][-1])[0]
@@ -875,14 +909,15 @@ class ScriptPerformer:
                     if self.with_compare_assumption:
                         new_branch['jump_states'].append({'condition': condition_string, 'jumped': True})
 
-                    self.open_branch_segments.append(new_branch)
+                    self.new_opens.append(new_branch)
 
-                    new_ram = copy.deepcopy(self.open_branch_segments[new_branch_index]['cur_ram'])
+                    new_ram = copy.deepcopy(self.new_opens[new_branch_index]['cur_ram'])
 
                     sub_hit_requested = self._run_subscript_branch(name=next_name, subscripts=subscripts, ptr=inst_ptr,
                                                                    ram=new_ram, back_log=copy.deepcopy(back_log),
                                                                    hit_requested=hit_requested,
-                                                                   branch_index=new_branch_index, depth=depth + 1)
+                                                                   branch_index=new_branch_index, depth=depth + 1,
+                                                                   blacklist=blacklist)
 
                     if not sub_hit_requested:
                         self.false_branches.append(new_branch_index)
@@ -900,7 +935,7 @@ class ScriptPerformer:
                         current_pointer = next_inst_ptr
 
                 action_jump_dict['jumped'] = jump
-                updated_branch = self.open_branch_segments[branch_index]
+                updated_branch = self.new_opens[branch_index]
 
                 if modify:
                     mod_key = list(updated_branch['actions'][-1])[0]
@@ -912,7 +947,7 @@ class ScriptPerformer:
                 if self.with_compare_assumption:
                     if not has_condition:
                         updated_branch['jump_states'].append({'condition': condition_string, 'jumped': jump})
-                self.open_branch_segments[branch_index] = updated_branch
+                self.new_opens[branch_index] = updated_branch
 
                 force_branch = False
                 force_jump = False
@@ -921,32 +956,25 @@ class ScriptPerformer:
             elif 'end' in inst:
                 end_dict = copy.deepcopy(inst['end'])
                 pos_traceback = self._convert_traceback_to_pos(copy.deepcopy(traceback), subscripts)
-                pos_traceback.append({'name': end_dict['script'], 'pos': 'start'})
+                pos_traceback.append({'name': end_dict['script'], 'pos': 'Start'})
                 end_dict = {**end_dict, 'traceback': pos_traceback}
 
                 if branch_index is not None:
-                    out_branch = self.open_branch_segments[branch_index]
-                    out_branch['out_value'] = end_dict
-                    out_branch['end_ram'] = copy.deepcopy(cur_ram)
-                    out_branch['exit'] = True
-                    self.open_branch_segments[branch_index] = out_branch
-                    self.open_branch_segments[branch_index]['actions'].append({'out_value': copy.deepcopy(end_dict)})
-                    self.new_closed.append(out_branch)
-                    prev_req_dict = copy.deepcopy(self.open_branch_segments[branch_index]['init_value'])
-                    closing_branch = f'{branch_index}:{prev_req_dict["parameter values"]}-' \
-                                     f'{prev_req_dict["address_values"]}'
-
+                    self.new_opens[branch_index]['actions'].append({'end': copy.deepcopy(end_dict)})
+                    prev_req_dict: dict = copy.deepcopy(self.new_opens[branch_index]['init_value'])
+                    if 'parameter values' in prev_req_dict.keys():
+                        closing_branch = f'{branch_index}:{prev_req_dict["parameter values"]}-' \
+                                         f'{prev_req_dict["address_values"]}'
+                    else:
+                        closing_branch = f'{branch_index}: Start'
                 else:
-                    out_branch = {'out_value': end_dict, 'end_ram': copy.deepcopy(cur_ram),
-                                  'init_value': {'traceback': [{'name': 'Start', 'pos': 0}]}, 'exit': True}
-                    self.all_starts.append(out_branch)
-                    closing_branch = 'None'
+                    closing_branch = f'{branch_index}: Start'
 
                 if self.debug_verbose:
                     print(
                         f'\tDepth: {depth}, Closing Branch: {closing_branch} (would switch to {inst["end"]["script"]})')
 
-                return False
+                return True
 
             elif 'requested' in inst:
                 if inst_pos == 185:
@@ -954,6 +982,7 @@ class ScriptPerformer:
                     pass
                 hit_requested = True
                 req_dict = copy.deepcopy(inst['requested'])
+                current_inst_code = req_dict['instruction']
                 params = req_dict['parameter values']
                 param_address_values = {}
                 for value in params.values():
@@ -975,46 +1004,30 @@ class ScriptPerformer:
                             'traceback': pos_traceback, 'pos': inst_pos}
 
                 if branch_index is not None:
-                    out_branch = copy.deepcopy(self.open_branch_segments[branch_index])
-                    out_branch['out_value'] = req_dict
-                    out_branch['end_ram'] = copy.deepcopy(cur_ram)
-                    self.open_branch_segments[branch_index] = out_branch
-                    self.open_branch_segments[branch_index]['actions'].append({'out_value': copy.deepcopy(req_dict)})
-                    prev_req_dict = self.open_branch_segments[branch_index]['init_value']
-                    if prev_req_dict['traceback'][0]['name'] == 'Start':
-                        self.all_starts.append(out_branch)
-                        closing_branch = f'{branch_index}:Start'
-                    else:
-                        self.new_closed.append(out_branch)
+                    self.new_opens[branch_index]['actions'].append({'requested': req_dict})
+                    prev_req_dict = self.new_opens[branch_index]['init_value']
+                    if 'parameter values' in prev_req_dict.keys():
                         closing_branch = f'{branch_index}:{prev_req_dict["parameter values"]}-' \
                                          f'{prev_req_dict["address_values"]}'
-
+                    else:
+                        closing_branch = f'{branch_index}: Start'
                 else:
-                    out_branch = {'out_value': req_dict, 'end_ram': copy.deepcopy(cur_ram),
-                                  'init_value': {'traceback': [{'name': 'Start', 'pos': 0}]}}
-                    self.all_starts.append(out_branch)
+                    out_branch = {'end_ram': copy.deepcopy(cur_ram), 'actions': [{'requested': req_dict}],
+                                  'init_value': {'instruction': current_inst_code,
+                                                 'traceback': [{'name': 'Start', 'pos': 0}]},
+                                  'switch_states': [], 'jump_states': []}
+                    self.new_opens.append(out_branch)
                     closing_branch = 'None'
-
-                # start new branch, update branch_index with new branch ID
-                new_branch_index = len(self.open_branch_segments)
-                new_cur_ram = copy.deepcopy(cur_ram)
-                new_init_ram = copy.deepcopy(cur_ram)
-                cur_req_dict = copy.deepcopy(req_dict)
+                    branch_index = 0
 
                 if self.debug_verbose:
-                    print(f'\tDepth: {depth}, Closing Branch: {closing_branch}, Opening Branch: '
-                          f'{new_branch_index}{req_dict["parameter values"]}-{req_dict["address_values"]}')
-                self.open_branch_segments.append(
-                    {'init_value': cur_req_dict, 'init_ram': new_init_ram, 'actions': [],
-                     'cur_ram': new_cur_ram, 'switch_states': [], 'jump_states': [], 'children': {}})
-                branch_index = new_branch_index
+                    print(f'\tDepth: {depth}, Adding Req for {inst["requested"]["inst"]} to Branch {closing_branch}')
 
             elif 'switch' in inst:
                 if branch_index is None:
-                    self.all_starts.append({'end_ram': copy.deepcopy(cur_ram),
-                                            'init_value': {'inst': 'jumpif', 'subscript': name, 'pos': 'Start'}})
-                    self.open_branch_segments.append({'init_value': None, 'init_ram': copy.deepcopy(cur_ram),
-                                                      'cur_ram': copy.deepcopy(cur_ram), 'actions': []})
+                    self.new_opens.append({'init_value': {'instruction': 'all', 'traceback': [{'name': 'Start', 'pos': 0}]}, 'init_ram': copy.deepcopy(cur_ram),
+                                           'cur_ram': copy.deepcopy(cur_ram), 'actions': [], 'switch_states': [],
+                                           'jump_states': []})
                     branch_index = 0
 
                 switch_all = False
@@ -1038,7 +1051,7 @@ class ScriptPerformer:
                 prev_switch_entry = None
                 prev_switch_state = False
                 if switch_all:
-                    for state in self.open_branch_segments[branch_index]['switch_states']:
+                    for state in self.new_opens[branch_index]['switch_states']:
                         if state['address'] == switch_addr:
                             switch_all = False
                             prev_switch_state = True
@@ -1046,7 +1059,7 @@ class ScriptPerformer:
 
                 # If entry cannot be selected, produce a branch for each entry
                 if switch_all:
-                    prev_branch = copy.deepcopy(self.open_branch_segments[branch_index])
+                    prev_branch = copy.deepcopy(self.new_opens[branch_index])
                     back_log = copy.deepcopy(traceback)
                     if len(back_log) > 0:
                         back_log.pop()
@@ -1064,7 +1077,7 @@ class ScriptPerformer:
                                               'selected_entry': key, 'next_inst_ptr': inst_ptr,
                                               'next_inst_pos': current_sub['pos_list'][inst_ptr]}
 
-                        new_branch = copy.deepcopy(self.open_branch_segments[branch_index])
+                        new_branch = copy.deepcopy(self.new_opens[branch_index])
 
                         if modify:
                             mod_key = list(new_branch['actions'][-1])[0]
@@ -1077,17 +1090,19 @@ class ScriptPerformer:
                         if self.with_compare_assumption:
                             new_branch['switch_states'].append({'address': switch_addr, 'entry': key})
 
-                        new_branch_index = len(self.open_branch_segments)
-                        self.open_branch_segments.append(new_branch)
-                        new_ram = copy.deepcopy(self.open_branch_segments[new_branch_index]['cur_ram'])
+                        new_branch_index = len(self.new_opens)
+                        self.new_opens.append(new_branch)
+                        new_ram = copy.deepcopy(self.new_opens[new_branch_index]['cur_ram'])
 
                         sub_hit_requested = self._run_subscript_branch(name=name, subscripts=subscripts, ptr=inst_ptr,
                                                                        ram=new_ram, depth=depth + 1,
-                                                                       branch_index=new_branch_index, hit_requested=hit_requested,
-                                                                       back_log=copy.deepcopy(back_log))
+                                                                       branch_index=new_branch_index,
+                                                                       hit_requested=hit_requested,
+                                                                       back_log=copy.deepcopy(back_log),
+                                                                       blacklist=blacklist)
 
                         if not sub_hit_requested:
-                                self.false_branches.append(new_branch_index)
+                            self.false_branches.append(new_branch_index)
                         # if self.debug_verbose:
                         #     suffix = f'req:{hit_requested}'
                         #     print(f'{tabs}\t<-- {suffix}')
@@ -1108,15 +1123,16 @@ class ScriptPerformer:
                                       'next_inst_pos': current_sub['pos_list'][inst_ptr]}
 
                 if modify:
-                    mod_key = list(self.open_branch_segments[branch_index]['actions'][-1])[0]
-                    self.open_branch_segments[branch_index]['actions'][-1][mod_key]['modification'] = {
+                    mod_key = list(self.new_opens[branch_index]['actions'][-1])[0]
+                    self.new_opens[branch_index]['actions'][-1][mod_key]['modification'] = {
                         'switch': action_switch_dict}
                 else:
-                    self.open_branch_segments[branch_index]['actions'].append({'switch': action_switch_dict})
+                    self.new_opens[branch_index]['actions'].append({'switch': action_switch_dict})
 
                 if self.with_compare_assumption:
                     if force_branch:
-                        self.open_branch_segments[branch_index]['switch_states'].append({'address': switch_addr, 'entry': switch_addr_value})
+                        self.new_opens[branch_index]['switch_states'].append(
+                            {'address': switch_addr, 'entry': switch_addr_value})
 
                 current_pointer = inst_ptr
                 modify = False
@@ -1127,35 +1143,40 @@ class ScriptPerformer:
 
             elif 'choice' in inst:
                 if branch_index is None:
-                    self.all_starts.append({'end_ram': copy.deepcopy(cur_ram),
-                                            'init_value': {'inst': 'jumpif', 'subscript': name, 'pos': 'Start'}})
-                    self.open_branch_segments.append({'init_value': None, 'init_ram': copy.deepcopy(cur_ram),
-                                                      'cur_ram': copy.deepcopy(cur_ram), 'actions': []})
+                    self.new_opens.append({'init_value': {'instruction': 'all', 'traceback': [{'name': 'Start', 'pos': 0}]}, 'init_ram': copy.deepcopy(cur_ram),
+                                           'cur_ram': copy.deepcopy(cur_ram), 'switch_states': [], 'actions': [],
+                                           'jump_states': []})
                     branch_index = 0
                 force_branch = True
                 modify = True
                 choice_dict = {'details': inst['choice'], 'children': {}}
-                self.open_branch_segments[branch_index]['actions'].append({'choice': choice_dict})
+                self.new_opens[branch_index]['actions'].append({'choice': choice_dict})
 
             elif 'subscript_load' in inst:
-                back_log.append({'name': name, 'ptr': current_pointer})
                 next_name = inst['subscript_load']['next']
-                next_inst_pos = inst['subscript_load']['location']
-                next_inst_ptr = self._get_ptr(pos=next_inst_pos, pos_list=subscripts[next_name]['pos_list'])
-                traceback[-1]['ptr'] = current_pointer
-                traceback.append({'name': next_name, 'ptr': next_inst_ptr})
-                name = next_name
-                current_sub = subscripts[next_name]
-                current_pointer = next_inst_ptr
-                increment_pointer = False
-                # if branch_index is not None:
-                #     new_branch = self._branch_append_node(branch=self.open_branch_segments[branch_index],
-                #                                           node_key='subscript', node_value=copy.deepcopy(sub_dict))
-                #     self.open_branch_segments[branch_index] = new_branch
-                # if self.debug_verbose:
-                #     suffix = f'req:{hit_requested}'
-                #     print(f'{tabs}\t<-- {suffix}')
-                lis = 1
+                load_next = True
+                if blacklist is not None:
+                    if name in blacklist.keys():
+                        if next_name == blacklist[name]:
+                            load_next = False
+
+                if load_next:
+                    back_log.append({'name': name, 'ptr': current_pointer})
+                    next_inst_pos = inst['subscript_load']['location']
+                    next_inst_ptr = self._get_ptr(pos=next_inst_pos, pos_list=subscripts[next_name]['pos_list'])
+                    traceback[-1]['ptr'] = current_pointer
+                    traceback.append({'name': next_name, 'ptr': next_inst_ptr})
+                    name = next_name
+                    current_sub = subscripts[next_name]
+                    current_pointer = next_inst_ptr
+                    increment_pointer = False
+                    # if branch_index is not None:
+                    #     new_branch = self._branch_append_node(branch=self.open_branch_segments[branch_index],
+                    #                                           node_key='subscript', node_value=copy.deepcopy(sub_dict))
+                    #     self.open_branch_segments[branch_index] = new_branch
+                    # if self.debug_verbose:
+                    #     suffix = f'req:{hit_requested}'
+                    #     print(f'{tabs}\t<-- {suffix}')
 
             if increment_pointer:
                 current_pointer += 1
@@ -1195,7 +1216,7 @@ class ScriptPerformer:
                 done = True
 
         if branch_index is not None:
-            self.open_branch_segments[branch_index]['cur_ram'] = cur_ram
+            self.new_opens[branch_index]['cur_ram'] = copy.deepcopy(cur_ram)
         return hit_requested
 
     @staticmethod
@@ -1237,20 +1258,45 @@ class ScriptPerformer:
         # Group branches by: Inst, Inst_value, Subscript, Position
         print('Grouping Branches...')
         groups = {}
+        all_insts = []
         for i, branch in enumerate(all_branches):
-
             inst = branch['init_value']['instruction']
+            if isinstance(inst, str):
+                if inst == 'all':
+                    all_insts.append(branch)
+                    continue
+
             if inst not in groups.keys():
                 groups[inst] = {}
 
-            value = branch['init_value']['parameter values'][inst_details[inst]]
-            if isinstance(value, str):
-                addr = value
-                value = branch['init_value']['address_values'][addr]
+            start_check = branch['init_value']['traceback'][-1]['name']
+            if start_check == 'Start':
+                value = 'Start'
+            else:
+                value = branch['init_value']['parameter values'][inst_details[inst]]
+                if isinstance(value, str):
+                    addr = value
+                    value = branch['init_value']['address_values'][addr]
+
             if value not in groups[inst].keys():
                 groups[inst][value] = []
-
             groups[inst][value].append(branch)
+
+        for inst, values in groups.items():
+            for i, branch in enumerate(all_insts):
+
+                start_check = branch['init_value']['traceback'][-1]['name']
+                if start_check == 'Start':
+                    value = 'Start'
+                else:
+                    value = branch['init_value']['parameter values'][inst_details[inst]]
+                    if isinstance(value, str):
+                        addr = value
+                        value = branch['init_value']['address_values'][addr]
+
+                if value not in values.keys():
+                    groups[inst][value] = []
+                groups[inst][value].append(branch)
 
         grouped_branches = {}
         all_trace_levels = {}
@@ -1319,7 +1365,8 @@ class ScriptPerformer:
                         last_index = -1
                         for i in range(chunks):
                             first_index = last_index + 1
-                            quadratic_sqrt = math.sqrt((branch_num_for_index_calc * branch_num_for_index_calc) - (4 * (-1 / 2) * compares_per_chunk))
+                            quadratic_sqrt = math.sqrt((branch_num_for_index_calc * branch_num_for_index_calc) - (
+                                    4 * (-1 / 2) * compares_per_chunk))
                             numerator = abs((branch_num_for_index_calc * -1) + quadratic_sqrt)
                             if numerator == 0:
                                 numerator = abs((branch_num_for_index_calc * -1) - quadratic_sqrt)
@@ -1338,8 +1385,9 @@ class ScriptPerformer:
             pool.join()
 
             for i, out in enumerate(results):
-                duplicates[out['inst']][out['value']][out['trace']] = [*duplicates[out['inst']][out['value']][out['trace']],
-                                                                       *out['duplicates']]
+                duplicates[out['inst']][out['value']][out['trace']] = [
+                    *duplicates[out['inst']][out['value']][out['trace']],
+                    *out['duplicates']]
 
         for inst in duplicates.keys():
             for value in duplicates[inst].keys():
@@ -1371,7 +1419,6 @@ class ScriptPerformer:
 
         print('\nLooking for branch differences')
         all_args = []
-        row = 0
         difference_dicts = {}
         all_outs = {}
         all_diff_levels = {}
@@ -1407,7 +1454,8 @@ class ScriptPerformer:
                         last_index = -1
                         for i in range(chunks):
                             first_index = last_index + 1
-                            quadratic_sqrt = math.sqrt((branch_num_for_index_calc * branch_num_for_index_calc) - (4 * (-1 / 2) * compares_per_chunk))
+                            quadratic_sqrt = math.sqrt((branch_num_for_index_calc * branch_num_for_index_calc) - (
+                                    4 * (-1 / 2) * compares_per_chunk))
                             numerator = abs((branch_num_for_index_calc * -1) + quadratic_sqrt)
                             if numerator == 0:
                                 numerator = abs((branch_num_for_index_calc * -1) - quadratic_sqrt)
@@ -1537,8 +1585,7 @@ class ScriptPerformer:
                                     else:
                                         cur_sum = copy.deepcopy(cur_summary[key])
 
-                                    temp_sum = self._append_int_summary_to_externals(int_sum, cur_sum,
-                                                                                     int_traceback)
+                                    temp_sum = self._append_int_summary_to_externals(int_sum, cur_sum, int_traceback)
                                     new_sum[key] = temp_sum
 
                                 if sum_inst not in appended_summary.keys():
@@ -1549,7 +1596,6 @@ class ScriptPerformer:
                                     appended_summary[sum_inst][sum_value][sum_trace] = {}
 
                                 appended_summary[sum_inst][sum_value][sum_trace] = new_sum
-
         if len(appended_summary) == 0:
             appended_summary = summary
 
@@ -1694,7 +1740,10 @@ class ScriptPerformer:
         branch_outs = []
 
         for branch in branches:
-            if 'init' in trace or 'new_run' in branch.keys():
+            if isinstance(value, str):
+                if value == 'Start':
+                    is_internal = False
+            elif 'init' in trace or 'new_run' in branch.keys():
                 is_internal = False
 
             if 'exit' in branch.keys():
@@ -1705,7 +1754,7 @@ class ScriptPerformer:
                     addr = out_value
                     out_value = branch['out_value']['address_values'][addr]
             out_trace = branch['out_value']['traceback']
-            branch_outs.append({'value': out_value, 'traceback': out_trace})
+            branch_outs.append({'value': out_value, 'traceback': out_trace, 'exit': True})
 
         diffs_file_header = f'{inst}-{value}-{trace}'
         diff_levels = []
@@ -1992,7 +2041,7 @@ class ScriptPerformer:
                     strat_diff['results'].append(option2)
                 condition_key = list(diff['diff_details'][0]['condition'].keys())[0]
                 if re.match('0x', condition_key):
-                    condition = self._generate_condition_string( cond_in=details1['condition'][condition_key])
+                    condition = self._generate_condition_string(cond_in=details1['condition'][condition_key])
                 else:
                     condition = self._generate_condition_string(cond_in=details1['condition'])
                 strat_diff['condition'] = condition
@@ -2008,6 +2057,8 @@ class ScriptPerformer:
                 b_id = b_keys[1]
                 if b_id not in child_ids[option2]:
                     child_ids[option2].append(b_id)
+
+                child_ids = {k: child_ids[k] for k in sorted(list(child_ids.keys()))}
 
             elif diff_inst == 'switch':
                 details = diff['diff_details'][0]
@@ -2200,73 +2251,6 @@ class ScriptPerformer:
     # Branch manipulation functions #
     # ----------------------------- #
 
-    def _flag_outs_for_removal(self, remove_no_mod=False):
-        progress_prefix = 'Searching for out branch end errors'
-
-        outs_with_children = []
-        total = len(self.new_closed)
-        for i, out in enumerate(self.new_closed):
-            printProgressBar(prefix=progress_prefix, total=total, iteration=i, printEnd='\r')
-            if self._prune_out_children(out):
-                outs_with_children.append(i)
-        progress_suffix = f'{len(outs_with_children)} children removed'
-        printProgressBar(prefix=progress_prefix, suffix=progress_suffix, total=total, iteration=total, printEnd='\r')
-
-        outs = copy.deepcopy(self.new_closed)
-        outs_to_remove = []
-        no_mod = []
-        progress_prefix = 'Searching for choices without modifiers'
-        for i, out in enumerate(outs):
-            printProgressBar(prefix=progress_prefix, total=total, iteration=i, printEnd='\r')
-            if i in outs_to_remove:
-                continue
-            elif self._choice_with_no_mod(out):
-                no_mod.append(i)
-        progress_suffix = f'{len(no_mod)} branches found with a choice but no modifier'
-        if remove_no_mod:
-            outs_to_remove = [*outs_to_remove, *no_mod]
-            progress_suffix += ' (flagged for removal)'
-        printProgressBar(prefix=progress_prefix, suffix=progress_suffix, total=total, iteration=total, printEnd='\r')
-
-        return outs_to_remove
-
-    def _prune_out_children(self, out) -> bool:
-        # TODO - adjust this for using 'actions' list instead of nested children
-        goes_past_out = False
-        if len(out['children']) == 0:
-            return False
-        elif 'out_value' in out['children'].keys():
-            if 'children' in out['children']['out_value'].keys():
-                out['children']['out_value'].pop('children')
-                return True
-
-        for child1 in out['children'].values():
-            for key in child1.keys():
-                if goes_past_out:
-                    break
-                if key == 'children':
-                    goes_past_out = self._prune_out_children(out=child1)
-
-        return goes_past_out
-
-    def _choice_with_no_mod(self, out):
-        has_no_mod = False
-        out_children = out['children']
-        if len(out_children) == 0:
-            has_no_mod = False
-        elif 'choice' in out_children.keys():
-            if 'modification' not in out_children['choice'].keys():
-                has_no_mod = True
-
-        for child1 in out_children.values():
-            for key in child1.keys():
-                if has_no_mod:
-                    break
-                if key == 'children':
-                    has_no_mod = self._choice_with_no_mod(out=child1)
-
-        return has_no_mod
-
     def _branch_has_same_conditions(self, out_branch, open_branch, with_req=False, with_mid=False):
         is_same = True
 
@@ -2328,6 +2312,10 @@ class ScriptPerformer:
     def _set_memory_pos(self, details: dict, ram):
         addr_type = details['type']
         addr = details['addr']
+        if isinstance(addr, float):
+            addr = int(addr)
+        if isinstance(addr, int):
+            addr = str(addr)
         if addr not in ram.keys():
             if addr not in self.addrs.keys():
                 self.addrs[addr] = {'addr_not_init': True, 'types': addr_type}

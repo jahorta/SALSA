@@ -379,7 +379,7 @@ class SCTAnalysis:
                 for script_name in self.Index.keys():
                     if script_found:
                         next_script = script_name
-                        sub['fallthroughs'] = {'next': next_script}
+                        sub['fallthrough'] = next_script
                         if next_script not in [*decoded_scripts, *scripts_to_decode]:
                             scripts_to_decode.append(next_script)
                         break
@@ -498,7 +498,7 @@ class SCTSection:
     )
 
     flow_control_insts = (0, 3, 10)
-    change_script_insts = (43, 238, 257)
+    change_script_insts = (43, 210, 238, 257)
     change_subscript_insts = (0, 10, 11)
     choice_inst = 155
     switch_inst = 3
