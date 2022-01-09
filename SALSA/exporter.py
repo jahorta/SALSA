@@ -59,7 +59,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me514.+sct$',
+                'scripts': '^me5[4][0-9].+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -519,8 +519,13 @@ class ScriptPerformer:
 
                 open_num = len(all_open)
 
-                # flag for removal identical open branches
                 branches_to_remove = []
+                for i, branch in enumerate(all_open):
+                    if 'new_run' in branch.keys():
+                        branches_to_remove.append(i)
+
+                # flag for removal identical open branches
+
                 should_parallel_open = ((open_num * open_num) / 2) > self.chunk_compare_num
                 if self.use_multiprocessing and should_parallel_open:
                     print('Preparing Workers to flag identical open branches...')
@@ -867,14 +872,13 @@ class ScriptPerformer:
                         has_condition = True
                         condition_index = i
 
+                jump = False
+                make_branch = False
                 if has_condition and self.with_compare_assumption:
-                    make_branch = False
                     jump = self.new_opens[branch_index]['jump_states'][condition_index]['jumped']
                 else:
                     can_jump = self._can_jump(jump_condition, copy.deepcopy(cur_ram))
 
-                    jump = False
-                    make_branch = False
                     if not force_branch:
                         if can_jump:
                             should_jump = not self._should_not_jump(compare=jump_condition, ram=cur_ram, isBase=True)
@@ -885,6 +889,7 @@ class ScriptPerformer:
                             make_branch = True
                     else:
                         make_branch = True
+                        force_branch = False
 
                     if force_jump:
                         make_branch = False
@@ -1033,6 +1038,7 @@ class ScriptPerformer:
                 switch_all = False
                 if force_branch:
                     switch_all = True
+                    force_branch = False
 
                 # if memory addr has numerical value follow switch, add option: 'internal'
                 switch_addr = inst['switch']['condition']
@@ -2379,28 +2385,25 @@ class ScriptPerformer:
         params = []
         comparison = ''
         for short_compare, value in compare.items():
-            for comp, param in value.items():
-                comparison = comp
-                if isinstance(param, dict):
-                    for sub_param in param.values():
-                        if isinstance(sub_param, dict):
-                            params.append(self._should_not_jump(sub_param, ram))
-                        else:
-                            params.append(sub_param)
-                elif isinstance(param, float) or \
-                        isinstance(param, int) or \
-                        isinstance(param, str):
-                    params.append(param)
-                    comparison = short_compare
-                else:
-                    print(f'WARNING: unable to process param of type {type(param)}. Not performing jump')
-                    return False
-
-        if not len(params) == 2:
-            if isBase:
-                return False
+            if isinstance(value, dict):
+                for comp, param in value.items():
+                    comparison = comp
+                    if isinstance(param, dict):
+                        for sub_param in param.values():
+                            if isinstance(sub_param, dict):
+                                params.append(self._should_not_jump(sub_param, ram))
+                            else:
+                                params.append(sub_param)
+                    elif isinstance(param, float) or \
+                            isinstance(param, int) or \
+                            isinstance(param, str):
+                        params.append(param)
+                        comparison = short_compare
+                    else:
+                        print(f'WARNING: unable to process param of type {type(param)}. Not performing jump')
+                        return False
             else:
-                return 1
+                params.append(value)
 
         param_values = []
         for param in params:
@@ -2420,11 +2423,14 @@ class ScriptPerformer:
                 param_values.append(value)
             else:
                 param_values.append(param)
-        try:
-            result = self.scpt_codes[comparison](param_values[0], param_values[1])
-        except KeyError as e:
-            print(f'Error comparison not performed: {e}')
-            return False
+        if len(param_values) > 1:
+            try:
+                result = self.scpt_codes[comparison](param_values[0], param_values[1])
+            except KeyError as e:
+                print(f'Error comparison not performed: {e}')
+                return False
+        else:
+            result = param_values[0]
 
         if isBase:
             if result == 1:
@@ -2492,7 +2498,7 @@ class ScriptPerformer:
 
     @staticmethod
     def _is_geq(in_1, in_2):
-        result = in_1 > in_2
+        result = in_1 >= in_2
         if result:
             return 1
         return 0
