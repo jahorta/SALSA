@@ -12530,13 +12530,13 @@
   "167": {
     "Instruction ID": "167",
     "Name": "no name",
-    "Description": "\n\n",
+    "Description": "",
     "Location": "0x802150bc",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
     "Implement": false,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   },
   "168": {
@@ -14053,18 +14053,18 @@
   },
   "210": {
     "Instruction ID": "210",
-    "Name": "no name",
-    "Description": "unknown0: <unknown0>",
+    "Name": "Load script w/ GS=12",
+    "Description": "Loads new script with gamestate change to gamestate 12\n\n*lnk[offset,<offset>]*",
     "Location": "0x80214994",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "unknown0",
+        "Name": "offset",
         "Type": "int",
         "Override": false,
         "Override condition": "",
@@ -17367,7 +17367,7 @@
   },
   "257": {
     "Instruction ID": "257",
-    "Name": "?? change script w/ gamestate=7",
+    "Name": "Load Script w/ GS=7",
     "Description": "goes to: *lnk[offset,<offset>]*",
     "Location": "0x80214908",
     "Hard parameter one": "0x00000001",
