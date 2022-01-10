@@ -1,4 +1,5 @@
 import copy
+import datetime
 import json
 import os
 import queue
@@ -137,6 +138,7 @@ class Application(tk.Tk):
         self.export_script_names = []
         self.queue_to_exporter: queue.Queue = queue.Queue()
         self.queue_from_exporter: queue.Queue = queue.Queue()
+        self.export_start_time = None
 
     def on_select_instruction(self, newID):
         """Save the current instruction details to the current Instruction object"""
@@ -186,6 +188,7 @@ class Application(tk.Tk):
 
     # Called when asked to export data
     def on_data_export(self, export_type='Ship battle turn data'):
+        self.export_start_time = datetime.datetime.now()
         self.script_exports = {}
         relevant_script_regex = self.exporter.get_export_scripts(export_type)
         # TODO - create SCT objects for all relevant scripts
@@ -248,6 +251,12 @@ class Application(tk.Tk):
         if len(self.script_exports) >= script_num:
             self.export_window.update_exports(self.script_exports)
             self.export_thread.join()
+            d_time = datetime.datetime.now() - self.export_start_time
+            d = {"days": d_time.days}
+            d["hours"], rem = divmod(d_time.seconds, 3600)
+            d["minutes"], d["seconds"] = divmod(rem, 60)
+            time_difference = "{days} days {hours}:{minutes}:{seconds}".format(**d)
+            print('Time to complete export: ', time_difference)
         else:
             self.after(100, self.add_analysis_to_export)
 
