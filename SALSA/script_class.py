@@ -201,7 +201,7 @@ class SCTAnalysis:
                 if ID == 12:
                     return_hit = True
                 elif ID in current_subscript.change_script_insts:
-                    if ID == 238:
+                    if ID in (238, 211):
                         next_script = 'me099a.sct'
                     else:
                         offset_param_id = inst.get_param_id_by_name('offset')
@@ -498,7 +498,7 @@ class SCTSection:
     )
 
     flow_control_insts = (0, 3, 10)
-    change_script_insts = (43, 210, 238, 257)
+    change_script_insts = (43, 210, 211, 238, 257)
     change_subscript_insts = (0, 10, 11)
     choice_inst = 155
     switch_inst = 3

@@ -60,6 +60,7 @@ class SCTExporter:
             },
             'Ship battle turnID decisions': {
                 'scripts': '^me5.+sct$',
+                'split_by_sct': True,
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -82,8 +83,8 @@ class SCTExporter:
         self.export_option_fields['types']['values'] = types
         return self.export_option_fields
 
-    def get_export_scripts(self, export_type):
-        return self.export_options[export_type]['scripts']
+    def get_export_args(self, export_type):
+        return self.export_options[export_type]
 
     def export(self, sct_list, instruction_list, export_type, export_args=None):
         if export_args is None:

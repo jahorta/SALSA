@@ -190,8 +190,9 @@ class Application(tk.Tk):
     def on_data_export(self, export_type='Ship battle turn data'):
         self.export_start_time = datetime.datetime.now()
         self.script_exports = {}
-        relevant_script_regex = self.exporter.get_export_scripts(export_type)
-        # TODO - create SCT objects for all relevant scripts
+        args = self.exporter.get_export_args(export_type)
+        relevant_script_regex = args.get('scripts', None)
+        split_by_sct = args.get('split_by_sct', False)
         self.export_script_names = []
         script_paths = Path(self.script_dir).glob('**/*')
         for path in script_paths:
@@ -203,11 +204,15 @@ class Application(tk.Tk):
         self.export_thread = threading.Thread(target=self.perform_script_analysis)
         self.export_thread.start()
 
-        # Add script names to the queue for the export thread
-        script_num = len(self.export_script_names)
-        for i, script in enumerate(self.export_script_names):
-                pkg = {'index': i + 1, 'script': script, 'script_num': script_num}
-                self.queue_to_exporter.put(pkg)
+        if split_by_sct:
+            # Add script names to the queue for the export thread
+            script_num = len(self.export_script_names)
+            for i, script in enumerate(self.export_script_names):
+                    pkg = {'index': i + 1, 'script': script, 'script_num': script_num}
+                    self.queue_to_exporter.put(pkg)
+        else:
+            pkg = {'index': 1, 'script_list': self.export_script_names, 'script_num': len(self.export_script_names)}
+            self.queue_to_exporter.put(pkg)
 
         # After adding all script names, add a signal that exporting is finished
         self.queue_to_exporter.put({'done': True})
@@ -225,14 +230,31 @@ class Application(tk.Tk):
             # Check if no more analyses to perform
             if 'done' not in in_pkg.keys():
                 i = in_pkg['index']
-                sct = in_pkg['script']
                 script_num = in_pkg['script_num']
-                new_sct_analysis = SCTAnalysis(self.sctModel.load_sct(insts=self.instructionSet, file=sct))
-                print(f'{sct} analyzed: {i}/{script_num}')
-                new_sct_export = self.exporter.export(sct_list=[new_sct_analysis], instruction_list=self.instructionSet,
-                                                      export_type=self.export_type)
-                out_pkg = {'analysis': new_sct_export}
-                self.queue_from_exporter.put(out_pkg)
+                if 'script_list' in in_pkg.keys():
+                    sct_list = in_pkg['script_list']
+                    scripts = []
+                    for sct in sct_list:
+                        new_sct_analysis = SCTAnalysis(self.sctModel.load_sct(insts=self.instructionSet, file=sct))
+                        print(f'{sct} analyzed: {i}/{script_num}')
+                        progress = floor((i / script_num) * 100)
+                        self.export_window.update_progress(progress, f'{sct} analyzed: {i}/{script_num}')
+                        i += 1
+                        scripts.append(new_sct_analysis)
+                    new_sct_export = self.exporter.export(sct_list=scripts,
+                                                          instruction_list=self.instructionSet,
+                                                          export_type=self.export_type)
+                    out_pkg = {'analysis': new_sct_export}
+                    self.queue_from_exporter.put(out_pkg)
+                    self.queue_from_exporter.put({'done': True})
+                else:
+                    sct = in_pkg['script']
+                    new_sct_analysis = SCTAnalysis(self.sctModel.load_sct(insts=self.instructionSet, file=sct))
+                    print(f'{sct} analyzed: {i}/{script_num}')
+                    new_sct_export = self.exporter.export(sct_list=[new_sct_analysis], instruction_list=self.instructionSet,
+                                                          export_type=self.export_type)
+                    out_pkg = {'analysis': new_sct_export}
+                    self.queue_from_exporter.put(out_pkg)
             else:
                 done = True
 
@@ -240,15 +262,19 @@ class Application(tk.Tk):
 
     def add_analysis_to_export(self):
         script_num = len(self.export_script_names)
+        done = False
         if not self.queue_from_exporter.empty():
             in_pkg = self.queue_from_exporter.get()
             self.queue_from_exporter.task_done()
-            self.script_exports = {**self.script_exports, **in_pkg['analysis']}
-            progress = floor(((len(self.script_exports)) / script_num) * 100)
-            self.export_window.update_progress(progress, f'{list(in_pkg["analysis"].keys())[0]} analyzed: '
-                                                         f'{len(self.script_exports)}/{script_num}')
+            if 'done' in in_pkg.keys():
+                done = True
+            else:
+                self.script_exports = {**self.script_exports, **in_pkg['analysis']}
+                progress = floor(((len(self.script_exports)) / script_num) * 100)
+                self.export_window.update_progress(progress, f'{list(in_pkg["analysis"].keys())[0]} analyzed: '
+                                                             f'{len(self.script_exports)}/{script_num}')
 
-        if len(self.script_exports) >= script_num:
+        if len(self.script_exports) >= script_num or done:
             self.export_window.update_exports(self.script_exports)
             self.export_thread.join()
             d_time = datetime.datetime.now() - self.export_start_time
@@ -257,6 +283,7 @@ class Application(tk.Tk):
             d["minutes"], d["seconds"] = divmod(rem, 60)
             time_difference = "{days} days {hours}:{minutes}:{seconds}".format(**d)
             print('Time to complete export: ', time_difference)
+            self.export_window.update_progress(100, f'All scripts analyzed!')
         else:
             self.after(100, self.add_analysis_to_export)
 
