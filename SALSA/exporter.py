@@ -429,8 +429,14 @@ class ScriptPerformer:
 
         all_open = self.new_opens
         self.new_opens = []
+
         if len(all_open) > 0:
             self.new_opens.append(all_open.pop(0))
+
+        hit_requested = False
+        for action in self.new_opens[0]['actions']:
+            if 'requested' in action.keys():
+                hit_requested = True
 
         for name, sub_tree in input_dict['subscript_groups'].items():
             self.time = datetime.now()
@@ -467,7 +473,7 @@ class ScriptPerformer:
 
                 if self.debug_verbose:
                     print('Starting branch run:')
-                self._run_subscript_branch(name=name, subscripts=sub_tree,
+                self._run_subscript_branch(name=name, subscripts=sub_tree, hit_requested=hit_requested,
                                            ram=initial_ram, branch_index=branch_index, blacklist=blacklist)
 
                 new_open_num = len(self.new_opens)
@@ -629,6 +635,8 @@ class ScriptPerformer:
                     for branch in all_open:
                         branch['switch_states'] = []
                         branch['jump_states'] = []
+
+                hit_requested = False
 
                 if len(all_open) == 0:
                     done = True
