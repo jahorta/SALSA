@@ -59,7 +59,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me515.+sct$',
+                'scripts': '^me5.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -199,7 +199,9 @@ class SCTExporter:
             script_num = key[2:5]
             csv = headers
             csv = csv.replace('*ID*', script_num)
-
+            csvlines = csv.splitlines()
+            csv = '\n'.join(csvlines[:1])
+            csv += '\n'
             csv += '\nMemory Addresses,Set Location,Address Value'
             type_known = False
             script_addr_type = None
@@ -226,6 +228,9 @@ class SCTExporter:
                                 csv += f',{value}'
                 else:
                     print(f'no init location entered for {addr}')
+
+            csv += '\n'.join(csvlines[1:])
+            csv += '\n'
             inst_num = len(result['summary'])
             csv = csv.replace('*Inst*', 'Inst,' if inst_num > 1 else '')
             csv_verbose = csv
