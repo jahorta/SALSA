@@ -230,8 +230,8 @@ class SCTExporter:
                 else:
                     print(f'no init location entered for {addr}')
 
-            csv += '\n'.join(csvlines[1:])
             csv += '\n'
+            csv += '\n'.join(csvlines[1:])
             inst_num = len(result['summary'])
             csv = csv.replace('*Inst*', 'Inst,' if inst_num > 1 else '')
             csv_verbose = csv
