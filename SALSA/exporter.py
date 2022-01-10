@@ -59,7 +59,7 @@ class SCTExporter:
                 'function': self._get_script_parameters_by_group
             },
             'Ship battle turnID decisions': {
-                'scripts': '^me5[4][0-9].+sct$',
+                'scripts': '^me515.+sct$',
                 'subscripts': ['_TURN_CHK'],
                 'function': self._get_script_flows,
                 'instructions': {174: 'scene'},
@@ -1214,6 +1214,8 @@ class ScriptPerformer:
                 name = current_sub['fallthrough']
                 current_sub = subscripts[name]
                 current_pointer = 0
+                inst_pos = current_sub['pos_list'][current_pointer]
+                inst = current_sub[inst_pos]
                 traceback[-1] = {'name': name, 'ptr': current_pointer}
                 # if self.debug_verbose:
                 #     suffix = f'req:{hit_requested}'
