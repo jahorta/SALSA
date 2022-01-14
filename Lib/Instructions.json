@@ -12147,7 +12147,7 @@
   "165": {
     "Instruction ID": "165",
     "Name": "Load Ship Turn Values",
-    "Description": "Loads a number constants into memory\nTurn Modifiers:\t\t\t\tLost Modifiers:\n\tHit\tDamage\t\tFirst\tSecond\nEnemy: \t<EHitMod>\t<EDmgMod>\t\t<lost_eFirst>\t<lost_eSecond>\nPlayer: <PHitMod>\t\t<PDmgMod>\t\t<lost_pFirst>\t<lost_pSecond>\n\nOther Values:\n0: <unknown0>\t1: <unknown1>\t2: <unknown2>\t3: <unknown3>\t4: <unknown4> 5: <unknown5>\t\n6: <unknown6>\t7: <unknown7>\t8: <unknown8>\n\n17: <unknown17>\t18: <unknown18>",
+    "Description": "Loads a number constants into memory\nTurn Modifiers:\t\t\t\tLost Modifiers:\n\tHit\tDamage\t\tFirst\tSecond\nEnemy: \t<EHitMod>\t<EDmgMod>\t\t<lost_eFirst>\t<lost_eSecond>\nPlayer: <PHitMod>\t\t<PDmgMod>\t\t<lost_pFirst>\t<lost_pSecond>\n\nOther Values:\n0: <unknown0>\t1: <unknown1>\t2: <unknown2>\t3: <unknown3>\t4: <unknown4> 5: <unknown5>\t\n6: <unknown6>\t7: <unknown7>\t8: <unknown8>\n\n17: <unknown17>\t\nturn icons entry offset: <entry offset>",
     "Location": "0x80215590",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
@@ -12463,7 +12463,7 @@
       },
       "18": {
         "ID": "18",
-        "Name": "unknown18",
+        "Name": "entry offset",
         "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
@@ -14194,17 +14194,17 @@
   "213": {
     "Instruction ID": "213",
     "Name": "??Set Area",
-    "Description": "unknown0: <unknown0>\nunknown1: <unknown1>\nunknown2: <unknown2>\nunknown3: <unknown3>\nunknown4: <unknown4>\nunknown5: <unknown5>\nunknown6: <unknown6>\nunknown7: <unknown7>\nunknown8: <unknown8>\nunknown9: <unknown9>\nunknown10: <unknown10>\nunknown11: <unknown11>\nunknown12: <unknown12>\nunknown13: <unknown13>\nunknown14: <unknown14>\nunknown15: <unknown15>\nunknown16: <unknown16>",
+    "Description": "entry offset: <entry_offset>\nCurrent turn icons\nphase 1: <p1 icon> <p1 color>\nphase 2: <p2 icon> <p2 color>\nphase 3: <p3 icon> <p3 color>\nphase 4: <p4 icon> <p4 color>\n\nNext turn default icons\nphase 1: <t2 p1 icon> <t2 p1 color>\nphase 2: <t2 p2 icon> <t2 p2 color>\nphase 3: <t2 p3 icon> <t2 p3 color>\nphase 4: <t2 p4 icon> <t2 p4 color>",
     "Location": "0x80215444",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 17,
-    "Notes": "Has Error: \"sbBT Error : Set Area is Over !!\"\n\nif param1 & 1 == 1:\n\n1: scpt-int\n\nloop (8x):\n\n2: scpt-byte\n3: scpt-bype\n\nTherefore:\n\n2: scpt-byte\n3: scpt-byte\n4: scpt-byte\n5: scpt-byte\n6: scpt-byte\n7: scpt-byte\n8: scpt-byte\n9: scpt-byte\n10: scpt-byte\n11: scpt-byte\n12: scpt-byte\n13: scpt-byte\n14: scpt-byte\n15: scpt-byte\n16: scpt-byte\n17: scpt-byte\n\nThen uses these to set a bunch of bytes\n\n\n\n\n\n",
+    "Notes": "Has Error: \"sbBT Error : Set Area is Over !!\"\n\nif param1 & 1 == 1:\n\n1: scpt-int\n\nloop (8x):\n\n2: scpt-byte\n3: scpt-bype\n\nTherefore:\n\n2: scpt-byte\n3: scpt-byte\n4: scpt-byte\n5: scpt-byte\n6: scpt-byte\n7: scpt-byte\n8: scpt-byte\n9: scpt-byte\n10: scpt-byte\n11: scpt-byte\n12: scpt-byte\n13: scpt-byte\n14: scpt-byte\n15: scpt-byte\n16: scpt-byte\n17: scpt-byte\n\nThen uses these to set a bunch of bytes",
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "unknown0",
+        "Name": "entry_offset",
         "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
@@ -14221,7 +14221,7 @@
       },
       "1": {
         "ID": "1",
-        "Name": "unknown1",
+        "Name": "p1 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -14238,7 +14238,7 @@
       },
       "2": {
         "ID": "2",
-        "Name": "unknown2",
+        "Name": "p1 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -14255,7 +14255,7 @@
       },
       "3": {
         "ID": "3",
-        "Name": "unknown3",
+        "Name": "p2 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -14272,7 +14272,7 @@
       },
       "4": {
         "ID": "4",
-        "Name": "unknown4",
+        "Name": "p2 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -14289,7 +14289,7 @@
       },
       "5": {
         "ID": "5",
-        "Name": "unknown5",
+        "Name": "p3 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -14306,7 +14306,7 @@
       },
       "6": {
         "ID": "6",
-        "Name": "unknown6",
+        "Name": "p3 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -14323,7 +14323,7 @@
       },
       "7": {
         "ID": "7",
-        "Name": "unknown7",
+        "Name": "p4 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -14340,7 +14340,7 @@
       },
       "8": {
         "ID": "8",
-        "Name": "unknown8",
+        "Name": "p4 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -14357,7 +14357,7 @@
       },
       "9": {
         "ID": "9",
-        "Name": "unknown9",
+        "Name": "t2 p1 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -14374,7 +14374,7 @@
       },
       "10": {
         "ID": "10",
-        "Name": "unknown10",
+        "Name": "t2 p1 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -14391,7 +14391,7 @@
       },
       "11": {
         "ID": "11",
-        "Name": "unknown11",
+        "Name": "t2 p2 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -14408,7 +14408,7 @@
       },
       "12": {
         "ID": "12",
-        "Name": "unknown12",
+        "Name": "t2 p2 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -14425,7 +14425,7 @@
       },
       "13": {
         "ID": "13",
-        "Name": "unknown13",
+        "Name": "t2 p3 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -14442,7 +14442,7 @@
       },
       "14": {
         "ID": "14",
-        "Name": "unknown14",
+        "Name": "t2 p3 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -14459,7 +14459,7 @@
       },
       "15": {
         "ID": "15",
-        "Name": "unknown15",
+        "Name": "t2 p4 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -14476,7 +14476,7 @@
       },
       "16": {
         "ID": "16",
-        "Name": "unknown16",
+        "Name": "t2 p4 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15897,7 +15897,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "Only called if param1 & 1 == 1:\n\nSCPT:\n1: int\n2: int\n\n80147da8((1),(2))\n\n---\n80147da8(p1, p2):\n80142f04(p1, p2)\n\n---\n80142f04(p1, p2):\n*0x80346f64 = p2\n*0x80346f64 = p1\n*0x80346f64 = p2\n*0x80346f64 = p1\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only called if param1 & 1 == 1:\n\nSCPT:\n1: int\n2: int\n\n80147da8((1),(2))\n\n---\n80147da8(p1, p2):\n80142f04(p1, p2)\n\n---\n80142f04(p1, p2):\n*0x80346f64 = p2\n*0x80346f64 = p1\n*0x80346f64 = p2\n*0x80346f64 = p1",
     "Parameters": {
       "0": {
         "ID": "0",
