@@ -109,6 +109,7 @@ class SCTAnalysis:
             for group_name, param_list in group_dict.items():
                 if group_name not in groups.keys():
                     groups[group_name] = {}
+                groups[group_name]['inst'] = inst
 
         for sct in self.Sections.values():
             i = 0
@@ -117,11 +118,15 @@ class SCTAnalysis:
                     continue
                 if int(inst.ID, 16) in requested_insts:
                     for group_name, group in groups.items():
-                        group_params = inst.get_params(requested_group_list[int(inst.ID, 16)][group_name])
-                        if sct.name not in group.keys():
-                            group[sct.name] = {}
-                        group[sct.name][i] = group_params
+                        if group['inst'] == int(inst.ID, 16):
+                            group_params = inst.get_params(requested_group_list[int(inst.ID, 16)][group_name])
+                            if sct.name not in group.keys():
+                                group[sct.name] = {}
+                            group[sct.name][i] = group_params
                     i += 1
+
+        for group in groups.values():
+            group.pop('inst')
 
         return groups
 

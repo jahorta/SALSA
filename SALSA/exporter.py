@@ -50,11 +50,19 @@ class SCTExporter:
                         ],
                         'lost turns': [
                             13, 14, 15, 16
+                        ],
+                        'entry offset': [
+                            18
+                        ]
+                    },
+                    213: {
+                        'turn headings': [
+                            0, 1, 2, 3, 4, 5, 6, 7, 8
                         ]
                     }
                 },
                 'headers': [
-                    'turn bonus', 'lost turns'
+                    'turn bonus', 'lost turns', 'turn headings'
                 ],
                 'function': self._get_script_parameters_by_group
             },
@@ -113,19 +121,48 @@ class SCTExporter:
         info_list = self.export_options[self.export_type]['function']()
         combine = self.export_args.get('combine', False)
 
+        for key, group in info_list.items():
+            if key == 'headers':
+                continue
+            turn_headings = {}
+            for entry in group['turn headings'][list(group['turn headings'])[0]].values():
+                entry_key = entry.pop(0)
+                values = [i for i in entry.values()]
+                value_list = []
+                for i in range(0, 4):
+                    value_list.append([values[i*2], values[i*2+1]])
+                turn_headings[entry_key] = value_list
+            group['turn headings'] = turn_headings
+
+        for sct_name, sct in info_list.items():
+            if sct_name == 'headers':
+                continue
+            new_turn_headings = {}
+            for key, value in sct['entry offset'].items():
+                key1 = list(value.keys())[0]
+                key2 = list(value[key1].keys())[0]
+                offset = int(value[key1][key2])
+                if offset in sct['turn headings'].keys():
+                    new_turn_headings[key] = sct['turn headings'][offset]
+            sct['turn headings'] = new_turn_headings
+
+        turn_heading_icon_dict = {0: '---', 1: 'c!', 2: 'sp', 3: 'blank'}
+
         groups = [i for i in self.export_options['Ship battle turn data']['headers']]
         header_dict = info_list.pop('headers')
+        header_dict['turn headings'] = {0: 'icon', 1: 'color'}
         scripts = info_list
-        data_sets = 2
+        data_sets = len(groups)
         curr_group = ''
         if combine:
             data_sets = 1
             curr_group = 'all'
         max_turns = -1
         for sct in scripts.values():
-            for group in sct.values():
-                max_turns = max(max_turns, len(group))
-        print('check whats here')
+            for key, group in sct.items():
+                if key == 'turn bonus':
+                    max_turns = max(max_turns, len(group))
+        # print('check whats here')
 
         outs = {}
         for data_set in range(0, data_sets):
@@ -141,19 +178,32 @@ class SCTExporter:
                 header_rows[0] += f',{script_name},,,'
                 if combine:
                     header_rows[0] += ',,,,'
+                    header_rows[0] += ',,'
                 for group_name, group in header_dict.items():
                     if not combine:
                         if not group_name == curr_group:
                             continue
+                    if group_name == 'entry offset':
+                        continue
+                    if group_name == 'turn headings':
+                        header_rows[0] = header_rows[0][:-2]
+
                     for param_id, param_name in group.items():
                         cur_row = 0
                         header_rows[1] += f',{param_name}'
                         for turn in sct[group_name].values():
                             for phase in range(0, 4):
-                                value = turn.get(phase, '---')
-                                if not value == '---':
-                                    value = int(value[param_id])
-                                rows[cur_row] += f',{value}'
+                                if group_name == 'turn headings':
+                                    # print('check this out')
+                                    value = turn[phase][param_id]
+                                    if param_name == 'icon':
+                                        value = turn_heading_icon_dict[int(value)]
+                                    rows[cur_row] += f',{value}'
+                                else:
+                                    value = turn.get(phase, '---')
+                                    if not value == '---':
+                                        value = int(value[param_id])
+                                    rows[cur_row] += f',{value}'
                                 cur_row += 1
                         for row in range(cur_row, len(rows)):
                             rows[row] += ','
