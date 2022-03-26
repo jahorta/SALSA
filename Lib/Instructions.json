@@ -296,7 +296,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "This instruction calls the function 801f60f0\n\nThis function just returns a zero and produces a \ncode error. it is likely that this number is \nreserved for something else.\n\n\n\n\n\n",
+    "Notes": "This instruction calls the function 801f60f0\n\nThis function just returns a zero and produces a \ncode error. it is likely that this number is \nreserved for something else.",
     "Parameters": {}
   },
   "9": {
@@ -416,19 +416,19 @@
   "14": {
     "Instruction ID": "14",
     "Name": "code_error",
-    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call\n\n",
+    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call",
     "Location": "0x801f60f0",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "This instruction calls the function 801f60f0\n\nThis function just returns a zero and produces a \ncode error. it is likely that this number is \nreserved for something else.\n\n",
+    "Notes": "This instruction calls the function 801f60f0\n\nThis function just returns a zero and produces a \ncode error. it is likely that this number is \nreserved for something else.",
     "Parameters": {}
   },
   "15": {
     "Instruction ID": "15",
     "Name": "??Set something to zero",
-    "Description": "In the current workspace, 0x4 is set to zero",
+    "Description": "In the current workspace, 0x4 is set to zero\n\n**Not used in the game currently**",
     "Location": "0x801f5bb4",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00000000",
@@ -566,7 +566,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "No dependancy on param1\nFunctional at all times\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "No dependancy on param1\nFunctional at all times",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -596,7 +596,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "No dependancy on param1\nFunctional at all times\n\n801efc88 first generates a location for based on the parameter. This appears to correspond to the different inventory regions.\n\nIt then searches for the item and removes it from inventory.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "No dependancy on param1\nFunctional at all times\n\n801efc88 first generates a location for based on the parameter. This appears to correspond to the different inventory regions.\n\nIt then searches for the item and removes it from inventory.",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -775,7 +775,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nSCPT Analyze returns a float, casted to a short.\nThis is used as a parameter in function 80211058.\n\n2:\nAppears to be for displaying the message.\nShows this error if the message display times out:\ns_scptLetsTalk:_message_post_time_out_802d52c4\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nSCPT Analyze returns a float, casted to a short.\nThis is used as a parameter in function 80211058.\n\n2:\nAppears to be for displaying the message.\nShows this error if the message display times out:\ns_scptLetsTalk:_message_post_time_out_802d52c4",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -805,7 +805,7 @@
     "Hard parameter two": "0x00020000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: int   [7]\n3: int   [8]\n4: float [9]\nThis is used as a parameter in function 80211058.\n\n2:\nAppears to be for displaying the message.\nShows this error if the message display times out:\ns_scptDefMO:_message_post_time_out_802d4b70\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: int   [7]\n3: int   [8]\n4: float [9]\nThis is used as a parameter in function 80211058.\n\n2:\nAppears to be for displaying the message.\nShows this error if the message display times out:\ns_scptDefMO:_message_post_time_out_802d4b70",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -967,7 +967,7 @@
     "Hard parameter two": "0x00020000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: int   [7]\nThis is used as a parameter in function 80211058.\n\n2:\n\nShows this error if the message display times out:\ns_scptFace:_message_post_time_out_802d5260\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: int   [7]\nThis is used as a parameter in function 80211058.\n\n2:\n\nShows this error if the message display times out:\ns_scptFace:_message_post_time_out_802d5260",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -1014,7 +1014,7 @@
     "Hard parameter two": "0x00050000",
     "Implement": true,
     "Parameter num": 8,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: float [7]\n3: float [8]\n4: float [9]\n5: float [a]\n6: float [b]\n7: float [c]\n8: int   [d]\nThis is used as a parameter in function 80211058.\n\n2:\nAppears to be for displaying the message.\nShows this error if the message display times out:\ns_scptPutA:_message_post_time_out_802d51e0\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: float [7]\n3: float [8]\n4: float [9]\n5: float [a]\n6: float [b]\n7: float [c]\n8: int   [d]\nThis is used as a parameter in function 80211058.\n\n2:\nAppears to be for displaying the message.\nShows this error if the message display times out:\ns_scptPutA:_message_post_time_out_802d51e0",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -1163,7 +1163,7 @@
     "Hard parameter two": "0x00050000",
     "Implement": true,
     "Parameter num": 8,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: float [7]\n3: float [8]\n4: float [9]\n5: float [a]\n6: float [b]\n7: float [c]\n8: int   [d]\nThis is used as a parameter in function 80211058.\n\n2:\nAppears to be for displaying the message.\nShows this error if the message display times out:\ns_scptPutP:_message_post_time_out_802d51a8\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: float [7]\n3: float [8]\n4: float [9]\n5: float [a]\n6: float [b]\n7: float [c]\n8: int   [d]\nThis is used as a parameter in function 80211058.\n\n2:\nAppears to be for displaying the message.\nShows this error if the message display times out:\ns_scptPutP:_message_post_time_out_802d51a8",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -1729,7 +1729,7 @@
     "Hard parameter two": "0x00050000",
     "Implement": true,
     "Parameter num": 13,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nparameters:\n1 short (SCPT) [6]\n1 int          [7]\nthen loop with [7] as number of iterations:\n4 float\n2 int\n1 float\n2 int\n(inside 1:) 4:\n\n2:\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nparameters:\n1 short (SCPT) [6]\n1 int          [7]\nthen loop with [7] as number of iterations:\n4 float\n2 int\n1 float\n2 int\n(inside 1:) 4:\n\n2:",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -1963,7 +1963,7 @@
     "Hard parameter two": "0x00050000",
     "Implement": true,
     "Parameter num": 8,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: float [7]\n3: float [8]\n4: float [9]\n5: int   [a]\n6: int   [b]\n7: int   [c]\n8: float [d]\nThis is used as a parameter in function 80211058 (only if param1 4: is 0.\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptRollA:_message_post_time_out_802d4c74\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: float [7]\n3: float [8]\n4: float [9]\n5: int   [a]\n6: int   [b]\n7: int   [c]\n8: float [d]\nThis is used as a parameter in function 80211058 (only if param1 4: is 0.\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptRollA:_message_post_time_out_802d4c74",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -2112,7 +2112,7 @@
     "Hard parameter two": "0x00050000",
     "Implement": true,
     "Parameter num": 8,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: float [7]\n3: float [8]\n4: float [9]\n5: int   [a]\n6: int   [b]\n7: int   [c]\n8: float [d]\nThis is used as a parameter in function 80211058 (only if param1 4: is 0.\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptRollP:_message_post_time_out_802d4c34\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: float [7]\n3: float [8]\n4: float [9]\n5: int   [a]\n6: int   [b]\n7: int   [c]\n8: float [d]\nThis is used as a parameter in function 80211058 (only if param1 4: is 0.\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptRollP:_message_post_time_out_802d4c34",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -2261,7 +2261,7 @@
     "Hard parameter two": "0x00020000",
     "Implement": true,
     "Parameter num": 5,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: short [1a]\n3: float [7]\n4: float [8]\n5: float [9]\nThis is used as a parameter in function 80211058 (only if param1 4: is 0.\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_necM:_message_post_timed_out_802d5138\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: short [1a]\n3: float [7]\n4: float [8]\n5: float [9]\nThis is used as a parameter in function 80211058 (only if param1 4: is 0.\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_necM:_message_post_timed_out_802d5138",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -2359,7 +2359,7 @@
     "Hard parameter two": "0x00020000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: float [7]\nThis is used as a parameter in function 80211058\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptNecA:_message_post_time_out_802d5170\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: float [7]\nThis is used as a parameter in function 80211058\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptNecA:_message_post_time_out_802d5170",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -2406,7 +2406,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 3,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nReads in from SCPT:\n1: int\n2: float\n3: int\n\n-- Only functions if param1 bit 1 == 1 --\n\nFUN_80097294(0x2)\nFUN_80097094((2),(1) & 0xffff)\nif (((3) & 0xffff) == 0x0) {\n  FUN_80097318(0x1);\n}\nelse {\n  FUN_80097318(0x0);\n}\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nReads in from SCPT:\n1: int\n2: float\n3: int\n\n-- Only functions if param1 bit 1 == 1 --\n\nFUN_80097294(0x2)\nFUN_80097094((2),(1) & 0xffff)\nif (((3) & 0xffff) == 0x0) {\n  FUN_80097318(0x1);\n}\nelse {\n  FUN_80097318(0x0);\n}",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -2470,7 +2470,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Dependent on param1:\nbit is 1:\n1:\nGets int from SCPT Analyze.\nif int == 0x10000:\nwhile loop to find next available slot in an array of pointers, then does something with it:\ncalls 8020f934 which calls 802107a4 with that location as a parameter\nelse:\ncalls 802107a4 with int as a parameter\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1:\nGets int from SCPT Analyze.\nif int == 0x10000:\nwhile loop to find next available slot in an array of pointers, then does something with it:\ncalls 8020f934 which calls 802107a4 with that location as a parameter\nelse:\ncalls 802107a4 with int as a parameter",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -2500,7 +2500,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 5,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: int   \n2: float \n\nIf (2)==0x10000:\nFunction 80207738 is run with (1) as parameter\n\nelse:\nwhile loop to read in SCPT:\npattern:\n3: short\niterations = (2)\t\n\n2:\nShows this error if the process times out:\ns_scptCl:_message_post_time_out_802d50b8\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: int   \n2: float \n\nIf (2)==0x10000:\nFunction 80207738 is run with (1) as parameter\n\nelse:\nwhile loop to read in SCPT:\npattern:\n3: short\niterations = (2)\t\n\n2:\nShows this error if the process times out:\ns_scptCl:_message_post_time_out_802d50b8",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -2640,7 +2640,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "Only active if param1 & 1 == 1:\nFrees some RAM at location of pointer at 8030e7b4\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only active if param1 & 1 == 1:\nFrees some RAM at location of pointer at 8030e7b4",
     "Parameters": {}
   },
   "46": {
@@ -2652,7 +2652,7 @@
     "Hard parameter two": "0xfffe0000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: int (scpt *  182.04445)\n2: int (scpt *  182.04445)\n3: int (scpt *  182.04445)\n4: int (scpt)\n\nif (4) < 2:\nSets values, does not enter part 2\n\n2:\n??\nSet some globals\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: int (scpt *  182.04445)\n2: int (scpt *  182.04445)\n3: int (scpt *  182.04445)\n4: int (scpt)\n\nif (4) < 2:\nSets values, does not enter part 2\n\n2:\n??\nSet some globals",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -2733,7 +2733,7 @@
     "Hard parameter two": "0xfffe0000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "Only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-int\n3: scpt-int\n4: scpt-int\n\ncalls 80213478 with ((1),8030e79c,something)\nif (4) < 2:\nSets values, does not enter part 2\n\n2:\n??\nSet some globals\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-int\n3: scpt-int\n4: scpt-int\n\ncalls 80213478 with ((1),8030e79c,something)\nif (4) < 2:\nSets values, does not enter part 2\n\n2:\n??\nSet some globals",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -2814,7 +2814,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -2844,7 +2844,7 @@
     "Hard parameter two": "0xfffe0000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameter\n1: float\n\nif (1) == 0x7f7fffff:\nset (1) to 60.0\n\nrun 8022d34c((1),1)\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameter\n1: float\n\nif (1) == 0x7f7fffff:\nset (1) to 60.0\n\nrun 8022d34c((1),1)",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -2874,7 +2874,7 @@
     "Hard parameter two": "0xfffe0000",
     "Implement": true,
     "Parameter num": 6,
-    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: float\n2: float\n3: float\n4: float\n5: float\n6: float\n\n8030e7a8 = (4) * 182.04445\n8030e79c = (1)\n8030e7ac = (5) * 182.04445\n8030e7b0 = (6) * 182.04445\n8030e7a0 = (2)\n8030e7a4 = (3)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: float\n2: float\n3: float\n4: float\n5: float\n6: float\n\n8030e7a8 = (4) * 182.04445\n8030e79c = (1)\n8030e7ac = (5) * 182.04445\n8030e7b0 = (6) * 182.04445\n8030e7a0 = (2)\n8030e7a4 = (3)",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -2989,7 +2989,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: int\n2: byte\n3: byte\n4: float\n\nUses these parameters to load something from DVD.\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: int\n2: byte\n3: byte\n4: float\n\nUses these parameters to load something from DVD.",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -3070,7 +3070,7 @@
     "Hard parameter two": "0xfffe0000",
     "Implement": true,
     "Parameter num": 6,
-    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: float [0]\n2: float [1]\n3: float [2]\n4: float [0]\n5: float [1]\n6: float [2]\n\n8030e79c = (1)\n8030e7a0 = (2)\n8030e7a4 = (3)\n\nRuns 80213478(&(4),&(1), 8030e7a8)\n\n&(n) is a pointer to the location of that value\nSince 1,2,3 and 4,5,6 are in arrays, each can be reached by indexing from the pointer value.\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: float [0]\n2: float [1]\n3: float [2]\n4: float [0]\n5: float [1]\n6: float [2]\n\n8030e79c = (1)\n8030e7a0 = (2)\n8030e7a4 = (3)\n\nRuns 80213478(&(4),&(1), 8030e7a8)\n\n&(n) is a pointer to the location of that value\nSince 1,2,3 and 4,5,6 are in arrays, each can be reached by indexing from the pointer value.",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -3185,7 +3185,7 @@
     "Hard parameter two": "0x00050000",
     "Implement": true,
     "Parameter num": 20,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n\n01: short [6]\n02: int   [e + 0x58]\n03: float [e]\n04: float [e + 0x4]\n05: float [e + 0x8]\n06: int   [e + 0x1c]\n07: int   [e + 0x20]\n08: float [e + 0x24]\n09: int   [e + 0x28]\n10: float [e + 0x34]\n11: int   [e + 0x4c]\n12: int   [e + 0x50]\n13: float [e + 0x54]\n14: float [e + 0x60]\n15: float [e + 0x64]\n16: float [e + 0x68]\n17: int   [e + 0x7c]\n18: int   [e + 0x80]\n19: float [e + 0x84]\n20: int   [e + 0x88]\n\nThis is used as a parameter in function 80211058 (only if param1 4: is 0.\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptMVJ:_message_post_time_out_802d4a34\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n\n01: short [6]\n02: int   [e + 0x58]\n03: float [e]\n04: float [e + 0x4]\n05: float [e + 0x8]\n06: int   [e + 0x1c]\n07: int   [e + 0x20]\n08: float [e + 0x24]\n09: int   [e + 0x28]\n10: float [e + 0x34]\n11: int   [e + 0x4c]\n12: int   [e + 0x50]\n13: float [e + 0x54]\n14: float [e + 0x60]\n15: float [e + 0x64]\n16: float [e + 0x68]\n17: int   [e + 0x7c]\n18: int   [e + 0x80]\n19: float [e + 0x84]\n20: int   [e + 0x88]\n\nThis is used as a parameter in function 80211058 (only if param1 4: is 0.\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptMVJ:_message_post_time_out_802d4a34",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -3538,7 +3538,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: int\n\nGets an offset to a string\n\n(1) might be for duration of the music\n\nLooks like if it were to use 80218d84 instead of 80218d80, it would load some music.\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: int\n\nGets an offset to a string\n\n(1) might be for duration of the music\n\nLooks like if it were to use 80218d84 instead of 80218d80, it would load some music.",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -3585,7 +3585,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 3,
-    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: byte\n2: byte\n3: float\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: byte\n2: byte\n3: float",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -3649,7 +3649,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: short\nif (1) < 1: (1) = 1\n\nUses this to calculate a param for 8021730c:\nparam = 8026216c(*803475b4 * 16.666 * (1))\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: short\nif (1) < 1: (1) = 1\n\nUses this to calculate a param for 8021730c:\nparam = 8026216c(*803475b4 * 16.666 * (1))",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -3691,7 +3691,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {}
   },
   "59": {
@@ -3703,7 +3703,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: int\n\nif (1) == 0:\n  DAT_80347504 = 0x0;\n  DAT_80347508 = 0x0;\n  DAT_80347510 = FLOAT_8034bce0;\n  DAT_80347518 = 0x0;\n\nelse:\n  if (1) == 0x7fffffff:\n    DAT_80347514 = 30\n  else:\n    DAT_80347514 = (float)(1)\n\n  DAT_80347510 = FLOAT_8034c20c;\n  DAT_80347518 = 0x0;\n\n\n",
+    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: int\n\nif (1) == 0:\n  DAT_80347504 = 0x0;\n  DAT_80347508 = 0x0;\n  DAT_80347510 = FLOAT_8034bce0;\n  DAT_80347518 = 0x0;\n\nelse:\n  if (1) == 0x7fffffff:\n    DAT_80347514 = 30\n  else:\n    DAT_80347514 = (float)(1)\n\n  DAT_80347510 = FLOAT_8034c20c;\n  DAT_80347518 = 0x0;",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -3733,7 +3733,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -3763,7 +3763,7 @@
     "Hard parameter two": "0x00040000",
     "Implement": true,
     "Parameter num": 3,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: int   [6]\n2: int   [7]\n3: int   [8] (set to 0 if 0x7fffffff)\n\nThis is used as a parameter in function 802110e8\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptHopen:_message_post_time_out_802d4ff8\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: int   [6]\n2: int   [7]\n3: int   [8] (set to 0 if 0x7fffffff)\n\nThis is used as a parameter in function 802110e8\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptHopen:_message_post_time_out_802d4ff8",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -3827,7 +3827,7 @@
     "Hard parameter two": "0x00040000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: int     [6]\n2: int     [8] (set to 0 if 0x7fffffff)\n\nConstants:\n0x7fffffff [7]\n\nThis is used as a parameter in function 802110e8\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptHclose:_message_post_time_ou_802d4fb8\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: int     [6]\n2: int     [8] (set to 0 if 0x7fffffff)\n\nConstants:\n0x7fffffff [7]\n\nThis is used as a parameter in function 802110e8\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptHclose:_message_post_time_ou_802d4fb8",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -3874,7 +3874,7 @@
     "Hard parameter two": "0x00040000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: int     [6]\n2: int     [7] (set to 0 if 0x7fffffff)\n\nConstants:\n0x0        [8]\n\nThis is used as a parameter in function 802110e8\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptHchange:_message_post_time_o_802d4f78\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: int     [6]\n2: int     [7] (set to 0 if 0x7fffffff)\n\nConstants:\n0x0        [8]\n\nThis is used as a parameter in function 802110e8\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptHchange:_message_post_time_o_802d4f78",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -3921,7 +3921,7 @@
     "Hard parameter two": "0x00040000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: int     [6]\n\nConstants:\n0x0        [7]\n0x0        [8]\n\nThis is used as a parameter in function 802110e8\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptHread:_message_post_time_out_802d4f38\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: int     [6]\n\nConstants:\n0x0        [7]\n0x0        [8]\n\nThis is used as a parameter in function 802110e8\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptHread:_message_post_time_out_802d4f38",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -3951,7 +3951,7 @@
     "Hard parameter two": "0x00040000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: int     [6]\n\nConstants:\n0x0        [7]\n0x0        [8]\n\nThis is used as a parameter in function 802110e8\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptHset:_message_post_time_out_802d4ebc\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: int     [6]\n\nConstants:\n0x0        [7]\n0x0        [8]\n\nThis is used as a parameter in function 802110e8\n\n2:\nAppears to be for displaying the message.\nShows this error if the process times out:\ns_scptHset:_message_post_time_out_802d4ebc",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -3981,7 +3981,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 3,
-    "Notes": "Dependent on param1:\nOnly runs if bit 1 == 1:\nScript calls a number of parameters through SCPT analyze:\n1: int   [6]\n2: byte  [7]\n3: byte  [8]\n\nUses these as parameters for 80217fd4\nThis seems to load something from disc\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nOnly runs if bit 1 == 1:\nScript calls a number of parameters through SCPT analyze:\n1: int   [6]\n2: byte  [7]\n3: byte  [8]\n\nUses these as parameters for 80217fd4\nThis seems to load something from disc",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -4045,7 +4045,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "\ns_scptKill:_SYNTAX_ERROR!!!_802d4e18\n\n\n\n",
+    "Notes": "\ns_scptKill:_SYNTAX_ERROR!!!_802d4e18",
     "Parameters": {}
   },
   "68": {
@@ -4057,7 +4057,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "Only runs if param1 & 1 == 1:\nNo parameters taken from script\nRuns 8011768c\n\nThis function may return a value based on the player's status:\non ship vs in dungeon, etc\n\n8030e414 is then set to this value\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\nNo parameters taken from script\nRuns 8011768c\n\nThis function may return a value based on the player's status:\non ship vs in dungeon, etc\n\n8030e414 is then set to this value",
     "Parameters": {}
   },
   "69": {
@@ -4069,7 +4069,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -4099,7 +4099,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "Only runs if param1 & 1 == 1:\nGets SCPT parameters:\n1: float\n2: float\n3: float\n4: int\n\nruns a few functions:\n80097294(1)\nif (1) != 0x7fffffff:\n  80097228((1),(2),(int)(3))\nif (4) == 0:\n  80097318(1)\nelse:\n  80097318(0)\n\n80097294 sets some globals:\n  DAT_802e0084 = 1\n  DAT_802e0085 = 0\n  DAT_802e0086 = 0\n\n80097228 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x8\n  DAT_802e00a0 = (float)(1)\n  DAT_802e00a4 = (float)(2)\n  DAT_802e00a8 = (3)\n\n80097318 sets a bit:\nif param == 1:\n  DAT_802e0085 = DAT_802e0085 | 0x1;\n  (sets the bit to 1)\nelse:\n  DAT_802e0085 = DAT_802e0085 & 0xfe;\n  (sets the bit to 0)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\nGets SCPT parameters:\n1: float\n2: float\n3: float\n4: int\n\nruns a few functions:\n80097294(1)\nif (1) != 0x7fffffff:\n  80097228((1),(2),(int)(3))\nif (4) == 0:\n  80097318(1)\nelse:\n  80097318(0)\n\n80097294 sets some globals:\n  DAT_802e0084 = 1\n  DAT_802e0085 = 0\n  DAT_802e0086 = 0\n\n80097228 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x8\n  DAT_802e00a0 = (float)(1)\n  DAT_802e00a4 = (float)(2)\n  DAT_802e00a8 = (3)\n\n80097318 sets a bit:\nif param == 1:\n  DAT_802e0085 = DAT_802e0085 | 0x1;\n  (sets the bit to 1)\nelse:\n  DAT_802e0085 = DAT_802e0085 & 0xfe;\n  (sets the bit to 0)",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -4180,7 +4180,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "Only runs if param1 & 1 == 1:\nGets SCPT parameters:\n1: float\n2: float\n3: float\n4: int\n\nruns a few functions:\n80097294(1)\nif (1) != 0x7fffffff:\n  80097228((1),(2),(3))\nif (4) == 0:\n  80097318(1)\nelse:\n  80097318(0)\n\n---\n80097294 sets some globals:\n  DAT_802e0084 = (3)\n  DAT_802e0085 = 0x0\n  DAT_802e0086 = 0x0\n\n---\n80097204 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x8\n  DAT_802e00ac = (float)(1)\n  DAT_802e00b0 = (float)(2)\n  DAT_802e00b4 = (float)(3)\n\n---\n80097318 sets a bit:\nif param == 1:\n  DAT_802e0085 = DAT_802e0085 | 0x1;\n  (sets the bit to 1)\nelse:\n  DAT_802e0085 = DAT_802e0085 & 0xfe;\n  (sets the bit to 0)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\nGets SCPT parameters:\n1: float\n2: float\n3: float\n4: int\n\nruns a few functions:\n80097294(1)\nif (1) != 0x7fffffff:\n  80097228((1),(2),(3))\nif (4) == 0:\n  80097318(1)\nelse:\n  80097318(0)\n\n---\n80097294 sets some globals:\n  DAT_802e0084 = (3)\n  DAT_802e0085 = 0x0\n  DAT_802e0086 = 0x0\n\n---\n80097204 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x8\n  DAT_802e00ac = (float)(1)\n  DAT_802e00b0 = (float)(2)\n  DAT_802e00b4 = (float)(3)\n\n---\n80097318 sets a bit:\nif param == 1:\n  DAT_802e0085 = DAT_802e0085 | 0x1;\n  (sets the bit to 1)\nelse:\n  DAT_802e0085 = DAT_802e0085 & 0xfe;\n  (sets the bit to 0)",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -4261,7 +4261,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 9,
-    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: float     \n2: float     \n3: float     \n4: float\n5: float     \n6: float\n7: float     \n8: float\n9: float\n\n2:\nA bunch of stuff happens:\n1) A 2 iteration loop is set where so that the function waits for 2 frames.\n\n2) When the timer is over, \n\nruns a few functions:\n80097294(0x3,1)\n\nif (1) != 0x7fffffff:\n  80097204((1),(2),(3))\n\nif (4) != 0x7fffffff:\n  8009724c((4),(5),(6))\n\nif (5) != 0x7fffffff:\n  FUN_80097118((7))\n\nif (6) != 0x7fffffff:\n  FUN_800970fc((8))\n\nif (9) == 0:\n  80097318(1)\nelse:\n  80097318(0)\n\nResult:\n80097294 sets some globals:\n  DAT_802e0084 = 0x3\n  DAT_802e0085 = 0x0\n  DAT_802e0086 = 0x0\n\n80097204 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x10\n  DAT_802e00ac = (1)\n  DAT_802e00b0 = (2)\n  DAT_802e00b4 = (3)\n\n80097228 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x8\n  DAT_802e00a0 = (4)\n  DAT_802e00a4 = (5)\n  DAT_802e00a8 = (6)\n\n80097118 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x40\n  DAT_802e00d0 = (7)\n\n800970fc sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x80\n  DAT_802e00d4 = (8)\n\n80097318 sets a bit:\nif param == 1:\n  DAT_802e0085 = DAT_802e0085 | 0x1;\n  (sets the bit to 1)\nelse:\n  DAT_802e0085 = DAT_802e0085 & 0xfe;\n  (sets the bit to 0)\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: float     \n2: float     \n3: float     \n4: float\n5: float     \n6: float\n7: float     \n8: float\n9: float\n\n2:\nA bunch of stuff happens:\n1) A 2 iteration loop is set where so that the function waits for 2 frames.\n\n2) When the timer is over, \n\nruns a few functions:\n80097294(0x3,1)\n\nif (1) != 0x7fffffff:\n  80097204((1),(2),(3))\n\nif (4) != 0x7fffffff:\n  8009724c((4),(5),(6))\n\nif (5) != 0x7fffffff:\n  FUN_80097118((7))\n\nif (6) != 0x7fffffff:\n  FUN_800970fc((8))\n\nif (9) == 0:\n  80097318(1)\nelse:\n  80097318(0)\n\nResult:\n80097294 sets some globals:\n  DAT_802e0084 = 0x3\n  DAT_802e0085 = 0x0\n  DAT_802e0086 = 0x0\n\n80097204 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x10\n  DAT_802e00ac = (1)\n  DAT_802e00b0 = (2)\n  DAT_802e00b4 = (3)\n\n80097228 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x8\n  DAT_802e00a0 = (4)\n  DAT_802e00a4 = (5)\n  DAT_802e00a8 = (6)\n\n80097118 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x40\n  DAT_802e00d0 = (7)\n\n800970fc sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x80\n  DAT_802e00d4 = (8)\n\n80097318 sets a bit:\nif param == 1:\n  DAT_802e0085 = DAT_802e0085 | 0x1;\n  (sets the bit to 1)\nelse:\n  DAT_802e0085 = DAT_802e0085 & 0xfe;\n  (sets the bit to 0)",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -4427,7 +4427,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 10,
-    "Notes": "Dependent on param1:\nOnly runs if bit1 == 1:\n\nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: float\n2: float\n3: float\n4: float\n5: float\n6: float\n7: float\n8: float\n9: int\n10:short\n\nruns a few functions:\n80097294(0x4)\n\nif (1) != 0x7fffffff:\n  80097204((1),(2),(3))\n\nif (4) != 0x7fffffff:\n  8009724c((4),(5),(6))\n\n80097188((7),(8))\n8009716c((10))\n\nif (9) == 0:\n  80097318(1)\nelse:\n  80097318(0)\n\n\n\nResult:\n80097294 sets some globals:\n  DAT_802e0084 = 0x4\n  DAT_802e0085 = 0x0\n  DAT_802e0086 = 0x0\n\n80097204 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x10\n  DAT_802e00ac = (1)\n  DAT_802e00b0 = (2)\n  DAT_802e00b4 = (3)\n\n80097228 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x8\n  DAT_802e00a0 = (4)\n  DAT_802e00a4 = (5)\n  DAT_802e00a8 = (6)\n\n80097188 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x800;\n  DAT_802e00d8 = (7)\n  DAT_802e00e0 = (8)\n\n8009716c sets another global:\n  DAT_802e0086 = DAT_802e0086 | 0x1000\n  DAT_802e00e6 = (10)\n\n80097318 sets a bit:\nif (9) == 1:\n  DAT_802e0085 = DAT_802e0085 | 0x1;\n  (sets the bit to 1)\nelse:\n  DAT_802e0085 = DAT_802e0085 & 0xfe;\n  (sets the bit to 0)\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nOnly runs if bit1 == 1:\n\nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: float\n2: float\n3: float\n4: float\n5: float\n6: float\n7: float\n8: float\n9: int\n10:short\n\nruns a few functions:\n80097294(0x4)\n\nif (1) != 0x7fffffff:\n  80097204((1),(2),(3))\n\nif (4) != 0x7fffffff:\n  8009724c((4),(5),(6))\n\n80097188((7),(8))\n8009716c((10))\n\nif (9) == 0:\n  80097318(1)\nelse:\n  80097318(0)\n\n\n\nResult:\n80097294 sets some globals:\n  DAT_802e0084 = 0x4\n  DAT_802e0085 = 0x0\n  DAT_802e0086 = 0x0\n\n80097204 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x10\n  DAT_802e00ac = (1)\n  DAT_802e00b0 = (2)\n  DAT_802e00b4 = (3)\n\n80097228 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x8\n  DAT_802e00a0 = (4)\n  DAT_802e00a4 = (5)\n  DAT_802e00a8 = (6)\n\n80097188 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x800;\n  DAT_802e00d8 = (7)\n  DAT_802e00e0 = (8)\n\n8009716c sets another global:\n  DAT_802e0086 = DAT_802e0086 | 0x1000\n  DAT_802e00e6 = (10)\n\n80097318 sets a bit:\nif (9) == 1:\n  DAT_802e0085 = DAT_802e0085 | 0x1;\n  (sets the bit to 1)\nelse:\n  DAT_802e0085 = DAT_802e0085 & 0xfe;\n  (sets the bit to 0)",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -4610,7 +4610,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 7,
-    "Notes": "Dependent on param1:\nOnly runs when bit 1 == 1:\nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: float     \n2: float     \n3: float     \n4: float\n5: float     \n6: float\n7: float\n\nruns a few functions:\n80097294(0x5)\n\nif (1) != 0x7fffffff:\n  80097228((1),(2),(3))\n\nif (4) != 0x7fffffff:\n  8009724c((4),(5),(6))\n\nif (7) == 0:\n  80097318(1)\nelse:\n  80097318(0)\n\nResult:\n80097294 sets some globals:\n  DAT_802e0084 = 0x3\n  DAT_802e0085 = 0x0\n  DAT_802e0086 = 0x0\n\n80097228 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x10\n  DAT_802e00a0 = (1)\n  DAT_802e00a4 = (2)\n  DAT_802e00a8 = (3)\n\n80097228 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x8\n  DAT_802e00a0 = (4)\n  DAT_802e00a4 = (5)\n  DAT_802e00a8 = (6)\n\n80097118 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x40\n  DAT_802e00d0 = (7)\n\n800970fc sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x80\n  DAT_802e00d4 = (8)\n\n80097318 sets a bit:\nif param == 1:\n  DAT_802e0085 = DAT_802e0085 | 0x1;\n  (sets the bit to 1)\nelse:\n  DAT_802e0085 = DAT_802e0085 & 0xfe;\n  (sets the bit to 0)\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nOnly runs when bit 1 == 1:\nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: float     \n2: float     \n3: float     \n4: float\n5: float     \n6: float\n7: float\n\nruns a few functions:\n80097294(0x5)\n\nif (1) != 0x7fffffff:\n  80097228((1),(2),(3))\n\nif (4) != 0x7fffffff:\n  8009724c((4),(5),(6))\n\nif (7) == 0:\n  80097318(1)\nelse:\n  80097318(0)\n\nResult:\n80097294 sets some globals:\n  DAT_802e0084 = 0x3\n  DAT_802e0085 = 0x0\n  DAT_802e0086 = 0x0\n\n80097228 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x10\n  DAT_802e00a0 = (1)\n  DAT_802e00a4 = (2)\n  DAT_802e00a8 = (3)\n\n80097228 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x8\n  DAT_802e00a0 = (4)\n  DAT_802e00a4 = (5)\n  DAT_802e00a8 = (6)\n\n80097118 sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x40\n  DAT_802e00d0 = (7)\n\n800970fc sets some more globals:\n  DAT_802e0086 = DAT_802e0086 | 0x80\n  DAT_802e00d4 = (8)\n\n80097318 sets a bit:\nif param == 1:\n  DAT_802e0085 = DAT_802e0085 | 0x1;\n  (sets the bit to 1)\nelse:\n  DAT_802e0085 = DAT_802e0085 & 0xfe;\n  (sets the bit to 0)",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -4742,7 +4742,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 12,
-    "Notes": "Dependent on param1:\nOnly runs if bit1 == 1:\n\nSCPT analyze:\n1: float\n2: float\n3: float\n4: float\n5: float\n6: float\n7: float\n8: float\n9: int\n10: float\n11: float\n12: float\n\n\n\n80097294(0x6)\n\nif (0x7f7fffff != (1)):\n  80097270(scpt_1,scpt_2,scpt_3)\n\nif (0x7f7fffff != (4)): \n  8009724c(scpt_4,scpt_5,scpt_6)\n\n800971c4((7))\n\n800971e0((8),0x0,0x0)\nif (0 == (9)):\n  80097150(0x0)\n\nif (1 == (9)):\n 80097150(0x8000)\n\nif (0x7f7fffff != (10)): \n  80097118(scpt_10)\n\nif (0x7f7fffff != (11)): \n  800970fc(scpt_11)\n\nif ((12) == 0x0):\n 80097318(0x1)\n\nelse:\n  80097318(0x0)\n\n80097294 sets some globals:\n  802e0084 = 0x6\n  802e0085 = 0x0\n  802e0086 = 0x0\n\n80097270 sets some more globals:\n  802e0086 = 802e0086 | 0x2;\n  802e0088 = (1)\n  802e008c = (2)\n  802e0090 = (3)\n\n8009724c sets some more globals:\n  802e0086 = 802e0086 | 0x4;\n  802e0094 = (4)\n  802e0098 = (5)\n  802e009c = (6)\n\n800971c4 sets a global:\n  802e0086 = 802e0086 | 0x100\n  802e00d8 = (7)\n\n800971e0 sets some more globals:\n  802e0086 = 802e0086 | 0x20\n  802e00b8 = (8)\n  802e00bc = 0x0\n  802e00c0 = 0x0\n\n80097150 sets:\n  802e0086 = 802e0086 | 0x200\n  if (9) == 0\n    802e00dc = 0\n  if (9) == 1  \n    802e00dc = 0x8000\n\n80097118 sets:\n  802e0086 = 802e0086 | 0x40\n  802e00d0 = (10)\n\n800970fc sets:\n  802e0086 = 802e0086 | 0x80\n  802e00d4 = (11)\n\n80097318 sets a bit:\nif (12) == 1:\n  802e0085 = 802e0085 | 0x1;\n  (sets the bit to 1)\nelse:\n  802e0085 = 802e0085 & 0xfe;\n  (sets the bit to 0)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Dependent on param1:\nOnly runs if bit1 == 1:\n\nSCPT analyze:\n1: float\n2: float\n3: float\n4: float\n5: float\n6: float\n7: float\n8: float\n9: int\n10: float\n11: float\n12: float\n\n\n\n80097294(0x6)\n\nif (0x7f7fffff != (1)):\n  80097270(scpt_1,scpt_2,scpt_3)\n\nif (0x7f7fffff != (4)): \n  8009724c(scpt_4,scpt_5,scpt_6)\n\n800971c4((7))\n\n800971e0((8),0x0,0x0)\nif (0 == (9)):\n  80097150(0x0)\n\nif (1 == (9)):\n 80097150(0x8000)\n\nif (0x7f7fffff != (10)): \n  80097118(scpt_10)\n\nif (0x7f7fffff != (11)): \n  800970fc(scpt_11)\n\nif ((12) == 0x0):\n 80097318(0x1)\n\nelse:\n  80097318(0x0)\n\n80097294 sets some globals:\n  802e0084 = 0x6\n  802e0085 = 0x0\n  802e0086 = 0x0\n\n80097270 sets some more globals:\n  802e0086 = 802e0086 | 0x2;\n  802e0088 = (1)\n  802e008c = (2)\n  802e0090 = (3)\n\n8009724c sets some more globals:\n  802e0086 = 802e0086 | 0x4;\n  802e0094 = (4)\n  802e0098 = (5)\n  802e009c = (6)\n\n800971c4 sets a global:\n  802e0086 = 802e0086 | 0x100\n  802e00d8 = (7)\n\n800971e0 sets some more globals:\n  802e0086 = 802e0086 | 0x20\n  802e00b8 = (8)\n  802e00bc = 0x0\n  802e00c0 = 0x0\n\n80097150 sets:\n  802e0086 = 802e0086 | 0x200\n  if (9) == 0\n    802e00dc = 0\n  if (9) == 1  \n    802e00dc = 0x8000\n\n80097118 sets:\n  802e0086 = 802e0086 | 0x40\n  802e00d0 = (10)\n\n800970fc sets:\n  802e0086 = 802e0086 | 0x80\n  802e00d4 = (11)\n\n80097318 sets a bit:\nif (12) == 1:\n  802e0085 = 802e0085 | 0x1;\n  (sets the bit to 1)\nelse:\n  802e0085 = 802e0085 & 0xfe;\n  (sets the bit to 0)",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -4959,7 +4959,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "If param1 & 1 == 1:\n\nClear som ram (801f7500())\n\nget 1 SCPT variable:\n(1) int\n\n0x802e0084 = 0xf;\n0x802e0086 = 0x0;\n\ncVar1 = 8009763c()\n\nif (1) == 0:\n  80097318(1)\nelse:\n  80097318(0)\n\nif cVar1 == 2:\n  Set workspace variables:\n    +0x20 = 2\n    +0x4  = 0\n\n***\nIf param1 & 2 == 1:\n\n\n\n8009763c():\ncVar2 = -1\nif (0x80346c3c == 2) {\n  cVar2 = (char)0x80302f18\n}\nreturn cVar2;\n\n\n80097318(p1):\nif p1 == 0:\n  Set flag at 802e0085 bit 0\nelse:\n  Unset flag at 802e0085 bit 0\n\n\n\n\n\n\n\n\n",
+    "Notes": "If param1 & 1 == 1:\n\nClear som ram (801f7500())\n\nget 1 SCPT variable:\n(1) int\n\n0x802e0084 = 0xf;\n0x802e0086 = 0x0;\n\ncVar1 = 8009763c()\n\nif (1) == 0:\n  80097318(1)\nelse:\n  80097318(0)\n\nif cVar1 == 2:\n  Set workspace variables:\n    +0x20 = 2\n    +0x4  = 0\n\n***\nIf param1 & 2 == 1:\n\n\n\n8009763c():\ncVar2 = -1\nif (0x80346c3c == 2) {\n  cVar2 = (char)0x80302f18\n}\nreturn cVar2;\n\n\n80097318(p1):\nif p1 == 0:\n  Set flag at 802e0085 bit 0\nelse:\n  Unset flag at 802e0085 bit 0",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -4989,7 +4989,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 5,
-    "Notes": "Only runs if param1 & 1 == 1:\nGets SCPT parameters:\n1: int\n2: float\n3: float\n4: float\n5: float\n\nThen runs 80118578((2),(3),(4),(5),(1))\n\n80118578(p1,p2,p3,p4,p5):\n\n0x8030a380 = 1\n0x8030a384 = p5\n0x8030a388 = p1\n0x8030a38c = p2\n0x8030a390 = 0x8030a394 = 0x8030a39c = p3\n0x8030a398 = p4\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\nGets SCPT parameters:\n1: int\n2: float\n3: float\n4: float\n5: float\n\nThen runs 80118578((2),(3),(4),(5),(1))\n\n80118578(p1,p2,p3,p4,p5):\n\n0x8030a380 = 1\n0x8030a384 = p5\n0x8030a388 = p1\n0x8030a38c = p2\n0x8030a390 = 0x8030a394 = 0x8030a39c = p3\n0x8030a398 = p4",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -5087,7 +5087,7 @@
     "Hard parameter two": "0x00020000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "Only runs if param1 & 1 == 1:\n\nload params:\n1: scpt-short\n2: scpt-int\n3: scpt-int\n4: scpt-float\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\nload params:\n1: scpt-short\n2: scpt-int\n3: scpt-int\n4: scpt-float",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -5168,7 +5168,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 7,
-    "Notes": "Only runs if param1 & 1 == 1:\n\nload params:\n1: scpt-int\n2: scpt-int\n3: scpt-int\n4: scpt-int\n5: scpt-float\n6: scpt-float\n7: scpt-int\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\nload params:\n1: scpt-int\n2: scpt-int\n3: scpt-int\n4: scpt-int\n5: scpt-float\n6: scpt-float\n7: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -5293,14 +5293,14 @@
   },
   "80": {
     "Instruction ID": "80",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "Reset 80305ba9",
+    "Description": "Sets global variable at 80305ba9 to zero",
     "Location": "0x80200f88",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   },
   "81": {
@@ -5312,7 +5312,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 9,
-    "Notes": "Only runs if param1 & 1 == 1:\n\nload params:\n1: scpt-int\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-float\n9: scpt-float\n\nruns 801d9a0c((2),(3),(4),(5),(6),(7),(8),(9),(2))\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\nload params:\n1: scpt-int\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-float\n9: scpt-float\n\nruns 801d9a0c((2),(3),(4),(5),(6),(7),(8),(9),(2))",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -5478,7 +5478,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int\n2: scpt-float\n3: scpt-float\n4: scpt-float\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int\n2: scpt-float\n3: scpt-float\n4: scpt-float",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -5559,7 +5559,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 7,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -5691,7 +5691,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 10,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int\n2: scpt-int\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-float\n9: scpt-float\n10: scpt-float\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int\n2: scpt-int\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-float\n9: scpt-float\n10: scpt-float",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -5874,7 +5874,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 5,
-    "Notes": "if param1 & 1 == 1: \n\nparams:\n1: scpt-int\n2: iterations (int)\n\nloop:\n3: scpt-short\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1: \n\nparams:\n1: scpt-int\n2: iterations (int)\n\nloop:\n3: scpt-short",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -5972,7 +5972,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 5,
-    "Notes": "if param1 & 1 == 1: \n\nparams:\n1: scpt-int\n2: iterations (int)\n\nloop:\n3: scpt-short\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1: \n\nparams:\n1: scpt-int\n2: iterations (int)\n\nloop:\n3: scpt-short",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -6070,7 +6070,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 5,
-    "Notes": "if param1 & 1 == 1: \n\nparams:\n1: scpt-int\n2: iterations (int)\n\nloop:\n3: scpt-short\n\n\n\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1: \n\nparams:\n1: scpt-int\n2: iterations (int)\n\nloop:\n3: scpt-short",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -6168,7 +6168,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 5,
-    "Notes": "\nif param1 & 1 == 1: \n\nparams:\n1: scpt-int\n2: iterations (int)\n\nloop:\n3: scpt-short\n\n\n\n\n\n\n",
+    "Notes": "\nif param1 & 1 == 1: \n\nparams:\n1: scpt-int\n2: iterations (int)\n\nloop:\n3: scpt-short",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -6266,7 +6266,7 @@
     "Hard parameter two": "0x00050000",
     "Implement": true,
     "Parameter num": 13,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-short\n2: int\n\nloop ((2)) iterations):\n\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-int\n8: scpt-int\n9: scpt-float\n10: scpt-int\n11: scpt-int\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-short\n2: int\n\nloop ((2)) iterations):\n\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-int\n8: scpt-int\n9: scpt-float\n10: scpt-int\n11: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -6500,7 +6500,7 @@
     "Hard parameter two": "0x00050000",
     "Implement": true,
     "Parameter num": 13,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-short\n2: int\n\nloop ((2)) iterations):\n\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-int\n8: scpt-int\n9: scpt-float\n10: scpt-int\n11: scpt-int\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-short\n2: int\n\nloop ((2)) iterations):\n\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-int\n8: scpt-int\n9: scpt-float\n10: scpt-int\n11: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -6734,7 +6734,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "Only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-int\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -6781,7 +6781,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "\nFirst checks that param from r3 is != zero\n\nThen if the next instruction is a 0x7f7fffff:\niVar1 becomes 0x7fffffff\n\nelse, it uses SCPT analyze to generate the iVar1\n(in the case of me002b.sct, init, this is a 1)\n\nif Var1 == (Ox7fffffff or 1):\n\tFUN_800d2c84 is run with parameter 1\n\nelse FUN800d2c84 is run with parameter 0\n\nFUN_800d2c84 sets an address value (80305baa) to\nits parameter\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "\nFirst checks that param from r3 is != zero\n\nThen if the next instruction is a 0x7f7fffff:\niVar1 becomes 0x7fffffff\n\nelse, it uses SCPT analyze to generate the iVar1\n(in the case of me002b.sct, init, this is a 1)\n\nif Var1 == (Ox7fffffff or 1):\n\tFUN_800d2c84 is run with parameter 1\n\nelse FUN800d2c84 is run with parameter 0\n\nFUN_800d2c84 sets an address value (80305baa) to\nits parameter",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -6811,7 +6811,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Very similar in structure to instruction 82,\nthough the function which it calls is different, \nleading to setting a different memory address\n\n\n\n\n\n\n",
+    "Notes": "Very similar in structure to instruction 82,\nthough the function which it calls is different, \nleading to setting a different memory address",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -6841,7 +6841,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "If param1 & 1 == 1:\n\nparams:\n1: scpt-int\n\n\n\n",
+    "Notes": "If param1 & 1 == 1:\n\nparams:\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -6864,15 +6864,135 @@
   },
   "95": {
     "Instruction ID": "95",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "unknown0: <unknown0>\nunknown1: <unknown1>\nunknown2: <unknown2>\nunknown3: <unknown3>\nunknown4: <unknown4>\nunknown5: <unknown5>\nunknown6: <unknown6>",
     "Location": "0x80206424",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 7,
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-float\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-int\n\n\nThen runs the following:\n\nFUN_80097294(1);\n\nif ((double)7f7fffff_8034c1e0 != scpt_1) {\n  FUN_80097228(scpt_1,scpt_2,scpt_3);\n}\n\nif ((double)7f7fffff_8034c1e0 == scpt_4) {\n  scpt_4 = (double)FLOAT_8034c234;\n}\n\nFUN_8009724c((double)FLOAT_8034c204,scpt_4,(double)FLOAT_8034c204);\n\nif ((double)7f7fffff_8034c1e0 == scpt_5) {\n  scpt_5 = (double)FLOAT_8034c23c;\n}\nFUN_800971a8(scpt_5);\n\nif ((double)7f7fffff_8034c1e0 == scpt_6) {\n  scpt_6 = (double)FLOAT_8034c240;\n}\nFUN_80097134((int)scpt_6);\n\nif (scpt_7 == 0) {\n  FUN_80097318(1);\n}\nelse {\n  FUN_80097318(0);\n}",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "1": {
+        "ID": "1",
+        "Name": "unknown1",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "2": {
+        "ID": "2",
+        "Name": "unknown2",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "3": {
+        "ID": "3",
+        "Name": "unknown3",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "4": {
+        "ID": "4",
+        "Name": "unknown4",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "5": {
+        "ID": "5",
+        "Name": "unknown5",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "6": {
+        "ID": "6",
+        "Name": "unknown6",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "96": {
     "Instruction ID": "96",
@@ -6883,7 +7003,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 7,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-float\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-int\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-float\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -7015,7 +7135,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 3,
-    "Notes": "Has error: \"scptChangeParts: malloc failed\"\n\nIf param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-int\n3: scpt-int\n\n\n\n\n\n",
+    "Notes": "Has error: \"scptChangeParts: malloc failed\"\n\nIf param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-int\n3: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -7079,7 +7199,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "If param1 & 1 == 1:\n\nparams:\n\n1: int\n\nloop ((1) iterations):\nparam:\n2: scpt-short\nruns 3 fxns:\n8010a164\n80211058\n80210f74\n\nif param1 & 2 == 1:\nRuns 800cd0b8\n\n\n\n\n\n\n",
+    "Notes": "If param1 & 1 == 1:\n\nparams:\n\n1: int\n\nloop ((1) iterations):\nparam:\n2: scpt-short\nruns 3 fxns:\n8010a164\n80211058\n80210f74\n\nif param1 & 2 == 1:\nRuns 800cd0b8",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -7160,7 +7280,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "If param1 & 1 == 1:\n\nparams:\n1: int\n\nloop ((1) iterations):\n param:\n 2: scpt-short\n runs:\n 80211058\n 80210f74\n\n\n\n\n\n",
+    "Notes": "If param1 & 1 == 1:\n\nparams:\n1: int\n\nloop ((1) iterations):\n param:\n 2: scpt-short\n runs:\n 80211058\n 80210f74",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -7234,15 +7354,67 @@
   },
   "100": {
     "Instruction ID": "100",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??TextChange?",
+    "Description": "unknown0: <unknown0>\nunknown1: <unknown1>\nunknown2: <unknown2>",
     "Location": "0x80208c08",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 3,
+    "Notes": "Debug message present:\nDBPrintf(s_TextChange:_message_post_timed_o_802d5348);",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-short",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "1": {
+        "ID": "1",
+        "Name": "unknown1",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "2": {
+        "ID": "2",
+        "Name": "unknown2",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "101": {
     "Instruction ID": "101",
@@ -7253,7 +7425,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "If param1 & 1 == 1:\n\nparams:\n1: scpt-int\n\n\n\n",
+    "Notes": "If param1 & 1 == 1:\n\nparams:\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -7276,15 +7448,33 @@
   },
   "102": {
     "Instruction ID": "102",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "unknown0: <unknown0>\n\ntest for some sort of offset:\n*lnk*[unknown0,<unknown0>]",
     "Location": "0x801f9668",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 1,
+    "Notes": "Appears to load something from the disc depending on the parameter (integer), \ncould be an offset to a file name? \nor the file number in the file structure?",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "103": {
     "Instruction ID": "103",
@@ -7295,7 +7485,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "\nThis seems to only be present in the initializtion of ship battles\n\n\n\n\n\n",
+    "Notes": "\nThis seems to only be present in the initializtion of ship battles",
     "Parameters": {}
   },
   "104": {
@@ -7307,7 +7497,7 @@
     "Hard parameter two": "0xfffe0000",
     "Implement": true,
     "Parameter num": 3,
-    "Notes": "If param_1 & 1 == 1:\n\nParams:\n1: scpt-int\n2: scpt-float\n3: scpt-int\n\n\n\n\n\n\n\n",
+    "Notes": "If param_1 & 1 == 1:\n\nParams:\n1: scpt-int\n2: scpt-float\n3: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -7371,7 +7561,7 @@
     "Hard parameter two": "0xfffe0000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Only runs if param_1 & 1 == 1:\n\nParams:\n1: scpt-int\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param_1 & 1 == 1:\n\nParams:\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -7401,7 +7591,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 9,
-    "Notes": "** Has Debug Msg: \"scptParentOn: message post time out\"\n\nIf param_1 & 1 == 1:\n\nParams:\n\n1: scpt-short\n2: scpt-int\n3: scpt-short\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-float\n9: scpt-float\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "** Has Debug Msg: \"scptParentOn: message post time out\"\n\nIf param_1 & 1 == 1:\n\nParams:\n\n1: scpt-short\n2: scpt-int\n3: scpt-short\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-float\n9: scpt-float",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -7567,7 +7757,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "***Has error: \"scptParentOff: malloc failed\"\n\nif param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-short\n\n\n\n",
+    "Notes": "***Has error: \"scptParentOff: malloc failed\"\n\nif param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-short",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -7614,7 +7804,7 @@
     "Hard parameter two": "0x00050000",
     "Implement": true,
     "Parameter num": 13,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -8014,7 +8204,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -8044,7 +8234,7 @@
     "Hard parameter two": "0xfffe0000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "If param_1 & 1 == 1:\n\nParams:\n\n1: scpt-int\n2: scpt-int\n\n\n",
+    "Notes": "If param_1 & 1 == 1:\n\nParams:\n\n1: scpt-int\n2: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -8085,13 +8275,13 @@
   "112": {
     "Instruction ID": "112",
     "Name": "??Trigger Battle",
-    "Description": "unknown0: <unknown0>\nunknown1: <unknown1>\nunknown2: <unknown2>\nunknown3: <unknown3>",
+    "Description": "EnemyID: <unknown0>\nEncounterID: <unknown1>\nBattle Stage: <unknown2>\nunknown3: <unknown3>",
     "Location": "0x801ff210",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "If param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-int\n3: scpt-int\n4: scpt-int\n\nmaybe trigers a battle using these parameters?\n\n\n",
+    "Notes": "If param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-int\n3: scpt-int\n4: scpt-int\n\nmaybe trigers a battle using these parameters?",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -8172,7 +8362,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "If param1 & 1 == 1:\n\n1: int\n\nstores pointer: SCPTpointer + 4 + offset*4\n\nIf param1 & 2 == 1:\n\nruns 8010038c(pointer, (1)\n\n\n\n\n\n\n\n",
+    "Notes": "If param1 & 1 == 1:\n\n1: int\n\nstores pointer: SCPTpointer + 4 + offset*4\n\nIf param1 & 2 == 1:\n\nruns 8010038c(pointer, (1)",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -8202,7 +8392,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "If param1 & 1 == 1:\n\n1: scpt-int\n2: scpt-short\n\n\n\n\n",
+    "Notes": "If param1 & 1 == 1:\n\n1: scpt-int\n2: scpt-short",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -8242,27 +8432,147 @@
   },
   "115": {
     "Instruction ID": "115",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "Maybe changes current area?",
     "Location": "0x801fef48",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "Runs 800ffa18:\n\nvoid FUN_800ffa18(void)\n\n{\n  char cVar1;\n  \n  DAT_80347470 = 1;\n  FUN_8025f120(&DAT_80305cf0,s_me002z.sct_802b233c);\n  FUN_800ff908();\n  if ((zzOnShip == 1) && (zzCurrentArea_80311ac4 == 99)) {\n    cVar1 = '\\0';\n  }\n  else {\n    cVar1 = zzCurrentSubArea_letter_80311ac8 + -0x61;\n  }\n  FUN_801f7b04((int)cVar1 + zzCurrentArea_80311ac4 * 10);\n  DAT_80347488 = DAT_80349b00;\n  GameState_Switch_80311aec = 0xf;\n  DAT_803475d4 = 1;\n  if ((DAT_803475d8 != 1) && (DAT_80346e48 != 1)) {\n    FUN_801004c4(&DAT_80311ac0,&DAT_80305cf0);\n  }\n  GameState_Switch_80311aec = 0xf;\n  return;\n}",
     "Parameters": {}
   },
   "116": {
     "Instruction ID": "116",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "unknown0: <unknown0>\nunknown1: <unknown1>\nunknown2: <unknown2>\nunknown3: <unknown3>\nunknown4: <unknown4>\nunknown5: <unknown5>\nunknown6: <unknown6>",
     "Location": "0x801f9ea8",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 7,
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int\n2: scpt-byte\n3: scpt-byte\n4: scpt-int\n5: scpt-float\n6: scpt-float\n7: scpt-float (fVar2)\n\nFUN_801694fc(scpt_5,\n             scpt_6,\n             (double)fVar2,\n             scpt_1,\n             (int)scpt_2,\n             (int)scpt_3,\n             scpt_4);",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "1": {
+        "ID": "1",
+        "Name": "unknown1",
+        "Type": "scpt-byte",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "2": {
+        "ID": "2",
+        "Name": "unknown2",
+        "Type": "scpt-byte",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "3": {
+        "ID": "3",
+        "Name": "unknown3",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "4": {
+        "ID": "4",
+        "Name": "unknown4",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "5": {
+        "ID": "5",
+        "Name": "unknown5",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "6": {
+        "ID": "6",
+        "Name": "unknown6",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "117": {
     "Instruction ID": "117",
@@ -8273,7 +8583,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "If param1 & 1 == 1:\n\n1: scpt-short\n2: scpt-int\n\nRuns 80211058() using them\n\nif param1 & 2 == 1:\n\nruns 800cd0b8 using results from section 1\n\n\n\n\n\n",
+    "Notes": "If param1 & 1 == 1:\n\n1: scpt-short\n2: scpt-int\n\nRuns 80211058() using them\n\nif param1 & 2 == 1:\n\nruns 800cd0b8 using results from section 1",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -8320,7 +8630,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 6,
-    "Notes": "If param1 & 1 == 1:\n\nparameters:\n1: scpt-int\n2: int\n\nif scpt\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "If param1 & 1 == 1:\n\nparameters:\n1: scpt-int\n2: int\n\nif scpt",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -8435,7 +8745,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 5,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -8526,15 +8836,135 @@
   },
   "120": {
     "Instruction ID": "120",
-    "Name": "no name",
-    "Description": "",
+    "Name": "??PlayMO3?",
+    "Description": "unknown0: <unknown0>\nunknown1: <unknown1>\nunknown2: <unknown2>\nunknown3: <unknown3>\nunknown4: <unknown4>\nunknown5: <unknown5>\nunknown6: <unknown6>",
     "Location": "0x801f8608",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00020000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 7,
+    "Notes": "Debug message:\ns_PlayMO3:_message_post_time_out_802d48a8\n\nOnly runs if param1 & 1 == 1:\n\n1: scpt-short\n2: scpt-int\n3: scpt-int\n4: scpt-float\n5: scpt-float\n6: scpt-int\n7: scpt-int",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-short",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "1": {
+        "ID": "1",
+        "Name": "unknown1",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "2": {
+        "ID": "2",
+        "Name": "unknown2",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "3": {
+        "ID": "3",
+        "Name": "unknown3",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "4": {
+        "ID": "4",
+        "Name": "unknown4",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "5": {
+        "ID": "5",
+        "Name": "unknown5",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "6": {
+        "ID": "6",
+        "Name": "unknown6",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "121": {
     "Instruction ID": "121",
@@ -8545,7 +8975,7 @@
     "Hard parameter two": "0xfffe0000",
     "Implement": true,
     "Parameter num": 10,
-    "Notes": "\n\nif param1 & 1 == 1:\n\nparams:\n1: int\n\nloop ((1) iterations):\n  2: scpt-float\n  3: scpt-float\n  4: scpt-float\n  5: scpt-float\n  6: scpt-float\n  7: scpt-float\n  8: scpt-int\n\n\n",
+    "Notes": "\n\nif param1 & 1 == 1:\n\nparams:\n1: int\n\nloop ((1) iterations):\n  2: scpt-float\n  3: scpt-float\n  4: scpt-float\n  5: scpt-float\n  6: scpt-float\n  7: scpt-float\n  8: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -8728,7 +9158,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 5,
-    "Notes": "only runs if param1 & 1 == 1\n\n\n\n",
+    "Notes": "only runs if param1 & 1 == 1",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -8826,7 +9256,7 @@
     "Hard parameter two": "0xfffe0000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "Has error: \"TrackUp: malloc failed\"\n\nif param1 & 1 == 1:\n\nparams:\n1: scpt-float\n2: scpt-int\n\nCreates an array:\n[0]: 0\n[6]:(2)\n[7]:(1)\n[8]: 0\n[9]: *0x8030e79c\n[a]: *0x8030e7a0\n[b]: *0x8030e7a4\n\nif param1 & 2 == 1:\nuses array in 802136a8()\n\n\n\n",
+    "Notes": "Has error: \"TrackUp: malloc failed\"\n\nif param1 & 1 == 1:\n\nparams:\n1: scpt-float\n2: scpt-int\n\nCreates an array:\n[0]: 0\n[6]:(2)\n[7]:(1)\n[8]: 0\n[9]: *0x8030e79c\n[a]: *0x8030e7a0\n[b]: *0x8030e7a4\n\nif param1 & 2 == 1:\nuses array in 802136a8()",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -8873,7 +9303,7 @@
     "Hard parameter two": "0xfffe0000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "Only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-float\n2: scpt-int\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-float\n2: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -8913,14 +9343,14 @@
   },
   "125": {
     "Instruction ID": "125",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "???",
     "Location": "0x8020731c",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0xfffe0000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "\nDoes the following:\n\nFUN_80210ce4();\nFUN_801f7500();\nDAT_8030e46c = 0;",
     "Parameters": {}
   },
   "126": {
@@ -8932,7 +9362,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: int\n\nloop ((2) iterations):\n  2: scpt-int\n  \n  run 80210ea4((2), 5)\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: int\n\nloop ((2) iterations):\n  2: scpt-int\n  \n  run 80210ea4((2), 5)",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -9013,7 +9443,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "If param1 & 1 == 1:\n\n1: int\n\nloop ((1) iterations):\n  param:\n  2: scpt-int\n  80210ea4((2))\n  v1 = 8015f1a0((2))\n  v2 = 8015f1f0()\n  if v2 == 1:\n    v2 = 8015f180(v1)\n\n",
+    "Notes": "If param1 & 1 == 1:\n\n1: int\n\nloop ((1) iterations):\n  param:\n  2: scpt-int\n  80210ea4((2))\n  v1 = 8015f1a0((2))\n  v2 = 8015f1f0()\n  if v2 == 1:\n    v2 = 8015f180(v1)",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -9209,7 +9639,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "only runs if param1 & 1 == 1:\n\nparam:\n1: scpt-int\n2: int\n\nruns 802114ac((1),scptPointer)\n\nseems to add something to a list. It seems to use the information from the script, incrementing down the list for as far as the entries parameter tells it to. Maybe it buffers instructions?\n\n(1) appears to be the frames to wait to perform the instruction\n\n(2) appears to be the length of the instruction to perform\n\nInstructions can likely be performed arbitrarily with this\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "only runs if param1 & 1 == 1:\n\nparam:\n1: scpt-int\n2: int\n\nruns 802114ac((1),scptPointer)\n\nseems to add something to a list. It seems to use the information from the script, incrementing down the list for as far as the entries parameter tells it to. Maybe it buffers instructions?\n\n(1) appears to be the frames to wait to perform the instruction\n\n(2) appears to be the length of the instruction to perform\n\nInstructions can likely be performed arbitrarily with this",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -9256,7 +9686,7 @@
     "Hard parameter two": "0x00050000",
     "Implement": true,
     "Parameter num": 11,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: int\n\nloop ((2) iterations):\n  3: scpt-float\n  4: scpt-float\n  5: scpt-float\n  6: scpt-float\n  4: scpt-float\n  5: scpt-float\n  6: scpt-float\n\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: int\n\nloop ((2) iterations):\n  3: scpt-float\n  4: scpt-float\n  5: scpt-float\n  6: scpt-float\n  4: scpt-float\n  5: scpt-float\n  6: scpt-float",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -9456,7 +9886,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 7,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: int\n\nloop ((1) iterations):\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-int\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: int\n\nloop ((1) iterations):\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -9588,7 +10018,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 10,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: int\n\nloop ((1) iterations):\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-int\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: int\n\nloop ((1) iterations):\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -9771,7 +10201,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 13,
-    "Notes": "\n1: int\n2: scpt-int\n\nloop ((1) iterations):\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-float\n9: scpt-float\n10: scpt-float\n11: scpt-int\n\n\n",
+    "Notes": "\n1: int\n2: scpt-int\n\nloop ((1) iterations):\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-float\n9: scpt-float\n10: scpt-float\n11: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -10005,7 +10435,7 @@
     "Hard parameter two": "0x00020000",
     "Implement": true,
     "Parameter num": 7,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-int\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-int\n7: scpt-int\n\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-int\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-int\n7: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -10137,7 +10567,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 5,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -10333,7 +10763,7 @@
     "Hard parameter two": "0x00050000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -10363,7 +10793,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "If param1 & 1 == 0, returns either a 1 or zero \nwith no additional function calls\n\nif param1&1 == 1, advances the script pointer and calls FUN_800ff780, then returns a 1\n\nFUN_800ff780 calls FUN_80123e9c\n\nFUN_80123e9c sets two words:\n\t803473b0 => 0\n\t803473b4 => 1\n\nI should test setting these two bytes\n\n803473b0 seems to do nothing\n803473b4 seems to be a flag which loads the save menu\n\n\n\n\n\n\n",
+    "Notes": "If param1 & 1 == 0, returns either a 1 or zero \nwith no additional function calls\n\nif param1&1 == 1, advances the script pointer and calls FUN_800ff780, then returns a 1\n\nFUN_800ff780 calls FUN_80123e9c\n\nFUN_80123e9c sets two words:\n\t803473b0 => 0\n\t803473b4 => 1\n\nI should test setting these two bytes\n\n803473b0 seems to do nothing\n803473b4 seems to be a flag which loads the save menu",
     "Parameters": {}
   },
   "139": {
@@ -10588,7 +11018,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "if param1 & 1 == 1:\n\nparam:\n1: scpt-int\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparam:\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -10618,7 +11048,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 5,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-short\n3: scpt-short\n4: scpt-float\n5: scpt-int\n\nstructure similar to inst_262\n\n\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-short\n3: scpt-short\n4: scpt-float\n5: scpt-int\n\nstructure similar to inst_262",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -10709,14 +11139,14 @@
   },
   "143": {
     "Instruction ID": "143",
-    "Name": "no name",
-    "Description": "",
-    "Location": "0x8020a734",
+    "Name": "No Function",
+    "Description": "This only returns a zero, which will allow a frame to pass before the next instruction. However, this doesn't seem to increment the script pointer, so it may cause an infinite loop?",
+    "Location": "0x8020a72c",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {}
   },
   "144": {
@@ -11265,7 +11695,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Only runs if param1 & 1 == 1:\n\nparam:\n1: scpt-int\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\nparam:\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -11295,7 +11725,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-int\n\n",
+    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -11342,7 +11772,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -11423,7 +11853,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 6,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: int\n\nloop ((1) iterations):\n  params:\n  2: scpt-byte\n  3: scpt-byte\n  4: scpt-short\n  (May break early if (4) == 0)\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: int\n\nloop ((1) iterations):\n  params:\n  2: scpt-byte\n  3: scpt-byte\n  4: scpt-short\n  (May break early if (4) == 0)",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -11625,14 +12055,14 @@
   },
   "156": {
     "Instruction ID": "156",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "Copies data from one memory location to another...",
     "Location": "0x801fed04",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "Runs 800ff7a0\n\nvoid FUN_800ff7a0(void)\n\n{\n  if (DAT_80347450 == 0) {\n    return;\n  }\n  if ((zzOnShip != 1) && (DAT_803474b0 == 1)) {\n    *(undefined4 *)(DAT_80347450 + 0x38) = DAT_8030a77c;\n    *(undefined4 *)(DAT_80347450 + 0x3c) = DAT_8030a780;\n    *(undefined4 *)(DAT_80347450 + 0x40) = DAT_8030a784;\n    *(undefined4 *)(DAT_80347450 + 0x44) = DAT_8030a764;\n    *(undefined4 *)(DAT_80347450 + 0x48) = DAT_8030a768;\n    *(undefined4 *)(DAT_80347450 + 0x4c) = DAT_8030a76c;\n    *(undefined2 *)(*(int *)(DAT_80347450 + 0x1b8) + 0x2a) = DAT_803474ac;\n    *(undefined2 *)(*(int *)(DAT_80347450 + 0x1b8) + 0x28) = 0xffff;\n    *(undefined2 *)(*(int *)(DAT_80347450 + 0x1b8) + 0x2e) = 0xffff;\n    *(undefined2 *)(*(int *)(DAT_80347450 + 0x1b8) + 0x2c) = 0xffff;\n    return;\n  }\n  if (DAT_803474b4 != 1) {\n    return;\n  }\n  *(undefined4 *)(DAT_80347450 + 0x38) = DAT_8030a788;\n  *(undefined4 *)(DAT_80347450 + 0x3c) = DAT_8030a78c;\n  *(undefined4 *)(DAT_80347450 + 0x40) = DAT_8030a790;\n  *(undefined4 *)(DAT_80347450 + 0x44) = DAT_8030a770;\n  *(undefined4 *)(DAT_80347450 + 0x48) = DAT_8030a774;\n  *(undefined4 *)(DAT_80347450 + 0x4c) = DAT_8030a778;\n  *(undefined2 *)(*(int *)(DAT_80347450 + 0x1b8) + 0x2a) = DAT_803474ae;\n  *(undefined2 *)(*(int *)(DAT_80347450 + 0x1b8) + 0x28) = 0xffff;\n  *(undefined2 *)(*(int *)(DAT_80347450 + 0x1b8) + 0x2e) = 0xffff;\n  *(undefined2 *)(*(int *)(DAT_80347450 + 0x1b8) + 0x2c) = 0xffff;\n  return;\n}",
     "Parameters": {}
   },
   "157": {
@@ -11644,7 +12074,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -11674,7 +12104,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -11704,7 +12134,7 @@
     "Hard parameter two": "0xfffe0000",
     "Implement": true,
     "Parameter num": 11,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: int\n\nloop ((1) iterations):\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-int\n9: scpt-byte\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: int\n\nloop ((1) iterations):\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-int\n9: scpt-byte",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -11897,39 +12327,399 @@
   },
   "160": {
     "Instruction ID": "160",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "unknown0: <unknown0>\nunknown1: <unknown1>\nunknown2: <unknown2>\nunknown3: <unknown3>\nunknown4: <unknown4>\nunknown5: <unknown5>\nunknown6: <unknown6>",
     "Location": "0x8020a168",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 7,
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float (fVar2)\n\nFUN_801185a8(scpt_2,\n             scpt_3,\n             scpt_4,\n             scpt_5,\n             scpt_6,\n             (double)fVar2,\n             scpt_1);\n\n{\n  DAT_8030a380 = 2;\n  DAT_8030a384 = param_7;\n  DAT_8030a388 = (float)param_1;\n  DAT_8030a38c = (float)param_2;\n  DAT_8030a390 = (float)param_3;\n  DAT_8030a394 = (float)param_4;\n  DAT_8030a398 = (float)param_5;\n  DAT_8030a39c = (float)param_6;\n  return;\n}",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "1": {
+        "ID": "1",
+        "Name": "unknown1",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "2": {
+        "ID": "2",
+        "Name": "unknown2",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "3": {
+        "ID": "3",
+        "Name": "unknown3",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "4": {
+        "ID": "4",
+        "Name": "unknown4",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "5": {
+        "ID": "5",
+        "Name": "unknown5",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "6": {
+        "ID": "6",
+        "Name": "unknown6",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "161": {
     "Instruction ID": "161",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??scptMV3?",
+    "Description": "unknown0: <unknown0>\n\n<loop>",
     "Location": "0x801f8158",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00050000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 13,
+    "Notes": "",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-short",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "1": {
+        "ID": "1",
+        "Name": "iter",
+        "Type": "int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "2": {
+        "ID": "2",
+        "Name": "loop",
+        "Type": "loop-start",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "1-iter",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "3": {
+        "ID": "3",
+        "Name": "unknown3",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "4": {
+        "ID": "4",
+        "Name": "unknown4",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "5": {
+        "ID": "5",
+        "Name": "unknown5",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "6": {
+        "ID": "6",
+        "Name": "unknown6",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "7": {
+        "ID": "7",
+        "Name": "unknown7",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "8": {
+        "ID": "8",
+        "Name": "unknown8",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "9": {
+        "ID": "9",
+        "Name": "unknown9",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "10": {
+        "ID": "10",
+        "Name": "unknown10",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "11": {
+        "ID": "11",
+        "Name": "unknown11",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "12": {
+        "ID": "12",
+        "Name": "unknown12",
+        "Type": "loop-end",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "162": {
     "Instruction ID": "162",
-    "Name": "no name",
-    "Description": "",
+    "Name": "??no name ?",
+    "Description": "unknown0: <unknown0>\n\nIf unknown0 is 1:\n  sets flag at 802e0085 & 1 to 1\nelse:\n  sets flag at 802e0085 & 1 to 0",
     "Location": "0x80205e48",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 1,
+    "Notes": "if param1 & 1 == 1:\n\n1: scpt-int\n\nFUN_80097294(9);\nif ((scpt_1 & 0xffff) == 0) {\n  FUN_80097318(1);\n} else {\n  FUN_80097318(0);\n}",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "163": {
     "Instruction ID": "163",
@@ -11940,7 +12730,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 9,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -12106,7 +12896,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "**Has debug:\"HCLR: message post timed out\"\n\n1: scpt-short\n2: scpt-int\n\n\n\n\n\n\n\n\n",
+    "Notes": "**Has debug:\"HCLR: message post timed out\"\n\n1: scpt-short\n2: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -12489,7 +13279,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -12529,12 +13319,12 @@
   },
   "167": {
     "Instruction ID": "167",
-    "Name": "no name",
-    "Description": "",
+    "Name": "??no name",
+    "Description": "???",
     "Location": "0x802150bc",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
     "Notes": "",
     "Parameters": {}
@@ -12548,7 +13338,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -12578,7 +13368,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -12659,7 +13449,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {}
   },
   "171": {
@@ -12671,7 +13461,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "Only runs if param1 & 1 == 1\n\n0x803472 = 8034a380\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1\n\n0x803472 = 8034a380",
     "Parameters": {}
   },
   "172": {
@@ -12713,7 +13503,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "if Param1 & 1 == 1:\n\n1: scpt-int\n\nruns 80148be8((1))\n\n80148be8(p1):\n-Tests whether p1 is in a scene table\n-Allocates some ram for something\n\n\n\n\n\n\n\n",
+    "Notes": "if Param1 & 1 == 1:\n\n1: scpt-int\n\nruns 80148be8((1))\n\n80148be8(p1):\n-Tests whether p1 is in a scene table\n-Allocates some ram for something",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -12767,14 +13557,49 @@
   "175": {
     "Instruction ID": "175",
     "Name": "no name",
-    "Description": "",
-    "Location": "0x80801f54",
+    "Description": "unknown0: <unknown0>\nunknown1: <unknown1>\n\nunknown1 may not be used at all...",
+    "Location": "0x801f5468",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 2,
+    "Notes": "debug printout:\nDBPrintf(s_Timeout_Error_:_%d_802d470c,s_rdt_scriptact.c_802d46fc,0x98);",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-short",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "1": {
+        "ID": "1",
+        "Name": "unknown1",
+        "Type": "scpt",
+        "Override": false,
+        "Override condition": "compare-value-current",
+        "Override offset": "0x00000000",
+        "Override result": "0",
+        "Override compare": "0x7f7fffff",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "176": {
     "Instruction ID": "176",
@@ -12785,7 +13610,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 6,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-short\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-int\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-short\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -12900,7 +13725,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 13,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-float\n9: scpt-float\n10: scpt-float\n11: scpt-float\n12: scpt-float\n13: scpt-float\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-float\n9: scpt-float\n10: scpt-float\n11: scpt-float\n12: scpt-float\n13: scpt-float",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -13134,7 +13959,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 8,
-    "Notes": "only runs if param1 & 1 == 1\n\n\n",
+    "Notes": "only runs if param1 & 1 == 1",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -13283,7 +14108,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-float\n2: scpt-float\n3: scpt-float\n4: scpt-int\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-float\n2: scpt-float\n3: scpt-float\n4: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -13364,7 +14189,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "**Has error: \"scptHtaskset: message post time out\"\n\nIf param1 & 1 == 1:\n\n1: scpt-int [6]\n\nconstants:\n0 [7]\n0 [8]\n\nruns 802110e8() using above params\n\nIf param1 & 2 == 1:\n\nruns 800cd0b8() on above result\n\n\n\n\n",
+    "Notes": "**Has error: \"scptHtaskset: message post time out\"\n\nIf param1 & 1 == 1:\n\n1: scpt-int [6]\n\nconstants:\n0 [7]\n0 [8]\n\nruns 802110e8() using above params\n\nIf param1 & 2 == 1:\n\nruns 800cd0b8() on above result",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -13394,7 +14219,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -13418,13 +14243,13 @@
   "182": {
     "Instruction ID": "182",
     "Name": "code_error",
-    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call\n\n",
+    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call",
     "Location": "0x801f60f0",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "This instruction calls the function 801f60f0\n\nThis function just returns a zero and produces a \ncode error. it is likely that this number is \nreserved for something else.\n\n",
+    "Notes": "This instruction calls the function 801f60f0\n\nThis function just returns a zero and produces a \ncode error. it is likely that this number is \nreserved for something else.",
     "Parameters": {}
   },
   "183": {
@@ -13436,7 +14261,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-short\n\nruns 801f452c((1)) which either returns the item ID or amount, not sure which yet.\n\nSets 0x8030e474 to the result of 801f452c()\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-short\n\nruns 801f452c((1)) which either returns the item ID or amount, not sure which yet.\n\nSets 0x8030e474 to the result of 801f452c()",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -13466,7 +14291,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-byte\n2: scpt-int\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-byte\n2: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -13513,7 +14338,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -13543,7 +14368,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -13566,38 +14391,74 @@
   },
   "187": {
     "Instruction ID": "187",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "unknown0: <unknown0>",
     "Location": "0x8020bb8c",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 1,
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int\n\nif (iVar1 == 0) {\n  FUN_8016d114(7);\n} else {\n  FUN_8016d114(4);\n}",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "188": {
     "Instruction ID": "188",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "unknown0: <unknown0>",
     "Location": "0x8020bae0",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 1,
+    "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-int\n\nif (iVar1 == 0) {\n  FUN_8016d114(8);\n} else {\n  FUN_8016d114(5);\n}",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "189": {
     "Instruction ID": "189",
     "Name": "code_error",
-    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call\n\n",
+    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call",
     "Location": "0x801f60f0",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "This instruction calls the function 801f60f0\n\nThis function just returns a zero and produces a \ncode error. it is likely that this number is \nreserved for something else.\n\n",
+    "Notes": "This instruction calls the function 801f60f0\n\nThis function just returns a zero and produces a \ncode error. it is likely that this number is \nreserved for something else.",
     "Parameters": {}
   },
   "190": {
@@ -13609,7 +14470,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 3,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-int\n3: scpt-float\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-int\n3: scpt-float",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -13696,39 +14557,110 @@
   },
   "192": {
     "Instruction ID": "192",
-    "Name": "no name",
-    "Description": "",
+    "Name": "??no name",
+    "Description": "Appears to run a function which is not implemented??\n\nunknown0: <unknown0>",
     "Location": "0x80214d6c",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 1,
+    "Notes": "",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "193": {
     "Instruction ID": "193",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "Appears to run a function which is not implemented??\n\nunknown0: <unknown0>",
     "Location": "0x80214cdc",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 1,
+    "Notes": "",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "194": {
     "Instruction ID": "194",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "Appears to run a function which is not implemented??\n\nunknown0: <unknown0>\nunknown1: <unknown1>",
     "Location": "0x80214c04",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 2,
+    "Notes": "",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "1": {
+        "ID": "1",
+        "Name": "unknown1",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "195": {
     "Instruction ID": "195",
@@ -13739,7 +14671,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-int\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -13779,14 +14711,14 @@
   },
   "196": {
     "Instruction ID": "196",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??Set 80346c3c",
+    "Description": "Sets 80346c3c to 1",
     "Location": "0x80207368",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   },
   "197": {
@@ -13798,7 +14730,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -13845,7 +14777,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-float\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-float",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -13892,7 +14824,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -13916,37 +14848,37 @@
   "200": {
     "Instruction ID": "200",
     "Name": "code_error",
-    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call\n\n",
+    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call",
     "Location": "0x801f60f0",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "This instruction calls the function 801f60f0\n\nThis function just returns a zero and produces a \ncode error. it is likely that this number is \nreserved for something else.\n\n",
+    "Notes": "This instruction calls the function 801f60f0\n\nThis function just returns a zero and produces a \ncode error. it is likely that this number is \nreserved for something else.",
     "Parameters": {}
   },
   "201": {
     "Instruction ID": "201",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "Restore Health All",
+    "Description": "Restores everyone's health to max",
     "Location": "0x801fd9b0",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   },
   "202": {
     "Instruction ID": "202",
-    "Name": "Restore Health All",
-    "Description": "Restore's all of the party members' health to full",
+    "Name": "Restore Magic All",
+    "Description": "Restore's all of the party members' magic to full",
     "Location": "0x801fd8f0",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {}
   },
   "203": {
@@ -13958,7 +14890,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Only functions if param1 & 1 == 1:\n\nparam:\n1: scpt-int\n\n\n",
+    "Notes": "Only functions if param1 & 1 == 1:\n\nparam:\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -13981,27 +14913,80 @@
   },
   "204": {
     "Instruction ID": "204",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "Appears to have an unimplemented function",
     "Location": "0x80214b28",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 2,
+    "Notes": "",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "1": {
+        "ID": "1",
+        "Name": "unknown1",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "205": {
     "Instruction ID": "205",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "Appears to have an unimplemented function",
     "Location": "0x80214aa0",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 1,
+    "Notes": "",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "206": {
     "Instruction ID": "206",
@@ -14012,20 +14997,72 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {}
   },
   "207": {
     "Instruction ID": "207",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "",
     "Location": "0x8020bdb0",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 3,
+    "Notes": "\n\nCalls:\nFUN_802173f4(scpt_1,(int)scpt_2,(int)scpt_3);",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "1": {
+        "ID": "1",
+        "Name": "unknown1",
+        "Type": "scpt-byte",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "2": {
+        "ID": "2",
+        "Name": "unknown2",
+        "Type": "scpt-short",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "208": {
     "Instruction ID": "208",
@@ -14036,7 +15073,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {}
   },
   "209": {
@@ -14048,7 +15085,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {}
   },
   "210": {
@@ -14102,7 +15139,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 5,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -14193,7 +15230,7 @@
   },
   "213": {
     "Instruction ID": "213",
-    "Name": "??Set Area",
+    "Name": "Ship Battle - Set Turn Icons",
     "Description": "entry offset: <entry_offset>\nCurrent turn icons\nphase 1: <p1 icon> <p1 color>\nphase 2: <p2 icon> <p2 color>\nphase 3: <p3 icon> <p3 color>\nphase 4: <p4 icon> <p4 color>\n\nNext turn default icons\nphase 1: <t2 p1 icon> <t2 p1 color>\nphase 2: <t2 p2 icon> <t2 p2 color>\nphase 3: <t2 p3 icon> <t2 p3 color>\nphase 4: <t2 p4 icon> <t2 p4 color>",
     "Location": "0x80215444",
     "Hard parameter one": "0x00000001",
@@ -14495,15 +15532,33 @@
   },
   "214": {
     "Instruction ID": "214",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??Warp areas?",
+    "Description": "Appears to warp to another area while setting some things up.\n\n*lnk*[offset,<offset>]",
     "Location": "0x80207428",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 1,
+    "Notes": "iVar1 = *(int *)(param_2 + 0x1c);\nFUN_801002d0(iVar1 + 4 + *(int *)(iVar1 + 4));\n*(int *)(param_2 + 0x1c) = iVar1 + 8;\nFUN_801f7b04(40000);\nDAT_80347474 = 1;\n\nparam_2 is the current worksheet (with param_2 + 0x1c being the current scpt pointer\n\nThat means that the current script pointer (SP) + 4 + \nthe value at SP + 4 (offset) is the target warp point.\n\nAfter the setup, the warp occurs? \n - 8030e420 is set to 40000",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "offset",
+        "Type": "int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "215": {
     "Instruction ID": "215",
@@ -14514,7 +15569,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "Seems to activate a read from disc after loading a filename from the footer.\n\nThe one from the end of the battle with baltor appeared to load a sound file.\nSomething to do with strings\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "Seems to activate a read from disc after loading a filename from the footer.\n\nThe one from the end of the battle with baltor appeared to load a sound file.\nSomething to do with strings",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -14561,7 +15616,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Only called if param1 & 1 == 1:\n\nSCPT:\n1: int\n2: int\n\n\n\n",
+    "Notes": "Only called if param1 & 1 == 1:\n\nSCPT:\n1: int\n2: int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -14591,7 +15646,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -14621,7 +15676,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n\nruns 801e4ab0((1))\n\n\n\n\n\n\n",
+    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n\nruns 801e4ab0((1))",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -14651,7 +15706,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n\n\n\n\n\n\n\n",
+    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -14681,7 +15736,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 9,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -14840,15 +15895,50 @@
   },
   "221": {
     "Instruction ID": "221",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "Probably not fully implemented. Parameter unknown0 doesn't appear to be used...",
     "Location": "0x801fd584",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
-    "Parameter num": 0,
-    "Notes": "\n",
-    "Parameters": {}
+    "Implement": true,
+    "Parameter num": 2,
+    "Notes": "",
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt",
+        "Override": false,
+        "Override condition": "compare-value-current",
+        "Override offset": "0x00000000",
+        "Override result": "0",
+        "Override compare": "0x7f7fffff",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "1": {
+        "ID": "1",
+        "Name": "unknown1",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "222": {
     "Instruction ID": "222",
@@ -14859,7 +15949,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n\n\n\n",
+    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -14889,7 +15979,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 25,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -15327,7 +16417,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 25,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -15765,7 +16855,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 7,
-    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-int\n3: scpt-int\n4: scpt-int\n5: scpt-int\n6: scpt-int\n7: scpt-int\n\n\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-int\n3: scpt-int\n4: scpt-int\n5: scpt-int\n6: scpt-int\n7: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -15944,7 +17034,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n\nruns 800ff4ec((1))\n\nFunction is something to do with the current party and maybe getting stats??\n\n",
+    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n\nruns 800ff4ec((1))\n\nFunction is something to do with the current party and maybe getting stats??",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -15967,26 +17057,26 @@
   },
   "228": {
     "Instruction ID": "228",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "Calculate Player Stats?",
+    "Description": "Appears to perform a few functions related to counting players, their stats, and recalculating swashbuckler rank",
     "Location": "0x801feb40",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   },
   "229": {
     "Instruction ID": "229",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "Count Gold",
+    "Description": "Appears to count gold, maybe xp...",
     "Location": "0x801feb08",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "FUN_801f3148();",
     "Parameters": {}
   },
   "230": {
@@ -15998,7 +17088,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 7,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -16130,7 +17220,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n\n\n\n\n",
+    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -16160,7 +17250,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 14,
-    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-int\n3: scpt-int\n4: scpt-int\n5: scpt-int\n6: scpt-int\n7: scpt-int\n8: scpt-int\n9: scpt-int\n10: scpt-int\n11: scpt-int\n12: scpt-int\n13: scpt-int\n14: scpt-int\n\n\n\n\n\n\n\n\n\n",
+    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-int\n3: scpt-int\n4: scpt-int\n5: scpt-int\n6: scpt-int\n7: scpt-int\n8: scpt-int\n9: scpt-int\n10: scpt-int\n11: scpt-int\n12: scpt-int\n13: scpt-int\n14: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -16411,7 +17501,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-int\n\nruns fxn which gives an item:\nthere are 3 options of item to give based on (2):\n\nID: 0x103 - Cham\nID: 0x121 - Abirk Cham\nID: 0x122 - Chom\n\n\n",
+    "Notes": "only runs if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-int\n\nruns fxn which gives an item:\nthere are 3 options of item to give based on (2):\n\nID: 0x103 - Cham\nID: 0x121 - Abirk Cham\nID: 0x122 - Chom",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -16451,14 +17541,14 @@
   },
   "234": {
     "Instruction ID": "234",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "Sets two globals:\n803473b0 = 0\n803473b4 = 1",
     "Location": "0x801fed3c",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   },
   "235": {
@@ -16470,7 +17560,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Only runs if param1 & 1 == 1:\n\nSCPT:\n1: int\n\n800e2924((1))\n\n---\n800e2924(p1):\n**Has Debug Text: \"Chgkmap Error %d\"\n\nProbably for changing maps?\n\n\n\n\n\n",
+    "Notes": "Only runs if param1 & 1 == 1:\n\nSCPT:\n1: int\n\n800e2924((1))\n\n---\n800e2924(p1):\n**Has Debug Text: \"Chgkmap Error %d\"\n\nProbably for changing maps?",
     "Parameters": {
       "0": {
         "ID": "0",
