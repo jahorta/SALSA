@@ -15231,7 +15231,7 @@
   "213": {
     "Instruction ID": "213",
     "Name": "Ship Battle - Set Turn Icons",
-    "Description": "entry offset: <entry_offset>\nCurrent turn icons\nphase 1: <p1 icon> <p1 color>\nphase 2: <p2 icon> <p2 color>\nphase 3: <p3 icon> <p3 color>\nphase 4: <p4 icon> <p4 color>\n\nNext turn default icons\nphase 1: <t2 p1 icon> <t2 p1 color>\nphase 2: <t2 p2 icon> <t2 p2 color>\nphase 3: <t2 p3 icon> <t2 p3 color>\nphase 4: <t2 p4 icon> <t2 p4 color>",
+    "Description": "entry offset: <entry_offset>\nCurrent turn icons\t\t\tIcon\tColor\nphase 1:\t\t \t<p1 icon> \t<p1 color>\nphase 2: \t\t\t<p2 icon> \t<p2 color>\nphase 3:\t\t \t<p3 icon> \t<p3 color>\nphase 4:\t\t \t<p4 icon> \t<p4 color>\n\nNext turn default icons\t\tIcon\t\tColor\nphase 1:\t\t\t<t2 p1 icon> \t<t2 p1 color>\nphase 2:\t\t \t<t2 p2 icon> \t<t2 p2 color>\nphase 3:\t\t \t<t2 p3 icon> \t<t2 p3 color>\nphase 4:\t\t \t<t2 p4 icon> \t<t2 p4 color>",
     "Location": "0x80215444",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
@@ -15258,7 +15258,7 @@
       },
       "1": {
         "ID": "1",
-        "Name": "p1 icon",
+        "Name": "p1 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15275,7 +15275,7 @@
       },
       "2": {
         "ID": "2",
-        "Name": "p1 color",
+        "Name": "p1 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15292,7 +15292,7 @@
       },
       "3": {
         "ID": "3",
-        "Name": "p2 icon",
+        "Name": "p2 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15309,7 +15309,7 @@
       },
       "4": {
         "ID": "4",
-        "Name": "p2 color",
+        "Name": "p2 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15326,7 +15326,7 @@
       },
       "5": {
         "ID": "5",
-        "Name": "p3 icon",
+        "Name": "p3 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15343,7 +15343,7 @@
       },
       "6": {
         "ID": "6",
-        "Name": "p3 color",
+        "Name": "p3 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15360,7 +15360,7 @@
       },
       "7": {
         "ID": "7",
-        "Name": "p4 icon",
+        "Name": "p4 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15377,7 +15377,7 @@
       },
       "8": {
         "ID": "8",
-        "Name": "p4 color",
+        "Name": "p4 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15394,7 +15394,7 @@
       },
       "9": {
         "ID": "9",
-        "Name": "t2 p1 icon",
+        "Name": "t2 p1 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15411,7 +15411,7 @@
       },
       "10": {
         "ID": "10",
-        "Name": "t2 p1 color",
+        "Name": "t2 p1 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15428,7 +15428,7 @@
       },
       "11": {
         "ID": "11",
-        "Name": "t2 p2 icon",
+        "Name": "t2 p2 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15445,7 +15445,7 @@
       },
       "12": {
         "ID": "12",
-        "Name": "t2 p2 color",
+        "Name": "t2 p2 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15462,7 +15462,7 @@
       },
       "13": {
         "ID": "13",
-        "Name": "t2 p3 icon",
+        "Name": "t2 p3 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15479,7 +15479,7 @@
       },
       "14": {
         "ID": "14",
-        "Name": "t2 p3 color",
+        "Name": "t2 p3 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15496,7 +15496,7 @@
       },
       "15": {
         "ID": "15",
-        "Name": "t2 p4 icon",
+        "Name": "t2 p4 color",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
@@ -15513,7 +15513,7 @@
       },
       "16": {
         "ID": "16",
-        "Name": "t2 p4 color",
+        "Name": "t2 p4 icon",
         "Type": "scpt-byte",
         "Override": false,
         "Override condition": "",
