@@ -150,7 +150,7 @@ class SCTExporter:
 
         groups = [i for i in self.export_options['Ship battle turn data']['headers']]
         header_dict = info_list.pop('headers')
-        header_dict['turn headings'] = {0: 'icon', 1: 'color'}
+        header_dict['turn headings'] = {0: 'color', 1: 'icon'}
         scripts = info_list
         data_sets = len(groups)
         curr_group = ''
