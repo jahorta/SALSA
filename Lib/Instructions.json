@@ -12937,7 +12937,7 @@
   "165": {
     "Instruction ID": "165",
     "Name": "Load Ship Turn Values",
-    "Description": "Loads a number constants into memory\nTurn Modifiers:\t\t\t\tLost Modifiers:\n\tHit\tDamage\t\tFirst\tSecond\nEnemy: \t<EHitMod>\t<EDmgMod>\t\t<lost_eFirst>\t<lost_eSecond>\nPlayer: <PHitMod>\t\t<PDmgMod>\t\t<lost_pFirst>\t<lost_pSecond>\n\nOther Values:\n0: <unknown0>\t1: <unknown1>\t2: <unknown2>\t3: <unknown3>\t4: <unknown4> 5: <unknown5>\t\n6: <unknown6>\t7: <unknown7>\t8: <unknown8>\n\n17: <unknown17>\t\nturn icons entry offset: <entry offset>",
+    "Description": "Loads a number constants into memory\nTurn Modifiers:\t\t\t\tLost Modifiers:\n\tHit\tDamage\t\tFirst\tSecond\nEnemy: \t<EHitMod>\t<EDmgMod>\t\t<lost_eFirst>\t<lost_eSecond>\nPlayer: <PHitMod>\t\t<PDmgMod>\t\t<lost_pFirst>\t<lost_pSecond>\n\nGoes First: <Initiative> (0: Roll, 1: Player, 2: Enemy)\n\nOther Values:\n0: <unknown0>\t1: <unknown1>\t2: <unknown2>\t3: <unknown3>\t4: <unknown4> 5: <unknown5>\t\n6: <unknown6>\t8: <unknown8>\n\n17: <unknown17>\t\nturn icons entry offset: <entry offset>",
     "Location": "0x80215590",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
@@ -13066,7 +13066,7 @@
       },
       "7": {
         "ID": "7",
-        "Name": "unknown7",
+        "Name": "Initiative",
         "Type": "scpt-int",
         "Override": false,
         "Override condition": "",

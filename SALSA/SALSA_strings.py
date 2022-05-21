@@ -62,8 +62,6 @@ class HelpStrings:
                   "* param1 & 2: run instruction\n" \
                   "* param1 & 8: terminate instruction"
 
-
-
     def get_all(self):
         return {
             'Instructions': self.instruction_features,

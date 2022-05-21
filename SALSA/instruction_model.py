@@ -26,7 +26,6 @@ class InstructionModel:
         self.instructions = self.load_instructions()
 
     def load_instructions(self):
-
         if not os.path.exists(self.filename):
             with open(self.filename, 'w') as fh:
                 inst = {}

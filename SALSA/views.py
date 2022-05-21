@@ -1424,7 +1424,7 @@ class ExporterView(tk.Toplevel):
         self.resizable(width=True, height=True)
         posX = position['x'] + self.window_offset['x']
         posY = position['y'] + self.window_offset['y']
-        pos = '+{0}+{1}'.format(posX, posY)
+        pos = f'+{posX}+{posY}'
         self.geometry(pos)
 
         self.export_values = {}

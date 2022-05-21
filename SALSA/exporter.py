@@ -45,6 +45,9 @@ class SCTExporter:
                 'scripts': '^me5.+sct$',
                 'instructions': {
                     165: {
+                        'initiative': [
+                            7
+                        ],
                         'turn bonus': [
                             9, 10, 11, 12
                         ],
@@ -62,7 +65,7 @@ class SCTExporter:
                     }
                 },
                 'headers': [
-                    'turn bonus', 'lost turns', 'turn headings'
+                    'turn bonus', 'lost turns', 'turn headings', 'initiative'
                 ],
                 'function': self._get_script_parameters_by_group
             },
@@ -187,6 +190,8 @@ class SCTExporter:
                         continue
                     if group_name == 'turn headings':
                         header_rows[0] = header_rows[0][:-2]
+                    if group_name == 'initiative':
+                        header_rows[0] = header_rows[0][:-3]
 
                     for param_id, param_name in group.items():
                         cur_row = 0
