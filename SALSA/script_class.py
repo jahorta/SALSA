@@ -32,6 +32,8 @@ class SCTAnalysis:
             self.Sections[name] = SCTSection(sect, name, length, position)
             inst_list = self.Sections[name].get_instruction_set()
             for inst in inst_list:
+                if inst not in self.InstLocations.keys():
+                    self.InstLocations[inst] = []
                 self.InstLocations[inst].append(name)
             sectCount += 1
         self.Footer = list(sct_dict['Footer'].values())
