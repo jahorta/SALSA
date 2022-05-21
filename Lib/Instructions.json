@@ -17583,26 +17583,26 @@
   },
   "236": {
     "Instruction ID": "236",
-    "Name": "no name",
+    "Name": "??no name",
     "Description": "",
     "Location": "0x8020b670",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {}
   },
   "237": {
     "Instruction ID": "237",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "",
     "Location": "0x801fd54c",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   },
   "238": {
@@ -17671,14 +17671,14 @@
   },
   "239": {
     "Instruction ID": "239",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "",
     "Location": "0x801fd1d0",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   },
   "240": {
@@ -17690,7 +17690,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 6,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -17798,14 +17798,14 @@
   },
   "241": {
     "Instruction ID": "241",
-    "Name": "no name",
+    "Name": "??no name",
     "Description": "",
     "Location": "0x801f7cd8",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {}
   },
   "242": {
@@ -17817,7 +17817,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 3,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-byte\n3: scpt-int\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-byte\n3: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -17881,7 +17881,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 10,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-byte\n6: scpt-float\n7: scpt-int\n8: scpt-byte\n9: scpt-byte\n10: scpt-int\n\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-byte\n6: scpt-float\n7: scpt-int\n8: scpt-byte\n9: scpt-byte\n10: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -18057,14 +18057,14 @@
   },
   "244": {
     "Instruction ID": "244",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "",
     "Location": "0x8020bee8",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   },
   "245": {
@@ -18076,7 +18076,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: int\n\nloop ((1) iterations):\n2: scpt-short\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: int\n\nloop ((1) iterations):\n2: scpt-short",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -18157,7 +18157,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -18231,14 +18231,14 @@
   },
   "247": {
     "Instruction ID": "247",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "",
     "Location": "0x801f95c0",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   },
   "248": {
@@ -18250,7 +18250,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -18327,7 +18327,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Has \n\n\n\n\n\n\n",
+    "Notes": "Has",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -18350,14 +18350,14 @@
   },
   "251": {
     "Instruction ID": "251",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "",
     "Location": "0x8020014c",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   },
   "252": {
@@ -18369,7 +18369,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-float\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-int\n2: scpt-float",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -18409,14 +18409,14 @@
   },
   "253": {
     "Instruction ID": "253",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "",
     "Location": "0x801fffa4",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   },
   "254": {
@@ -18428,7 +18428,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "If param1 & 1 == 1:\n  Return 1\n\nElse:\n  Run 80142cd8()\n\n80142cd8():\n\nFirst seems to determine number of PCs\n\n\n\n\n\n\n",
+    "Notes": "If param1 & 1 == 1:\n  Return 1\n\nElse:\n  Run 80142cd8()\n\n80142cd8():\n\nFirst seems to determine number of PCs",
     "Parameters": {}
   },
   "255": {
@@ -18440,17 +18440,17 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 0,
-    "Notes": "If param1 & 1 == 1:\n  Return 1\n\nElse:\n  Run 801427d8()\n\n801427d8():\n\n80130350(1): {\n  if 0x80346f40 != 0\n    *(word *)(0x80346f64) = 1\n}\n\nif 80306744 != 0:\n  *(word *)(0x80306768) = 0\n  *(word *)(0x8030676c) = 0\n  *(byte *)(0x8030675c) = *(byte *)(0x8030675c) | 0x40\n  0x80306744 = 0\n\n\n",
+    "Notes": "If param1 & 1 == 1:\n  Return 1\n\nElse:\n  Run 801427d8()\n\n801427d8():\n\n80130350(1): {\n  if 0x80346f40 != 0\n    *(word *)(0x80346f64) = 1\n}\n\nif 80306744 != 0:\n  *(word *)(0x80306768) = 0\n  *(word *)(0x8030676c) = 0\n  *(byte *)(0x8030675c) = *(byte *)(0x8030675c) | 0x40\n  0x80306744 = 0",
     "Parameters": {}
   },
   "256": {
     "Instruction ID": "256",
-    "Name": "no name",
+    "Name": "??no name",
     "Description": "",
     "Location": "0x801fdc70",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
     "Notes": "",
     "Parameters": {}
@@ -18494,7 +18494,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -18575,7 +18575,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "\n\n",
+    "Notes": "",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -18598,26 +18598,26 @@
   },
   "260": {
     "Instruction ID": "260",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "",
     "Location": "0x801fda70",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   },
   "261": {
     "Instruction ID": "261",
-    "Name": "no name",
-    "Description": "\n\n",
+    "Name": "??no name",
+    "Description": "",
     "Location": "0x8020ae04",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   },
   "262": {
@@ -18629,7 +18629,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 5,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-short\n3: scpt-short\n4: scpt-float\n5: scpt-int\n\n\n\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-short\n3: scpt-short\n4: scpt-float\n5: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -18727,7 +18727,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "\n\nparam:\n1: int\n\nloop ((1) iterations):\n  2: scpt-float\n\n\n\n\n",
+    "Notes": "\n\nparam:\n1: int\n\nloop ((1) iterations):\n  2: scpt-float",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -18808,7 +18808,7 @@
     "Hard parameter two": "0x00050000",
     "Implement": true,
     "Parameter num": 8,
-    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-int\n\n\n\n",
+    "Notes": "if param1 & 1 == 1:\n\nparams:\n1: scpt-short\n2: scpt-float\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-float\n8: scpt-int",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -18950,14 +18950,14 @@
   },
   "265": {
     "Instruction ID": "265",
-    "Name": "no name",
-    "Description": "\n",
+    "Name": "??no name",
+    "Description": "",
     "Location": "0x8020aaa8",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
-    "Implement": false,
+    "Implement": true,
     "Parameter num": 0,
-    "Notes": "\n",
+    "Notes": "",
     "Parameters": {}
   }
 }
