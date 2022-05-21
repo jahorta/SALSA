@@ -81,7 +81,7 @@ class SCTExporter:
                 }
             },
             'Instruction Count': {
-                'scripts': '^me.+sct$',
+                'scripts': '^.+sct$',
                 'header1': 'ScriptID',
                 'header2': 'Inst details'
             }
@@ -400,6 +400,8 @@ class SCTExporter:
         first_sct = True
         for script in self.script_list:
             name = script.Name[2:6]
+            if script.Name[6] != '.':
+                name += script.Name[6]
             insts_used_raw = script.Details['Instructions Used']
             print_header2 += f',{name}'
             for i in range(0, 265):
