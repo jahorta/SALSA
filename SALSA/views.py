@@ -97,10 +97,11 @@ class FileSelectView(tk.Toplevel):
 
     def on_select_script_file(self, *args):
         self.scalebarPos = str(self.file_select_tree.yview()[0])
-        self.file = self.file_select_tree.selection()[0]
+        file = self.file_select_tree.selection()
+        if len(self.file) == 0:
+            return
+        self.file = file[0]
         self.populate_files(self.path)
-
-        pass
 
     def on_load_script_file(self, *args):
         if self.file is None:
@@ -125,7 +126,7 @@ class FileSelectView(tk.Toplevel):
             if path.name == self.file:
                 values.append('***')
             self.file_select_tree.insert('', 'end', iid=str(path.name), text=str(path.name), values=values)
-        # print(paths)
+        print(paths, 'loaded')
 
 
 class InstructionView(tk.Frame):
@@ -238,11 +239,12 @@ class InstructionSelector(tk.LabelFrame):
             self.treeview.insert('', 'end', iid=key, text=key, values=values)
 
     def on_select_instruction(self, *args):
-        if not self.treeview_update:
-            self.treeview_update = True
+        selected_ids = self.treeview.selection()
+        if len(selected_ids) == 0:
             return
-        self.treeview_update = False
-        selected_id = self.treeview.selection()[0]
+        selected_id = selected_ids[0]
+        if self.currentID == selected_id:
+            return
         self.currentID = selected_id
         self.callbacks['on_select_instruction'](selected_id)
 
@@ -1540,10 +1542,10 @@ class ExporterView(tk.Toplevel):
             tab_button.grid(row=0, column=1)
 
         self.export_all.grid(row=0, column=0)
-
         self.export_notebook.tkraise()
 
     def export_selected_data(self):
+        print('export button pressed')
         self.button_extract_data['state'] = 'disabled'
         export_type = self.export_selector.get()
         if export_type == '':

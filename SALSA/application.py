@@ -188,6 +188,7 @@ class Application(tk.Tk):
 
     # Called when asked to export data
     def on_data_export(self, export_type='Ship battle turn data'):
+        print('exporting data')
         self.export_start_time = datetime.datetime.now()
         self.script_exports = {}
         args = self.exporter.get_export_args(export_type)
@@ -195,11 +196,16 @@ class Application(tk.Tk):
         split_by_sct = args.get('split_by_sct', False)
         self.export_script_names = []
         script_paths = Path(self.script_dir).glob('**/*')
-        print(len(script_paths), 'scripts detected')
+        total_scripts = 0
+        print('export path:', self.script_dir)
         for path in script_paths:
+            total_scripts += 1
+            print(f'testing {path.name} for pattern {relevant_script_regex}')
             if re.search(relevant_script_regex, path.name):
                 self.export_script_names.append(path.name)
-        print(len(self.export_script_names, 'scripts selected for export'))
+
+        print(total_scripts, 'scripts in directory')
+        print(len(self.export_script_names), 'scripts selected for export')
         self.export_type = export_type
 
         # Start a background thread
@@ -260,8 +266,6 @@ class Application(tk.Tk):
             else:
                 done = True
 
-        # Update Exports expects a dictionary of strings. The key becomes the tab name and the string is csv format
-
     def add_analysis_to_export(self):
         script_num = len(self.export_script_names)
         done = False
@@ -277,6 +281,7 @@ class Application(tk.Tk):
                                                              f'{len(self.script_exports)}/{script_num}')
 
         if len(self.script_exports) >= script_num or done:
+            print('All exports completed:', len(self.script_exports), '/', script_num)
             self.export_window.update_exports(self.script_exports)
             self.export_thread.join()
             d_time = datetime.datetime.now() - self.export_start_time
