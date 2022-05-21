@@ -195,9 +195,11 @@ class Application(tk.Tk):
         split_by_sct = args.get('split_by_sct', False)
         self.export_script_names = []
         script_paths = Path(self.script_dir).glob('**/*')
+        print(len(script_paths), 'scripts detected')
         for path in script_paths:
             if re.search(relevant_script_regex, path.name):
                 self.export_script_names.append(path.name)
+        print(len(self.export_script_names, 'scripts selected for export'))
         self.export_type = export_type
 
         # Start a background thread
