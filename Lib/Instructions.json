@@ -12098,7 +12098,7 @@
   "158": {
     "Instruction ID": "158",
     "Name": "Remove Party Member",
-    "Description": "Removes PC with index <PC>",
+    "Description": "Removes PC with index <PC> with armor and accessory unequip. Removes PCs weapon from the player inventory, but does not remove armor or accessory from the inventory.\n\nPC indices:\n0: Vyse\n1: Aika\n2: Fina\n3: Enrique\n4: Gilder\n5: Drachma",
     "Location": "0x801febfc",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
@@ -17028,7 +17028,7 @@
   "227": {
     "Instruction ID": "227",
     "Name": "??noname",
-    "Description": "unknown0: <unknown0>",
+    "Description": "Removes PC with index <PC>. Removes PCs weapon, armor, and accessory from the player inventory.\n\nPC indices:\n0: Vyse\n1: Aika\n2: Fina\n3: Enrique\n4: Gilder\n5: Drachma",
     "Location": "0x801feb78",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
@@ -17038,7 +17038,7 @@
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "unknown0",
+        "Name": "PC",
         "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
@@ -17057,8 +17057,8 @@
   },
   "228": {
     "Instruction ID": "228",
-    "Name": "Calculate Player Stats?",
-    "Description": "Appears to perform a few functions related to counting players, their stats, and recalculating swashbuckler rank",
+    "Name": "Swap player group",
+    "Description": "If the player characters have been split into two groups, this allows for switches the active group.",
     "Location": "0x801feb40",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
@@ -17069,8 +17069,8 @@
   },
   "229": {
     "Instruction ID": "229",
-    "Name": "Count Gold",
-    "Description": "Appears to count gold, maybe xp...",
+    "Name": "Unify player groups",
+    "Description": "If the player characters have been split into two groups, this recombines the two groups into one. Only seems to be used at Daccat's isle, so not sure if it is specific to Aika/Fina and Vyse/Gilder groups, or if it can be used for other groups as well.",
     "Location": "0x801feb08",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
