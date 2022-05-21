@@ -698,6 +698,8 @@ class ScriptView(tk.Frame):
         'Set and Decisions only': 'set'
     }
 
+    details_canvas_padding = {'x': 5, 'y': 5}
+
     script_start_field = {'req': False, 'type': FT.hex, 'pattern': '^0x8[0-9,a-f]{7}$'}
 
     def __init__(self, parent, callbacks, *args, **kwargs):
@@ -730,16 +732,21 @@ class ScriptView(tk.Frame):
         scriptDisplayBotLeft = tk.Frame(scriptDisplayBot)
 
         # Frame to hold the error display and scrollbar
+        self.details_text_objects = []
         detailsDisplay = tk.LabelFrame(scriptDisplayBotLeft, text='Script Parsing Details')
-        self.details_display = tk.Text(detailsDisplay, width=18, height=20)
+        self.details_display = tk.Canvas(detailsDisplay, width=18, height=20)
         self.details_display.grid(row=0, column=0, sticky='NSEW')
-        self.error_display_scroll = ttk.Scrollbar(detailsDisplay, orient=tk.VERTICAL,
-                                                  command=self.details_display.yview)
-        self.details_display.configure(yscrollcommand=self.error_display_scroll.set)
-        self.error_display_scroll.grid(row=0, column=1, sticky='NSEW')
+        self.details_display_scroll = ttk.Scrollbar(detailsDisplay, orient=tk.VERTICAL,
+                                                    command=self.details_display.yview)
+        self.details_display.configure(yscrollcommand=self.details_display_scroll.set, bg='white')
+        self.details_display_scroll.grid(row=0, column=1, sticky='NSEW')
+        self.details_display.tag_bind('inst', '<Button-1>', func=self.highlight_detail)
         detailsDisplay.grid(row=0, column=0, sticky='NSEW')
         detailsDisplay.rowconfigure(0, weight=1)
         detailsDisplay.columnconfigure(0, weight=1)
+        self.cur_highlight_obj_id = None
+        self.highlighted_detail = None
+        self.highlights_lists = None
 
         # Frame to hold the footer display and scrollbar
         footer = tk.LabelFrame(scriptDisplayBotLeft, text='Footer')
@@ -763,6 +770,7 @@ class ScriptView(tk.Frame):
         """Script Tree Fields"""
         self.script_tree_update = True
         self.current_script_id = None
+        self.current_script_tree = None
         scriptTree = tk.LabelFrame(scriptDisplayBotRight, text='Script Index')
         columns = list(self.script_tree_headers.keys())[1:]
         self.script_tree = ttk.Treeview(scriptTree, columns=columns, height=25)
@@ -791,6 +799,7 @@ class ScriptView(tk.Frame):
         """Instruction Tree Fields"""
         self.current_instruction_id = None
         self.instruction_tree_update = True
+        self.current_instruction_tree = None
         instructionTree = tk.LabelFrame(scriptDisplayBotRight, text='Instruction Index')
         columns = list(self.instruction_tree_headers.keys())[1:]
         self.instruction_tree = ttk.Treeview(instructionTree, columns=columns, height=25)
@@ -976,6 +985,8 @@ class ScriptView(tk.Frame):
     def display_script_analysis_new(self, sct_file_info, sct_tree):
         self.current_script_id = None
         self.current_instruction_id = None
+        self.cur_highlight_obj_id = None
+        self.highlighted_detail = None
 
         name = 'Script File Details: {}'.format(sct_file_info['Filename'])
         script_num = 'Number of scripts: {}'.format(sct_file_info['Script num'])
@@ -984,26 +995,36 @@ class ScriptView(tk.Frame):
         self.script_file_title.config(text=name)
         self.script_file_script_num.config(text=script_num)
 
-        self.details_display.delete('1.0', tk.END)
+        self.details_display.delete('all')
+        self.details_text_objects = []
+        self.highlights_lists = sct_file_info['Inst Locs']
         if self.error_list == '':
             value = 'No Errors\n\nInstructions Used:\n'
+            self.details_display.create_text(self.details_canvas_padding['x'], self.details_canvas_padding['y'], anchor=tk.NW, text=value)
+            cur_height = self.details_display.bbox('all')[3]
             insts = sct_file_info['Insts']
             separatorPlaced = False
             for inst, count in sorted(insts.items()):
                 if inst > 265:
                     if not separatorPlaced:
-                        value += '---------------\n'
+                        self.details_display.create_text(self.details_canvas_padding['x'], cur_height + self.details_canvas_padding['y'], anchor=tk.NW, text='---------------\n')
+                        cur_height = self.details_display.bbox('all')[3]
                         separatorPlaced = True
-                    value += f'{hex(inst)}: {count}\n'
+                    self.details_display.create_text(self.details_canvas_padding['x'], cur_height + self.details_canvas_padding['y'], anchor=tk.NW, text=f'{hex(inst)}: {count}\n', tags=f'{hex(inst)}')
                 else:
-                    value += f'{inst}: {count}\n'
+                    self.details_display.create_text(self.details_canvas_padding['x'], cur_height + self.details_canvas_padding['y'], anchor=tk.NW, text=f'{inst}: {count}', tags=('inst', f'{inst}'))
+                cur_height = self.details_display.bbox('all')[3]
         else:
-            value = self.error_list
-            if len(value) > 1:
-                if value[:-1] == '\n':
-                    value = value[:-1]
-            value = 'Errors:\n\n' + value
-        self.details_display.insert('1.0', value)
+            self.details_display.create_text(self.details_canvas_padding['x'], self.details_canvas_padding['y'],
+                                                 anchor=tk.NW, text='Errors:\n\n')
+            cur_height = self.details_display.bbox('all')[3]
+            for error in self.error_list:
+                v = self.details_display.create_text(self.details_canvas_padding['x'], cur_height + self.details_canvas_padding['y'],
+                                                     anchor=tk.NW, text=error, tags='error')
+                self.details_text_objects.append(v)
+                cur_height = self.details_display.bbox('all')[3]
+
+        self.details_display.configure(scrollregion=self.details_display.bbox("all"))
 
         self.footer_text.delete('1.0', tk.END)
         value = footer
@@ -1023,12 +1044,22 @@ class ScriptView(tk.Frame):
         selected_id = self.script_tree.selection()[0]
         # print('showing: {}'.format(selected_id))
         self.current_script_id = selected_id
+        self.current_instruction_id = None
+        self.current_instruction_tree = None
         self.callbacks['on_select_script'](self.current_script_id)
 
         t = Timer(0.1, lambda: self.reset_scroll_bars('Instruction'))
         t.run()
 
-    def populate_scripts(self, scts_tree):
+    def populate_scripts(self, scts_tree=None):
+        if scts_tree is None:
+            if self.current_script_tree is None:
+                return
+            else:
+                scts_tree = self.current_script_tree
+
+        self.current_script_tree = scts_tree
+
         for row in self.script_tree.get_children():
             self.script_tree.delete(row)
 
@@ -1046,10 +1077,21 @@ class ScriptView(tk.Frame):
         for s in scripts_to_remove:
             scts_tree.pop(s)
 
+        if self.highlighted_detail is None:
+            highlight_inst = False
+        else:
+            highlight_inst = True
+            highlight_list = self.highlights_lists[self.highlighted_detail]
+
         for key, value in scts_tree.items():
             values = [value['Type'], value['Length']]
+            if highlight_inst:
+                if key in highlight_list:
+                    values.append(f'{self.highlighted_detail}')
             if self.current_script_id is not None:
                 if key == self.current_script_id:
+                    if len(values) > 2:
+                        values.pop()
                     values.append('>>>')
             self.script_tree.insert('', 'end', iid=key, text=key, values=values)
 
@@ -1068,7 +1110,12 @@ class ScriptView(tk.Frame):
             self.instruction_tree.delete(row)
 
         if insts is None:
-            return
+            if self.current_instruction_tree is None:
+                return
+            else:
+                insts = self.current_instruction_tree
+
+        self.current_instruction_tree = insts
 
         hasSelection = True
         if new_id is None:
@@ -1107,8 +1154,16 @@ class ScriptView(tk.Frame):
                 values[1] = ''
             if self.hideDefault and values[2] == 'None':
                 values[2] = ''
+            suffix_added = False
+            if 'ID' in inst:
+                id_int = int(inst['ID'], 16)
+                if self.highlighted_detail == id_int:
+                    values.append(f'{id_int}')
+                    suffix_added = True
             if hasSelection:
                 if key == self.current_instruction_id:
+                    if suffix_added:
+                        values.pop()
                     values.append('>>>')
             pos = key
             values.insert(0, inst.get('pos', ''))
@@ -1291,6 +1346,37 @@ class ScriptView(tk.Frame):
             return
 
         self.callbacks['on_set_inst_start'](start, self.current_script_id)
+
+    def highlight_detail(self, event):
+        canvas_scrollable_bbox = self.details_display['scrollregion'].split(' ')
+        canvas_window_y = self.details_display.yview()
+        canvas_window_x = self.details_display.xview()
+        canvas_window_bbox = (int(canvas_scrollable_bbox[0]) + int(canvas_window_x[0] * int(canvas_scrollable_bbox[2])),
+                              int(canvas_scrollable_bbox[1]) + int(canvas_window_y[0] * int(canvas_scrollable_bbox[3])),
+                              int(canvas_scrollable_bbox[0]) + int(canvas_window_x[1] * int(canvas_scrollable_bbox[2])),
+                              int(canvas_scrollable_bbox[1]) + int(canvas_window_y[1] * int(canvas_scrollable_bbox[3]))
+                              )
+        e_x = canvas_window_bbox[0] + event.x
+        e_y = canvas_window_bbox[1] + event.y
+        closest = self.details_display.find_closest(e_x, e_y, halo=3)
+        tags = self.details_display.gettags(closest)
+        if 'inst' not in tags:
+            return
+
+        if self.cur_highlight_obj_id is not None:
+            self.details_display.itemconfigure(self.cur_highlight_obj_id, fill='black')
+
+        next_highlight_inst = int(tags[1])
+        if self.highlighted_detail == next_highlight_inst:
+            self.highlighted_detail = None
+        else:
+            self.highlighted_detail = next_highlight_inst
+            self.cur_highlight_obj_id = closest
+            self.details_display.itemconfigure(closest, fill='red')
+
+        self.populate_scripts()
+        if self.current_script_id is not None:
+            self.populate_instructions()
 
 
 class HelpPopupView(tk.Toplevel):

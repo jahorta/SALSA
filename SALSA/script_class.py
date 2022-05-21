@@ -21,6 +21,8 @@ class SCTAnalysis:
         self.BodyLength = sct_dict['Body Length']
         self.FooterLength = sct_dict['Footer Length']
         self.TotalLength = self.BodyLength + self.FooterLength
+        self.Details = sct_dict['Details']
+        self.InstLocations = {k: [] for k in self.Details['Instructions Used'].keys()}
         self.Sections = {}
         sectCount = 0
         for name, sect in sct_dict['Sections'].items():
@@ -28,11 +30,13 @@ class SCTAnalysis:
             length = int(self.Index[name]['length'], 16)
             position = int(self.Index[name]['pos'], 16)
             self.Sections[name] = SCTSection(sect, name, length, position)
+            inst_list = self.Sections[name].get_instruction_set()
+            for inst in inst_list:
+                self.InstLocations[inst].append(name)
             sectCount += 1
         self.Footer = list(sct_dict['Footer'].values())
         self.IndexedInstructions = list(sct_dict['Implemented Instructions'])
         self.ErrorSections = sct_dict['Errors']
-        self.Details = sct_dict['Details']
         # Provides a dictionary for linking segments. Key is position of requester, Value is position of requested
         self.Links = {}
         self.generate_links()
@@ -53,7 +57,8 @@ class SCTAnalysis:
     def get_sct_info(self):
         sct_info = {'Filename': self.Name, 'Footer': "{}".format('\n'.join(self.Footer)),
                     'Errors': "{}".format('\n'.join(self.ErrorSections)),
-                    'Script num': int(self.Header[2], 16), 'Insts': self.Details['Instructions Used']}
+                    'Script num': int(self.Header[2], 16), 'Insts': self.Details['Instructions Used'],
+                    'Inst Locs': self.InstLocations}
         return sct_info
 
     def get_instruction_details(self, sctID, instID):
@@ -523,6 +528,7 @@ class SCTSection:
             self.location = pos
 
         self.instructions = {}
+        self.instruction_id_set = []
         instCount = 0
         for key, value in sect_dict['data'].items():
             if key == 'errors':
@@ -530,7 +536,13 @@ class SCTSection:
             if key == 'final':
                 break
             self.instructions[key] = SCTInstruct(self.startPos, value)
+            code = self.instructions[key].get_code()
+            if code != '':
+                if int(code, 16) < 257:
+                    self.instruction_id_set.append(int(code, 16))
             instCount += 1
+
+        self.instruction_id_set = list(set(self.instruction_id_set))
 
         self.hasError = False
         if 'errors' in sect_dict.keys():
@@ -546,6 +558,7 @@ class SCTSection:
             elif code == 'Skip 2':
                 current['Code'] = 'Skip 2'
             elif -1 < int(code, 16) < 265:
+                current['ID'] = code
                 if value.isDecoded:
                     current['Code'] = value.name
                 else:
@@ -594,6 +607,9 @@ class SCTSection:
             inst = self.instructions[instID]
             inst_details = inst.get_details()
         return inst_details
+
+    def get_instruction_set(self):
+        return self.instruction_id_set
 
     def get_links(self):
         inst_links = {}
@@ -703,6 +719,12 @@ class SCTInstruct:
             desc = desc.replace(keyword, result)
 
         return desc
+
+    def get_code(self):
+        if self.ID[:2] == '0x':
+            return self.ID
+        else:
+            return ''
 
     def get_details(self):
         if self.hasSCPTerror:
