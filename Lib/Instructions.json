@@ -11171,7 +11171,7 @@
         "Override compare": "0x00000000",
         "Mask": false,
         "Mask Value": "0x00000000",
-        "Signed": false,
+        "Signed": true,
         "Iterations": "",
         "Condition Parameter": "",
         "Condition Test": "",
@@ -17027,7 +17027,7 @@
   },
   "227": {
     "Instruction ID": "227",
-    "Name": "??noname",
+    "Name": "Remove Party Member 2",
     "Description": "Removes PC with index <PC>. Removes PCs weapon, armor, and accessory from the player inventory.\n\nPC indices:\n0: Vyse\n1: Aika\n2: Fina\n3: Enrique\n4: Gilder\n5: Drachma",
     "Location": "0x801feb78",
     "Hard parameter one": "0x00000001",
@@ -18568,8 +18568,8 @@
   },
   "259": {
     "Instruction ID": "259",
-    "Name": "??sennin print?",
-    "Description": "unknown0: <unknown0>",
+    "Name": "Hamachou Hermit Stat Dialog",
+    "Description": "Helper instruction for Hamachou Hermit. Displays a text box containing current stats of a certain type.\n\nDialog display index: <index>\n\nBattles - (0, 1, 10, 2)\nRuns - (3, 4)\nKnocked Unconscious - (5, 6)\nTreasure Chests - (7, 8)\nFish - (9)\n\nTechnically, Domingo's discovery text can also be displayed using this instruction using 100 as the parameter.",
     "Location": "0x8020b4ac",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
@@ -18579,7 +18579,7 @@
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "unknown0",
+        "Name": "index",
         "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
@@ -18598,7 +18598,7 @@
   },
   "260": {
     "Instruction ID": "260",
-    "Name": "??no name",
+    "Name": "Restore Ship Health All",
     "Description": "",
     "Location": "0x801fda70",
     "Hard parameter one": "0x00000000",
@@ -18610,8 +18610,8 @@
   },
   "261": {
     "Instruction ID": "261",
-    "Name": "??no name",
-    "Description": "",
+    "Name": "Domingo Discovery Dialog",
+    "Description": "Instruction to display a textbox from Domingo with the current number of discoveries. Uses the same function as INST_259 but with a 100 as the parameter to force Domingo's text.",
     "Location": "0x8020ae04",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
@@ -18622,8 +18622,8 @@
   },
   "262": {
     "Instruction ID": "262",
-    "Name": "??noname",
-    "Description": "unknown0: <unknown0>\nunknown1: <unknown1>\nunknown2: <unknown2>\nunknown3: <unknown3>\nunknown4: <unknown4>",
+    "Name": "Activate Screen Overlay",
+    "Description": "Fades out into a color as defined below:\n\nRed (0-255): <Red>\nGreen (0-255): <Green>\nBlue (0-255): <Blue>\nDistance from Camera: <Distance>\nTransition Time: <Transition_Time>\n\nDistance in direction camera is pointing is negative, and reverse is positive. Textboxes appear at -1, so distance should be less than -1 to show text boxes.\n\nTransition time must fully occur before moving to next instruction.",
     "Location": "0x801fe310",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
@@ -18633,7 +18633,7 @@
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "unknown0",
+        "Name": "Red",
         "Type": "scpt-short",
         "Override": false,
         "Override condition": "",
@@ -18650,7 +18650,7 @@
       },
       "1": {
         "ID": "1",
-        "Name": "unknown1",
+        "Name": "Green",
         "Type": "scpt-short",
         "Override": false,
         "Override condition": "",
@@ -18667,7 +18667,7 @@
       },
       "2": {
         "ID": "2",
-        "Name": "unknown2",
+        "Name": "Blue",
         "Type": "scpt-short",
         "Override": false,
         "Override condition": "",
@@ -18684,7 +18684,7 @@
       },
       "3": {
         "ID": "3",
-        "Name": "unknown3",
+        "Name": "Distance",
         "Type": "scpt-float",
         "Override": false,
         "Override condition": "",
@@ -18701,7 +18701,7 @@
       },
       "4": {
         "ID": "4",
-        "Name": "unknown4",
+        "Name": "Transition_Time",
         "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
