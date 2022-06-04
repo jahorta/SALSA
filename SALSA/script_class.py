@@ -540,7 +540,7 @@ class SCTSection:
             self.instructions[key] = SCTInstruct(self.startPos, value)
             code = self.instructions[key].get_code()
             if code != '':
-                if int(code, 16) < 265:
+                if int(code, 16) < 266:
                     self.instruction_id_set.append(int(code, 16))
             instCount += 1
 

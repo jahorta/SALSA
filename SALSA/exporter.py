@@ -404,7 +404,7 @@ class SCTExporter:
                 name += script.Name[6]
             insts_used_raw = script.Details['Instructions Used']
             print_header2 += f',{name}'
-            for i in range(0, 265):
+            for i in range(0, 266):
                 if first_sct:
                     print_rows.append(f'{i} - {self.instruction_list[str(i)].name}')
                 print_rows[i] += f',{insts_used_raw.get(i, 0)}'
