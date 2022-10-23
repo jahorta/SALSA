@@ -1,6 +1,7 @@
 import os
 import re
 
+from SALSA.AKLZ.aklz import Aklz
 from SALSA.Tools.byte_array_utils import getString, getWord, deriveStringLength, word2Float, applyHexMask, padded_hex, \
     word2SignedInt, toInt
 from SALSA.Tools.constants import FieldTypes as FT
@@ -110,6 +111,9 @@ class SctModel:
         else:
             raise FileExistsError(
                 'This sct file does not exist: {}\nMay need to select the active script folder..'.format(filename))
+
+        if Aklz.is_compressed(ba):
+            ba = Aklz().decompress(ba)
 
         return [file, ba]
 
