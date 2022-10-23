@@ -97,9 +97,6 @@ class SctModel:
             return None
         name = out[0]
         sct_raw = out[1]
-        if sct_raw[0:4].decode(errors='backslashreplace') == 'AKLZ':
-            print('file is AKLZ encrypted. Decryption is not yet implemented. Please decrypt file before use.')
-            return None
         sct_dict = self._decode_sct(name, sct_raw)
         return sct_dict
 
