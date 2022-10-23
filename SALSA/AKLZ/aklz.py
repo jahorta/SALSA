@@ -73,8 +73,8 @@ class Aklz:
                 if file_in_ptr >= file_in_size or cur_out_size >= file_out_size:
                     break
 
-        if not len(file_out) - 1 == file_out_size:
-            print(f'Incorrect file size: expected {file_out_size}, got {len(file_out) - 1}')
+        if not len(file_out) == file_out_size:
+            print(f'Incorrect file size: expected {file_out_size}, got {len(file_out)}')
 
         return file_out
 
@@ -139,7 +139,7 @@ class Aklz:
 
     @classmethod
     def is_compressed(cls, file_in: bytearray) -> bool:
-        if file_in[:cls._FILE_SIGNATURE] == cls._FILE_SIGNATURE:
+        if file_in[:len(cls._FILE_SIGNATURE)] == cls._FILE_SIGNATURE:
             return True
         return False
 
