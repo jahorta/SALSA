@@ -1,8 +1,8 @@
 import json
 import os
 
-from .constants import FieldTypes as FT
-from .constants import OverrideTypes as OT
+from SALSA.Tools.constants import FieldTypes as FT
+from SALSA.Tools.constants import OverrideTypes as OT
 
 
 class InstructionModel:

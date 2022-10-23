@@ -11,13 +11,13 @@ from pathlib import Path
 from threading import Timer
 from tkinter import ttk, messagebox, filedialog
 
-from SALSA import views as v
-from SALSA.SALSA_strings import HelpStrings
-from SALSA.exporter import SCTExporter
-from SALSA.instruction_class import Instruct
-from SALSA.instruction_model import InstructionModel
-from SALSA.script_class import SCTAnalysis
-from SALSA.sct_model import SctModel
+from SALSA.GUI import views as v
+from SALSA.Tools.SALSA_strings import HelpStrings
+from SALSA.Tools.exporter import SCTExporter
+from SALSA.Tools.instruction_class import Instruct
+from SALSA.FileModels.instruction_model import InstructionModel
+from SALSA.Tools.script_class import SCTAnalysis
+from SALSA.FileModels.sct_model import SctModel
 
 
 class Application(tk.Tk):

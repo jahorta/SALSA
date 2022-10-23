@@ -10,9 +10,9 @@ from datetime import datetime
 from math import floor
 from typing import List, Dict
 
-from SALSA.constants import FieldTypes as FT, KnownMemAddresses as KA
-from SALSA.instruction_class import Instruct
-from SALSA.script_class import SCTAnalysis
+from SALSA.Tools.constants import FieldTypes as FT, KnownMemAddresses as KA
+from SALSA.Tools.instruction_class import Instruct
+from SALSA.Tools.script_class import SCTAnalysis
 
 
 class SCTExporter:

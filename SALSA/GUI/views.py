@@ -4,8 +4,8 @@ from pathlib import Path
 from threading import Timer
 from tkinter import ttk
 
-from . import widgets as w
-from .constants import FieldTypes as FT
+from SALSA.GUI import widgets as w
+from SALSA.Tools.constants import FieldTypes as FT
 
 
 class MainMenu(tk.Menu):

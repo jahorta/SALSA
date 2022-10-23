@@ -1,9 +1,9 @@
 import os
 import re
 
-from .byte_array_utils import getString, getWord, deriveStringLength, word2Float, applyHexMask, padded_hex, \
+from SALSA.Tools.byte_array_utils import getString, getWord, deriveStringLength, word2Float, applyHexMask, padded_hex, \
     word2SignedInt, toInt
-from .constants import FieldTypes as FT
+from SALSA.Tools.constants import FieldTypes as FT
 
 
 class SctModel:

@@ -3,7 +3,7 @@ import tkinter as tk
 from decimal import Decimal, InvalidOperation
 from tkinter import ttk
 
-from .constants import FieldTypes as FT
+from SALSA.Tools.constants import FieldTypes as FT
 
 
 ##################
