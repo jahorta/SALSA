@@ -139,9 +139,7 @@ class Aklz:
 
     @classmethod
     def is_compressed(cls, file_in: bytearray) -> bool:
-        if file_in[:len(cls._FILE_SIGNATURE)] == cls._FILE_SIGNATURE:
-            return True
-        return False
+        return file_in[:len(cls._FILE_SIGNATURE)] == cls._FILE_SIGNATURE
 
 
 class LzWindowDictionary:
