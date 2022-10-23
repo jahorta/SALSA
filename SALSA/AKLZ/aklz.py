@@ -10,11 +10,6 @@ class Aklz:
     _FILE_SIGNATURE: bytearray = bytearray(b'AKLZ~?Qd=\xcc\xcc\xcd')
     _ENDIAN = 'big'
 
-    _dictionary = []
-
-    def _init_dictionary(self):
-        self._dictionary = []
-
     # SOAL Editor method
     def decompress(self, file_in: bytearray) -> bytearray:
         file_in_ptr = 0
@@ -141,6 +136,12 @@ class Aklz:
                 mirror_hex_array.append(hex(byte))
 
         return file_out
+
+    @classmethod
+    def is_compressed(cls, file_in: bytearray) -> bool:
+        if file_in[:cls._FILE_SIGNATURE] == cls._FILE_SIGNATURE:
+            return True
+        return False
 
 
 class LzWindowDictionary:
