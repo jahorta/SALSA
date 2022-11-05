@@ -49,7 +49,7 @@
   "1": {
     "Instruction ID": "1",
     "Name": "code_error",
-    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call",
+    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call\n\n***Used once in 17f***",
     "Location": "0x801f60f0",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
@@ -61,7 +61,7 @@
   "2": {
     "Instruction ID": "2",
     "Name": "code_error",
-    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call",
+    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call\n\n***Not used in the game***",
     "Location": "0x801f60f0",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
@@ -195,8 +195,8 @@
   },
   "6": {
     "Instruction ID": "6",
-    "Name": "Copy Variable Value",
-    "Description": "Loads <SCPT> and copies it to Word: *add[0x8030e514,*mul[<Offset>,4]*]* \nSCPT Analysis: <SCPT>\n\nIf <Offset> == 0, it corresponds to player gold\nIf <Offset> == 1, it corresponds to player reputation",
+    "Name": "Set Int",
+    "Description": "Loads <SCPT> and copies it to Word: *add[0x8030e3e4,*mul[<Offset>,4]*]* \nSCPT Analysis: <SCPT>\n\nIf <Offset> == 0, it corresponds to player gold\nIf <Offset> == 1, it corresponds to player reputation",
     "Location": "0x801f5d7c",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
@@ -242,7 +242,7 @@
   },
   "7": {
     "Instruction ID": "7",
-    "Name": "Store Float",
+    "Name": "Set Float",
     "Description": "Writes <SCPT> to Word: *add[0x8030e514,*mul[<Offset>,4]*",
     "Location": "0x801f5d08",
     "Hard parameter one": "0x00000001",
@@ -290,7 +290,7 @@
   "8": {
     "Instruction ID": "8",
     "Name": "code_error",
-    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call",
+    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call\n\n***Not used in the game***",
     "Location": "0x801f60f0",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
@@ -416,7 +416,7 @@
   "14": {
     "Instruction ID": "14",
     "Name": "code_error",
-    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call",
+    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call\n\n***Not used in the game***",
     "Location": "0x801f60f0",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
@@ -427,8 +427,8 @@
   },
   "15": {
     "Instruction ID": "15",
-    "Name": "??Set something to zero",
-    "Description": "In the current workspace, 0x4 is set to zero\n\n**Not used in the game currently**",
+    "Name": "Force next frame",
+    "Description": "***Not used in the game***\n\nThis instruction will set the 0x4 field in the current instruction buffer to zero. This forces the instruction interpreter function to exit allow for the next frame to be drawn. On next frame, any pending instruction buffers will be read.",
     "Location": "0x801f5bb4",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00000000",
@@ -439,8 +439,8 @@
   },
   "16": {
     "Instruction ID": "16",
-    "Name": "??Wait timer",
-    "Description": "Waits for <Result> frames before continuing with the script.\n\nWait timer for animations and other things?",
+    "Name": "Sleep",
+    "Description": "Waits for <Result> frames before continuing with the script.\nThis forces a frame refresh as the 0x4 field of the instruction buffer is set to zero",
     "Location": "0x801f570c",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
@@ -530,7 +530,7 @@
   "19": {
     "Instruction ID": "19",
     "Name": "Invert Bit",
-    "Description": "Inverts a bit in the bit field at 0x80310b3c\nBit: *add[<Offset>,0]*",
+    "Description": "Inverts a bit in the bit field at 0x80310b3c\nBit: *add[<Offset>,0]*\n\n***Not used in the game***",
     "Location": "0x801f59c0",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
@@ -620,7 +620,7 @@
   "22": {
     "Instruction ID": "22",
     "Name": "Return 1",
-    "Description": "Just returns a 1",
+    "Description": "Returns a 1. Does not advance the pointer, so possibly infinite loop...\n\n***Not used in the game***",
     "Location": "0x801f58b0",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
@@ -631,8 +631,8 @@
   },
   "23": {
     "Instruction ID": "23",
-    "Name": "??Load Model",
-    "Description": "Loads file:\n*lnk[Offset,<Offset>]*\nMight be loading the model itself",
+    "Name": "Load *.mld file",
+    "Description": "Loads file from disk:\n*lnk[Offset,<Offset>]*",
     "Location": "0x801ff13c",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00000000",
@@ -662,13 +662,13 @@
   "24": {
     "Instruction ID": "24",
     "Name": "??Print",
-    "Description": "Has two different functions depending on state\n*lnk[offset,<offset>]*",
+    "Description": "\n*lnk[offset,<offset>]*",
     "Location": "0x8020a938",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Dependency on param1:\n\n\n\n\n\n\n\n\n\n\n\n\n\nHas Debug Messages:\n\"scptPRINT: malloc failed 1\"\n\"scptPRINT: message post timed out\"",
+    "Notes": "Dependency on param1:\n\nHas Debug Messages:\n\"scptPRINT: malloc failed 1\"\n\"scptPRINT: message post timed out\"",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -1469,7 +1469,7 @@
       },
       "9": {
         "ID": "9",
-        "Name": "unknown9",
+        "Name": "End",
         "Type": "loop-end",
         "Override": false,
         "Override condition": "",
@@ -1703,7 +1703,7 @@
       },
       "12": {
         "ID": "12",
-        "Name": "unknown12",
+        "Name": "End",
         "Type": "loop-end",
         "Override": false,
         "Override condition": "",
@@ -2411,7 +2411,7 @@
       "0": {
         "ID": "0",
         "Name": "unknown0",
-        "Type": "scpt-int",
+        "Type": "scpt-short",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -2445,7 +2445,7 @@
       "2": {
         "ID": "2",
         "Name": "unknown2",
-        "Type": "scpt-int",
+        "Type": "scpt-short",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -2505,7 +2505,7 @@
       "0": {
         "ID": "0",
         "Name": "unknown0",
-        "Type": "scpt",
+        "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -2572,7 +2572,7 @@
       },
       "4": {
         "ID": "4",
-        "Name": "unknown4",
+        "Name": "end",
         "Type": "loop-end",
         "Override": false,
         "Override condition": "",
@@ -2982,14 +2982,14 @@
   },
   "51": {
     "Instruction ID": "51",
-    "Name": "??Load",
+    "Name": "??Load Music/Sound",
     "Description": "Reads from DVD, so loads something\nunknown0: <unknown0>\nunknown1: <unknown1>\nunknown2: <unknown2>\nunknown3: <unknown3>",
     "Location": "0x801fa060",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 4,
-    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: int\n2: byte\n3: byte\n4: float\n\nUses these parameters to load something from DVD.",
+    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: int\n2: byte\n3: byte\n4: float\n\nUses these parameters to load something from DVD.\n\nThis appears to load sound of some sort.\nparam 4 is unused I think, and I'm not sure how param 1 is used. params 2 and 3 are similar to the 2 and 3 from INST 55, especially in that a 1 in param 2 loads a sound effect.\n\nUnlike INST 55, it plays the sound effect once only, not repeated",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -3190,7 +3190,7 @@
       "0": {
         "ID": "0",
         "Name": "unknown0",
-        "Type": "scpt",
+        "Type": "scpt-short",
         "Override": true,
         "Override condition": "compare-value-offset",
         "Override offset": "0x00000004",
@@ -3207,7 +3207,7 @@
       "1": {
         "ID": "1",
         "Name": "unknown1",
-        "Type": "scpt",
+        "Type": "scpt-float",
         "Override": true,
         "Override condition": "compare-value-offset",
         "Override offset": "0x00000004",
@@ -3224,7 +3224,7 @@
       "2": {
         "ID": "2",
         "Name": "unknown2",
-        "Type": "scpt",
+        "Type": "scpt-float",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -3241,7 +3241,7 @@
       "3": {
         "ID": "3",
         "Name": "unknown3",
-        "Type": "scpt",
+        "Type": "scpt-float",
         "Override": false,
         "Override condition": "",
         "Override offset": "0x00000000",
@@ -3578,8 +3578,8 @@
   },
   "55": {
     "Instruction ID": "55",
-    "Name": "??no name",
-    "Description": "unknown0: <unknown0>\nunknown1: <unknown1>\nunknown2: <unknown2>",
+    "Name": "??Set Music Track",
+    "Description": "unknown0: <unknown0> - track\nunknown1: <unknown1> - subtrack\nunknown2: <unknown2>\nif unknown0 == 1 it is soundeffects and the subtrack becomes useful\nunknown2 is unused. Its value is read but never sent to the function which sets the track",
     "Location": "0x801fa398",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
@@ -7192,8 +7192,8 @@
   },
   "98": {
     "Instruction ID": "98",
-    "Name": "??no name",
-    "Description": "Has a while loop:\n<loop>",
+    "Name": "??Play Effect",
+    "Description": "Seems to start an effect. Used for: cannon shots, explosions, nametag for introducing ship\nHas a while loop:\n<loop>",
     "Location": "0x801ffc20",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
@@ -7237,7 +7237,7 @@
       },
       "2": {
         "ID": "2",
-        "Name": "unknown2",
+        "Name": "effect_id",
         "Type": "scpt-short",
         "Override": false,
         "Override condition": "",
@@ -7254,7 +7254,7 @@
       },
       "3": {
         "ID": "3",
-        "Name": "unknown3",
+        "Name": "loop-end",
         "Type": "loop-end",
         "Override": false,
         "Override condition": "",
@@ -11139,7 +11139,7 @@
   },
   "143": {
     "Instruction ID": "143",
-    "Name": "No Function",
+    "Name": "Return 0",
     "Description": "This only returns a zero, which will allow a frame to pass before the next instruction. However, this doesn't seem to increment the script pointer, so it may cause an infinite loop?",
     "Location": "0x8020a72c",
     "Hard parameter one": "0x00000000",
@@ -14332,7 +14332,7 @@
   "185": {
     "Instruction ID": "185",
     "Name": "??noname",
-    "Description": "unknown0: <unknown0>",
+    "Description": "May be related to controlling a ship. Also related to inst 186.\nunknown0: <unknown0>",
     "Location": "0x8020bcf4",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
@@ -14362,7 +14362,7 @@
   "186": {
     "Instruction ID": "186",
     "Name": "??noname",
-    "Description": "unknown0: <unknown0>",
+    "Description": "May be related to controlling a ship. Also related to inst 185.\nunknown0: <unknown0>",
     "Location": "0x8020bc38",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
@@ -17542,7 +17542,7 @@
   "234": {
     "Instruction ID": "234",
     "Name": "??no name",
-    "Description": "Sets two globals:\n803473b0 = 0\n803473b4 = 1",
+    "Description": "",
     "Location": "0x801fed3c",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
@@ -17584,14 +17584,117 @@
   "236": {
     "Instruction ID": "236",
     "Name": "??no name",
-    "Description": "",
+    "Description": "unknown0: <unknown0>\nunknown1: <unknown1>\nunknown0: <unknown2>\nunknown1: <unknown3>\nunknown0: <unknown4>\nunknown1: <unknown5>",
     "Location": "0x8020b670",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
     "Implement": true,
-    "Parameter num": 0,
+    "Parameter num": 6,
     "Notes": "",
-    "Parameters": {}
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "1": {
+        "ID": "1",
+        "Name": "unknown1",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "2": {
+        "ID": "2",
+        "Name": "unknown2",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "3": {
+        "ID": "3",
+        "Name": "unknown3",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "4": {
+        "ID": "4",
+        "Name": "unknown4",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "5": {
+        "ID": "5",
+        "Name": "unknown5",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "237": {
     "Instruction ID": "237",
@@ -17672,14 +17775,32 @@
   "239": {
     "Instruction ID": "239",
     "Name": "??no name",
-    "Description": "",
+    "Description": "unknown0: <unknown0>",
     "Location": "0x801fd1d0",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
     "Implement": true,
-    "Parameter num": 0,
+    "Parameter num": 1,
     "Notes": "",
-    "Parameters": {}
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "240": {
     "Instruction ID": "240",
@@ -18058,14 +18179,49 @@
   "244": {
     "Instruction ID": "244",
     "Name": "??no name",
-    "Description": "",
+    "Description": "unknown0: <unknown0>\nunknown1: <unknown1>",
     "Location": "0x8020bee8",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
     "Implement": true,
-    "Parameter num": 0,
+    "Parameter num": 2,
     "Notes": "",
-    "Parameters": {}
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "1": {
+        "ID": "1",
+        "Name": "unknown1",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "245": {
     "Instruction ID": "245",
@@ -18351,14 +18507,49 @@
   "251": {
     "Instruction ID": "251",
     "Name": "??no name",
-    "Description": "",
+    "Description": "unknown0: <unknown0>\nunknown1: <unknown1>",
     "Location": "0x8020014c",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
     "Implement": true,
-    "Parameter num": 0,
+    "Parameter num": 2,
     "Notes": "",
-    "Parameters": {}
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "1": {
+        "ID": "1",
+        "Name": "unknown1",
+        "Type": "scpt-float",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "252": {
     "Instruction ID": "252",
@@ -18410,14 +18601,49 @@
   "253": {
     "Instruction ID": "253",
     "Name": "??no name",
-    "Description": "",
+    "Description": "unknown0: <unknown0>\nunknown1: <unknown1>",
     "Location": "0x801fffa4",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
     "Implement": true,
-    "Parameter num": 0,
+    "Parameter num": 2,
     "Notes": "",
-    "Parameters": {}
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      },
+      "1": {
+        "ID": "1",
+        "Name": "unknown1",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "254": {
     "Instruction ID": "254",
@@ -18446,14 +18672,32 @@
   "256": {
     "Instruction ID": "256",
     "Name": "??no name",
-    "Description": "",
+    "Description": "Reads in a parameter but does nothing with it. Returns false",
     "Location": "0x801fdc70",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
     "Implement": true,
-    "Parameter num": 0,
+    "Parameter num": 1,
     "Notes": "",
-    "Parameters": {}
+    "Parameters": {
+      "0": {
+        "ID": "0",
+        "Name": "unknown0",
+        "Type": "scpt-int",
+        "Override": false,
+        "Override condition": "",
+        "Override offset": "0x00000000",
+        "Override result": "",
+        "Override compare": "0x00000000",
+        "Mask": false,
+        "Mask Value": "0x00000000",
+        "Signed": false,
+        "Iterations": "",
+        "Condition Parameter": "",
+        "Condition Test": "",
+        "Condition Value": ""
+      }
+    }
   },
   "257": {
     "Instruction ID": "257",

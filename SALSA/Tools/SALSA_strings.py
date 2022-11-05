@@ -1,5 +1,5 @@
 class HelpStrings:
-    instruction_features = "Instruction Descriptions\n" \
+    instruction_descriptions = "Instruction Descriptions\n" \
                            "------------------------\n\n" \
                            "Instruction descriptions are flexible, in that certain modifiers can be " \
                            "used to display the result of parameters from the instruction, or even " \

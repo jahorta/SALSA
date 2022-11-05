@@ -11,7 +11,7 @@ from pathlib import Path
 from threading import Timer
 from tkinter import ttk, messagebox, filedialog
 
-from SALSA.GUI import views as v
+from SALSA.GUI import menus, popups, instruction_view as iv, script_viewer as sv
 from SALSA.Tools.SALSA_strings import HelpStrings
 from SALSA.Tools.exporter import SCTExporter
 from SALSA.Tools.instruction_class import Instruct
@@ -87,7 +87,8 @@ class Application(tk.Tk):
             'on_instruction_display_change': self.on_instruction_display_change,
             'on_select_script': self.on_select_script,
             'on_select_script_instruction': self.on_select_script_instruction,
-            'on_set_inst_start': self.on_set_inst_start
+            'on_set_inst_start': self.on_set_inst_start,
+            'create_breakpoint': self.on_create_breakpoints
         }
         self.exporter_callbacks = {
             'on_export': self.on_data_export,
@@ -107,20 +108,20 @@ class Application(tk.Tk):
         style.map("Treeview", background=[('selected', 'focus', 'blue'), ('selected', '!focus', 'blue')])
 
         # Implement Menu
-        menu = v.MainMenu(self, self.menu_callbacks)
+        menu = menus.MainMenu(self, self.menu_callbacks)
         self.config(menu=menu)
 
         # Load help strings
         self.help = HelpStrings()
 
         # Setup script parsing view
-        self.ScriptFrame = v.ScriptView(self, self.script_callbacks)
+        self.ScriptFrame = sv.ScriptView(self, self.script_callbacks)
         self.ScriptFrame.grid(row=0, column=0, sticky='NEWS')
 
         # Initialize instruction edit view
-        self.InstructionFrame = v.InstructionView(self, self.instModel.fields,
-                                                  self.instModel.parameter_model.getAllFields(),
-                                                  self.instruction_callbacks, self.instructionSet)
+        self.InstructionFrame = iv.InstructionView(self, self.instModel.fields,
+                                                   self.instModel.parameter_model.getAllFields(),
+                                                   self.instruction_callbacks, self.instructionSet)
         self.InstructionFrame.grid(row=0, column=0, sticky='NEWS')
         self.populate_instructions(self.instructionSet)
         self.InstructionFrame.tkraise()
@@ -182,9 +183,9 @@ class Application(tk.Tk):
         self.script_exports = []
         self.export_type = ''
         position = {'x': self.winfo_x(), 'y': self.winfo_y()}
-        self.export_window = v.ExporterView(parent=self, title='Export',
-                                            export_fields=self.exporter.get_export_fields(), position=position,
-                                            callbacks=self.exporter_callbacks)
+        self.export_window = popups.ExporterView(parent=self, title='Export',
+                                             export_fields=self.exporter.get_export_fields(), position=position,
+                                             callbacks=self.exporter_callbacks)
 
     # Called when asked to export data
     def on_data_export(self, export_type='Ship battle turn data'):
@@ -322,8 +323,8 @@ class Application(tk.Tk):
         file_path = self.script_dir
         position = {'x': self.winfo_x(), 'y': self.winfo_y()}
 
-        self.file_select = v.FileSelectView(self, self.file_select_last_selected, self.file_select_scalebar_pos,
-                                            position, file_path, self.file_select_callbacks)
+        self.file_select = popups.FileSelectView(self, self.file_select_last_selected, self.file_select_scalebar_pos,
+                                             position, file_path, self.file_select_callbacks)
         self.file_select.populate_files(file_path)
         t = Timer(0.01, self.set_file_select_scrollbar)
         t.start()
@@ -414,6 +415,18 @@ class Application(tk.Tk):
             self.ScriptFrame.populate_instructions(instruct_dict, None)
         self.ScriptFrame.set_instruction_detail_fields(details=None, mode='reset')
 
+    def on_create_breakpoints(self, newID):
+        instruct_dict = self.sctAnalysis.get_instruction_tree(newID)
+        breaks = []
+        for inst in instruct_dict.values():
+            addr = inst['pos'][2:]
+            addr = addr[:2] + ',' + addr[2:5] + ',' + addr[5:]
+            breaks.append(f'{addr} {addr} rp')
+        break_string = '\n'.join(breaks)
+        self.clipboard_clear()
+        self.clipboard_append(break_string)
+        print('breakpoints sent to clipboard')
+
     def on_select_script(self, newID):
         script_dict = self.sctAnalysis.get_script_tree()
         if not newID is None:
@@ -448,17 +461,17 @@ class Application(tk.Tk):
 
     def on_help_about(self):
         position = {'x': self.winfo_x(), 'y': self.winfo_y()}
-        self.help_window = v.HelpPopupView(self, 'About', self.about_text, position, self.about_window_callbacks)
+        self.help_window = popups.HelpPopupView(self, 'About', self.about_text, position, self.about_window_callbacks)
 
     def on_help_inst(self):
         position = {'x': self.winfo_x(), 'y': self.winfo_y()}
-        self.help_window = v.HelpPopupView(self, 'Instruction Details', HelpStrings.instruction_descriptions,
-                                           position, self.about_window_callbacks)
+        self.help_window = popups.HelpPopupView(self, 'Instruction Details', HelpStrings.instruction_descriptions,
+                                            position, self.about_window_callbacks)
 
     def on_help_notes(self):
         position = {'x': self.winfo_x(), 'y': self.winfo_y()}
-        self.help_window = v.HelpPopupView(self, 'Other Notes', HelpStrings.other_notes,
-                                           position, self.about_window_callbacks)
+        self.help_window = popups.HelpPopupView(self, 'Other Notes', HelpStrings.other_notes,
+                                            position, self.about_window_callbacks)
 
     def about_window_close(self, window):
         if window == 'help':
@@ -474,8 +487,8 @@ class Application(tk.Tk):
 
     def show_help(self):
         position = {'x': self.winfo_x(), 'y': self.winfo_y()}
-        self.help_window = v.TabbedHelpPopupView(self, 'Help', self.help.get_all(),
-                                                 position, self.about_window_callbacks)
+        self.help_window = popups.TabbedHelpPopupView(self, 'Help', self.help.get_all(),
+                                                  position, self.about_window_callbacks)
 
 
 class Settings:
