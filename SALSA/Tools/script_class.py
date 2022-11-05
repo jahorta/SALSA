@@ -4,7 +4,7 @@ import re
 from SALSA.Tools.byte_array_utils import getTypeFromString, toInt, asStringOfType, toFloat
 
 
-class SCTAnalysis:
+class SCTScript:
     start_pos = None
 
     special_addresses = {

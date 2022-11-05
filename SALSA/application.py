@@ -13,10 +13,10 @@ from tkinter import ttk, messagebox, filedialog
 
 from SALSA.GUI import menus, popups, instruction_view as iv, script_viewer as sv
 from SALSA.Tools.SALSA_strings import HelpStrings
-from SALSA.Tools.exporter import SCTExporter
+from Analysis.analyzer import SCTAnalyzer
 from SALSA.Tools.instruction_class import Instruct
 from SALSA.FileModels.instruction_model import InstructionModel
-from SALSA.Tools.script_class import SCTAnalysis
+from SALSA.Tools.script_class import SCTScript
 from SALSA.FileModels.sct_model import SctModel
 
 
@@ -133,7 +133,7 @@ class Application(tk.Tk):
 
         # initializing exporter
         self.export_window = None
-        self.exporter = SCTExporter()
+        self.exporter = SCTAnalyzer()
         self.export_type = ''
         self.script_exports = {}
         self.export_script_names = []
@@ -179,7 +179,7 @@ class Application(tk.Tk):
         self.storedInstructionSet = self.instModel.load_instructions()
 
     def on_create_export_window(self):
-        self.exporter = SCTExporter()
+        self.exporter = SCTAnalyzer()
         self.script_exports = []
         self.export_type = ''
         position = {'x': self.winfo_x(), 'y': self.winfo_y()}
@@ -244,7 +244,7 @@ class Application(tk.Tk):
                     sct_list = in_pkg['script_list']
                     scripts = []
                     for sct in sct_list:
-                        new_sct_analysis = SCTAnalysis(self.sctModel.load_sct(insts=self.instructionSet, file=sct))
+                        new_sct_analysis = SCTScript(self.sctModel.load_sct(insts=self.instructionSet, file=sct))
                         print(f'{sct} analyzed: {i}/{script_num}')
                         progress = floor((i / script_num) * 100)
                         self.export_window.update_progress(progress, f'{sct} analyzed: {i}/{script_num}')
@@ -258,7 +258,7 @@ class Application(tk.Tk):
                     self.queue_from_exporter.put({'done': True})
                 else:
                     sct = in_pkg['script']
-                    new_sct_analysis = SCTAnalysis(self.sctModel.load_sct(insts=self.instructionSet, file=sct))
+                    new_sct_analysis = SCTScript(self.sctModel.load_sct(insts=self.instructionSet, file=sct))
                     print(f'{sct} analyzed: {i}/{script_num}')
                     new_sct_export = self.exporter.export(sct_list=[new_sct_analysis], instruction_list=self.instructionSet,
                                                           export_type=self.export_type)
@@ -381,7 +381,7 @@ class Application(tk.Tk):
             if sct_dict is None:
                 print('No Script file loaded')
                 return
-            self.sctAnalysis = SCTAnalysis(sct_dict)
+            self.sctAnalysis = SCTScript(sct_dict)
             sct_view_info = self.sctAnalysis.get_sct_info()
             sct_tree = self.sctAnalysis.get_script_tree()
             self.ScriptFrame.display_script_analysis_new(sct_view_info, sct_tree)
