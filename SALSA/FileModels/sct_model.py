@@ -10,7 +10,7 @@ from SALSA.Tools.constants import FieldTypes as FT
 class SctModel:
     """Creates an object which can read in and decode *.sct files based on an instruction object"""
     path = './scripts/'
-    overwriteCheck = False
+
 
     sct_keys = {
         'Name',
@@ -74,30 +74,17 @@ class SctModel:
     indexNum = 0
 
     def __init__(self, path=None):
-        self.instructionNum = 0
-        self.instructions = {}
-        self.implementedInstKeys = []
-        self.cursor = 0
-        self.indexed_sct = {}
-        self.decoded_sct = {}
-        self.sctLength = 0
-        self.errorCount: int = 1
         if path is not None:
             self.path = path
 
     def load_sct(self, insts, file: str):
-        self.instructionNum = len(insts)
-        self.instructions = insts
-        self.implementedInstKeys = []
-        for inst in self.instructions.values():
-            if inst.implement:
-                self.implementedInstKeys.append(str(int(inst.instID)))
         out = self._read_sct_file(file)
         if out is None:
             return None
         name = out[0]
         sct_raw = out[1]
-        sct_dict = self._decode_sct(name, sct_raw)
+        decoder = SCTDecoder(name, sct_raw, insts)
+        sct_dict = decoder._decode_sct()
         return sct_dict
 
     def _read_sct_file(self, file: str):
@@ -114,10 +101,30 @@ class SctModel:
 
         return [file, ba]
 
-    def _decode_sct(self, name, sct_raw):
-        self.indexed_sct = self._generate_indexed_sct(sct_raw)
+
+class SCTDecoder:
+
+    overwriteCheck = False
+
+    def __init__(self, name, sct, insts):
+        self.name = name
+        self.instructionNum = len(insts)
+        self.instructions = insts
+        self.implementedInstKeys = []
+        for inst in self.instructions.values():
+            if inst.implement:
+                self.implementedInstKeys.append(str(int(inst.instID)))
+        self.cursor = 0
+        self.indexed_sct = {}
+        self.decoded_sct = {}
+        self.sctLength = 0
+        self.errorCount: int = 1
+        self.sct = sct
+
+    def _decode_sct(self):
+        self.indexed_sct = self._generate_indexed_sct()
         self.decoded_sct = {
-            'Name': name, 'Header': self.indexed_sct['Header'], 'Footer': self.indexed_sct['Footer'],
+            'Name': self.name, 'Header': self.indexed_sct['Header'], 'Footer': self.indexed_sct['Footer'],
             'Index': self.indexed_sct['Index'], 'Positions': self.indexed_sct['Positions'],
             'Stats': {'Index Num': self.indexed_sct['Index Num'],
                       'Scripts Start Pos': self.indexed_sct['Index End Pos']},
@@ -134,7 +141,7 @@ class SctModel:
             self.cursor = 0
             length = len(value)
             if length == 16:
-                data = self.__decode_sct_section(value, int(self.indexed_sct['Index'][key]['pos'], 16))
+                data = self._decode_sct_section(value, int(self.indexed_sct['Index'][key]['pos'], 16))
                 self.decoded_sct['Sections'][key] = {'type': 'inst', 'data': data, 'string': ''}
                 if 'errors' in data.keys():
                     self.decoded_sct['Sections'][key]['errors'] = data['errors']
@@ -144,7 +151,7 @@ class SctModel:
                 # if re.search('^M.{8}$', key):
                 #     encoding = 'UTF-8'
                 labelLength = 16
-                data = self.__decode_sct_section(value[:16], int(self.indexed_sct['Index'][key]['pos'], 16))
+                data = self._decode_sct_section(value[:16], int(self.indexed_sct['Index'][key]['pos'], 16))
                 string = getString(value, labelLength, encoding)
                 self.decoded_sct['Sections'][key] = {'type': 'str', 'data': data, 'string': string}
                 self.decoded_sct['Details']['Strings'].append(string)
@@ -152,13 +159,12 @@ class SctModel:
                     self.decoded_sct['Sections'][key]['error'] = 'Length of string == 0'
             else:
                 # print('Decoding: {}'.format(key))
-                data = self.__decode_sct_section(value, int(self.indexed_sct['Index'][key]['pos'], 16))
+                data = self._decode_sct_section(value, int(self.indexed_sct['Index'][key]['pos'], 16))
                 self.decoded_sct['Sections'][key] = {'type': 'inst', 'data': data, 'string': ''}
                 if 'errors' in data.keys():
                     self.decoded_sct['Sections'][key]['errors'] = data['errors']
                     self.decoded_sct['Errors'].append(key)
                     data.pop('errors')
-                # noinspection PyAssignmentToLoopOrWithParameter
                 for value1 in data.values():
                     if not isinstance(value1, dict):
                         continue
@@ -175,14 +181,14 @@ class SctModel:
 
         return self.decoded_sct
 
-    def _generate_indexed_sct(self, sct):
-        index_length = getWord(sct, 8)
+    def _generate_indexed_sct(self):
+        index_length = getWord(self.sct, 8)
         head = 12
         entryLength = 20
         indEnd = head + (entryLength * index_length)
-        body_length = len(sct) - index_length
+        body_length = len(self.sct) - index_length
         i = 0
-        header = {'misc1': getWord(sct, 0, 'hex'), 'misc2': getWord(sct, 4, 'hex'), 'Index Num': getWord(sct, 8, 'hex')}
+        header = {'misc1': getWord(self.sct, 0, 'hex'), 'misc2': getWord(self.sct, 4, 'hex'), 'Index Num': getWord(self.sct, 8, 'hex')}
         ind = {'Header': header, 'Index Num': index_length, 'Index': {}, 'Index End Pos': indEnd, 'Positions': {},
                'Sections': {}, 'Footer': {}}
         prevPos = 0
@@ -190,8 +196,8 @@ class SctModel:
         prevLength = 0
         for i in range(0, index_length):
             titlePos = head + (i * entryLength) + 4
-            title = getString(sct, titlePos)
-            pos = getWord(sct, head + i * entryLength, 'int')  # get position from file as hex string
+            title = getString(self.sct, titlePos)
+            pos = getWord(self.sct, head + i * entryLength, 'int')  # get position from file as hex string
             ind['Index'][title] = {'name': title, 'pos': padded_hex(pos, 8)}
             ind['Positions'][pos] = title
             if i > 0:
@@ -199,17 +205,17 @@ class SctModel:
                 ind['Index'][prevTitle]['length'] = padded_hex(prevLength, 8)
                 sctStart = prevPos + indEnd
                 sctEnd = pos + indEnd
-                ind['Sections'][prevTitle] = sct[sctStart:sctEnd]
+                ind['Sections'][prevTitle] = self.sct[sctStart:sctEnd]
             prevTitle = title
             prevPos = pos
-        prevLength = self._find_length_of_last_section(sct[(prevPos + indEnd):])
+        prevLength = self._find_length_of_last_section(self.sct[(prevPos + indEnd):])
         ind['Index'][prevTitle]['length'] = padded_hex(prevLength, 8)
         sctStart = prevPos + indEnd
         sctEnd = sctStart + prevLength
-        ind['Sections'][prevTitle] = sct[sctStart:sctEnd]
+        ind['Sections'][prevTitle] = self.sct[sctStart:sctEnd]
         footerStart = sctStart + prevLength
         footerStartNoIndex = footerStart - indEnd
-        footerSCT = sct[footerStart:]
+        footerSCT = self.sct[footerStart:]
         footerLength = len(footerSCT)
         pos = 0
         index = 0
@@ -232,7 +238,7 @@ class SctModel:
         sectLength = 0
         if self.test_for_string(sct):
             sectLength += 16
-            strNoLabel = sct[16:]
+            strNoLabel = self.sct[16:]
             sectLengths = deriveStringLength(strNoLabel, 0)
             sectLength += len(sectLengths) - 1
             for s in sectLengths:
@@ -251,8 +257,8 @@ class SctModel:
             All footer segments should be bounded by at least one single 0x00 bytes, however,
             final instructions tend to have at least two sequential 0x00 bytes"""
             hadOne00 = False
-            for i in reversed(range(len(sct))):
-                byte = sct[i]
+            for i in reversed(range(len(self.sct))):
+                byte = self.sct[i]
                 if byte in endBytes:
                     if hadOne00:
                         break
@@ -273,7 +279,7 @@ class SctModel:
             sectLength = lastNotFooterByte + lastNotFooterByte % 4
         return sectLength
 
-    def __decode_sct_section(self, sct_bytes, sct_start_pos):
+    def _decode_sct_section(self, sct_bytes, sct_start_pos):
         scptErr = False
         self.cursor = 0
         self.sctLength = len(sct_bytes) / 4
@@ -285,9 +291,6 @@ class SctModel:
             currWord = getWord(sct_bytes, self.cursor * 4, 'hex')
             currWord_int = int(currWord, 16)
             startPos = self.cursor
-            # print('Cursor: {0}, Current Word: {1} -> as int: {2}'.format(self.cursor, currWord, currWord_int))
-            # if currWord == '0x000000ca':
-            #     print('Restore Health')
 
             """Apparently, 0x0a000000 is used after some instructions, but never read from file, so capture it along with
             the next instruction, which is sometimes 0x04000000 and triggers a false SCPTAnalyze call. Maybe its used as padding?"""
@@ -298,15 +301,14 @@ class SctModel:
                                            'function': 'None'}
                 self.cursor += 1
 
-            # Since 0x04000000 is reserved for SCPTAnalyze more or less, capture any instructions following this code as SCPT parameters
+            # Since 0x04000000 is reserved for SCPTAnalyze, capture any instructions following this code as SCPT parameters
             elif currWord == '0x04000000':
                 if 'errors' not in insts.keys():
                     insts['errors'] = {}
                 insts['errors'][self.errorCount] = 'Unknown SCPT parameter'
                 self.errorCount += 1
                 errors = {}
-                inSCPT = True
-                while inSCPT:
+                while True:
                     errors[str(self.errorCount)] = currWord
                     self.errorCount += 1
                     self.cursor += 1
@@ -334,7 +336,7 @@ class SctModel:
                                         'function': 'None'}
 
             # if the current word is not within the instruction number, set a false instruction using the current word
-            elif currWord_int >= self.instructionNum or currWord_int < 0:
+            elif not 0 <= currWord_int <= self.instructionNum:
                 if self.overwriteCheck and scptErr:
                     print('next instruction: {}'.format(self.cursor))
                     scptErr = False
@@ -344,7 +346,7 @@ class SctModel:
 
             # if the current word is a valid instruction, resolve said instruction
             else:
-                instResult = self.__decode_instruction(sct_bytes, currWord, scptErr, sct_start_pos)
+                instResult = self._decode_instruction(sct_bytes, currWord, scptErr, sct_start_pos)
                 if 'Canceled' in instResult.keys():
                     self.cursor = startPos
                     if 'errors' not in insts.keys():
@@ -361,7 +363,7 @@ class SctModel:
                 insts['final'] = currWord
         return insts
 
-    def __decode_instruction(self, sct, inst, scptErr, sct_start_pos):
+    def _decode_instruction(self, sct, inst, scptErr, sct_start_pos):
         instDict = {}
         if not str(int(inst, 16)) in self.implementedInstKeys:
             if self.overwriteCheck and scptErr:

@@ -128,7 +128,7 @@ class Instruct:
 
         self.paramNum = newParamNum
 
-        self.__remove_unused_parameters()
+        self._remove_unused_parameters()
 
         for i in range(len(self.parameters)):
             curID = str(i)
@@ -145,7 +145,7 @@ class Instruct:
         else:
             return False
 
-    def __remove_unused_parameters(self):
+    def _remove_unused_parameters(self):
         if len(self.parameters) > self.paramNum:
             paramToRemove = len(self.parameters) - self.paramNum
             for i in reversed(range(paramToRemove)):

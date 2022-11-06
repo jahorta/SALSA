@@ -14,6 +14,7 @@
         <option value="$MODULE_DIR$/SALSA/GUI" />
         <option value="$MODULE_DIR$/SALSA/Tools" />
         <option value="$MODULE_DIR$/SALSA/FileModels" />
+        <option value="$MODULE_DIR$/SALSA/Analysis" />
       </list>
     </option>
   </component>

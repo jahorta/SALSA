@@ -4,13 +4,12 @@ import struct
 
 
 def getWord(file: bytearray, pos: int, out='int'):
-    try:
-        posByte1 = file[pos]
-        posByte2 = file[pos + 1]
-        posByte3 = file[pos + 2]
-        posByte4 = file[pos + 3]
-    except (IndexError):
-       print('stop here')
+    if pos + 4 > len(file):
+        raise IndexError(f'This the input bytearray is not long enough to contain a word')
+    posByte1 = file[pos]
+    posByte2 = file[pos + 1]
+    posByte3 = file[pos + 2]
+    posByte4 = file[pos + 3]
     word = posByte1 * 16777216 + posByte2 * 65536 + posByte3 * 256 + posByte4
     if out == 'int':
         return word
@@ -80,9 +79,12 @@ def deriveStringLength(file: bytearray, pos: int, terminators=None):
     lengths = []
     length = 0
 
-    while not currentChar in terminators:
+    while currentChar not in terminators:
         currentCharIndex += 1
         length += 1
+        if currentCharIndex == len(file):
+            length -= 1
+            break
         currentChar = file[currentCharIndex]
 
     lengths.append(length)

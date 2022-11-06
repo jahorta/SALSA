@@ -13,10 +13,10 @@ from tkinter import ttk, messagebox, filedialog
 
 from SALSA.GUI import menus, popups, instruction_view as iv, script_viewer as sv
 from SALSA.Tools.SALSA_strings import HelpStrings
-from Analysis.analyzer import SCTAnalyzer
-from SALSA.Tools.instruction_class import Instruct
+from SALSA.Analysis.analyzer import SCTAnalyzer
+from SALSA.InstructionClasses.instruction_class import Instruct
 from SALSA.FileModels.instruction_model import InstructionModel
-from SALSA.Tools.script_class import SCTScript
+from SALSA.ScriptClass.script_class import SCTScript
 from SALSA.FileModels.sct_model import SctModel
 
 
@@ -492,19 +492,19 @@ class Application(tk.Tk):
 
 
 class Settings:
-    filename = './Lib/settings.json'
     defaults = {
         'previous_sct_file': '',
         'script_directory': './scripts/'
     }
 
     def __init__(self):
-        self.settings = self.__load_settings()
+        self.filename = './Lib/settings.json'
+        self.settings = self._load_settings()
 
-    def __load_settings(self):
+    def _load_settings(self):
 
         if not os.path.exists(self.filename):
-            self.__new_settings_file()
+            self._new_settings_file()
         with open(self.filename, 'r') as fh:
             settings = json.loads(fh.read())
 
@@ -514,7 +514,7 @@ class Settings:
 
         return settings
 
-    def __new_settings_file(self):
+    def _new_settings_file(self):
         with open(self.filename, 'w') as fh:
             fh.write(json.dumps(self.defaults))
 

@@ -3,8 +3,8 @@ from typing import List, Dict
 
 from SALSA.Analysis.script_performer import ScriptPerformer
 from SALSA.Tools.constants import FieldTypes as FT, KnownMemAddresses as KA
-from SALSA.Tools.instruction_class import Instruct
-from SALSA.Tools.script_class import SCTScript
+from SALSA.InstructionClasses.instruction_class import Instruct
+from SALSA.ScriptClass.script_class import SCTScript
 
 
 class SCTAnalyzer:
