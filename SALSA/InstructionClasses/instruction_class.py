@@ -1,6 +1,120 @@
 import copy
 
+from SALSA.InstructionClasses.instruct_defaults import inst_defaults as id
 
+
+class Parameter2:
+
+    def __init__(self, param_id, param_dict, default_name):
+
+        self.locked_fields = [k for k in param_dict.keys()]
+        self.paramID = param_id
+        self.name = param_dict.get('Name', default_name)
+        self.type = param_dict['Type']
+        self.default_value = param_dict.get('Default', None)
+        self.mask = param_dict.get('Mask', None)
+        self.isSigned = param_dict.get('Signed', None)
+
+    def set_parameter_details(self, param_details):
+
+        if 'Name' not in self.locked_fields:
+            self.name = param_details.get('Name', self.name)
+        if 'Mask' not in self.locked_fields:
+            self.mask = param_details.get('Mask', self.mask)
+        if 'Signed' not in self.locked_fields:
+            self.isSigned = param_details.get('Signed', self.isSigned)
+        if 'Default' not in self.locked_fields and self.type is not 'int':
+            self.default_value = param_details.get('Default', self.default_value)
+
+    def get_fields(self):
+        fields = {}
+        if 'Name' not in self.locked_fields:
+            fields['Name'] = self.name
+        if 'Signed' not in self.locked_fields:
+            fields['Signed'] = self.isSigned
+        if 'Mask' not in self.locked_fields and self.mask is not None:
+            fields['Mask'] = self.mask
+        if 'Default' not in self.locked_fields and self.default_value is not None:
+            fields['Default'] = self.default_value
+
+
+class Instruct2:
+
+    def __init__(self, inst_id, inst_values):
+
+        self.locked_fields = [k for k in inst_values.keys() if k is not 'Parameters']
+        self.instID = inst_id
+        self.name = inst_values.get('Name', f'Inst{inst_id}')
+        self.description = inst_values.get('Description', '\n')
+        self.location = inst_values['Location']
+        self.no_new_frame = inst_values['Skip Frame Refresh']
+        if self.no_new_frame == 1:
+            self.forced_new_frame = inst_values['Force Frame Refresh']
+        self.param2 = inst_values['Hard parameter two']
+        self.notes = inst_values.get('Notes', '\n')
+        self.parameters = {}
+        for key, param in inst_values['Parameters'].items():
+            self.parameters[key] = Parameter(param)
+
+        self.link = inst_values.get('Link', None)
+        self.link_type = inst_values.get('Link Type', None)
+
+        self.loop = inst_values.get('Loop', None)
+        self.loop_iter = inst_values.get('Loop Iterations', None)
+        self.loop_cond = inst_values.get('Loop Condition', None)
+
+        self.warning = inst_values.get('Warning', None)
+
+    def get_all(self):
+        all_fields = {'Name': self.name, 'Description': self.description, 'Notes': self.notes}
+        param = {}
+        currParam = 0
+        for key, value in self.parameters.items():
+            param[key] = value.get_fields()
+            currParam += 1
+
+        all_fields['Parameters'] = param
+
+        return all_fields
+
+    def set_inst_details(self, updated_details):
+        if 'Name' not in self.locked_fields:
+            self.name = updated_details.get('Name', self.name)
+        if 'Description' not in self.locked_fields:
+            self.description = updated_details.get('Description', self.description)
+        self.notes = updated_details.get('Notes', self.notes)
+        if 'Parameters' in updated_details.keys():
+            for key, param_details in updated_details['Parameters'].items():
+                self.parameters[key].set_parameter_details(param_details=param_details)
+
+    def get_param_names(self, param_list):
+        names = {}
+        for param in self.parameters.values():
+            if int(param.paramID) in param_list:
+                names[int(param.paramID)] = param.name
+        return names
+
+
+class InstLib:
+    """Takes in a dictionary containing instruction information and produces an object containing
+        the necessary information to decode *.sct files"""
+
+    def __init__(self):
+        self.insts = [Instruct2(k, v) for k, v in id.items()]
+
+    def get_inst(self, inst_id) -> Instruct2:
+        return self.insts[inst_id]
+
+    def set_inst_fields(self, inst_dict):
+        for inst_id, inst_settings in inst_dict.items():
+            self.insts[inst_id].set_inst_details(inst_settings)
+
+
+###################################################################
+###################################################################
+
+
+# This will be depreciated for the class above eventually
 class Instruct:
     """Takes in a dictionary containing instruction information and produces an object containing
     the necessary information to decode *.sct files"""
