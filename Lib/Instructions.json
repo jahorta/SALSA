@@ -2,7 +2,7 @@
   "0": {
     "Instruction ID": "0",
     "Name": "JMP: jump if false",
-    "Description": "Jump test: <test>\n\nJump if False:\n*lnk[offset,<offset>]*",
+    "Description": "Jump test: <test>\n\nJump if False:\n*lnk[Offset,<Offset>]*",
     "Location": "0x801f6044",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
@@ -29,7 +29,7 @@
       },
       "1": {
         "ID": "1",
-        "Name": "offset",
+        "Name": "Offset",
         "Type": "int",
         "Override": false,
         "Override condition": "",
@@ -196,7 +196,7 @@
   "6": {
     "Instruction ID": "6",
     "Name": "Set Int",
-    "Description": "Loads <SCPT> and copies it to Word: *add[0x8030e3e4,*mul[<Offset>,4]*]* \nSCPT Analysis: <SCPT>\n\nIf <Offset> == 0, it corresponds to player gold\nIf <Offset> == 1, it corresponds to player reputation",
+    "Description": "Puts <Value> as Int into location: *add[0x8030e3e4,*mul[<Offset>,4]*]* \n\nIf <Offset> == 0, it corresponds to player gold\nIf <Offset> == 1, it corresponds to player reputation",
     "Location": "0x801f5d7c",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
@@ -243,7 +243,7 @@
   "7": {
     "Instruction ID": "7",
     "Name": "Set Float",
-    "Description": "Writes <SCPT> to Word: *add[0x8030e514,*mul[<Offset>,4]*",
+    "Description": "Writes <Value> as a float into: *add[0x8030e514,*mul[<Offset>,4]*",
     "Location": "0x801f5d08",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
@@ -332,17 +332,17 @@
   "10": {
     "Instruction ID": "10",
     "Name": "GOTO",
-    "Description": "Checks endian, masks to between -65536 - 65536 bytes.\n\nGoto <offset> bytes from here.\n*lnk[offset,<offset>]*",
+    "Description": "Checks endian, masks to between -65536 - 65536 bytes.\n\nGoto <Offset> bytes from here.\n*lnk[Offset,<Offset>]*",
     "Location": "0x801f5ccc",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "No dependancy on param1\nFunctional at all times\n\nReads in the word at the current pointer position\nif the word > 65536 or word < -65536:\n\tReverse byte order\n\n\t\t(seems like this would be a thing if the offset was put in in the wrong order. i.e. big endian vs. little endian.\n\nThen, use the offset and go to.",
+    "Notes": "No dependancy on param1\nFunctional at all times\n\nReads in the word at the current pointer position\nif the word > 65536 or word < -65536:\n\tReverse byte order\n\n\t\t(seems like this would be a thing if the Offset was put in in the wrong order. i.e. big endian vs. little endian.\n\nThen, use the Offset and go to.",
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "offset",
+        "Name": "Offset",
         "Type": "int",
         "Override": false,
         "Override condition": "",
@@ -368,7 +368,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "No dependancy on param1\nFunctional at all times\n\nIncrements 8030e71a by 1\n\tThis is the counter for the depth of the current substack\n\nAdds a pointer to the current position to the subscript stack\n\nAdds the offset to the current instruction pointer to go to the subscript.",
+    "Notes": "No dependancy on param1\nFunctional at all times\n\nIncrements 8030e71a by 1\n\tThis is the counter for the depth of the current substack\n\nAdds a pointer to the current position to the subscript stack\n\nAdds the Offset to the current instruction pointer to go to the subscript.",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -440,7 +440,7 @@
   "16": {
     "Instruction ID": "16",
     "Name": "Sleep",
-    "Description": "Waits for <Result> frames before continuing with the script.\nThis forces a frame refresh as the 0x4 field of the instruction buffer is set to zero",
+    "Description": "Waits for <Duration> frames before continuing with the script.\nThis forces a frame refresh as the 0x4 field of the instruction buffer is set to zero",
     "Location": "0x801f570c",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
@@ -450,7 +450,7 @@
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "Result",
+        "Name": "Duration",
         "Type": "scpt-int",
         "Override": true,
         "Override condition": "compare-value-offset",
@@ -476,7 +476,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "No dependancy on param1\nFunctional at all times\n\nFirst, it checks that the next value is not \n7F7FFFFF. If it is, it moves the scpt pointer up two and sets uvar1 to be 0x7FFFFFFF\n\nOtherwise, it enters scptAnalyze to generate uvar1\n\nA byte offset is generated from  the upper 15 bits of uvar1, while the bit to set is generated from masking uVar1 with 0x1f",
+    "Notes": "No dependancy on param1\nFunctional at all times\n\nFirst, it checks that the next value is not \n7F7FFFFF. If it is, it moves the scpt pointer up two and sets uvar1 to be 0x7FFFFFFF\n\nOtherwise, it enters scptAnalyze to generate uvar1\n\nA byte Offset is generated from  the upper 15 bits of uvar1, while the bit to set is generated from masking uVar1 with 0x1f",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -500,13 +500,13 @@
   "18": {
     "Instruction ID": "18",
     "Name": "Unset Bit",
-    "Description": "Unsets a bit in the bit field at 0x80310b3c\nBit: *add[<Offset>,0]*",
+    "Description": "Unsets a bit in the bit field at 0x80310b3c\nBit: *add[<Offset>,0]*\n\n(Sets the bit to 0)",
     "Location": "0x801f5a74",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "No dependancy on param1\nFunctional at all times\n\nFirst, it checks that the next value is not \n7F7FFFFF. If it is, it moves the scpt pointer up two and sets uvar1 to be 0x7FFFFFFF\n\nOtherwise, it enters scptAnalyze to generate uvar1\n\nA byte offset is generated from  the upper 15 bits of uvar1, while the bit to unset is generated from masking uVar1 with 0x1f",
+    "Notes": "No dependancy on param1\nFunctional at all times\n\nFirst, it checks that the next value is not \n7F7FFFFF. If it is, it moves the scpt pointer up two and sets uvar1 to be 0x7FFFFFFF\n\nOtherwise, it enters scptAnalyze to generate uvar1\n\nA byte Offset is generated from  the upper 15 bits of uvar1, while the bit to unset is generated from masking uVar1 with 0x1f",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -536,7 +536,7 @@
     "Hard parameter two": "0x00000000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "No dependancy on param1\nFunctional at all times\n\nFirst, it checks that the next value is not \n7F7FFFFF. If it is, it moves the scpt pointer up two and sets uvar1 to be 0x7FFFFFFF\n\nOtherwise, it enters scptAnalyze to generate uvar1\n\nA byte offset is generated from  the upper 15 bits of uvar1, while the bit to unset is generated from masking uVar1 with 0x1f",
+    "Notes": "No dependancy on param1\nFunctional at all times\n\nFirst, it checks that the next value is not \n7F7FFFFF. If it is, it moves the scpt pointer up two and sets uvar1 to be 0x7FFFFFFF\n\nOtherwise, it enters scptAnalyze to generate uvar1\n\nA byte Offset is generated from  the upper 15 bits of uvar1, while the bit to unset is generated from masking uVar1 with 0x1f",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -662,7 +662,7 @@
   "24": {
     "Instruction ID": "24",
     "Name": "??Print",
-    "Description": "\n*lnk[offset,<offset>]*",
+    "Description": "\n*lnk[Offset,<Offset>]*",
     "Location": "0x8020a938",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
@@ -672,7 +672,7 @@
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "offset",
+        "Name": "Offset",
         "Type": "int",
         "Override": false,
         "Override condition": "",
@@ -692,7 +692,7 @@
   "25": {
     "Instruction ID": "25",
     "Name": "??Select",
-    "Description": "PRINT: <PRINT>\nlist position: *lnk[offset,<offset>]*",
+    "Description": "PRINT: <Print>\nlist position: *lnk[Offset,<Offset>]*",
     "Location": "0x8020a580",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
@@ -702,7 +702,7 @@
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "PRINT",
+        "Name": "Print",
         "Type": "scpt-int",
         "Override": true,
         "Override condition": "compare-value-offset",
@@ -719,7 +719,7 @@
       },
       "1": {
         "ID": "1",
-        "Name": "offset",
+        "Name": "Offset",
         "Type": "int",
         "Override": false,
         "Override condition": "",
@@ -2592,7 +2592,7 @@
   "43": {
     "Instruction ID": "43",
     "Name": "Load Script",
-    "Description": "Switches the main active script file\n*lnk[offset,<offset>]*",
+    "Description": "Switches the main active script file\n*lnk[Offset,<Offset>]*",
     "Location": "0x802073b4",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00000000",
@@ -2602,7 +2602,7 @@
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "offset",
+        "Name": "Offset",
         "Type": "int",
         "Override": false,
         "Override condition": "",
@@ -2808,7 +2808,7 @@
   "48": {
     "Instruction ID": "48",
     "Name": "??Set 8030e414",
-    "Description": "Set 8030e414 to <value>",
+    "Description": "Set 8030e414 to <Value>",
     "Location": "0x802051d0",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
@@ -2818,7 +2818,7 @@
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "value",
+        "Name": "Value",
         "Type": "scpt",
         "Override": false,
         "Override condition": "compare-value-offset",
@@ -3538,7 +3538,7 @@
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 2,
-    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: int\n\nGets an offset to a string\n\n(1) might be for duration of the music\n\nLooks like if it were to use 80218d84 instead of 80218d80, it would load some music.",
+    "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: int\n\nGets an Offset to a string\n\n(1) might be for duration of the music\n\nLooks like if it were to use 80218d84 instead of 80218d80, it would load some music.",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -7449,13 +7449,13 @@
   "102": {
     "Instruction ID": "102",
     "Name": "??no name",
-    "Description": "unknown0: <unknown0>\n\ntest for some sort of offset:\n*lnk*[unknown0,<unknown0>]",
+    "Description": "unknown0: <unknown0>",
     "Location": "0x801f9668",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "Appears to load something from the disc depending on the parameter (integer), \ncould be an offset to a file name? \nor the file number in the file structure?",
+    "Notes": "Appears to load something from the disc depending on the parameter (integer), \ncould be an Offset to a file name? \nor the file number in the file structure?",
     "Parameters": {
       "0": {
         "ID": "0",
@@ -8356,17 +8356,17 @@
   "113": {
     "Instruction ID": "113",
     "Name": "?? No Name",
-    "Description": "Refers to:\n*lnk[offset,<offset>]*",
+    "Description": "Refers to:\n*lnk[Offset,<Offset>]*",
     "Location": "0x801ff05c",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "If param1 & 1 == 1:\n\n1: int\n\nstores pointer: SCPTpointer + 4 + offset*4\n\nIf param1 & 2 == 1:\n\nruns 8010038c(pointer, (1)",
+    "Notes": "If param1 & 1 == 1:\n\n1: int\n\nstores pointer: SCPTpointer + 4 + Offset*4\n\nIf param1 & 2 == 1:\n\nruns 8010038c(pointer, (1)",
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "offset",
+        "Name": "Offset",
         "Type": "int",
         "Override": false,
         "Override condition": "",
@@ -11199,7 +11199,7 @@
   "145": {
     "Instruction ID": "145",
     "Name": "?? rand",
-    "Description": "At Word: *add[0x8030e424,*mul[4,<offset>]*]* put: rand(0,9999)",
+    "Description": "At Word: *add[0x8030e424,*mul[4,<Offset>]*]* put: rand(0,9999)",
     "Location": "0x801fe21c",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
@@ -11209,7 +11209,7 @@
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "offset",
+        "Name": "Offset",
         "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
@@ -11992,7 +11992,7 @@
   "155": {
     "Instruction ID": "155",
     "Name": "Select Choice",
-    "Description": "Presents choice at:\n*lnk[offset,<offset>]*",
+    "Description": "Presents choice at:\n*lnk[Offset,<Offset>]*",
     "Location": "0x8020a338",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
@@ -12019,7 +12019,7 @@
       },
       "1": {
         "ID": "1",
-        "Name": "offset",
+        "Name": "Offset",
         "Type": "int",
         "Override": false,
         "Override condition": "",
@@ -12937,7 +12937,7 @@
   "165": {
     "Instruction ID": "165",
     "Name": "Load Ship Turn Values",
-    "Description": "Loads a number constants into memory\nTurn Modifiers:\t\t\t\tLost Modifiers:\n\tHit\tDamage\t\tFirst\tSecond\nEnemy: \t<EHitMod>\t<EDmgMod>\t\t<lost_eFirst>\t<lost_eSecond>\nPlayer: <PHitMod>\t\t<PDmgMod>\t\t<lost_pFirst>\t<lost_pSecond>\n\nGoes First: <Initiative> (0: Roll, 1: Player, 2: Enemy)\n\nOther Values:\n0: <unknown0>\t1: <unknown1>\t2: <unknown2>\t3: <unknown3>\t4: <unknown4> 5: <unknown5>\t\n6: <unknown6>\t8: <unknown8>\n\n17: <unknown17>\t\nturn icons entry offset: <entry offset>",
+    "Description": "Loads a number constants into memory\nTurn Modifiers:\t\t\t\tLost Modifiers:\n\tHit\tDamage\t\tFirst\tSecond\nEnemy: \t<EHitMod>\t<EDmgMod>\t\t<lost_eFirst>\t<lost_eSecond>\nPlayer: <PHitMod>\t\t<PDmgMod>\t\t<lost_pFirst>\t<lost_pSecond>\n\nGoes First: <Initiative> (0: Roll, 1: Player, 2: Enemy)\n\nOther Values:\n0: <unknown0>\t1: <unknown1>\t2: <unknown2>\t3: <unknown3>\t4: <unknown4> 5: <unknown5>\t\n6: <unknown6>\t8: <unknown8>\n\n17: <unknown17>\t\nturn icons entry Offset: <entry Offset>",
     "Location": "0x80215590",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
@@ -13253,7 +13253,7 @@
       },
       "18": {
         "ID": "18",
-        "Name": "entry offset",
+        "Name": "entry Offset",
         "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
@@ -15091,7 +15091,7 @@
   "210": {
     "Instruction ID": "210",
     "Name": "Load script w/ GS=12",
-    "Description": "Loads new script with gamestate change to gamestate 12\n\n*lnk[offset,<offset>]*",
+    "Description": "Loads new script with gamestate change to gamestate 12\n\n*lnk[Offset,<Offset>]*",
     "Location": "0x80214994",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
@@ -15101,7 +15101,7 @@
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "offset",
+        "Name": "Offset",
         "Type": "int",
         "Override": false,
         "Override condition": "",
@@ -15231,7 +15231,7 @@
   "213": {
     "Instruction ID": "213",
     "Name": "Ship Battle - Set Turn Icons",
-    "Description": "entry offset: <entry_offset>\nCurrent turn icons\t\t\tIcon\tColor\nphase 1:\t\t \t<p1 icon> \t<p1 color>\nphase 2: \t\t\t<p2 icon> \t<p2 color>\nphase 3:\t\t \t<p3 icon> \t<p3 color>\nphase 4:\t\t \t<p4 icon> \t<p4 color>\n\nNext turn default icons\t\tIcon\t\tColor\nphase 1:\t\t\t<t2 p1 icon> \t<t2 p1 color>\nphase 2:\t\t \t<t2 p2 icon> \t<t2 p2 color>\nphase 3:\t\t \t<t2 p3 icon> \t<t2 p3 color>\nphase 4:\t\t \t<t2 p4 icon> \t<t2 p4 color>",
+    "Description": "entry Offset: <entry_Offset>\nCurrent turn icons\t\t\tIcon\tColor\nphase 1:\t\t \t<p1 icon> \t<p1 color>\nphase 2: \t\t\t<p2 icon> \t<p2 color>\nphase 3:\t\t \t<p3 icon> \t<p3 color>\nphase 4:\t\t \t<p4 icon> \t<p4 color>\n\nNext turn default icons\t\tIcon\t\tColor\nphase 1:\t\t\t<t2 p1 icon> \t<t2 p1 color>\nphase 2:\t\t \t<t2 p2 icon> \t<t2 p2 color>\nphase 3:\t\t \t<t2 p3 icon> \t<t2 p3 color>\nphase 4:\t\t \t<t2 p4 icon> \t<t2 p4 color>",
     "Location": "0x80215444",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
@@ -15241,7 +15241,7 @@
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "entry_offset",
+        "Name": "entry_Offset",
         "Type": "scpt-int",
         "Override": false,
         "Override condition": "",
@@ -15533,17 +15533,17 @@
   "214": {
     "Instruction ID": "214",
     "Name": "??Warp areas?",
-    "Description": "Appears to warp to another area while setting some things up.\n\n*lnk*[offset,<offset>]",
+    "Description": "Appears to warp to another area while setting some things up.\n\n*lnk*[Offset,<Offset>]",
     "Location": "0x80207428",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
     "Implement": true,
     "Parameter num": 1,
-    "Notes": "iVar1 = *(int *)(param_2 + 0x1c);\nFUN_801002d0(iVar1 + 4 + *(int *)(iVar1 + 4));\n*(int *)(param_2 + 0x1c) = iVar1 + 8;\nFUN_801f7b04(40000);\nDAT_80347474 = 1;\n\nparam_2 is the current worksheet (with param_2 + 0x1c being the current scpt pointer\n\nThat means that the current script pointer (SP) + 4 + \nthe value at SP + 4 (offset) is the target warp point.\n\nAfter the setup, the warp occurs? \n - 8030e420 is set to 40000",
+    "Notes": "iVar1 = *(int *)(param_2 + 0x1c);\nFUN_801002d0(iVar1 + 4 + *(int *)(iVar1 + 4));\n*(int *)(param_2 + 0x1c) = iVar1 + 8;\nFUN_801f7b04(40000);\nDAT_80347474 = 1;\n\nparam_2 is the current worksheet (with param_2 + 0x1c being the current scpt pointer\n\nThat means that the current script pointer (SP) + 4 + \nthe value at SP + 4 (Offset) is the target warp point.\n\nAfter the setup, the warp occurs? \n - 8030e420 is set to 40000",
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "offset",
+        "Name": "Offset",
         "Type": "int",
         "Override": false,
         "Override condition": "",
@@ -18702,7 +18702,7 @@
   "257": {
     "Instruction ID": "257",
     "Name": "Load Script w/ GS=7",
-    "Description": "goes to: *lnk[offset,<offset>]*",
+    "Description": "goes to: *lnk[Offset,<Offset>]*",
     "Location": "0x80214908",
     "Hard parameter one": "0x00000001",
     "Hard parameter two": "0x00010000",
@@ -18712,7 +18712,7 @@
     "Parameters": {
       "0": {
         "ID": "0",
-        "Name": "offset",
+        "Name": "Offset",
         "Type": "int",
         "Override": false,
         "Override condition": "",
@@ -19195,7 +19195,7 @@
   "265": {
     "Instruction ID": "265",
     "Name": "Valuan Piracy List Dialog",
-    "Description": "Gets current reputation, puts it on and sorts a list of reputations to display on a custom \nAfter displaying the reputation list, displays the following message:\n*lnk[offset,<offset>]*",
+    "Description": "Gets current reputation, puts it on and sorts a list of reputations to display on a custom \nAfter displaying the reputation list, displays the following message:\n*lnk[Offset,<Offset>]*",
     "Location": "0x8020aaa8",
     "Hard parameter one": "0x00000000",
     "Hard parameter two": "0x00010000",
@@ -19222,7 +19222,7 @@
       },
       "1": {
         "ID": "1",
-        "Name": "offset",
+        "Name": "Offset",
         "Type": "int",
         "Override": false,
         "Override condition": "",
