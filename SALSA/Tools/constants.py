@@ -1,4 +1,5 @@
 class FieldTypes:
+    scptSkip = 0
     string = 1
     string_list = 2
     long_string = 3
