@@ -56,6 +56,7 @@ class ParameterModel:
         FT.scptShort: 'scpt-short',
         FT.scptInt: 'scpt-int',
         FT.scptFloat: 'scpt-float',
+        FT.scptSkip: 'scpt-skip',
         FT.scpt: 'scpt',
         FT.loopCondition: 'loop-condition',
         FT.loopStart: 'loop-start',
