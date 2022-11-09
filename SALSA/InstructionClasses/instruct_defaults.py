@@ -2539,6 +2539,7 @@ inst_defaults = {
         "Skip Frame Refresh": 0x00000000,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
                 "Type": "scpt-int",
@@ -2647,6 +2648,7 @@ inst_defaults = {
         "Skip Frame Refresh": 0x00000000,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00020000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
                 "Type": "scpt-short",
@@ -3266,7 +3268,7 @@ inst_defaults = {
         "Skip Frame Refresh": 0x00000000,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
-        "Warning": "May cause an infinite loop.",
+        "Warning": "May cause an infinite loop. Instruction not used in the game, may be buggy",
         "Parameters": {}
     },
     144: {
@@ -3658,6 +3660,7 @@ inst_defaults = {
         "Skip Frame Refresh": 0x00000000,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00050000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Loop": [2, 3, 4, 5, 6, 7, 8, 9, 10],
         "Loop Iterations": 1,
         "Parameters": {
@@ -3965,6 +3968,7 @@ inst_defaults = {
         "Skip Frame Refresh": 0x00000000,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
           0: {
             "Type": "scpt-short",
@@ -4159,7 +4163,7 @@ inst_defaults = {
         "Skip Frame Refresh": 0x00000000,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
-        "Warning": "This instruction does nothing",
+        "Warning": "This instruction does nothing. Instruction not used in the game, may be buggy",
         "Parameters": {}
     },
     183: {
@@ -4214,6 +4218,7 @@ inst_defaults = {
         "Location": "0x8020bb8c",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
                 "Type": "scpt-int",
@@ -4225,6 +4230,7 @@ inst_defaults = {
         "Location": "0x8020bae0",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
                 "Type": "scpt-int",
@@ -4237,6 +4243,7 @@ inst_defaults = {
         "Skip Frame Refresh": 0x00000000,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {}
     },
     190: {
@@ -4273,6 +4280,7 @@ inst_defaults = {
         "Location": "0x80214d6c",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
                 "Type": "scpt-int",
@@ -4284,6 +4292,7 @@ inst_defaults = {
         "Location": "0x80214cdc",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
                 "Type": "scpt-int",
@@ -4295,6 +4304,7 @@ inst_defaults = {
         "Location": "0x80214c04",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
                 "Type": "scpt-int",
@@ -4374,6 +4384,7 @@ inst_defaults = {
         "Skip Frame Refresh": 0x00000000,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {}
     },
     201: {
@@ -4408,6 +4419,7 @@ inst_defaults = {
         "Location": "0x80214b28",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
                 "Type": "scpt-int",
@@ -4423,6 +4435,7 @@ inst_defaults = {
         "Location": "0x80214aa0",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
                 "Type": "scpt-int",
@@ -4440,6 +4453,7 @@ inst_defaults = {
         "Location": "0x8020bdb0",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
                 "Type": "scpt-int",
@@ -4713,6 +4727,7 @@ inst_defaults = {
         "Location": "0x801fd584",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
                 "Type": "scpt-float",
@@ -5158,7 +5173,7 @@ inst_defaults = {
         "Skip Frame Refresh": 0x00000000,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
-        "Warning": "This instruction does nothing and returns zero",
+        "Warning": "This instruction does nothing and returns zero. Instruction not used in the game, may be buggy",
         "Parameters": {}
     },
     235: {
@@ -5176,6 +5191,7 @@ inst_defaults = {
         "Location": "0x8020b670",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
                 "Type": "scpt-float",
@@ -5234,6 +5250,7 @@ inst_defaults = {
         "Location": "0x801fd1d0",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
                 "Type": "scpt-int",
@@ -5350,6 +5367,7 @@ inst_defaults = {
         "Skip Frame Refresh": 0x00000000,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
                 "Type": "scpt-int",
@@ -5453,6 +5471,7 @@ inst_defaults = {
         "Location": "0x8020014c",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
                 "Type": "scpt-int",
@@ -5483,6 +5502,7 @@ inst_defaults = {
         "Location": "0x801fffa4",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
           0: {
             "Type": "scpt-int",
@@ -5511,6 +5531,7 @@ inst_defaults = {
         "Skip Frame Refresh": 0x00000000,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
           0: {
             "Type": "scpt-int",
