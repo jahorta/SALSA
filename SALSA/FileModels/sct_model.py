@@ -238,7 +238,7 @@ class SCTDecoder:
         sectLength = 0
         if self.test_for_string(sct):
             sectLength += 16
-            strNoLabel = self.sct[16:]
+            strNoLabel = sct[16:]
             sectLengths = deriveStringLength(strNoLabel, 0)
             sectLength += len(sectLengths) - 1
             for s in sectLengths:
@@ -246,18 +246,19 @@ class SCTDecoder:
             sectLength += 4 - (sectLength % 4)
         else:
             """checking for 12 or '0xFFFFFFE4' (-29) leads to errors. Might be better to work backwards for all text"""
-            # terminators = (int('0x0000000c', 16), int('0xffffffe4', 16))
-            # isEOF = False
-            # while not isEOF:
-            #     current_inst = getWord(sct, sectLength)
-            #     sectLength += 4
-            #     if current_inst in terminators:
-            #         isEOF = True
+            terminators = (int('0x0000000c', 16), int('0xffffffe4', 16))
+            isEOF = False
+            while not isEOF and sectLength < len(sct):
+                current_inst = getWord(sct, sectLength)
+                sectLength += 4
+                if current_inst in terminators:
+                    return sectLength
+            # If this fails, try the other way
             """Check starting from the end of the sct file and work backwards. 
             All footer segments should be bounded by at least one single 0x00 bytes, however,
             final instructions tend to have at least two sequential 0x00 bytes"""
             hadOne00 = False
-            for i in reversed(range(len(self.sct))):
+            for i in reversed(range(len(sct))):
                 byte = self.sct[i]
                 if byte in endBytes:
                     if hadOne00:
