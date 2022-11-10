@@ -52,7 +52,6 @@ inst_defaults = {
                 "Name": "Switch",
                 "Type": "switch",
                 "Signed": False,
-                "Iterations": "1-ChoiceNum",
             }
         }
     },
@@ -112,7 +111,6 @@ inst_defaults = {
             1: {
                 "Name": "Value",
                 "Type": "scpt-float",
-                "Override": False,
                 "Signed": False,
             }
         }
@@ -943,7 +941,7 @@ inst_defaults = {
             0: {
                 "Name": "Compare",
                 "Type": "scpt-float",
-                "Override result": 60.0,
+                "Default": 60.0,
                 "Signed": False,
             }
         }
@@ -1154,7 +1152,6 @@ inst_defaults = {
             },
             2: {
                 "Type": "scpt-int",
-                "Unused": "0x7f7ffff",
                 "Signed": False
             }
         }
@@ -1224,12 +1221,10 @@ inst_defaults = {
             },
             1: {
                 "Type": "scpt-int",
-                "Override": True,
                 "Signed": False,
             },
             2: {
                 "Type": "scpt-int",
-                "Override": True,
                 "Signed": False,
             }
         }
