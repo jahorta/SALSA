@@ -63,6 +63,7 @@ inst_defaults = {
         "Parameters": {}
     },
     5: {
+        "Location": "0x801f5eb4",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00000000,
         "Parameters": {
@@ -249,7 +250,6 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "ID": "0",
                 "Name": "Offset",
                 "Type": "scpt-int",
                 "Signed": False,
@@ -264,7 +264,7 @@ inst_defaults = {
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00000000,
         "Parameters": {
-            "0": {
+            0: {
                 "Name": "ItemID",
                 "Type": "scpt-short",
                 "Signed": False
@@ -278,7 +278,7 @@ inst_defaults = {
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00000000,
         "Parameters": {
-            "0": {
+            0: {
                 "Name": "ItemID",
                 "Type": "scpt-short",
                 "Signed": False
@@ -360,7 +360,7 @@ inst_defaults = {
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00010000,
         "Parameters": {
-            "0": {
+            0: {
                 "Type": "scpt-short",
                 "Signed": False,
             }
@@ -3374,6 +3374,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
+                "Type": "int",
                 "Signed": False,
             },
             1: {
@@ -3464,6 +3465,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
+                "Type": "int",
                 "Signed": False,
             },
             1: {
@@ -4632,6 +4634,7 @@ inst_defaults = {
           },
           1: {
                 "Name": "Offset",
+                "Type": "int",
                 "Signed": False,
           }
         }
