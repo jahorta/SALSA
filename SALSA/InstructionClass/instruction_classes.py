@@ -1,11 +1,11 @@
 from typing import List
 import json
-from SALSA.InstructionClasses.instruct_defaults import inst_defaults
+from SALSA.InstructionClass.instruct_defaults import inst_defaults
 
 
 class Parameter2:
 
-    def __init__(self, param_id, param_dict, default_name):
+    def __init__(self, param_id, param_dict, default_name, link_type=None):
 
         self.locked_fields = [k for k in param_dict.keys()]
         self.paramID = param_id
@@ -14,6 +14,7 @@ class Parameter2:
         self.default_value = param_dict.get('Default', None)
         self.mask = param_dict.get('Mask', None)
         self.isSigned = param_dict.get('Signed', None)
+        self.link_type = link_type
 
         # # Use for finding unused keys in instruct defaults
         # for key in param_dict.keys():
@@ -25,10 +26,13 @@ class Parameter2:
         if 'Name' not in self.locked_fields:
             self.name = param_details.get('Name', self.name)
         if 'Mask' not in self.locked_fields:
-            if 'Mask Value' in param_details.keys():
-                self.mask = param_details.get('Mask Value')
-            else:
-                self.mask = param_details.get('Mask', self.mask)
+            if 'Mask' in param_details.keys():
+                if isinstance(param_details['Mask'], bool):
+                    if 'Mask Value' in param_details.keys() and param_details['Mask']:
+                        temp_mask = param_details.get('Mask Value')
+                        self.mask = int(temp_mask, 16) if isinstance(temp_mask, str) else temp_mask
+                else:
+                    self.mask = param_details.get('Mask', self.mask)
         if 'Signed' not in self.locked_fields:
             self.isSigned = param_details.get('Signed', self.isSigned)
         if 'Default' not in self.locked_fields and self.type != 'int':
@@ -57,20 +61,24 @@ class Instruct2:
         self.description = inst_values.get('Description', '\n')
         self.location = inst_values['Location']
         self.no_new_frame = inst_values['Skip Frame Refresh']
-        if self.no_new_frame == 0:
-            self.forced_new_frame = inst_values['Force Frame Refresh']
-        self.param2 = inst_values['Hard parameter two']
-        self.notes = inst_values.get('Notes', '\n')
-        self.parameters = {}
-        for key, param in inst_values['Parameters'].items():
-            self.parameters[key] = Parameter2(key, param, f'Unknown{key}')
+        self.forced_new_frame = inst_values['Force Frame Refresh'] if self.no_new_frame == 0 else False
 
         self.link = inst_values.get('Link', None)
         self.link_type = inst_values.get('Link Type', None)
 
+        self.param2 = inst_values['Hard parameter two']
+        self.notes = inst_values.get('Notes', '\n')
+        self.parameters = {}
+        for key, param in inst_values['Parameters'].items():
+            link_type = None
+            if self.link is not None:
+                if self.link == key:
+                    link_type = self.link_type
+            self.parameters[key] = Parameter2(param_id=key, param_dict=param, default_name=f'Unknown{key}', link_type=link_type)
+
         self.loop = inst_values.get('Loop', None)
         self.loop_iter = inst_values.get('Loop Iterations', None)
-        self.loop_cond = inst_values.get('Loop Condition', None)
+        self.loop_cond = inst_values.get('Loop Break Condition', None)
 
         self.warning = inst_values.get('Warning', None)
 
@@ -125,6 +133,9 @@ class Instruct2:
                 names[int(param.paramID)] = param.name
         return names
 
+    def __repr__(self):
+        return f'INST({self.instID}: pos:{self.location}'
+
 
 class InstLib:
     """Takes in a dictionary containing instruction information and produces an object containing
@@ -132,6 +143,9 @@ class InstLib:
 
     def __init__(self):
         self.insts = [Instruct2(k, v) for k, v in inst_defaults.items()]
+        insts_with_a_parameter = [_ for _ in self.insts if len(_.parameters) > 0]
+        self.p1_scpt = [_.instID for _ in insts_with_a_parameter if 'scpt' in _.parameters[0].type]
+        self.p1_int = [_.instID for _ in insts_with_a_parameter if 'int' in _.parameters[0].type]
 
     def get_inst(self, inst_id) -> Instruct2:
         return self.insts[inst_id]

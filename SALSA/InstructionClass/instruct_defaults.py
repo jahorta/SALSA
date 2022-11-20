@@ -3,7 +3,7 @@ inst_defaults = {
         "Location": "0x801f6044",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00000000,
-        "Link": "Offset",
+        "Link": 1,
         "Link Type": "Jump",
         "Parameters": {
             0: {
@@ -35,8 +35,11 @@ inst_defaults = {
         "Location": "0x801f5f50",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00000000,
-        "Link": 2,
-        "LinkType": "Switch",
+        "Link": 3,
+        "Link Type": "Switch",
+        "Loop": [2, 3],
+        "Loop Iterations": 1,
+        "Switch Entry": [2, 3],
         "Parameters": {
             0: {
                 "Name": "Choice",
@@ -49,9 +52,14 @@ inst_defaults = {
                 "Signed": False,
             },
             2: {
-                "Name": "Switch",
-                "Type": "switch",
-                "Signed": False,
+                "Name": "Switch Case",
+                "Type": "int",
+                "Signed": False
+            },
+            3: {
+                "Name": "Switch Offset",
+                "Type": "int",
+                "Signed": False
             }
         }
     },
@@ -69,7 +77,7 @@ inst_defaults = {
             0: {
                 "Name": "Offset",
                 "Type": "int",
-                "Mask": "0x0000ffff",
+                "Mask": 0x0000ffff,
                 "Signed": False,
             },
             1: {
@@ -87,7 +95,7 @@ inst_defaults = {
             0: {
                 "Name": "Offset",
                 "Type": "int",
-                "Mask": "0x0000ffff",
+                "Mask": 0x0000ffff,
                 "Signed": False,
             },
             1: {
@@ -105,7 +113,7 @@ inst_defaults = {
             0: {
                 "Name": "Offset",
                 "Type": "int",
-                "Mask": "0x0000ffff",
+                "Mask": 0x0000ffff,
                 "Signed": False,
             },
             1: {
@@ -144,7 +152,7 @@ inst_defaults = {
             0: {
                 "Name": "Offset",
                 "Type": "int",
-                "Mask": "0x0000ffff",
+                "Mask": 0x0000ffff,
                 "Signed": True,
             }
         }
@@ -513,7 +521,7 @@ inst_defaults = {
         "Force Frame Refresh": False,
         "Hard parameter two": 0xfffe0000,
         "Loop": [1, 2, 3, 4, 5, 6, 7],
-        "Loop Iter": 0,
+        "Loop Iterations": 0,
         "Parameters": {
             0: {
                 "Name": "Iterations",
@@ -2589,10 +2597,11 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Loop": [2],
         "Loop Iterations": 1,
-        "Loop Condition": {
-            "Condition Parameter": 1,
-            "Condition Test": "!=",
-            "Condition Value": 0x10000
+        "Loop Break Condition": {
+            "Parameter": 1,
+            "Test": "==",
+            "Value": 0x10000,
+            "Location": 'External'
         },
         "Parameters": {
             0: {
@@ -2617,10 +2626,11 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Loop": [2],
         "Loop Iterations": 1,
-        "Loop Condition": {
-            "Condition Parameter": 1,
-            "Condition Test": "!=",
-            "Condition Value": 0x10000
+        "Loop Break Condition": {
+            "Parameter": 1,
+            "Test": "==",
+            "Value": 0x10000,
+            "Location": 'External'
         },
         "Parameters": {
             0: {
@@ -2933,7 +2943,7 @@ inst_defaults = {
             0: {
                 "Name": "Iterations",
                 "Type": "int",
-                "Mask": "0x0000ffff",
+                "Mask": 0x0000ffff,
                 "Signed": False,
             },
             1: {
@@ -2965,7 +2975,7 @@ inst_defaults = {
             0: {
                 "Name": "Iterations",
                 "Type": "int",
-                "Mask": "0x0000ffff",
+                "Mask": 0x0000ffff,
                 "Signed": False,
             },
             1: {
@@ -3475,10 +3485,11 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Loop": [1, 2, 3],
         "Loop Iterations": 0,
-        "Loop Condition": {
-            "Condition Parameter": 3,
-            "Condition Test": "!=",
-            "Condition Value": 0
+        "Loop Break Condition": {
+            "Parameter": 3,
+            "Test": "==",
+            "Value": 0,
+            "Location": 'Internal'
         },
         "Parameters": {
           0: {
@@ -5555,7 +5566,7 @@ inst_defaults = {
         "Location": "0x801fd44c",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00010000,
-        "Loop": [],
+        "Loop": [1],
         "Loop Iterations": 0,
         "Parameters": {
             0: {

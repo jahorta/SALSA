@@ -11,12 +11,12 @@ from pathlib import Path
 from threading import Timer
 from tkinter import ttk, messagebox, filedialog
 
-from SALSA.GUI import menus, popups, instruction_view as iv, script_viewer as sv
+from SALSA.GUI import menus, popups,
 from SALSA.Tools.SALSA_strings import HelpStrings
 from SALSA.Analysis.analyzer import SCTAnalyzer
-from SALSA.InstructionClasses.instruction_class import Instruct
+from SALSA.InstructionClass.instruction_classes import InstLib
 from SALSA.FileModels.instruction_model import InstructionModel
-from SALSA.ScriptClass.script_class import SCTScript
+from SALSA.ScriptClass.script_class2py import SCTScript, SCTProject
 from SALSA.FileModels.sct_model import SctModel
 
 
@@ -40,18 +40,11 @@ class Application(tk.Tk):
             self.file_select_last_selected = self.default_sct_file
         self.script_dir = self.settings.get_script_dir()
 
-        # Prepping an sct model
-        self.sctModel = SctModel(self.script_dir)
-        self.sctAnalysis = None
-        self.sctDisplayNew = True
-        self.activeFile = self.default_sct_file
+        # TODO - Prepping an sct model, only for read/write of the encoded file
 
-        # Reading in and setting up the initial instructions
-        self.instModel = InstructionModel()
-        instDict = self.instModel.load_instructions()
-        self.instructionSet = {}
-        for key in instDict.keys():
-            self.instructionSet[key] = Instruct(instDict[key])
+
+        # TODO - Reading in and setting up the initial instructions
+
 
         self.storedInstructionSet = copy.deepcopy(self.instructionSet)
 

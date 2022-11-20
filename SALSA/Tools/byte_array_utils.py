@@ -1,6 +1,7 @@
 import math
 import re
 import struct
+from typing import Union
 
 
 def getWord(file: bytearray, pos: int, out='int'):
@@ -107,7 +108,20 @@ def word2Float(s: str):
     return f
 
 
-def word2SignedInt(val: str):
+def word2SignedInt(val, swap_endian=False):
+    if isinstance(val, bytearray):
+        val = '0x' + val.hex()
+    if val[:2] != '0x':
+        val = '0x'+val
+    if swap_endian:
+        val = val[2:]
+        if len(val) % 2 != 0:
+            val = '0'+val
+        bytes_ = []
+        for i in range(0, len(val), 2):
+            bytes_.append(val[i:i+2])
+        val = '0x' + ''.join(reversed(bytes_))
+
     uintval = int(val, 16)
     bits = 4 * (len(val) - 2)
     if uintval >= math.pow(2, bits - 1):
@@ -115,11 +129,11 @@ def word2SignedInt(val: str):
     return uintval
 
 
-def applyHexMask(h: str, m: str):
+def applyHexMask(h: str, m: str) -> str:
     """Takes in a hex, applies a mask (hex), returns a hex with the same padding as the original"""
     inputValue = int(h, 16)
     mask = int(m, 16)
-    p = len(h) - 2
+    p = len(m) - 2 if m[:2] == '0x' else len(m)
 
     maskedValue = (inputValue & mask)
     outputHex = padded_hex(maskedValue, p=p)
@@ -134,7 +148,11 @@ def getTypeFromString(string: str):
         return 'int'
 
 
-def toInt(string: str):
+def is_a_number(num: str):
+        return re.search('^[0-9,.]+$', num) is not None and 0 < len(num.split('.')) <= 2
+
+
+def toInt(string: Union[str, int, float]):
     """Converts either hex, float, or int string into an int. Performs 'Floor' on floats"""
     if isinstance(string, int):
         return string
@@ -166,7 +184,16 @@ def asStringOfType(input_num, input_type: str):
         return str(input_num)
 
 
-def padded_hex(i: str, p: int = -1):
+def pad_hex(hex: str, digits: int):
+    if hex[:2] == '0x':
+        hex = hex[2:]
+    if digits <= len(hex):
+        return '0x'+hex
+    padding = '0' * (digits - len(hex))
+    return '0x'+padding+hex
+
+
+def padded_hex(i: int, p: int = -1):
     """Returns -1 if hex is too large to process"""
     lengths = [2, 4, 8]
     hexValue = hex(i)
