@@ -382,7 +382,7 @@ class SCTDecoder:
                 self.overwriteCheck = False
             inst = self.instructions[str(int(inst, 16))]
             paramNum = inst.get_attribute('param num')
-            instDict[inst_start_cursor] = {'decoded': True, 'instruction': inst.instID, 'name': inst.name,
+            instDict[inst_start_cursor] = {'decoded': True, 'instruction': inst.instID, 'name': inst._name,
                                            'description': inst.description, 'start location': inst_loc_str,
                                            'param num': paramNum,
                                            'function': inst.location}
@@ -400,7 +400,7 @@ class SCTDecoder:
                     self.errorCount += 1
                     break
 
-                currName = parameters[str(currentParamIndex)].name
+                currName = parameters[str(currentParamIndex)]._name
                 result = {'ID': currentParamIndex, 'name': currName,
                           'position': str(sct_start_pos + (self.cursor * 4))}
                 paramType = parameters[str(currentParamIndex)].type

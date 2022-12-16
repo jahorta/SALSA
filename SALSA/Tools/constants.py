@@ -36,3 +36,9 @@ class KnownMemAddresses:
                     '0x8030e424': 'Rand(0-9999)',
                     '0x8030e4ac': 'Ship Stat'
                     }
+
+
+class ScriptEditorTrees:
+    script = 0
+    section = 1
+    instruction = 2

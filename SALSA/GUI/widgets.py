@@ -1,26 +1,27 @@
+import platform
 import re
 import tkinter as tk
 from decimal import Decimal, InvalidOperation
 from tkinter import ttk
+from typing import Dict, List, Union
 
 from SALSA.Tools.constants import FieldTypes as FT
 
-
-##################
-# Widget Classes #
-##################
+# ------ #
+# Mixins #
+# ------ #
+from Tools.containers import Dimension, Vector2
 
 
 class ValidatedMixin:
     """Adds a validation functionality to an input widget"""
 
-    def __init__(self, *args, required=True, error_var=None, **kwargs):
+    def __init__(self, *args, error_var=None, **kwargs):
         self.error = error_var or tk.StringVar()
         super().__init__(*args, **kwargs)
 
         vcmd = self.register(self._validate)
         invcmd = self.register(self._invalid)
-        self.required = required
 
         self.config(
             validate='all',
@@ -87,217 +88,69 @@ class ValidatedMixin:
         return valid
 
 
-class RequiredEntry(ValidatedMixin, ttk.Entry):
+class RequiredEntryMixin:
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def _focusout_validate(self, event):
         valid = True
-        if not self.get() and self.required:
+        if self.get() == '':
             valid = False
             self.error.set('A value is required')
         return valid
 
 
-class ValidatedCombobox(ValidatedMixin, ttk.Combobox):
-
-    def _key_validate(self, proposed, action, **kwargs):
-        valid = True
-        # if the user tries to delete,
-        # just clear the field
-        if action == '0':
-            self.set('')
-            return True
-
-        # get our values list
-        values = self.cget('values')
-        # Do a case-insensitve match against the entered text
-        matching = [
-            x for x in values
-            if x.lower().startswith(proposed.lower())
-        ]
-        if len(matching) == 0:
-            valid = False
-        elif len(matching) == 1:
-            self.set(matching[0])
-            self.icursor(tk.END)
-            valid = False
-        return valid
-
-    def _focusout_validate(self, **kwargs):
-        valid = True
-        if not self.get() and self.required:
-            valid = False
-            self.error.set('A value is required')
-        return valid
+# -------------- #
+# Widget Classes #
+# -------------- #
 
 
-class ValidatedSpinbox(ValidatedMixin, tk.Spinbox):
+class RequiredEntry(ValidatedMixin, RequiredEntryMixin, tk.Entry):
 
-    def __init__(self, *args, min_var=None, max_var=None,
-                 focus_update_var=None, from_='-Infinity', to='Infinity',
-                 **kwargs):
-        super().__init__(*args, from_=from_, to=to, **kwargs)
-        self.resolution = Decimal(str(kwargs.get('increment', '1.0')))
-        self.precision = self.resolution.normalize().as_tuple().exponent
-        # there should always be a variable,
-        # or some of our code will fail
-        self.variable = kwargs.get('textvariable') or tk.DoubleVar()
-
-        if min_var:
-            self.min_var = min_var
-            self.min_var.trace('w', self._set_minimum)
-        if max_var:
-            self.max_var = max_var
-            self.max_var.trace('w', self._set_maximum)
-        self.focus_update_var = focus_update_var
-        self.bind('<FocusOut>', self._set_focus_update_var)
-
-    def _set_focus_update_var(self, event):
-        value = self.get()
-        if self.focus_update_var and not self.error.get():
-            self.focus_update_var.set(value)
-
-    def _set_minimum(self, *args):
-        current = self.get()
-        try:
-            new_min = self.min_var.get()
-            self.config(from_=new_min)
-        except (tk.TclError, ValueError):
-            pass
-        if not current:
-            self.delete(0, tk.END)
-        else:
-            self.variable.set(current)
-        self.trigger_focusout_validation()
-
-    def _set_maximum(self, *args):
-        current = self.get()
-        try:
-            new_max = self.max_var.get()
-            self.config(to=new_max)
-        except (tk.TclError, ValueError):
-            pass
-        if not current:
-            self.delete(0, tk.END)
-        else:
-            self.variable.set(current)
-        self.trigger_focusout_validation()
-
-    def _key_validate(self, char, index, current, proposed, action, **kwargs):
-        valid = True
-        min_val = self.cget('from')
-        max_val = self.cget('to')
-        no_negative = min_val >= 0
-        no_decimal = self.precision >= 0
-        if action == '0':
-            return True
-
-        # First, filter out obviously invalid keystrokes
-        if any([
-            (char not in '1234567890'),
-            (char == '-' and (no_negative or index != '0')),
-            (char == '.' and (no_decimal or '.' in current))
-        ]):
-            return False
-
-        # At this point, proposed is either '-', '.', '-.',
-        # or a valid Decimal string
-        # if proposed in '-.':
-        #     return True
-
-        # Proposed is a valid Decimal string
-        # convert to Decimal and check more:
-        proposed = Decimal(proposed)
-        proposed_precision = proposed.as_tuple().exponent
-
-        if any([
-            (proposed > max_val),
-            (proposed_precision < self.precision)
-        ]):
-            return False
-
-        return valid
-
-    def _focusout_validate(self, **kwargs):
-        valid = True
-        if not self.required:
-            return True
-        value = self.get()
-        min_val = self.cget('from')
-        max_val = self.cget('to')
-
-        try:
-            value = Decimal(value)
-        except InvalidOperation:
-            self.error.set('Invalid number string: {}'.format(value))
-            return False
-
-        if value < min_val:
-            self.error.set('Value is too low (min {})'.format(min_val))
-            valid = False
-        if value > max_val:
-            self.error.set('Value is too high (max {})'.format(max_val))
-
-        return valid
-
-
-class HexEntry (ValidatedMixin, tk.Entry):
-
-    def __init__(self, *args, pattern="^0x[0-9,a-f]+$", **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.pattern = pattern
 
-        self.pattern_length = 0
-        self.pattern_prefix = ''
-        inPrefix = True
-        for i in range(len(self.pattern)):
-            if inPrefix:
-                nextLetter = self.pattern[i]
-                if nextLetter == '[':
-                    inPrefix = False
-                elif nextLetter == '^':
-                    continue
-                else:
-                    self.pattern_prefix += nextLetter
-            else:
-                nextLetter = self.pattern[i]
-                if nextLetter == '{':
-                    self.pattern_length = int(self.pattern[i+1])
-                    self.pattern_length += len(self.pattern_prefix)
+class HexEntry(ValidatedMixin, tk.Entry):
+    def __init__(self, *args, hex_max_length: int, hex_min_length: int, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.pattern_internal = "[0-9,a-f]"
+        self.prefix = "^"
+        self.min_len = hex_min_length
+        min_str = '0' * self.min_len
+        self.set(min_str)
+        self.max_len = hex_max_length
+        self.suffix = '{' + str(self.min_len) + ',' + str(self.max_len) + '}$'
+        self._set_pattern()
+
+    def _set_pattern(self):
+        self.pattern = self.prefix + self.pattern_internal + self.suffix
 
     def _key_validate(self, char, index, current, proposed, action, **kwargs):
         valid = True
-        if action == '0':
-            return True
 
-        for i in range(len(self.pattern_prefix)):
-            if int(index) == i:
-                if current[:i] == self.pattern_prefix[:i]:
-                    return char == self.pattern_prefix[i]
-        else:
-            if int(index) < len(self.pattern_prefix):
-                return False
-
-        # After prefix, filter out obviously invalid keystrokes
-        if '0x' in current:
-            if any([
-                (char not in ('1234567890abcdef'))
-            ]):
-                return False
-            if len(proposed) > 10:
-                return False
-
-        # Check total length
-        if 0 < self.pattern_length:
-            if len(proposed) > self.pattern_length:
-                return False
+        if not re.search(proposed, self.get()):
+            valid = False
+            error = ''
+            if not self.min_len < len(proposed) < self.max_len:
+                error = f'length of field should be between {self.min_len} and {self.max_len}'
+            valid_chars = ['abcdefABCDEF1234567890']
+            if char not in valid_chars:
+                error = f'Invalid character: {char}, use one of these for hexadecimal: {"".join(valid_chars)}'
+            self.error.set(error)
 
         return valid
 
+
+class RequiredHexEntry(RequiredEntryMixin, HexEntry):
+
+    def __init__(self, hex_max_length: int, *args, hex_min_length: int = 0, **kwargs):
+        super().__init__(*args, hex_max_length=hex_max_length, hex_min_length=hex_min_length, **kwargs)
+
     def _focusout_validate(self, **kwargs):
-        valid = True
-        if not self.required and self.get() == '':
-            return True
+        valid = super()
 
         if not re.search(self.pattern, self.get()):
             valid = False
@@ -305,143 +158,403 @@ class HexEntry (ValidatedMixin, tk.Entry):
         return valid
 
 
-class NoEntry(ValidatedMixin, tk.Entry):
+class RequiredAddrEntry(RequiredHexEntry):
 
-    def _key_validate(self, char, index, current, proposed, action, **kwargs):
-        return False
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, hex_min_length=3, **kwargs)
 
-    def set(self, text):
-        self.delete(0, "end")
-        self.insert(0, text)
+        self.pattern_length = 8
+        self.prefix = '^0x8'
+        self.suffix = '{7}$'
+
+        self.set('0x8')
+
+    def _focusout_validate(self, **kwargs):
+        valid = super()
+
+        if not len(self.get()) == self.pattern_length:
+            valid = False
+            error = f'Final address should be the full '
+            self.error.set(f'')
+        return valid
 
 
-class NoText(ValidatedMixin, tk.Text):
+class RequiredByteEntry(RequiredHexEntry):
 
-    def _key_validate(self, char, index, current, proposed, action, **kwargs):
-        return False
-
-    def set(self, value):
-        self.delete('1.0', tk.END)
-        if len(value) > 1:
-            value = value[:-1]
-        self.insert('1.0', value)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, hex_max_length=2, **kwargs)
 
 
-class LabelInput(tk.Frame):
-    """A widget containing a label and input together."""
+class RequiredShortEntry(RequiredHexEntry):
 
-    field_types = {
-        FT.string: (RequiredEntry, tk.StringVar),
-        FT.string_list: (ValidatedCombobox, tk.StringVar),
-        FT.long_string: (tk.Text, lambda: None),
-        FT.decimal: (ValidatedSpinbox, tk.DoubleVar),
-        FT.integer: (ValidatedSpinbox, tk.IntVar),
-        FT.boolean: (ttk.Checkbutton, tk.BooleanVar),
-        FT.hex: (HexEntry, tk.StringVar),
-    }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, hex_max_length=4, **kwargs)
 
-    def __init__(self, parent, label='', input_class=None,
-                 input_var=None, input_args=None, label_args=None,
-                 field_spec=None, **kwargs):
-        super().__init__(parent, **kwargs)
-        input_args = input_args or {}
-        label_args = label_args or {}
-        if field_spec:
-            required = field_spec.get('req', False)
-            field_type = field_spec.get('type', FT.string)
-            input_class = input_class or self.field_types.get(field_type)[0]
-            var_type = self.field_types.get(field_type)[1]
-            self.variable = input_var if input_var else var_type()
-            # min, max, increment
-            if 'min' in field_spec and 'from_' not in input_args:
-                input_args['from_'] = field_spec.get('min')
-            if 'max' in field_spec and 'to' not in input_args:
-                input_args['to'] = field_spec.get('max')
-            if 'inc' in field_spec and 'increment' not in input_args:
-                input_args['increment'] = field_spec.get('inc')
-            # values
-            if 'values' in field_spec and 'values' not in input_args:
-                input_args['values'] = field_spec.get('values')
-            if 'pattern' in field_spec and 'pattern' not in input_args:
-                input_args['pattern'] = field_spec['pattern']
-        else:
-            self.variable = input_var
 
-        if input_class in (ttk.Button, ttk.Radiobutton):
-            input_args["text"] = label
-            input_args["variable"] = self.variable
-        elif input_class is ttk.Checkbutton:
-            self.label = ttk.Label(self, text=label, **label_args)
-            self.label.grid(row=0, column=0, sticky=(tk.W + tk.E))
-            input_args["variable"] = self.variable
-        else:
-            self.label = ttk.Label(self, text=label, **label_args)
-            self.label.grid(row=0, column=0, sticky=(tk.W + tk.E))
-            input_args["textvariable"] = self.variable
+class RequiredIntEntry(RequiredHexEntry):
 
-        self.input = input_class(self, **input_args)
-        self.input.grid(row=1, column=0, sticky=(tk.W + tk.E))
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, hex_max_length=8, **kwargs)
+
+
+# ------------- #
+# Frame Classes #
+# ------------- #
+
+class ScrollCanvas(tk.Frame):
+
+    def __init__(self, parent, size: dict, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+        self.parent = parent
+        self.canvas = tk.Canvas(self, width=size['width'], height=size['height'])
+        self.canvas.grid(row=0, column=0, sticky='NSEW')
+        self.canvas_scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.canvas_scrollbar.set)
+        self.canvas.config(scrollregion=self.canvas.bbox("all"))
+        self.canvas_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
         self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=2)
-        self.rowconfigure(1, weight=1)
+        self.rowconfigure(0, weight=1)
 
-    def grid(self, sticky=(tk.E + tk.W), **kwargs):
-        super().grid(sticky=sticky, **kwargs)
+        self.canvas.bind('<Enter>', self.onEnter)  # bind wheel events when the cursor enters the control
+        self.canvas.bind('<Leave>', self.onLeave)  # unbind wheel events when the cursor leaves the control
 
-    def get(self):
-        try:
-            if self.variable:
-                return self.variable.get()
-            elif type(self.input) == tk.Text:
-                return self.input.get('1.0', tk.END)
-            else:
-                return self.input.get()
-        except (TypeError, tk.TclError):
-            # happens when numeric fields are empty.
-            return ''
+    # whenever the size of the frame changes, alter the scroll region respectively.
+    def onCanvasContentChange(self, event):
+        """Reset the scroll region to encompass the canvas contents"""
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-    def set(self, value, *args, **kwargs):
-        if type(self.variable) == tk.BooleanVar:
-                self.variable.set(bool(value))
-        elif self.variable:
-                self.variable.set(value, *args, **kwargs)
-        elif type(self.input) in (ttk.Checkbutton, ttk.Radiobutton):
-            if value:
-                self.input.select()
-            else:
-                self.input.deselect()
-        elif type(self.input) == tk.Text:
-            self.input.delete('1.0', tk.END)
-            if len(value) > 1:
-                if value[:-1] == '\n':
-                    value = value[:-1]
-            self.input.insert('1.0', value)
+    # cross platform scroll wheel event
+    def onMouseWheel(self, event):
+        if platform.system() == 'Windows':
+            self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        elif platform.system() == 'Darwin':
+            self.canvas.yview_scroll(int(-1 * event.delta), "units")
         else:
-            self.input.delete(0, tk.END)
-            self.input.insert(0, value)
+            if event.num == 4:
+                self.canvas.yview_scroll(-1, "units")
+            elif event.num == 5:
+                self.canvas.yview_scroll(1, "units")
 
-    def set_trace(self, callback, type='w'):
-        self.variable.trace(type, callback)
+    # bind wheel events when the cursor enters the control
+    def onEnter(self, event):
+        if platform.system() == 'Linux':
+            self.canvas.bind_all("<Button-4>", self.onMouseWheel)
+            self.canvas.bind_all("<Button-5>", self.onMouseWheel)
+        else:
+            self.canvas.bind_all("<MouseWheel>", self.onMouseWheel)
 
-    def config(self, args):
-        if 'state' in args:
-            self.input.config(state=args['state'])
+    # unbind wheel events when the cursorl leaves the control
+    def onLeave(self, event):
+        if platform.system() == 'Linux':
+            self.canvas.unbind_all("<Button-4>")
+            self.canvas.unbind_all("<Button-5>")
+        else:
+            self.canvas.unbind_all("<MouseWheel>")
+
+    def resize(self):
+        width = self.parent.winfo_width()
+        height = self.parent.winfo_height()
+        self.canvas.configure(width=width - self.canvas_scrollbar.winfo_width(), height=height)
 
 
-class ScrolledTextCanvas(tk.Frame):
+class ScrollTextCanvas(ScrollCanvas):
 
     def __init__(self, parent, size: dict, text_offset: dict, text: str):
-        super().__init__(parent)
+        super().__init__(parent, size)
 
-        help_canvas = tk.Canvas(self, width=size['width'], height=size['height'])
-        help_canvas.grid(row=0, column=0)
-        help_canvas.create_text((text_offset['x'], text_offset['y']),
+        self.canvas.create_text((text_offset['x'], text_offset['y']),
                                 anchor=tk.NW, text=text,
                                 width=size['width'] - text_offset['x'])
 
-        canvas_scrollbar = tk.Scrollbar(self, orient="vertical", command=help_canvas.yview)
-        help_canvas.configure(yscrollcommand=canvas_scrollbar.set)
-        help_canvas.config(scrollregion=help_canvas.bbox("all"))
-        canvas_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
+
+class ScrollFrame(ScrollCanvas):
+
+    def __init__(self, parent, size=None, *args, **kwargs):
+        size = {'width': 100, 'height': 100} if size is None else size
+        super().__init__(parent, size, *args, **kwargs)
+
+        self.viewport = tk.Frame(self.canvas)
+        self.canvas_window = self.canvas.create_window(0, 0, window=self.viewport, anchor=tk.N + tk.W,
+                                                       tags='self.viewport')
+
+        # bind an event whenever the size of the viewPort frame changes.
+        self.viewport.bind("<Configure>", self.onCanvasContentChange)
+
+        # bind an event whenever the size of the canvas frame changes.
+        self.canvas.bind("<Configure>", self.onCanvasConfigure)
+
+        self.onCanvasContentChange(None)
+
+    # whenever the size of the canvas changes alter the window region respectively.
+    def onCanvasConfigure(self, event):
+        """Reset the canvas window to encompass inner frame when required"""
+        canvas_width = event.width
+        self.canvas.itemconfig(self.canvas_window, width=canvas_width)
+
+
+# ----- #
+# Trees #
+# ----- #
+
+class TreeEntry:
+    x_pad = 5
+    box_x_sel_offset = 5
+
+    def __init__(self, parent_canvas: tk.Canvas, text=None, row=0, offset_selected=False,
+                 highlight_selected=True, highlight_color='#8888FF', box_height=20, indent_level=0, indent_width=10,
+                 indent_field=0, text_start=0):
+        self.canvas: tk.Canvas = parent_canvas
+        self.txt_ids: List[int] = []
+        self.row = row
+        self.box_height = box_height
+        self.indent_level = indent_level
+        self.indent_field = indent_field
+        self.indent_width = indent_width
+        self.text = [''] if text is None else text
+        self.offset_selected = offset_selected
+        self.highlight = None
+        self.highlight_color = highlight_color
+        self.highlight_selected = highlight_selected
+        self.text_start = text_start
+
+        y = self.box_height * self.row + self.box_height // 2
+        for i, t in enumerate(self.text):
+            x = self.text_start
+            x += 0 if i == 0 else self.canvas.bbox(self.txt_ids[i - 1])
+            x += self.indent_width * self.indent_level if i == self.indent_field else 0
+            x += self.x_pad
+            self.txt_ids[i] = self.canvas.create_text(x, y, text=t, anchor='w')
+
+    def update_txt_starts(self, x_list: List[int]):
+        for j, i in enumerate(self.txt_ids):
+            m_x = x_list[j] - self.canvas.bbox(i)[0]
+            self.canvas.move(i, m_x, 0)
+
+    def select(self):
+        for i in self.txt_ids:
+            x = self.box_x_sel_offset if self.offset_selected else 0
+            self.canvas.move(i, x, 0)
+            self.canvas.tag_raise(i)
+        if self.highlight_selected:
+            self.add_highlight()
+
+    def add_highlight(self):
+        if self.highlight is None:
+            x1 = self.canvas.bbox('all')[2]
+            y0 = self.row * self.box_height
+            y1 = y0 + self.box_height
+            self.highlight = self.canvas.create_rectangle(0, y0, x1, y1, fill=self.highlight_color)
+            self.canvas.tag_lower(self.highlight, self.txt_ids[0])
+
+    def deselect(self):
+        for i in self.txt_ids:
+            x = self.box_x_sel_offset if self.offset_selected else 0
+            self.canvas.move(i, x, 0)
+        if self.highlight is not None:
+            self.remove_highlight()
+
+    def remove_highlight(self):
+        if self.highlight is not None:
+            self.canvas.delete(self.highlight)
+            self.highlight = None
+
+    def _move_y(self, m_ys):
+        """Moves the entry in the y direction
+
+        :param m_ys: A list containing scheduled y movements"""
+        m_y = m_ys.pop(0)
+        for i in self.txt_ids:
+            self.canvas.move(i, 0, m_y)
+        if len(m_ys) > 0:
+            self.canvas.after(10, self._move_y, m_ys)
+
+    def move_rows(self, row_change, increments=1):
+        # Linear by interpolation
+        tgt_m_y = row_change * self.box_height
+        step = tgt_m_y // increments
+        m_ys = list(range(0, tgt_m_y, step))
+        if m_ys[-1] != tgt_m_y:
+            m_ys.append(tgt_m_y)
+        self._move_y(m_ys)
+        self.row += row_change
+
+    def set_row(self, row):
+        target_y = row * self.box_height
+        for i in self.txt_ids:
+            m_y = target_y - self.canvas.bbox(i)[1]
+            self.canvas.move(i, 0, m_y)
+        self.row = row
+
+    def set_indent(self, indent_level):
+        ind_id = self.txt_ids[self.indent_field]
+        m_x = (self.indent_level - indent_level) * self.indent_width
+        self.canvas.move(ind_id, m_x, 0)
+
+
+class CustomTree(ScrollCanvas):
+    """A Canvas with a grid of elements. If an element is selected, will generate a '<<Select>>' event"""
+
+    row_height = 20
+
+    def __init__(self, parent, *args, size=None, color='#FFFFFF', highlight='#AAAAFF',
+                 pcnt_height=98, pcnt_width=100, dragable=False, **kwargs):
+        size = {'width': 100, 'height': 100} if size is None else size
+        super().__init__(parent, size, *args, **kwargs)
+        self.parent: tk.Frame = parent
+        self.header_canvas = tk.Canvas(self, width=size['width'], height=self.row_height)
+        self.header_canvas.grid(row=0, column=0)
+        self.header_list = []
+        self.header_widths = []
+
+        self.color = color
+        self.highlight = highlight
+        self.pcnt_width = pcnt_width / 100
+        self.pcnt_height = pcnt_height / 100
+
+        self.canvas.bind('<Button-1>', self.on_left_click)
+        self.canvas.bind('<KeyPress>', lambda event: self.keys_down.append(event.keycode))
+        self.canvas.bind('<KeyRelease>', self.key_release)
+
+        self.keys_down = []
+        self.canvas.grid_configure(row=1, column=0)
+        self.canvas_scrollbar.grid_configure(row=0, column=1, rowspan=2)
+
+        self.groups: Dict[str, List[int]] = {}
+        self.cur_indent = 0
+        self.rows: List[TreeEntry] = []
+        self.row_ids: Dict[TreeEntry, Union[int, str]] = {}
+
+        self.cur_grid_row = None
+        self.motion_widgets_height = None
+        self.motion_lists: Dict[str, List[TreeEntry]] = {'top': [], 'sel': [], 'bot': []}
+
+        self.dragable = dragable
+        self.dragging = False
+
+        self.in_window = False
+
+    def key_release(self, e):
+        if e.keycode in self.keys_down:
+            self.keys_down.pop(self.keys_down.index(e.keycode))
+
+    def resize(self):
+        width = self.parent.winfo_width()
+        height = self.parent.winfo_height()
+        self.header_canvas.configure(width=width * self.pcnt_width - self.canvas_scrollbar.winfo_width())
+        self.canvas.configure(width=width * self.pcnt_width - self.canvas_scrollbar.winfo_width(),
+                              height=height * self.pcnt_height - self.header_canvas.winfo_height())
+
+    # --------------------------------- #
+    # List Entry Manipulation functions #
+    # --------------------------------- #
+
+    def get_row(self, y):
+        scroll_y = self.canvas_scrollbar.get()[0]
+        x, y0, x, y1 = self.canvas.bbox('all')
+        top_y = y1 - y0 * scroll_y
+        return (top_y + y) // self.row_height
+
+    def start_group(self, group_name, row=-1, **kwargs):
+        pass
+
+    def end_group(self, group_name):
+        pass
+
+    def add_row(self, text, row=-1, row_data=None, **kwargs):
+        """Adds a row to """
+        if len(text) > len(self.header_list):
+            err = f'CustomTree: More text values than header fields:\n\tRow text: ' + ', '.join(text)
+            err += f'\n\n\tHeaders: '
+            raise ValueError(err)
+        kwargs['row'] = len(self.rows) if row == -1 else row
+        kwargs['text_start'] = 0  # Change this when grouping is implemented
+        new_row = TreeEntry(self.canvas, text=text, **kwargs)
+        row = row if row > 0 else len(self.rows)
+        self.rows.insert(row, new_row)
+        if row_data is not None:
+            self.row_ids[new_row] = row_data
+
+    def clear_all_entries(self):
+        self.canvas.delete('all')
+        self.rows = []
+        self.row_ids = {}
+        self.cur_grid_row = None
+        self.motion_widgets_height = None
+        self.motion_lists: Dict[str, List[TreeEntry]] = {'top': [], 'sel': [], 'bot': []}
+
+    # ------------------------ #
+    # Entry dragging functions #
+    # ------------------------ #
+
+    def on_left_click(self, e):
+        scroll_top_y = self.canvas_scrollbar.get()[0] * self.canvas.bbox('all')[3]
+        cur_row = (scroll_top_y + e.y) // self.row_height
+
+        if (50 in self.keys_down or 60 in self.keys_down) and len(self.motion_lists['sel']) > 0:
+            pass
+        elif len(self.motion_lists['sel']) == 0:
+            self.motion_lists['sel'] = [self.rows[cur_row]]
+
+    def drag(self, e):
+        if len(self.motion_lists) == 0 or not self.dragable:
+            return
+        if not (self.winfo_x() < e.x < self.winfo_width() and
+                self.winfo_y() < e.y < self.winfo_y() + ((len(self.rows) - 1) * self.row_height)):
+            return
+        self.dragging = True
+        grid_row = e.y // self.row_height
+        if self.cur_grid_row is None:
+            self.cur_grid_row = grid_row
+            self.motion_lists['top'] = [_ for _ in self.rows if (_ not in self.motion_lists['sel']
+                                                                 and self.rows.index(_) < grid_row)]
+            self.motion_lists['bot'] = [_ for _ in self.rows if (_ not in self.motion_lists['sel']
+                                                                 and _ not in self.motion_lists['top'])]
+            self.motion_widgets_height = len(self.motion_lists['sel']) * self.row_height
+
+            first_bot_row = grid_row + len(self.motion_lists['sel'])
+            for i, widget in enumerate(self.motion_lists['bot']):
+                widget.set_row(first_bot_row + i)
+
+            for i, widget in enumerate(self.motion_lists['sel']):
+                widget.set_row(grid_row + i)
+                widget.select()
+
+        elif self.cur_grid_row == grid_row:
+            return
+
+        else:
+            print(f'rect moved: {self.cur_grid_row} -> {grid_row}')
+            row_change = grid_row - self.cur_grid_row
+            if row_change > 0:
+                changed_ids = self.motion_lists['bot'][:row_change]
+                self.motion_lists['bot'] = self.motion_lists['bot'][row_change:]
+                self.motion_lists['top'] = [*self.motion_lists['top'], *changed_ids]
+            else:
+                row_ch_id_0 = len(self.motion_lists['top']) + row_change
+                changed_ids = self.motion_lists['top'][row_ch_id_0:]
+                self.motion_lists['top'] = self.motion_lists['top'][:row_ch_id_0]
+                self.motion_lists['bot'] = [*changed_ids, *self.motion_lists['bot']]
+
+            for i, widget in enumerate([*self.motion_lists['top'], *self.motion_lists['sel'],
+                                        *self.motion_lists['bot']]):
+                widget.set_row(i)
+            self.cur_grid_row = grid_row
+
+    def release(self, e):
+        if not self.dragging:
+            return
+
+        self.dragging = False
+
+        # remove selection offset
+        for widget in self.motion_lists['sel']:
+            widget.deselect()
+
+        self.rows = [*self.motion_lists['top'], *self.motion_lists['sel'], *self.motion_lists['bot']]
+
+        for i, widget in enumerate(self.rows):
+            widget.set_row(i)
+
+        self.cur_grid_row = None
+        self.motion_widgets_height = None
+        self.motion_lists = {'top': [], 'sel': [], 'bot': []}

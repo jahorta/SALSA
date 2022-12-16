@@ -15,14 +15,23 @@ class MainMenu(tk.Menu):
         file_menu.add_command(label='Quit', command=callbacks['file->quit'])
         self.add_cascade(label='File', menu=file_menu)
 
-        view_menu = tk.Menu(self, tearoff=False)
-        view_menu.add_command(label='SCT decoder mode', command=callbacks['view->sct'])
-        view_menu.add_command(label='Instruction edit mode', command=callbacks['view->inst'])
-        self.add_cascade(label='View', menu=view_menu)
+        self.view_menu = tk.Menu(self, tearoff=False)
+        self.view_menu.add_command(label='Instruction editor', command=callbacks['view->inst'])
+        self.view_menu.add_command(label='Variable editor', command=callbacks['view->variable'])
+        self.view_menu.add_command(label='String editor', command=callbacks['view->string'])
+        self.add_cascade(label='View', menu=self.view_menu)
 
         help_menu = tk.Menu(self, tearoff=False)
         # help_menu.add_command(label='Print debug to console', command=callbacks['help->debug'])
         help_menu.add_command(label='Help', command=callbacks['help->help'])
         help_menu.add_command(label='About', command=callbacks['help->about'])
         self.add_cascade(label='Help', menu=help_menu)
+
+    def disable_script_commands(self):
+        self.view_menu.entryconfig('Variable editor', state='disabled')
+        self.view_menu.entryconfig('String editor', state='disabled')
+
+    def enable_script_commands(self):
+        self.view_menu.entryconfig('Variable editor', state='normal')
+        self.view_menu.entryconfig('String editor', state='normal')
 

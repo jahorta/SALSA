@@ -5614,7 +5614,7 @@ inst_defaults = {
     },
     262: {
         "Name": "Activate Screen Overlay",
-        "Description": "Fades out into a color as defined below:\n\nRed (0-255): <Red>\nGreen (0-255): <Green>\nBlue (0-255): <Blue>\nDistance from Camera: <Distance>\nTransition Time: <Transition_Time>\n\nDistance in direction camera is pointing is negative, and reverse is positive. Textboxes appear at -1, so distance should be less than -1 to show text boxes.",
+        "Description": "Fades out into a color as defined below:\n\nRed (0-255): <Red>\nGreen (0-255): <Green>\nBlue (0-255): <Blue>\nDistance from Camera: <Distance>\nTransition Time: <Transition_Time>\n\nDistance in direction camera is pointing is negative, and reverse is positive. Text boxes appear at -1, so distance should be less than -1 to show text boxes.",
         "Location": "0x801fe310",
         "Skip Frame Refresh": 0x00000000,
         "Force Frame Refresh": False,

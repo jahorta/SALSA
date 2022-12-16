@@ -1,9 +1,9 @@
 from typing import List
 import json
-from SALSA.InstructionClass.instruct_defaults import inst_defaults
+from SALSA.BaseInstructions.base_instruct_defaults import inst_defaults
 
 
-class Parameter2:
+class BaseParam:
 
     def __init__(self, param_id, param_dict, default_name, link_type=None):
 
@@ -51,7 +51,7 @@ class Parameter2:
         return fields
 
 
-class Instruct2:
+class BaseInst:
 
     def __init__(self, inst_id, inst_values):
 
@@ -74,7 +74,7 @@ class Instruct2:
             if self.link is not None:
                 if self.link == key:
                     link_type = self.link_type
-            self.parameters[key] = Parameter2(param_id=key, param_dict=param, default_name=f'Unknown{key}', link_type=link_type)
+            self.parameters[key] = BaseParam(param_id=key, param_dict=param, default_name=f'Unknown{key}', link_type=link_type)
 
         self.loop = inst_values.get('Loop', None)
         self.loop_iter = inst_values.get('Loop Iterations', None)
@@ -137,41 +137,21 @@ class Instruct2:
         return f'INST({self.instID}: pos:{self.location}'
 
 
-class InstLib:
+class BaseInstLib:
     """Takes in a dictionary containing instruction information and produces an object containing
         the necessary information to decode *.sct files"""
 
     def __init__(self):
-        self.insts = [Instruct2(k, v) for k, v in inst_defaults.items()]
+        self.insts = [BaseInst(k, v) for k, v in inst_defaults.items()]
         insts_with_a_parameter = [_ for _ in self.insts if len(_.parameters) > 0]
         self.p1_scpt = [_.instID for _ in insts_with_a_parameter if 'scpt' in _.parameters[0].type]
         self.p1_int = [_.instID for _ in insts_with_a_parameter if 'int' in _.parameters[0].type]
 
-    def get_inst(self, inst_id) -> Instruct2:
-        return self.insts[inst_id]
-
-    def get_inst_details(self):
-        return {k: v.get_inst_details() for k, v in enumerate(self.insts)}
-
-    def set_inst_fields(self, inst_dict):
-        for inst_id, inst_settings in inst_dict.items():
-            if isinstance(inst_id, str):
-                inst_id = int(inst_id)
-            self.insts[inst_id].set_inst_details(inst_settings)
-
 
 if __name__ == '__main__':
-    inst_lib = InstLib()
-    insts: List[Instruct2] = inst_lib.insts
+
+    base_insts = BaseInstLib()
+    insts: List[BaseInst] = base_insts.insts
     for i in range(len(insts)):
         if insts[i].instID != i:
             print(f'inst at position {i} is {insts[i].instID}')
-
-    with open('./../../Lib/Instructions.json', 'r') as fh:
-        file = fh.read()
-        file_json = json.loads(file)
-
-    inst_lib.set_inst_fields(file_json)
-
-    inst_deets = inst_lib.get_inst_details()
-    print('loaded')

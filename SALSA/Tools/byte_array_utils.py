@@ -109,7 +109,7 @@ def word2Float(s: str):
 
 
 def word2SignedInt(val, swap_endian=False):
-    if isinstance(val, bytearray):
+    if isinstance(val, bytearray) or isinstance(val, bytes):
         val = '0x' + val.hex()
     if val[:2] != '0x':
         val = '0x'+val

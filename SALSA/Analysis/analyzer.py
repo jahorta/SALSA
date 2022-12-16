@@ -3,8 +3,8 @@ from typing import List, Dict
 
 from SALSA.Analysis.script_performer import ScriptPerformer
 from SALSA.Tools.constants import FieldTypes as FT, KnownMemAddresses as KA
-from SALSA.InstructionClass.instruction_class import Instruct
-from SALSA.ScriptClass.script_class import SCTScript
+from SALSA.BaseInstructions.instruction_class import Instruct
+from SALSA.Scripts.script_container import SCTScript
 
 
 class SCTAnalyzer:
@@ -398,7 +398,7 @@ class SCTAnalyzer:
             print_header2 += f',{name}'
             for i in range(0, 266):
                 if first_sct:
-                    print_rows.append(f'{i} - {self.instruction_list[str(i)].name}')
+                    print_rows.append(f'{i} - {self.instruction_list[str(i)]._name}')
                 print_rows[i] += f',{insts_used_raw.get(i, 0)}'
             first_sct = False
         all_rows = [print_header1, print_header2, *print_rows]

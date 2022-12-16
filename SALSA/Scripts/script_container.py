@@ -1,10 +1,10 @@
+import uuid
 from itertools import count
 from dataclasses import dataclass, field as dc_field
 from typing import List, Union, Dict, Tuple
 
-from InstructionClass.instruction_classes import Parameter2
+from BaseInstructions.base_instruction_container import BaseParam
 from Tools.byte_array_utils import toInt, getTypeFromString, asStringOfType, toFloat
-
 
 @dataclass
 class Link:
@@ -29,7 +29,7 @@ class SCTParameter:
     skip_refresh: bool
     link_value: (str, str)
 
-    def __init__(self, param: Parameter2):
+    def __init__(self, param: BaseParam):
         self.ID = param.paramID
         self.type = param.type
         self.link: Union[None, Link] = None
@@ -59,12 +59,11 @@ class SCTParameter:
     def _unpack_result_dict(self, cur_dict, level):
         returnValue = ''
         for key, value in cur_dict.items():
-
             if not isinstance(value, dict):
                 formatedReturn = '\n'
                 tabs = '  ' * level
                 formatedReturn += tabs
-                returnValue += '{0}{1}: {2}'.format(formatedReturn, key, value)
+                returnValue += f'{formatedReturn}{key}: {value}'
             else:
                 nextLevel = self._unpack_result_dict(value, level + 1)
                 formatedReturn = '\n'
@@ -83,10 +82,10 @@ class SCTInstruction:
     loop_parameters: List[Dict[int, SCTParameter]]
 
     def __init__(self, script_pos: int, inst_pos: int, inst_id: int):
+        self.ID = str(uuid.uuid4()).replace('-', '_')
         self.inst_id = inst_id
         self.inst_pos = inst_pos
         self.overall_pos = self.inst_pos + script_pos
-        self.ID = inst_id
         self.skip_refresh = False
         self.errors = []
         self.links = []
@@ -115,69 +114,13 @@ class SCTInstruction:
             paramSets[name] = param.value
 
         for key, value in paramSets.items():
-            keyword = '<{}>'.format(key)
+            keyword = f'<{key}>'
             if not isinstance(value, str):
                 value = str(value)
             result = value
             desc = desc.replace(keyword, result)
 
         return desc
-
-    def get_code(self):
-        if self.ID[:2] == '0x':
-            return self.ID
-        else:
-            return ''
-
-    def get_details(self):
-        if self.hasSCPTerror:
-            details = {
-                'Code': 'SCPT-specific Code was found before an appropriate instruction',
-                'Decoded': 'SCPT',
-            }
-            error_string = ''
-            for k, e in self.errors.items():
-                error_string += '{0}: {1}\n'.format(k, e)
-            details['Description'] = error_string
-            return details
-        if self.ID == 'Skip 2':
-            inst_details = {'Code': 'Skip 2',
-                            'Description': 'This is a skip of 2 positions. Not sure why yet, but necessary.'}
-        else:
-            inst_details = {'Code': '{0} ({1})'.format(int(self.ID, 16), self.ID)}
-        if not self.isDecoded:
-            inst_details['Decoded'] = 'This Instruction is NOT Decoded'
-            inst_details['Description'] = ''
-        else:
-            inst_details['Name'] = self.name
-            inst_details['Decoded'] = 'This Instruction is Decoded'
-            inst_details['Location'] = self.Function
-            inst_details['Description'] = self.description
-            inst_details['Errors'] = '{}'.format('{0}: {1}\n'.join(self.errors.keys()).join(self.errors.values()))
-            paramTree = {}
-            for key, param in self.parameters.items():
-                paramTree[key] = param.get_param_as_tree()
-            inst_details['Param Tree'] = paramTree
-
-        return inst_details
-
-    def get_params(self, param_list):
-        params = {}
-        for param in param_list:
-            params[param] = self.parameters[str(param)].value
-
-        return params
-
-    def get_error_types(self):
-        if self.hasSCPTerror:
-            return 'SCPT'
-        error_type = 'Inst'
-        if self.hasParamErrors:
-            error_type = 'Param'
-            if self.hasInstructError:
-                error_type = 'Both'
-
-        return error_type
 
     def resolveDescriptionFuncs(self, temp_desc):
 
@@ -329,6 +272,7 @@ class SCTSection:
         self.start_offset = pos
         self.instructions = []
         self.instruction_groups = {}
+        self.grouped_instructions = {}
         self.inst_group_hierarchy = {}
         self.inst_errors = []
         self.errors = []
@@ -344,9 +288,9 @@ class SCTSection:
 
     def add_instruction(self, instruction: SCTInstruction):
         self.instructions.append(instruction)
-        if instruction.ID not in self.instructions_used.keys():
-            self.instructions_used[instruction.ID] = 0
-        self.instructions_used[instruction.ID] += 1
+        if instruction.inst_id not in self.instructions_used.keys():
+            self.instructions_used[instruction.inst_id] = 0
+        self.instructions_used[instruction.inst_id] += 1
 
     def _propagate_links(self):
         pass
@@ -380,6 +324,8 @@ class SCTScript:
     footer: List[str]
     strings: Dict[str, str]
     error_sections: Dict[str, List[str]]
+    links_to_sections: Dict[str, List[str]]
+    unused_sections: List[str]
 
     def __init__(self, name: str, index: Union[None, Dict[str, Tuple[int, int]]] = None, header: Union[None, bytearray] = None):
         self.name = name
@@ -388,6 +334,7 @@ class SCTScript:
         self.sections = {}
         self.section_groups = {}
         self.section_group_keys = {}
+        self.grouped_section_names = {}
         self.inst_locations = [[] for _ in range(266)]
         self.links = []
         self.footer = []
@@ -395,6 +342,8 @@ class SCTScript:
         self.string_groups = {}
         self.error_sections = {}
         self.errors = []
+        self.links_to_sections = {}
+        self.unused_sections = []
 
     def add_section(self, section: SCTSection):
         name = section.name
@@ -416,10 +365,12 @@ class SCTScript:
 
 class SCTProject:
 
+    file_name: str
     scripts: Dict[str, SCTScript]
 
     def __init__(self):
         self.scripts = {}
+        self.file_name = 'Untitled.prj'
 
     def add_script(self, filename: str, script: SCTScript):
         self.scripts[filename] = script

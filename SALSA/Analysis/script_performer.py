@@ -901,7 +901,7 @@ class ScriptPerformer:
         if pos == 0:
             return ptr
         if pos in pos_list:
-            return int(pos_list.index(pos))
+            return int(pos_list._index(pos))
         else:
             if pos > pos_list[-1]:
                 return len(pos_list)

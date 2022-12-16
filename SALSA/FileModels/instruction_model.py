@@ -57,10 +57,6 @@ class ParameterModel:
         FT.scptInt: 'scpt-int',
         FT.scptFloat: 'scpt-float',
         FT.scptSkip: 'scpt-skip',
-        FT.scpt: 'scpt',
-        FT.loopCondition: 'loop-condition',
-        FT.loopStart: 'loop-start',
-        FT.loopEnd: 'loop-end',
         FT.switch: 'switch',
         FT.string: 'string'
     }
@@ -77,43 +73,6 @@ class ParameterModel:
     }
 
     value_fields = {
-        'Mask': {'req': True, 'type': FT.boolean},
-        'Mask Value': {'req': False, 'type': FT.hex, 'pattern': '^0x[0-9,a-f]{8}$'},
+        'Mask': {'req': True, 'type': FT.hex},
         'Signed': {'req': True, 'type': FT.boolean}
     }
-
-    loop_conditions = [
-        '==', '!=', '<', '>'
-    ]
-
-    loop_condition_fields = {
-        'Condition Parameter': {'req': True, 'type': FT.string_list, 'values': ['']},
-        'Condition Test': {'req': True, 'type': FT.string_list, 'values': loop_conditions},
-        'Condition Value': {'req': False, 'type': FT.hex, 'pattern': '^0x[0-9,a-f]*'}
-    }
-
-    loop_fields = {
-         'Iteration': {'req': True, 'type': FT.string_list, 'values': ['']}
-    }
-
-    int_fields = {
-        'Override': {'req': True, 'type': FT.boolean},
-        'Override condition': {'req': False, 'type': FT.string_list, 'values': list(overrideConditions.values())},
-        'Override offset': {'req': False, 'type': FT.hex, 'pattern': '^0x[0-9,a-f]*'},
-        'Override result': {'req': False, 'type': FT.string},
-        'Override compare': {'req': False, 'type': FT.hex},
-    }
-
-    def getAllFields(self):
-        allFields = self.base_fields
-
-        for key, value in self.value_fields.items():
-            allFields[key] = value
-        for key, value in self.loop_fields.items():
-            allFields[key] = value
-        for key, value in self.loop_condition_fields.items():
-            allFields[key] = value
-        for key, value in self.int_fields.items():
-            allFields[key] = value
-
-        return allFields
