@@ -149,7 +149,7 @@ def getTypeFromString(string: str):
 
 
 def is_a_number(num: str):
-        return re.search('^[0-9,.]+$', num) is not None and 0 < len(num.split('.')) <= 2
+    return re.search('^[0-9,.]+$', num) is not None and 0 < len(num.split('.')) <= 2
 
 
 def toInt(string: Union[str, int, float]):
@@ -218,9 +218,7 @@ def padded_hex(i: int, p: int = -1):
 
 def is_utf_8_file_character(byte):
     letters = [46, *range(48, 58), *range(65, 91), 95, *range(97, 123)]
-    if byte in letters:
-        return True
-    return False
+    return byte in letters
 
 
 def run_tests():

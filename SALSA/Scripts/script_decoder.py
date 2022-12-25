@@ -17,6 +17,7 @@ ind_name_max_len = 0x10
 
 endian = {'gc': 'big', 'dc': 'little'}
 
+
 class SCTDecoder:
     _overwriteCheck = False
     _name: str
@@ -777,7 +778,7 @@ class SCTDecoder:
                         if link.target < first_start:
                             internal = True
                             break
-                        new_error = e[1][first_start-inst.inst_pos:link.target-inst.inst_pos]
+                        new_error = e[1][first_start - inst.inst_pos:link.target - inst.inst_pos]
                         error_ind = i
                         break
 
@@ -788,20 +789,23 @@ class SCTDecoder:
                             inst.errors.pop(error_ind)
 
                     if internal:
-                        print(f'link position is internal to an instruction at {target_sct.name}:{target_inst_id}: \n\t{link}')
-                        decoded_sct.errors.append(f'link position is internal to an instruction at {target_sct.name}:{target_inst_id}: \n\t{link}')
+                        print(
+                            f'link position is internal to an instruction at {target_sct.name}:{target_inst_id}: \n\t{link}')
+                        decoded_sct.errors.append(
+                            f'link position is internal to an instruction at {target_sct.name}:{target_inst_id}: \n\t{link}')
                         break
 
                     bounds = (link.target, inst_end)
-                    suffix_insts = target_sct.instructions[target_inst_id+1:]
-                    target_sct.instructions = target_sct.instructions[:target_inst_id+1]
+                    suffix_insts = target_sct.instructions[target_inst_id + 1:]
+                    target_sct.instructions = target_sct.instructions[:target_inst_id + 1]
                     insts_before = len(target_sct.instructions)
                     changes = self._get_links_to_change(target_sct, insts_before)
                     target_sct = self._create_insts_from_region(bounds, target_sct, target_inst_id + 1)
                     insts_added = len(target_sct.instructions) - insts_before
                     self._set_changes(changes, insts_added)
                     target_sct.instructions += suffix_insts
-                    print(f'New instructions decoded at {target_sct.name}:{target_inst_id+1}. Restarting Link setup...')
+                    print(
+                        f'New instructions decoded at {target_sct.name}:{target_inst_id + 1}. Restarting Link setup...')
                     return False
                     # print(f'link position is incorrect: \n\t{link}')
                     # decoded_sct.errors.append(f'link position is incorrect: {link}')
@@ -944,7 +948,7 @@ class SCTDecoder:
                 # Check for a loop and add to loops if true
                 if prev_inst.parameters[0].value < 0:
                     group_key = f'{jmp_id}-while'
-                    decoded_sct.sections[sect_name].instruction_groups[group_key] = (f'{sect_name}-{jmp_id}',
+                    decoded_sct.sections[sect_name].instructions_grouped[group_key] = (f'{sect_name}-{jmp_id}',
                                                                                      f'{prev_sect_name}-{prev_to_id}')
                     decoded_sct.sections[sect_name].jump_loops.append(group_key)
                     continue
@@ -954,10 +958,12 @@ class SCTDecoder:
                 jmp_end_id = prev_inst.links[0].target_trace[1]
 
                 group_key = f'{jmp_id}-if'
-                decoded_sct.sections[sect_name].instruction_groups[group_key] = (f'{sect_name}-{jmp_id}',
+                decoded_sct.sections[sect_name].instructions_grouped[group_key] = (f'{sect_name}-{jmp_id}',
                                                                                  f'{prev_sect_name}-{prev_to_id}')
+                if jmp_to_id == jmp_end_id:
+                    continue
                 group_key = f'{jmp_id}-else'
-                decoded_sct.sections[sect_name].instruction_groups[group_key] = (f'{jmp_to_sect_name}-{jmp_to_id}',
+                decoded_sct.sections[sect_name].instructions_grouped[group_key] = (f'{jmp_to_sect_name}-{jmp_to_id}',
                                                                                  f'{jmp_end_sect}-{jmp_end_id}')
 
     def _group_switches(self, decoded_sct):
@@ -968,7 +974,7 @@ class SCTDecoder:
             if sect_name in decoded_sct.section_group_keys.keys():
                 key = decoded_sct.section_group_keys[sect_name]
                 group = decoded_sct.section_groups[key]
-                for s_name in group[group._index(sect_name):]:
+                for s_name in group[group.index(sect_name):]:
                     sect_group.append(s_name)
             else:
                 sect_group.append(sect_name)
@@ -1009,14 +1015,15 @@ class SCTDecoder:
                 prev_case = None
                 prev_start_sect = None
                 goto_jmp = None
+                end_sect = None
                 for inst_start, case in switch_entry_start_ids.items():
                     if prev_case is not None:
                         group_key = f'{s_id}-{prev_case}'
                         end_sect = self._find_sect_in_group(group_starts, inst_start - 1)
                         s = prev_start - group_starts[prev_start_sect]
                         e = inst_start - group_starts[end_sect] - 1
-                        decoded_sct.sections[sect_name].instruction_groups[group_key] = (
-                        f'{prev_start_sect}-{s}', f'{end_sect}{e}')
+                        decoded_sct.sections[sect_name].instructions_grouped[group_key] = (
+                            f'{prev_start_sect}-{s}', f'{end_sect}-{e}')
                         if section_insts[inst_start - 1].parameters[0].value < 0:
                             decoded_sct.sections[sect_name].jump_loops.append(group_key)
                         else:
@@ -1038,7 +1045,8 @@ class SCTDecoder:
                 # if an end for the last section was found previously, set it
                 if goto_jmp is not None:
                     group_key = f'{s_id}-{last_case}'
-                    decoded_sct.sections[sect_name].instruction_groups[group_key] = (last_start, cur_id)
+                    decoded_sct.sections[sect_name].instructions_grouped[group_key] = (
+                        f'{prev_start_sect}-{last_start}', f'{end_sect}-{cur_id}')
                     continue
 
                 # else search for a goto that matches with the switch.
@@ -1052,7 +1060,8 @@ class SCTDecoder:
                             jmp_groups -= 1
                         else:
                             group_key = f'{s_id}-{last_case}'
-                            decoded_sct.sections[sect_name].instruction_groups[group_key] = (last_start, cur_id)
+                            decoded_sct.sections[sect_name].instructions_grouped[group_key] = (
+                                f'{prev_start_sect}-{last_start}', f'{end_sect}-{cur_id}')
                             break
                     if cur_id == len(section_insts):
                         print(f'SCPT Decoder: Switch Groups: End of final switch entry not found: {sect_name}:{s_id}')
@@ -1079,8 +1088,7 @@ class SCTDecoder:
             if section.type == 'Label':
                 in_group = False
 
-    @staticmethod
-    def _create_group_heirarchies(decoded_sct):
+    def _create_group_heirarchies(self, decoded_sct):
 
         # Create grouped section heirarchy
         groups = decoded_sct.section_groups
@@ -1088,25 +1096,188 @@ class SCTDecoder:
         # sort groups by size with smallest first
         groups = {k: groups[k] for k in sorted(groups.keys(), key=lambda k: len(groups[k]))}
 
+        new_groups = self._nest_groups(groups)
+        new_groups = self._complete_heirarchy_sections(list(decoded_sct.sections.keys()), new_groups)
+        decoded_sct.grouped_sections = new_groups
+
+        # Create grouped instruction heirarchies
+        for section in decoded_sct.sections.values():
+            inst_groups = section.instructions_grouped
+
+            inst_groups = {k: [*range(int(v[0].split('-')[1]), int(v[1].split('-')[1]) + 1)]
+                           for k, v in inst_groups.items()}
+            new_groups = self._nest_groups(inst_groups, is_sections=False)
+            new_groups = self._complete_heirarchy_instructions(list(range(len(section.instructions))), new_groups)
+            new_groups = self._remove_duplicate_inst_locations(new_groups)
+            new_groups = self._resolve_switches(new_groups)
+            section.instructions_grouped = new_groups
+
+    def _nest_groups(self, groups, is_sections=True):
         # replace entries in parent groups with child groups
         new_groups = copy.deepcopy(groups)
-        for group_name, group in groups:
+        for group_name, group in groups.items():
+            group = new_groups[group_name]
             insert_keys = []
-            for b_group_name, b_group in new_groups:
-                if group_name == b_group_name:
+            for n_group_name, n_group in new_groups.items():
+                if group_name == n_group_name:
                     continue
                 all_present = True
                 for entry in group:
-                    if entry not in b_group:
+                    if not self._is_in(entry, n_group):
                         all_present = False
+                        break
                 if all_present:
-                    insert_keys.append(b_group_name)
+                    insert_keys.append(n_group_name)
             for key in insert_keys:
-                insert_index = new_groups[key].index(group_name)
+                if is_sections:
+                    insert_index = new_groups[key].index(group_name)
+                else:
+                    insert_index = new_groups[key].index(new_groups[group_name][0])
                 for entry in group:
                     new_groups[key].remove(entry)
-                # new_groups[key]
+                new_groups[key].insert(insert_index, {group_name: group})
+            if len(insert_keys) > 0:
+                new_groups.pop(group_name)
 
+        return new_groups
+
+    def _is_in(self, entry, group):
+        if isinstance(entry, dict):
+            for entry_key, entry_value in entry.items():
+                key_present = False
+                value_present = False
+                for obj in group:
+                    if not isinstance(obj, dict):
+                        continue
+                    if entry_key in obj.keys():
+                        key_present = True
+                        if self._is_in(entry_value, obj[entry_key]):
+                            value_present = True
+                            break
+                        return False
+                if not key_present or not value_present:
+                    return False
+            return True
+
+        if isinstance(entry, list):
+            if not isinstance(group, list):
+                return False
+            for entry_item in entry:
+                if not self._is_in(entry_item, group):
+                    return False
+            return True
+
+        return entry in group
+
+    def _complete_heirarchy_sections(self, full_list, groups):
+        heirarchy = []
+        skips = []
+        for entry in full_list:
+            if entry in skips:
+                continue
+            if entry not in groups.keys():
+                heirarchy.append(entry)
+                continue
+            group = groups[entry]
+            heirarchy.append(group)
+            skips.extend(self._get_heirarchy_skips(group))
+        return heirarchy
+
+    def _complete_heirarchy_instructions(self, full_list, groups):
+        heirarchy = []
+        skips = []
+        for entry in full_list:
+            if entry in skips:
+                continue
+            matching_groups = {}
+            for key in groups.keys():
+                if str(entry) == key.split('-')[0]:
+                    matching_groups[key] = groups[key]
+            if len(matching_groups) == 0:
+                heirarchy.append(entry)
+                continue
+            heirarchy.append(matching_groups)
+            skips.extend(self._get_heirarchy_skips(matching_groups))
+        return heirarchy
+
+    def _get_heirarchy_skips(self, group, skips=None):
+        if skips is None:
+            skips = []
+        if isinstance(group, dict):
+            for entry in group.values():
+                self._get_heirarchy_skips(entry, skips)
+        elif isinstance(group, list):
+            for entry in group:
+                self._get_heirarchy_skips(entry, skips)
+        else:
+            skips.append(group)
+        return skips
+
+    def _resolve_switches(self, inst_list):
+        switches = {}
+        for i, entry in enumerate(inst_list):
+            if not isinstance(entry, dict):
+                continue
+            inst_list[i][list(entry.keys())[0]] = self._resolve_switches(list(entry.values())[0])
+            if list(entry.keys())[0].split('-')[1].isnumeric():
+                switch_key = list(entry.keys())[0].split('-')[0] + '-switch'
+                if switch_key not in switches.keys():
+                    switches[switch_key] = []
+                switches[switch_key].append(i)
+        if len(switches) > 0:
+            for switch_key, switch_entries in switches.items():
+                inst_list = self._reorganize_switch(switch_key, switch_entries, inst_list)
+        return inst_list
+
+    def _remove_duplicate_inst_locations(self, new_groups):
+        key_insts = self._get_key_insts(new_groups)
+        return self._remove_key_insts(new_groups, key_insts)
+
+    def _get_key_insts(self, group, key_insts=None):
+        if key_insts is None:
+            key_insts = []
+        if not isinstance(group, list):
+            return key_insts
+        for entry in group:
+            if not isinstance(entry, dict):
+                continue
+            for key, value in entry.items():
+                key_insts.append(int(key.split('-')[0]))
+                key_insts = self._get_key_insts(value, key_insts)
+        return key_insts
+
+    def _remove_key_insts(self, group, key_insts):
+        if not isinstance(group, list):
+            return group
+        for inst in key_insts:
+            if inst in group:
+                group.remove(inst)
+        new_entries = []
+        for i, entry in enumerate(group):
+            if not isinstance(entry, dict):
+                continue
+            new_entry = {}
+            for key, value in entry.items():
+                new_entry[key] = self._remove_key_insts(value, key_insts)
+            new_entries.append((i, new_entry))
+        for entry in new_entries:
+            group.insert(entry[0], entry[1])
+            group.pop(entry[0]+1)
+        return group
+
+    @staticmethod
+    def _reorganize_switch(switch_key, switch_entries, inst_list: list):
+        first_entry = min(switch_entries)
+        switch = {}
+        for i in switch_entries:
+            entry = inst_list[i]
+            entry_key = list(entry.keys())[0].split('-')[1]
+            entry_value = list(entry.values())[0]
+            switch[entry_key] = entry_value
+        for i in reversed(switch_entries):
+            inst_list.pop(i)
+        inst_list.insert(first_entry, {switch_key: switch})
+        return inst_list
 
     @staticmethod
     def _get_inst_by_pos(inst_list, start_id, target_pos, origin_sect_name, origin_element_id):
@@ -1114,12 +1285,14 @@ class SCTDecoder:
         while cur_id < len(inst_list):
             cur_inst = inst_list[cur_id]
             if cur_id == len(inst_list):
-                print(f'SCPT Decoder: Find Inst: Entry not found: {origin_sect_name}:{origin_element_id} - {target_pos}')
+                print(
+                    f'SCPT Decoder: Find Inst: Entry not found: {origin_sect_name}:{origin_element_id} - {target_pos}')
                 return
             if cur_inst.inst_pos == target_pos:
                 break
             if cur_inst.inst_pos < target_pos < inst_list[cur_id + 1].inst_pos:
-                print(f'SCPT Decoder: Find Inst: Target pos in middle of entry {origin_sect_name}:{origin_element_id} - {target_pos}')
+                print(
+                    f'SCPT Decoder: Find Inst: Target pos in middle of entry {origin_sect_name}:{origin_element_id} - {target_pos}')
                 break
             cur_id += 1
 

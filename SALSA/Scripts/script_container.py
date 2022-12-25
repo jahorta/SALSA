@@ -72,6 +72,9 @@ class SCTParameter:
                 returnValue += '{0}{1}: {2}'.format(formatedReturn, key, nextLevel)
         return returnValue
 
+    def __repr__(self):
+        return f'{self.formatted_value}'
+
 
 class SCTInstruction:
     desc_codes = ['add', 'sub', 'mul']
@@ -190,6 +193,9 @@ class SCTInstruction:
         else:
             return None
 
+    def __repr__(self):
+        return f'{self.inst_id}: {", ".join([_.__repr__() for _ in self.parameters])}'
+
     @staticmethod
     def add_desc_params(param1, param2):
         result_type = getTypeFromString(param1)
@@ -258,7 +264,7 @@ class SCTInstruction:
 class SCTSection:
 
     instructions: List[SCTInstruction]
-    instruction_groups: Dict[str, Tuple[str, str]]
+    instructions_grouped: Dict[str, Tuple[str, str]]
     type: str
     inst_errors: List[int]
     errors: List[str]
@@ -271,9 +277,7 @@ class SCTSection:
         self.length = length
         self.start_offset = pos
         self.instructions = []
-        self.instruction_groups = {}
-        self.grouped_instructions = {}
-        self.inst_group_hierarchy = {}
+        self.instructions_grouped = {}
         self.inst_errors = []
         self.errors = []
         self.strings = {}
@@ -291,9 +295,6 @@ class SCTSection:
         if instruction.inst_id not in self.instructions_used.keys():
             self.instructions_used[instruction.inst_id] = 0
         self.instructions_used[instruction.inst_id] += 1
-
-    def _propagate_links(self):
-        pass
 
     def set_type(self, t: str):
         self.type = t
