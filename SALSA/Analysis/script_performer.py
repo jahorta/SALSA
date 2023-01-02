@@ -10,7 +10,7 @@ from datetime import datetime
 from math import floor
 from typing import List, Dict
 
-from SALSA.Tools.console_progress_bar import printProgressBar
+from SALSA.Common.console_progress_bar import printProgressBar
 
 
 class ScriptPerformer:

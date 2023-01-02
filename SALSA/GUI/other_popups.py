@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from Tools.containers import Vector2, Dimension
+from Common.containers import Vector2, Dimension
 
 
 class HelpPopupView(tk.Toplevel):

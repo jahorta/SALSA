@@ -1,6 +1,6 @@
 from typing import List
 import json
-from SALSA.BaseInstructions.base_instruct_defaults import inst_defaults
+from SALSA.BaseInstructions.bi_defaults import inst_defaults
 
 
 class BaseParam:

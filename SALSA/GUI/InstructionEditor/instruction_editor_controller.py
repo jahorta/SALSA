@@ -1,7 +1,7 @@
 import tkinter as tk
 
 from GUI.InstructionEditor.instruction_editor_view import InstructionEditorView
-from BaseInstructions.base_instruction_facade import BaseInstLibFacade
+from BaseInstructions.bi_facade import BaseInstLibFacade
 
 
 class InstructionEditorController:

@@ -2,15 +2,14 @@ import os
 import re
 
 from SALSA.AKLZ.aklz import Aklz
-from SALSA.Tools.byte_array_utils import getString, getWord, deriveStringLength, word2Float, applyHexMask, padded_hex, \
+from SALSA.Common.byte_array_utils import getString, getWord, deriveStringLength, word2Float, applyHexMask, padded_hex, \
     word2SignedInt, toInt
-from SALSA.Tools.constants import FieldTypes as FT
+from SALSA.Common.constants import FieldTypes as FT
 
 
-class SctModel:
+class SCTModel:
     """Creates an object which can read in and decode *.sct files based on an instruction object"""
     path = './scripts/'
-
 
     sct_keys = {
         'Name',

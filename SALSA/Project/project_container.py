@@ -3,17 +3,18 @@ from itertools import count
 from dataclasses import dataclass, field as dc_field
 from typing import List, Union, Dict, Tuple
 
-from BaseInstructions.base_instruction_container import BaseParam
-from Tools.byte_array_utils import toInt, getTypeFromString, asStringOfType, toFloat
 
 @dataclass
-class Link:
+class SCTLink:
     type: str
     trace: List[Union[int, str]]
     origin: int
     target: int
     target_trace: Union[List[Union[int, str]], None] = None
     ID: int = dc_field(default_factory=lambda counter=count(): next(counter))
+
+    def set_id(self, _id):
+        self.ID = _id
 
     def __repr__(self):
         return f'Link: {self.ID} - {self.trace[0]}:{self.trace[1]}:{self.trace[2]}' \
@@ -29,10 +30,10 @@ class SCTParameter:
     skip_refresh: bool
     link_value: (str, str)
 
-    def __init__(self, param: BaseParam):
-        self.ID = param.paramID
-        self.type = param.type
-        self.link: Union[None, Link] = None
+    def __init__(self, _id, _type):
+        self.ID = _id
+        self.type = _type
+        self.link: Union[None, SCTLink] = None
         self.errors = []
         self.analyze_log = {}
         self.value = None
@@ -69,18 +70,33 @@ class SCTParameter:
                 formatedReturn = '\n'
                 tabs = '  ' * level
                 formatedReturn += tabs
-                returnValue += '{0}{1}: {2}'.format(formatedReturn, key, nextLevel)
+                returnValue += f'{formatedReturn}{key}: {nextLevel}'
         return returnValue
 
     def __repr__(self):
         return f'{self.formatted_value}'
+
+    @classmethod
+    def from_dict(cls, param_dict, links):
+        param = cls(param_dict['ID'], param_dict['type'])
+        for link in links:
+            if param_dict['link']['ID'] == link.ID:
+                param.link = link
+                break
+        param.errors = param_dict['errors']
+        param.analyze_log = param_dict['analyze_log']
+        param.value = param_dict['value']
+        param.formatted_value = param_dict['formatted_value']
+        param.raw_bytes = bytearray.fromhex(param_dict['raw_bytes'])
+        param.link_result = param_dict['link_result']
+        return param
 
 
 class SCTInstruction:
     desc_codes = ['add', 'sub', 'mul']
 
     errors: List[Tuple[str, Union[int, str, bytearray]]]
-    links: List[Link]
+    links: List[SCTLink]
     parameters: Dict[int, SCTParameter]
     loop_parameters: List[Dict[int, SCTParameter]]
 
@@ -88,6 +104,7 @@ class SCTInstruction:
         self.ID = str(uuid.uuid4()).replace('-', '_')
         self.inst_id = inst_id
         self.inst_pos = inst_pos
+        self.script_pos = script_pos
         self.overall_pos = self.inst_pos + script_pos
         self.skip_refresh = False
         self.errors = []
@@ -109,156 +126,44 @@ class SCTInstruction:
             if len(param.errors) > 0:
                 self.errors.append((f'loop-{len(self.loop_parameters)-1}-param', p_id))
 
-    def description_insert_param_values(self, d):
-        desc = d
-        paramSets = {}
-        for param in self.parameters.values():
-            name = param.name
-            paramSets[name] = param.value
-
-        for key, value in paramSets.items():
-            keyword = f'<{key}>'
-            if not isinstance(value, str):
-                value = str(value)
-            result = value
-            desc = desc.replace(keyword, result)
-
-        return desc
-
-    def resolveDescriptionFuncs(self, temp_desc):
-
-        currentSubstring = temp_desc
-        if not isinstance(currentSubstring, str):
-            return currentSubstring
-        new_desc = ''
-        while True:
-            nextStarPos = currentSubstring.find('*')
-            if nextStarPos == -1:
-                new_desc += currentSubstring
-                break
-            new_desc += currentSubstring[:nextStarPos]
-            currentSubstring = currentSubstring[nextStarPos:]
-            currentCode = currentSubstring[1:4]
-            if currentCode in self.desc_codes:
-                tempCommand = currentSubstring.split(' ')[0]
-                closeBrackets = tempCommand.rfind(']*')
-                currentCommand = currentSubstring[:closeBrackets + 2]
-                currentSubstring = currentSubstring[closeBrackets + 2:]
-                result = self.run_desc_func(currentCommand)
-                new_desc += '{} '.format(result)
-            else:
-                currentSubstring = currentSubstring[1:]
-                new_desc += '*'
-
-        return new_desc
-
-    def run_desc_func(self, func):
-        command = func[1:4]
-        params = func[5:-2]
-        nextStarPos = params.find('*')
-        nextCommaPos = params.find(',')
-        if -1 < nextStarPos < nextCommaPos:
-            internal_func = params[nextStarPos:] + ']*'
-            params = self.run_desc_func(internal_func)
-        nextCloseParam = params.find(']')
-        param1 = params[:params.find(',')]
-        suffix = ''
-        if nextCloseParam == -1:
-            param2 = params[params.find(',') + 1:]
-        else:
-            param2 = params[params.find(',') + 1:nextCloseParam]
-            suffix = params[nextCloseParam + 2:]
-
-        nextStarPos = param2.find('*')
-        if -1 < nextStarPos:
-            internal_func = param2[nextStarPos:] + ']*'
-            param2 = self.run_desc_func(internal_func)
-
-        if command == 'add':
-            result = self.add_desc_params(param1, param2)
-        elif command == 'sub':
-            result = self.subtract_desc_params(param1, param2)
-        elif command == 'mul':
-            result = self.multiply_desc_params(param1, param2)
-        elif command == 'lnk':
-            result = self.link_desc_params(param1, param2)
-        else:
-            result = ''
-
-        return result + suffix
-
     def get_links(self):
-        if self.hasLink:
-            return self.links
-        else:
-            return None
+        return self.links if len(self.links) > 0 else None
 
     def __repr__(self):
         return f'{self.inst_id}: {", ".join([_.__repr__() for _ in self.parameters])}'
 
-    @staticmethod
-    def add_desc_params(param1, param2):
-        result_type = getTypeFromString(param1)
-        result = toInt(param1) + toInt(param2)
-        result = asStringOfType(result, result_type)
-        return result
-
-    @staticmethod
-    def subtract_desc_params(param1, param2):
-        result_type = getTypeFromString(param1)
-        result = toInt(param1) - toInt(param2)
-        result = asStringOfType(result, result_type)
-        return result
-
-    @staticmethod
-    def multiply_desc_params(param1, param2):
-        result_type = getTypeFromString(param1)
-        result = toFloat(param1) * toFloat(param2)
-        result = asStringOfType(result, result_type)
-        return result
-
-    def link_desc_params(self, param1, param2):
-        """
-        Reads in two parameters:
-        [1] The name of the start point, could be the instruction start (INST), or a param name
-        [2] The offset of the link target
-        The function then adds this information to the link dictionary and returns a new link
-        placeholder with the link index number.
-        """
-        startPos = -1
-        if param1 == 'INST':
-            startPos = self.pos
-        elif len(self.parameters) > 0:
-            for key, value in self.parameters.items():
-                if value.name == param1:
-                    startPos = value.position
-            if startPos == -1:
-                return 'Unable to link - invalid start position'
-        else:
-            return 'Unable to link - invalid start position'
-        self.hasLink = True
-        linkLabel = 'LINK{}'.format(len(self.links))
-        self.links[linkLabel] = {'start': startPos, 'target offset': param2}
-        return '<{}>'.format(linkLabel)
-
-    def set_link(self, link_dict):
-        for key, value in link_dict.items():
-            replace_key = '<{}>'.format(key)
-            stringList = self.description.split(replace_key)
-            if len(stringList) > 1:
-                self.description = stringList[0] + value + stringList[1]
-            # print('')
-
-    def get_param_id_by_name(self, name):
-        param_id = None
-        for key, param in self.parameters.items():
-            if param.name == name:
-                param_id = key
-                break
-        return param_id
+    # def get_param_id_by_name(self, name):
+    #     param_id = None
+    #     for key, param in self.parameters.items():
+    #         if param.name == name:
+    #             param_id = key
+    #             break
+    #     return param_id
 
     def set_skip_refresh(self):
         self.skip_refresh = True
+
+    @classmethod
+    def from_dict(cls, inst_dict, links: List[SCTLink]):
+        inst = cls(script_pos=inst_dict['script_pos'], inst_id=inst_dict['inst_id'], inst_pos=inst_dict['inst_pos'])
+        inst.ID = inst_dict['ID']
+        inst.skip_refresh = inst_dict['skip_refresh']
+        inst.errors = inst_dict['errors']
+        inst_links = {}
+        inst_link_ids = [_['ID'] for _ in inst_dict['links']]
+        for link in links:
+            if link.ID in inst_link_ids:
+                inst_links[link.ID] = link
+        for ID in inst_link_ids:
+            inst.links.append(inst_links[ID])
+        for key, param in inst_dict['parameters'].items:
+            inst.parameters[key] = SCTParameter.from_dict(param_dict=param, links=inst.links)
+        for param_group in inst_dict['loop_parameters']:
+            params = {}
+            for key, param in param_group.items():
+                params[key] = SCTParameter.from_dict(param_dict=param, links=inst.links)
+            inst.loop_parameters.append(params)
+        return inst
 
 
 class SCTSection:
@@ -308,6 +213,21 @@ class SCTSection:
     def add_loop(self, loop_id: int):
         self.jump_loops.append(loop_id)
 
+    @classmethod
+    def from_dict(cls, section_dict, links):
+        section = cls(section_dict['name'], section_dict['length'], section_dict['start_offset'])
+        for inst in section_dict['instructions']:
+            section.instructions.append(SCTInstruction.from_dict(inst, links))
+        section.instructions_grouped = section_dict['instructions_grouped']
+        section.inst_errors = section_dict['inst_errors']
+        section.errors = section_dict['errors']
+        section.strings = section_dict['strings']
+        section.instructions_used = section_dict['instructions_used']
+        section.garbage = section_dict['garbage']
+        section.string = section_dict['string']
+        section.jump_loops = section_dict['jump_loops']
+        return section
+
 
 class SCTScript:
     start_pos = None
@@ -321,14 +241,15 @@ class SCTScript:
     section_groups: Dict[str, List[str]]
     section_group_keys: Dict[str, str]
     inst_locations: List[List[str]]
-    links: List[Link]
+    links: List[SCTLink]
     footer: List[str]
     strings: Dict[str, str]
     error_sections: Dict[str, List[str]]
     links_to_sections: Dict[str, List[str]]
     unused_sections: List[str]
 
-    def __init__(self, name: str, index: Union[None, Dict[str, Tuple[int, int]]] = None, header: Union[None, bytearray] = None):
+    def __init__(self, name: str, index: Union[None, Dict[str, Tuple[int, int]]] = None,
+                 header: Union[None, bytearray] = None):
         self.name = name
         self.index = {k: v[0] for k, v in index.items()} if index is not None else {}
         self.header = header if header is not None else bytearray(b'/x07/xd2/x00/x06/x00/x0e/x00/x00')
@@ -338,13 +259,13 @@ class SCTScript:
         self.grouped_section_names = {}
         self.inst_locations = [[] for _ in range(266)]
         self.links = []
+        self.links_to_sections = {}
         self.footer = []
         self.strings = {}
         self.string_groups = {}
-        self.error_sections = {}
-        self.errors = []
-        self.links_to_sections = {}
         self.unused_sections = []
+        self.errors = []
+        self.error_sections = {}
 
     def add_section(self, section: SCTSection):
         name = section.name
@@ -355,13 +276,35 @@ class SCTScript:
         if len(section.errors) > 0:
             self.error_sections[name] = section.errors
 
-    def add_link(self, link: Link) -> int:
+    def add_link(self, link: SCTLink) -> int:
         self.links.append(link)
         return len(self.links) - 1
 
     def add_footer_entry(self, entry):
         self.footer.append(entry)
         return len(self.footer) - 1
+
+    @classmethod
+    def from_dict(cls, script_dict):
+        script = cls(name=script_dict['name'], index=script_dict['index'], header=script_dict['header'])
+        for link in script_dict['links']:
+            script.links.append(SCTLink(**link))
+            script.links[-1].set_id(link['ID'])
+
+        for key, value in script_dict['sections'].items():
+            script.sections[key] = SCTSection.from_dict(value, script.links)
+        script.section_groups = script_dict['section_groups']
+        script.section_group_keys = script_dict['section_group_keys']
+        script.grouped_section_names = script_dict['grouped_section_names']
+        script.inst_locations = script_dict['inst_locations']
+        script.links_to_sections = script_dict['links_to_sections']
+        script.footer = script_dict['footer']
+        script.strings = script_dict['strings']
+        script.string_groups = script_dict['string_groups']
+        script.unused_sections = script_dict['unused_sections']
+        script.errors = script_dict['errors']
+        script.error_sections = script_dict['error_sections']
+        return script
 
 
 class SCTProject:
@@ -375,3 +318,11 @@ class SCTProject:
 
     def add_script(self, filename: str, script: SCTScript):
         self.scripts[filename] = script
+
+    @classmethod
+    def from_dict(cls, proj_dict):
+        project = cls()
+        for key, script in proj_dict['scripts'].items():
+            project.scripts[key] = SCTScript.from_dict(script)
+        project.filename = proj_dict['file_name']
+        return project

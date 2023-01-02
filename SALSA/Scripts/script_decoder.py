@@ -4,11 +4,11 @@ import re
 import struct
 from typing import Dict, Tuple, List, Callable
 
-from BaseInstructions.base_instruction_facade import BaseInstLibFacade
-from SALSA.Scripts.script_container import SCTScript, SCTSection, Link, SCTInstruction, SCTParameter
-from SALSA.BaseInstructions.base_instruction_container import BaseInstLib, BaseParam
+from BaseInstructions.bi_facade import BaseInstLibFacade
+from Project.project_container import SCTScript, SCTSection, SCTLink, SCTInstruction, SCTParameter
+from SALSA.BaseInstructions.bi_container import BaseInstLib, BaseParam
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
-from SALSA.Tools.byte_array_utils import word2SignedInt, is_a_number, pad_hex, applyHexMask
+from SALSA.Common.byte_array_utils import word2SignedInt, is_a_number, pad_hex, applyHexMask
 from SALSA.Scripts import scpt_arithmetic_fxns as scpt_arithmetic, scpt_compare_fxns as scpt_compare
 
 ind_entry_len = 0x14
@@ -30,9 +30,9 @@ class SCTDecoder:
     _sct: bytearray
     _p_codes: SCPTParamCodes
     _enc = 'shiftjis'
-    _str_sect_links: List[Link] = []
-    _str_foot_links: List[Link] = []
-    _scpt_links: List[Link] = []
+    _str_sect_links: List[SCTLink] = []
+    _str_foot_links: List[SCTLink] = []
+    _scpt_links: List[SCTLink] = []
     _jmp_if_falses: Dict[str, List[int]]
     _switches: Dict[str, List[int]]
     _last_sect_pos: int
@@ -412,7 +412,7 @@ class SCTDecoder:
         return cur_inst
 
     def _decode_param(self, base_param: BaseParam, trace):
-        cur_param = SCTParameter(base_param)
+        cur_param = SCTParameter(_id=base_param.paramID, _type=base_param.type)
         param_type = base_param.type
         if 'scpt' in param_type:
             overrideCompare = [0x7f7fffff]
@@ -477,7 +477,7 @@ class SCTDecoder:
                 link_type = base_param.link_type
                 origin = self._cursor * 4
                 target = self._cursor * 4 + cur_value
-                newLink = Link(type=link_type, origin=origin, target=target, trace=trace)
+                newLink = SCTLink(type=link_type, origin=origin, target=target, trace=trace)
                 cur_param.link = newLink
                 if link_type == 'String':
                     if target > self._last_sect_pos:

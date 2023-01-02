@@ -5,13 +5,13 @@ from GUI.AnalysisPopup.analysis_controller import AnalysisController
 from GUI.HelpPopup.help_controller import HelpController
 from GUI.InstructionEditor.instruction_editor_controller import InstructionEditorController
 from GUI.other_popups import AboutView
-from BaseInstructions.base_instruction_facade import BaseInstLibFacade
+from BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.GUI.AnalysisPopup.analysis_view import AnalysisView
 from SALSA.GUI.HelpPopup.help_view import HelpView
 from SALSA.GUI.InstructionEditor.instruction_editor_view import InstructionEditorView
 from SALSA.GUI.ScriptEditor.script_editor_view import ScriptEditorView
-from Scripts.script_facade import SCTProjectFacade
-from Tools.containers import Vector2
+from Project.project_facade import SCTProjectFacade
+from Common.containers import Vector2
 
 
 class GUIController:
@@ -52,7 +52,8 @@ class GUIController:
 
     def show_instruction_view(self, inst_lib, callbacks, position):
         self.instruction_view = InstructionEditorView(self.parent, inst_lib, callbacks, position)
-        self.instruction_controller = InstructionEditorController(self.instruction_view)
+        self.instruction_controller = InstructionEditorController(view=self.instruction_view, callbacks=callbacks,
+                                                                  inst_lib_facade=inst_lib, position=position)
 
     def show_analysis_view(self):
         self.analysis_view = AnalysisView(self.parent)

@@ -1,7 +1,7 @@
 import json
 from typing import List
 
-from BaseInstructions.base_instruction_container import BaseInstLib, BaseInst
+from BaseInstructions.bi_container import BaseInstLib, BaseInst
 
 
 class BaseInstLibFacade:

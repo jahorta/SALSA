@@ -2,9 +2,9 @@ import re
 from typing import List, Dict
 
 from SALSA.Analysis.script_performer import ScriptPerformer
-from SALSA.Tools.constants import FieldTypes as FT, KnownMemAddresses as KA
+from SALSA.Common.constants import FieldTypes as FT, KnownMemAddresses as KA
 from SALSA.BaseInstructions.instruction_class import Instruct
-from SALSA.Scripts.script_container import SCTScript
+from Project.project_container import SCTScript
 
 
 class SCTAnalyzer:

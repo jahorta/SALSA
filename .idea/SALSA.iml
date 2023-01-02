@@ -12,7 +12,7 @@
     <option name="namespacePackageFolders">
       <list>
         <option value="$MODULE_DIR$/SALSA/GUI" />
-        <option value="$MODULE_DIR$/SALSA/Tools" />
+        <option value="$MODULE_DIR$/SALSA/Common" />
         <option value="$MODULE_DIR$/SALSA/FileModels" />
         <option value="$MODULE_DIR$/SALSA/Analysis" />
         <option value="$MODULE_DIR$/SALSA/BaseInstructions" />

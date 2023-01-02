@@ -5,12 +5,12 @@ from decimal import Decimal, InvalidOperation
 from tkinter import ttk
 from typing import Dict, List, Union
 
-from SALSA.Tools.constants import FieldTypes as FT
+from SALSA.Common.constants import FieldTypes as FT
 
 # ------ #
 # Mixins #
 # ------ #
-from Tools.containers import Dimension, Vector2
+from Common.containers import Dimension, Vector2
 
 
 class ValidatedMixin:
@@ -454,11 +454,12 @@ class CustomTree(ScrollCanvas):
         top_y = y1 - y0 * scroll_y
         return (top_y + y) // self.row_height
 
-    def start_group(self, group_name, row=-1, **kwargs):
-        pass
+    def start_group(self, group_name, row=-1, row_data=None, **kwargs):
+        self.cur_indent += 1
+        self.add_row(group_name, row=row, row_data=row_data)
 
     def end_group(self, group_name):
-        pass
+        self.cur_indent -= 1
 
     def add_row(self, text, row=-1, row_data=None, **kwargs):
         """Adds a row to """
@@ -468,7 +469,7 @@ class CustomTree(ScrollCanvas):
             raise ValueError(err)
         kwargs['row'] = len(self.rows) if row == -1 else row
         kwargs['text_start'] = 0  # Change this when grouping is implemented
-        new_row = TreeEntry(self.canvas, text=text, **kwargs)
+        new_row = TreeEntry(self.canvas, text=text, indent_level=self.cur_indent, **kwargs)
         row = row if row > 0 else len(self.rows)
         self.rows.insert(row, new_row)
         if row_data is not None:

@@ -1,8 +1,8 @@
 import json
 import os
 
-from SALSA.Tools.constants import FieldTypes as FT
-from SALSA.Tools.constants import OverrideTypes as OT
+from SALSA.Common.constants import FieldTypes as FT
+from SALSA.Common.constants import OverrideTypes as OT
 
 
 class InstructionModel:
@@ -27,13 +27,11 @@ class InstructionModel:
 
     def load_instructions(self):
         if not os.path.exists(self.filename):
-            with open(self.filename, 'w') as fh:
-                inst = {}
-                for i in range(0, 266):
-                    inst[str(i)] = {'Instruction ID': str(i), 'Name': 'no name', 'Location': '0x80xxxxxx',
-                                    'Hard parameter one': '0x00000000', 'Hard parameter two': '0x00000000',
-                                    'Parameter num': 0, 'Parameters': {}, 'Implement': False, 'Notes': ''}
-                fh.write(json.dumps(inst))
+            insts = {}
+            for i in range(0, 266):
+                insts[str(i)] = {'Instruction ID': str(i), 'Name': 'no name', 'Location': '0x80xxxxxx',
+                                 'Hard parameter two': '0x00000000', 'Parameters': {}, 'Notes': ''}
+            return insts
 
         with open(self.filename, 'r') as fh:
             instructions = json.loads(fh.read())
