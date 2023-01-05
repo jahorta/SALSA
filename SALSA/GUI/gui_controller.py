@@ -26,12 +26,12 @@ class GUIController:
     help_controller: Union[None, HelpController]
     about_view: Union[None, AboutView]
 
-    def __init__(self, parent, scpt_editor_view: ScriptEditorView, script_facade: SCTProjectFacade,
+    def __init__(self, parent, scpt_editor_view: ScriptEditorView, project_facade: SCTProjectFacade,
                  inst_lib_facade: BaseInstLibFacade):
 
         self.parent = parent
         self.scpt_view = scpt_editor_view
-        self.project = script_facade
+        self.project = project_facade
         self.base_lib = inst_lib_facade
 
         self.popup_cleanup = {
@@ -59,10 +59,8 @@ class GUIController:
         self.analysis_view = AnalysisView(self.parent)
         self.analysis_controller = AnalysisController(self.analysis_view)
 
-    def update_script_view(self):
-        self.scpt_view.after(50, func=self.scpt_view.scripts_tree.resize)
-        self.scpt_view.after(50, func=self.scpt_view.sections_tree.resize)
-        self.scpt_view.after(50, func=self.scpt_view.insts_tree.resize)
+    def update_all_views(self):
+        self.scpt_view.refresh_views()
 
     def enable_script_view(self):
         self.recursive_toggle(self.scpt_view, 'normal')
@@ -78,7 +76,8 @@ class GUIController:
             if 'frame' in r \
                     or 'labelframe' in r \
                     or 'customtree' in r\
-                    or 'scrollbar' in r:
+                    or 'scrollbar' in r\
+                    or 'panedwindow' in r:
                 self.recursive_toggle(child, state)
             else:
                 child.configure(state=state)
@@ -88,8 +87,12 @@ class GUIController:
         self.about_view = AboutView(parent=self.parent, position=position, callback=self.close_popup)
 
     def show_help(self):
-        self.help_view = HelpView(self.parent, callbacks={'close': self.close_popup}, )
-        self.help_controller = HelpController(self.help_view)
+        pass
+        # self.help_view = HelpView(self.parent, callbacks={'close': self.close_popup}, )
+        # self.help_controller = HelpController(self.help_view)
+
+    def show_settings(self):
+        pass
 
     def _instruction_edit_check(self):
         pass

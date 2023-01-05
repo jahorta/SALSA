@@ -101,8 +101,8 @@ class SCTInstruction:
     loop_parameters: List[Dict[int, SCTParameter]]
 
     def __init__(self, script_pos: int, inst_pos: int, inst_id: int):
-        self.ID = str(uuid.uuid4()).replace('-', '_')
-        self.inst_id = inst_id
+        self.ID: str = str(uuid.uuid4()).replace('-', '_')
+        self.instruction_id = inst_id
         self.inst_pos = inst_pos
         self.script_pos = script_pos
         self.overall_pos = self.inst_pos + script_pos
@@ -130,7 +130,7 @@ class SCTInstruction:
         return self.links if len(self.links) > 0 else None
 
     def __repr__(self):
-        return f'{self.inst_id}: {", ".join([_.__repr__() for _ in self.parameters])}'
+        return f'{self.instruction_id}: {", ".join([_.__repr__() for _ in self.parameters])}'
 
     # def get_param_id_by_name(self, name):
     #     param_id = None
@@ -169,7 +169,7 @@ class SCTInstruction:
 class SCTSection:
 
     instructions: List[SCTInstruction]
-    instructions_grouped: Dict[str, Tuple[str, str]]
+    instructions_ids_grouped: Dict[str, Tuple[str, str]]
     type: str
     inst_errors: List[int]
     errors: List[str]
@@ -178,11 +178,12 @@ class SCTSection:
     garbage: Dict[str, bytearray]
 
     def __init__(self, name, length, pos):
+        self.instruction_ids_ungrouped = []
         self.name = name
         self.length = length
         self.start_offset = pos
-        self.instructions = []
-        self.instructions_grouped = {}
+        self.instructions: Dict[str, SCTInstruction] = {}
+        self.instructions_ids_grouped = {}
         self.inst_errors = []
         self.errors = []
         self.strings = {}
@@ -196,10 +197,11 @@ class SCTSection:
         self.string = string
 
     def add_instruction(self, instruction: SCTInstruction):
-        self.instructions.append(instruction)
-        if instruction.inst_id not in self.instructions_used.keys():
-            self.instructions_used[instruction.inst_id] = 0
-        self.instructions_used[instruction.inst_id] += 1
+        self.instructions[instruction.ID] = instruction
+        self.instruction_ids_ungrouped.append(instruction.ID)
+        if instruction.instruction_id not in self.instructions_used.keys():
+            self.instructions_used[instruction.instruction_id] = 0
+        self.instructions_used[instruction.instruction_id] += 1
 
     def set_type(self, t: str):
         self.type = t
@@ -218,7 +220,7 @@ class SCTSection:
         section = cls(section_dict['name'], section_dict['length'], section_dict['start_offset'])
         for inst in section_dict['instructions']:
             section.instructions.append(SCTInstruction.from_dict(inst, links))
-        section.instructions_grouped = section_dict['instructions_grouped']
+        section.instructions_ids_grouped = section_dict['instructions_grouped']
         section.inst_errors = section_dict['inst_errors']
         section.errors = section_dict['errors']
         section.strings = section_dict['strings']
@@ -227,6 +229,12 @@ class SCTSection:
         section.string = section_dict['string']
         section.jump_loops = section_dict['jump_loops']
         return section
+
+    def get_inst_list(self, style):
+        return self.instructions_ids_grouped if style == 'grouped' else self.instruction_ids_ungrouped
+
+    def get_instruction_by_position(self, pos=-1):
+        return self.instructions[self.instruction_ids_ungrouped[pos]]
 
 
 class SCTScript:
@@ -256,7 +264,7 @@ class SCTScript:
         self.sections = {}
         self.section_groups = {}
         self.section_group_keys = {}
-        self.grouped_section_names = {}
+        self.grouped_sections = {}
         self.inst_locations = [[] for _ in range(266)]
         self.links = []
         self.links_to_sections = {}
@@ -295,7 +303,7 @@ class SCTScript:
             script.sections[key] = SCTSection.from_dict(value, script.links)
         script.section_groups = script_dict['section_groups']
         script.section_group_keys = script_dict['section_group_keys']
-        script.grouped_section_names = script_dict['grouped_section_names']
+        script.grouped_sections = script_dict['grouped_section_names']
         script.inst_locations = script_dict['inst_locations']
         script.links_to_sections = script_dict['links_to_sections']
         script.footer = script_dict['footer']
@@ -305,6 +313,9 @@ class SCTScript:
         script.errors = script_dict['errors']
         script.error_sections = script_dict['error_sections']
         return script
+
+    def get_sect_list(self, style):
+        return self.grouped_sections if style == 'grouped' else list(self.sections.keys())
 
 
 class SCTProject:

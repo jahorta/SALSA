@@ -10,7 +10,6 @@ class InstructionModel:
         'Instruction ID': {'req': True, 'type': FT.integer, 'min': 0, 'max': 270},
         'Name': {'req': True, 'type': FT.string},
         'Location': {'req': True, 'type': FT.hex, 'pattern': '^0x80[0-9,a-f]{6}$'},
-        'Hard parameter one': {'req': True, 'type': FT.hex},
         'Hard parameter two': {'req': True, 'type': FT.hex},
         'Description': {'req': False, 'type': FT.long_string},
         'Parameter num': {'req': True, 'type': FT.integer, 'min': 0, 'max': 1000},
@@ -21,28 +20,28 @@ class InstructionModel:
 
     def __init__(self):
 
-        self.filename = "./Lib/Instructions.json"
+        self.user_filename = "./UserSettings/UserInstructions.json"
+        self.default_filename = "./UserSettings/DefaultInstructions.json"
         self.parameter_model = ParameterModel()
-        self.instructions = self.load_instructions()
 
-    def load_instructions(self):
-        if not os.path.exists(self.filename):
+    def load_instructions(self, inst_type):
+        filename = self.user_filename if inst_type == 'user' else self.default_filename
+        if not os.path.exists(filename):
             insts = {}
             for i in range(0, 266):
-                insts[str(i)] = {'Instruction ID': str(i), 'Name': 'no name', 'Location': '0x80xxxxxx',
-                                 'Hard parameter two': '0x00000000', 'Parameters': {}, 'Notes': ''}
+                insts[str(i)] = {'Instruction ID': str(i), 'Parameters': {}}
             return insts
 
-        with open(self.filename, 'r') as fh:
+        with open(filename, 'r') as fh:
             instructions = json.loads(fh.read())
 
         return instructions
 
-    def save_instructions(self, inst_dict):
+    def save_instructions(self, inst_dict, inst_type):
         """Function to save instructions to file"""
         print("saving to file")
-
-        with open(self.filename, 'w') as fh:
+        filename = self.user_filename if inst_type == 'user' else self.default_filename
+        with open(filename, 'w') as fh:
             fh.write(json.dumps(inst_dict, indent=2))
 
 

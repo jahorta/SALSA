@@ -323,7 +323,7 @@ class TreeEntry:
             x += 0 if i == 0 else self.canvas.bbox(self.txt_ids[i - 1])
             x += self.indent_width * self.indent_level if i == self.indent_field else 0
             x += self.x_pad
-            self.txt_ids[i] = self.canvas.create_text(x, y, text=t, anchor='w')
+            self.txt_ids.append(self.canvas.create_text(x, y, text=t, anchor='w'))
 
     def update_txt_starts(self, x_list: List[int]):
         for j, i in enumerate(self.txt_ids):
@@ -390,27 +390,42 @@ class TreeEntry:
         m_x = (self.indent_level - indent_level) * self.indent_width
         self.canvas.move(ind_id, m_x, 0)
 
+    def get_layer(self):
+        return self.txt_ids[0]
+
+    def lower(self, below_id):
+        for _id in self.txt_ids:
+            self.canvas.tag_lower(below_id)
+
 
 class CustomTree(ScrollCanvas):
     """A Canvas with a grid of elements. If an element is selected, will generate a '<<Select>>' event"""
 
     row_height = 20
 
-    def __init__(self, parent, *args, size=None, color='#FFFFFF', highlight='#AAAAFF',
+    def __init__(self, parent,  headers: List[str], *args, name='', header_widths=None, size=None, color='#FFFFFF', highlight='#AAAAFF',
                  pcnt_height=98, pcnt_width=100, dragable=False, **kwargs):
         size = {'width': 100, 'height': 100} if size is None else size
         super().__init__(parent, size, *args, **kwargs)
         self.parent: tk.Frame = parent
+        self.name = name
         self.header_canvas = tk.Canvas(self, width=size['width'], height=self.row_height)
         self.header_canvas.grid(row=0, column=0)
-        self.header_list = []
-        self.header_widths = []
+        self.header_list = headers
+        self.header_widths = header_widths
+        if header_widths is None or len(header_widths) != len(self.header_list):
+            self.header_widths = [50]*len(self.header_list)
+        x = 0
+        for i, header in enumerate(self.header_list):
+            self.header_canvas.create_text(x+(self.header_widths[i]//2), 0, text=header, anchor='n')
+            x += self.header_widths[i]
 
         self.color = color
         self.highlight = highlight
         self.pcnt_width = pcnt_width / 100
         self.pcnt_height = pcnt_height / 100
 
+        self.canvas.bind('<Double-Button-1', self.on_double_click)
         self.canvas.bind('<Button-1>', self.on_left_click)
         self.canvas.bind('<KeyPress>', lambda event: self.keys_down.append(event.keycode))
         self.canvas.bind('<KeyRelease>', self.key_release)
@@ -432,6 +447,7 @@ class CustomTree(ScrollCanvas):
         self.dragging = False
 
         self.in_window = False
+        self.callbacks = {}
 
     def key_release(self, e):
         if e.keycode in self.keys_down:
@@ -456,13 +472,13 @@ class CustomTree(ScrollCanvas):
 
     def start_group(self, group_name, row=-1, row_data=None, **kwargs):
         self.cur_indent += 1
-        self.add_row(group_name, row=row, row_data=row_data)
+        text = [group_name].extend(['']*(len(self.header_list)-1))
+        self.add_row(text=text, row=row, row_data=row_data)
 
-    def end_group(self, group_name):
+    def end_group(self):
         self.cur_indent -= 1
 
     def add_row(self, text, row=-1, row_data=None, **kwargs):
-        """Adds a row to """
         if len(text) > len(self.header_list):
             err = f'CustomTree: More text values than header fields:\n\tRow text: ' + ', '.join(text)
             err += f'\n\n\tHeaders: '
@@ -471,6 +487,8 @@ class CustomTree(ScrollCanvas):
         kwargs['text_start'] = 0  # Change this when grouping is implemented
         new_row = TreeEntry(self.canvas, text=text, indent_level=self.cur_indent, **kwargs)
         row = row if row > 0 else len(self.rows)
+        if row > 0:
+            new_row.lower(self.rows[row-1].get_layer())
         self.rows.insert(row, new_row)
         if row_data is not None:
             self.row_ids[new_row] = row_data
@@ -483,13 +501,26 @@ class CustomTree(ScrollCanvas):
         self.motion_widgets_height = None
         self.motion_lists: Dict[str, List[TreeEntry]] = {'top': [], 'sel': [], 'bot': []}
 
+    # ------------------------- #
+    # Entry selection functions #
+    # ------------------------- #
+
+    def get_entry_row(self, event):
+        scroll_top_y = self.canvas_scrollbar.get()[0] * self.canvas.bbox('all')[3]
+        return int((scroll_top_y + event.y) // self.row_height)
+
+    def on_double_click(self, e):
+        cur_row = self.get_entry_row(e)
+        if cur_row >= len(self.row_ids):
+            return
+        self.callbacks['select'](cur_row)
+
     # ------------------------ #
     # Entry dragging functions #
     # ------------------------ #
 
     def on_left_click(self, e):
-        scroll_top_y = self.canvas_scrollbar.get()[0] * self.canvas.bbox('all')[3]
-        cur_row = (scroll_top_y + e.y) // self.row_height
+        cur_row = self.get_entry_row(e)
 
         if (50 in self.keys_down or 60 in self.keys_down) and len(self.motion_lists['sel']) > 0:
             pass
@@ -559,3 +590,76 @@ class CustomTree(ScrollCanvas):
         self.cur_grid_row = None
         self.motion_widgets_height = None
         self.motion_lists = {'top': [], 'sel': [], 'bot': []}
+
+    def enable(self):
+        pass
+
+    def disable(self):
+        pass
+
+    def get_headers(self):
+        return self.header_list
+
+
+class CustomTree2(ttk.Treeview):
+
+    def __init__(self, parent, name, callbacks=None, **kwargs):
+        super().__init__(parent, **kwargs)
+
+        self.parent = parent
+        self.name = name
+        self.callbacks = callbacks if callbacks is not None else {}
+        self.row_data = {}
+        self.group_types = {}
+
+        self.bind("<Double-ButtonPress-1>", self.open_entry)
+        self.bind("<ButtonPress-1>", self.bDown)
+        self.bind("<ButtonRelease-1>", self.bUp, add='+')
+        self.bind("<B1-Motion>", self.bMove, add='+')
+        self.bind("<Shift-ButtonPress-1>", self.bDown_Shift, add='+')
+        self.bind("<Shift-ButtonRelease-1>", self.bUp_Shift, add='+')
+
+    def add_callback(self, key, callback):
+        self.callbacks[key] = callback
+
+    def open_entry(self, event):
+        widget = self.identify_row(event.y)
+        row_data = self.row_data[widget]
+        if row_data is not None:
+            self.callbacks['select'](self.name, row_data)
+
+    def bDown_Shift(self, event):
+        select = [self.index(s) for s in self.selection()]
+        select.append(self.index(self.identify_row(event.y)))
+        select.sort()
+        for i in range(select[0], select[-1] + 1, 1):
+            self.selection_add(self.get_children()[i])
+
+    def bDown(self, event):
+        if self.identify_row(event.y) not in self.selection():
+            self.selection_set(self.identify_row(event.y))
+
+    def bUp(self, event):
+        if self.identify_row(event.y) in self.selection():
+            self.selection_set(self.identify_row(event.y))
+
+    def bUp_Shift(self, event):
+        pass
+
+    def bMove(self, event):
+        iid = self.identify_row(event.y)
+        moveto = self.index(iid)
+        parent_iid = self.parent(iid)
+        for s in self.selection():
+            self.move(s, parent_iid, moveto)
+
+    def insert_entry(self, parent, text, values, group_type=None, row_data=None, **kwargs):
+        iid = str(len(self.row_data))
+        self.row_data[iid] = row_data
+        self.group_types[iid] = group_type
+        super().insert(parent=parent, iid=iid, text=text, values=values, **kwargs)
+        return iid
+
+    def clear_all_entries(self):
+        for row in self.get_children():
+            self.delete(row)

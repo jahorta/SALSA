@@ -1,5 +1,6 @@
 inst_defaults = {
     0: {
+        "Name": "If ",
         "Location": "0x801f6044",
         "Skip Frame Refresh": 0x00000001,
         "Hard parameter two": 0x00000000,

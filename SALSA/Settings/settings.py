@@ -1,47 +1,37 @@
 import os
-import json
+import configparser
 
-class Settings:
+
+class Settings(configparser.ConfigParser):
     defaults = {
-        'previous_sct_file': '',
-        'script_directory': './scripts/'
+        'DEFAULT': {
+            'previous_prj_file': '',
+            'script_directory': './scripts/'
+        }
     }
 
     def __init__(self):
-        self.filename = './Lib/settings.json'
-        self.settings = self._load_settings()
+        super().__init__()
+        self.filename = './UserSettings/config.ini'
+        self._load_settings()
 
     def _load_settings(self):
 
         if not os.path.exists(self.filename):
             self._new_settings_file()
-        with open(self.filename, 'r') as fh:
-            settings = json.loads(fh.read())
 
-        for key, value in self.defaults.items():
-            if key not in settings.keys():
-                settings[key] = value
-
-        return settings
+        with open(self.filename, 'r') as configfile:
+            self.read(configfile)
 
     def _new_settings_file(self):
-        with open(self.filename, 'w') as fh:
-            fh.write(json.dumps(self.defaults))
+        for name, group in self.defaults.items():
+            self[name] = group
+        with open(self.filename, 'w') as configfile:
+            self.write(configfile)
 
     def save_settings(self):
-        with open(self.filename, 'w') as fh:
-            fh.write(json.dumps(self.settings, indent=2))
+        with open(self.filename, 'w') as configfile:
+            self.write(configfile)
 
-    def set_sct_file(self, file):
-        self.settings['previous_sct_file'] = file
-        self.save_settings()
 
-    def get_sct_file(self):
-        return self.settings['previous_sct_file']
-
-    def set_script_dir(self, dir):
-        self.settings['script_directory'] = dir
-        self.save_settings()
-
-    def get_script_dir(self):
-        return self.settings['script_directory']
+settings = Settings()

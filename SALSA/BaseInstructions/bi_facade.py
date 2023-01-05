@@ -1,13 +1,26 @@
 import json
+import os.path
 from typing import List
 
 from BaseInstructions.bi_container import BaseInstLib, BaseInst
+
+from FileModels.instruction_model import InstructionModel
 
 
 class BaseInstLibFacade:
 
     def __init__(self):
         self.lib = BaseInstLib()
+        self.inst_model = InstructionModel()
+        self.default_inst_details = self.inst_model.load_instructions('default')
+        self.set_inst_all_fields(self.default_inst_details)
+        if os.path.exists('./UserSettings/user_is_default.txt'):
+            self.user_inst_details = None
+            self.user_identifier = 'default'
+        else:
+            self.user_inst_details = self.inst_model.load_instructions('user')
+            self.user_identifier = 'user'
+            self.set_inst_all_fields(self.user_inst_details)
 
     def set_inst_all_fields(self, inst_dict):
         for inst_id, inst_settings in inst_dict.items():
@@ -21,6 +34,15 @@ class BaseInstLibFacade:
     def get_inst_details(self):
         return {k: v.get_inst_details() for k, v in enumerate(self.lib.insts)}
 
+    def get_all_insts(self):
+        return self.lib.insts
+
+    def set_inst_detail(self, inst_id, details: dict):
+        self.lib.insts[inst_id].set_inst_details(details)
+
+    def save_user_insts(self):
+        self.inst_model.save_instructions()
+
 
 if __name__ == '__main__':
 
@@ -30,7 +52,7 @@ if __name__ == '__main__':
         if insts[i].instID != i:
             print(f'inst at position {i} is {insts[i].instID}')
 
-    with open('./../../Lib/Instructions.json', 'r') as fh:
+    with open('../../UserSettings/DefaultInstructions.json', 'r') as fh:
         file = fh.read()
         file_json = json.loads(file)
 

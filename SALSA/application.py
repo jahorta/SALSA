@@ -26,15 +26,7 @@ class Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Load settings
-        self.settings = Settings()
-        if self.settings.get_sct_file() == '':
-            self.settings.set_sct_file(self.default_sct_file)
-        else:
-            self.default_sct_file = self.settings.get_sct_file()
-            self.file_select_last_selected = self.default_sct_file
-        self.script_dir = self.settings.get_script_dir()
-
+        # Load base instructions
         self.base_insts = BaseInstLibFacade()
 
         # Define callbacks for the different views
@@ -64,7 +56,7 @@ class Application(tk.Tk):
         self.resizable(width=True, height=True)
 
         # Setup project details
-        self.project_facade = SCTProjectFacade()
+        self.project_facade = SCTProjectFacade(self.base_insts)
         self.project_filepath = ''
 
         # Setup script editor view and controller
@@ -73,16 +65,16 @@ class Application(tk.Tk):
         self.script_edit_controller = ScriptEditorController(self.script_edit_view, self.project_facade)
 
         self.gui = GUIController(parent=self, scpt_editor_view=self.script_edit_view,
-                                 script_facade=self.project_facade, inst_lib_facade=self.base_insts)
+                                 project_facade=self.project_facade, inst_lib_facade=self.base_insts)
 
         self.menu_callbacks = {
             'file->new_prj': self.on_new_project,
             'file->save_prj': self.on_save_project,
             'file->save_as_prj': self.on_save_as_project,
             'file->load_prj': self.on_load_project,
+            'file->settings': self.gui.show_settings,
             'file->quit': self.on_quit,
             'prj->add_script': self.add_script,
-            'set->script_dir': self.settings.set_script_dir,
             'analysis->export': self.gui.show_analysis_view,
             'view->inst': self.gui.show_instruction_view,
             'view->variable': self.script_edit_controller.show_variables,
@@ -102,7 +94,6 @@ class Application(tk.Tk):
         })
 
         self.gui.disable_script_view()
-        self.gui.update_script_view()
 
         # Create Models
         self.proj_model = ProjectModel()
@@ -111,7 +102,13 @@ class Application(tk.Tk):
     def on_new_project(self):
         self.project_facade.create_new_project()
         self.gui.enable_script_view()
-        self.gui.update_script_view()
+
+    def on_save_as_project(self):
+        filepath = filedialog.asksaveasfile(filetypes=(('Project File', '*.prj'),), title='Save a project file')
+        if filepath == '':
+            return
+        self.project_filepath = filepath
+        self.on_save_project()
 
     def on_save_project(self):
         if self.project_filepath == '':
@@ -120,16 +117,11 @@ class Application(tk.Tk):
         project = self.project_facade.get_cur_project_json()
         self.project_facade.project = project
 
-    def on_save_as_project(self):
-        # request file path
-        # send to on_save_project
-        pass
-
     def on_load_project(self):
         default_dir = self.settings.get_script_dir()
         prev_file = self.settings.get_sct_file()
         script = filedialog.askopenfilename(initialdir=default_dir, initialfile=prev_file,
-                                            filetypes=(('script file', '*.sct'),), title='Open a script file')
+                                            filetypes=(('Project File', '*.prj'),), title='Open a project file')
         if script == '':
             print('no file selected')
             return
@@ -139,12 +131,11 @@ class Application(tk.Tk):
         with open(os.path.join(default_dir, new_file_name), 'rb') as fh:
             sct = fh.read()
 
-        self.active_project = SCTProject()
-        self.active_project.add_script(new_file_name, SCTDecoder.decode_sct_from_file(name=script, sct=sct,
-                                                                                      inst_lib=self.base_insts))
-        self.project_facade.project = self.active_project
+        active_project = SCTProject()
+        active_project.add_script(new_file_name, SCTDecoder.decode_sct_from_file(name=script, sct=sct,
+                                                                                 inst_lib=self.base_insts))
+        self.project_facade.project = active_project
         self.gui.enable_script_view()
-        self.gui.update_script_view()
 
     def on_print_debug(self):
         print(f'\nWindow Dimensions:\nHeight: {self.winfo_height()}\nWidth: {self.winfo_width()}')
@@ -153,8 +144,8 @@ class Application(tk.Tk):
         script = filedialog.askopenfile()
         if script == '':
             return
-        script = self.sct_model.load_sct(self.base_insts, file=script)
-        self.project_facade.add_script_to_project(script)
+        name, script = self.sct_model.load_sct(self.base_insts, file=script.name)
+        self.project_facade.add_script_to_project(name, script)
 
     def set_script_dir(self):
         script_dir = filedialog.askdirectory()

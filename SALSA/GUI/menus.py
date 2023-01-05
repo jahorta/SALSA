@@ -28,9 +28,9 @@ class MainMenu(tk.Menu):
 
         self.view_menu = tk.Menu(self, tearoff=False)
         self.view_menu.add_command(label='Instruction editor', command=callbacks['view->inst'])
+        self.view_menu.add_separator()
         self.view_menu.add_command(label='Variable editor', command=callbacks['view->variable'])
         self.view_menu.add_command(label='String editor', command=callbacks['view->string'])
-        file_menu.add_command(label='Export Data', command=callbacks['file->export_data'])
         self.add_cascade(label='View', menu=self.view_menu)
 
         help_menu = tk.Menu(self, tearoff=False)
@@ -47,5 +47,5 @@ class MainMenu(tk.Menu):
     def enable_script_commands(self):
         self.view_menu.entryconfig('Variable editor', state='normal')
         self.view_menu.entryconfig('String editor', state='normal')
-        self.project_menu.entryconfig('Add SCT File', state='disabled')
+        self.project_menu.entryconfig('Add SCT File', state='normal')
 
