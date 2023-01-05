@@ -606,7 +606,7 @@ class CustomTree2(ttk.Treeview):
     def __init__(self, parent, name, callbacks=None, **kwargs):
         super().__init__(parent, **kwargs)
 
-        self.parent = parent
+        self._parent = parent
         self.name = name
         self.callbacks = callbacks if callbacks is not None else {}
         self.row_data = {}
@@ -648,6 +648,8 @@ class CustomTree2(ttk.Treeview):
 
     def bMove(self, event):
         iid = self.identify_row(event.y)
+        if iid == '':
+            return
         moveto = self.index(iid)
         parent_iid = self.parent(iid)
         for s in self.selection():
