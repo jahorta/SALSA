@@ -611,8 +611,12 @@ class CustomTree2(ttk.Treeview):
         self.callbacks = callbacks if callbacks is not None else {}
         self.row_data = {}
         self.group_types = {}
+        self.cur_selection = []
+        self.selection_order = []
 
         self.bind("<Double-ButtonPress-1>", self.open_entry)
+        self.unbind_all('<ButtonPress-1>')
+        self.unbind_all('<<TreeviewSelect>>')
         self.bind("<ButtonPress-1>", self.bDown)
         self.bind("<ButtonRelease-1>", self.bUp, add='+')
         self.bind("<B1-Motion>", self.bMove, add='+')
@@ -632,16 +636,29 @@ class CustomTree2(ttk.Treeview):
         select = [self.index(s) for s in self.selection()]
         select.append(self.index(self.identify_row(event.y)))
         select.sort()
+        self.cur_selection = []
         for i in range(select[0], select[-1] + 1, 1):
             self.selection_add(self.get_children()[i])
+            self.cur_selection.append(i)
+        self.cur_selection = list(set(self.cur_selection))
 
     def bDown(self, event):
-        if self.identify_row(event.y) not in self.selection():
+        if self.index(self.identify_row(event.y)) not in self.cur_selection:
             self.selection_set(self.identify_row(event.y))
+            self.cur_selection = [self.identify_row(event.y)]
+        else:
+            self.after(10, self.set_selection_list)
+
+    def set_selection_list(self, select_list=None):
+        select_list = select_list if select_list is not None else self.cur_selection
+        self.selection_clear()
+        for s in select_list:
+            self.selection_add(self.get_children()[int(s)])
 
     def bUp(self, event):
         if self.identify_row(event.y) in self.selection():
             self.selection_set(self.identify_row(event.y))
+            self.cur_selection = [self.identify_row(event.y)]
 
     def bUp_Shift(self, event):
         pass
@@ -649,6 +666,8 @@ class CustomTree2(ttk.Treeview):
     def bMove(self, event):
         iid = self.identify_row(event.y)
         if iid == '':
+            return
+        if iid in self.selection():
             return
         moveto = self.index(iid)
         parent_iid = self.parent(iid)
