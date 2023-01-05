@@ -104,19 +104,14 @@ class ScriptEditorController:
                 else:
                     raise ValueError(f'SEController: Unknown command in tree list sent to _add_tree_entries')
                 continue
-            kwargs = {'parent': parent_list[-1], 'index': 'end'}
+            kwargs = {'parent': parent_list[-1], 'index': 'end', 'text': ''}
             values = []
-            first = True
             for col in headers:
-                if first:
-                    kwargs['text'] = entry[col]
-                else:
-                    values.append(entry[col])
+                values.append(entry[col])
                 entry.pop(col)
             kwargs['values'] = values
             kwargs = {**kwargs, **entry}
             prev_iid = tree.insert_entry(**kwargs)
-
 
     def set_instruction_details(self, details):
         pass
