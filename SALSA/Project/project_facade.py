@@ -51,6 +51,7 @@ class SCTProjectFacade:
                         tree_list.extend(self._create_tree(group=group, key_list=[ele_key[0]], headers=headers, base=base, base_key=base_key))
                         tree_list[-1]['group_type'] = ele_key[1]
                     tree_list.append('group')
+                    ele_value = [ele_value] if not isinstance(ele_value, list) else ele_value
                     tree_list.extend(self._create_tree(group=group, key_list=ele_value, headers=headers, base=base, base_key=base_key))
                     tree_list.append('ungroup')
                 continue
