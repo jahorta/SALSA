@@ -6,13 +6,13 @@ import SALSA.GUI.widgets as w
 default_headers = {
     'script': ('Name',),
     'section': ('Name',),
-    'instruction': ('Name',)
+    'instruction': ('Name', 'Instruction ID')
 }
 
 available_headers = {
     'script': ('Name', 'Sections'),
     'section': ('Name', 'Relative Offset', 'Offset'),
-    'instruction': ('Relative Offset', 'Offset', 'InstructionID', 'Name', 'Synopsis')
+    'instruction': ('Name', 'Instruction ID', 'Relative Offset', 'Offset', 'Synopsis')
 }
 
 
@@ -37,10 +37,15 @@ class ScriptEditorView(tk.Frame):
         script_tree_label.grid(row=0, column=0, sticky=tk.W)
         self.main_frame.add(script_tree_frame, weight=1)
 
-        self.scripts_tree = w.CustomTree2(script_tree_frame, name='script', columns=self.headers['script'])
+        self.scripts_tree = w.CustomTree2(script_tree_frame, name='script', columns=self.headers['script'][1:])
         self.scripts_tree.grid(row=1, column=0, sticky='NSEW')
+        first = True
         for header in self.headers['script']:
-            self.scripts_tree.heading(header, text=header)
+            header_text = header
+            if first:
+                header = '#0'
+                first = False
+            self.scripts_tree.heading(header, text=header_text)
         script_tree_frame.rowconfigure(1, weight=1)
         script_tree_frame.columnconfigure(1, weight=1)
 
@@ -50,10 +55,15 @@ class ScriptEditorView(tk.Frame):
         section_tree_label.grid(row=0, column=0, sticky=tk.W)
         self.main_frame.add(section_tree_frame, weight=1)
 
-        self.sections_tree = w.CustomTree2(section_tree_frame, name='section', columns=self.headers['section'])
+        self.sections_tree = w.CustomTree2(section_tree_frame, name='section', columns=self.headers['section'][1:])
         self.sections_tree.grid(row=1, column=0, sticky='NSEW')
+        first = True
         for header in self.headers['section']:
-            self.sections_tree.heading(header, text=header)
+            header_text = header
+            if first:
+                header = '#0'
+                first = False
+            self.sections_tree.heading(header, text=header_text)
         section_tree_frame.rowconfigure(1, weight=1)
         section_tree_frame.columnconfigure(1, weight=1)
 
@@ -63,10 +73,15 @@ class ScriptEditorView(tk.Frame):
         inst_tree_label.grid(row=0, column=0, sticky=tk.W)
         self.main_frame.add(inst_tree_frame, weight=1)
 
-        self.insts_tree = w.CustomTree2(inst_tree_frame, name='instruction', columns=self.headers['instruction'])
+        self.insts_tree = w.CustomTree2(inst_tree_frame, name='instruction', columns=self.headers['instruction'][1:])
         self.insts_tree.grid(row=1, column=0, sticky='NSEW')
+        first = True
         for header in self.headers['instruction']:
-            self.insts_tree.heading(header, text=header)
+            header_text = header
+            if first:
+                header = '#0'
+                first = False
+            self.insts_tree.heading(header, text=header_text)
         inst_tree_frame.rowconfigure(1, weight=1)
         inst_tree_frame.columnconfigure(1, weight=1)
 

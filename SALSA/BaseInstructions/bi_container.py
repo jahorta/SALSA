@@ -56,7 +56,7 @@ class BaseInst:
     def __init__(self, inst_id, inst_values):
 
         self.locked_fields = [k for k in inst_values.keys() if k != 'Parameters']
-        self.instID = inst_id
+        self.instruction_id = inst_id
         self.name = inst_values.get('Name', f'Inst{inst_id}')
         self.description = inst_values.get('Description', '\n')
         self.location = inst_values['Location']
@@ -134,7 +134,7 @@ class BaseInst:
         return names
 
     def __repr__(self):
-        return f'INST({self.instID}: pos:{self.location}'
+        return f'INST({self.instruction_id}: pos:{self.location}'
 
 
 class BaseInstLib:
@@ -144,8 +144,8 @@ class BaseInstLib:
     def __init__(self):
         self.insts = [BaseInst(k, v) for k, v in inst_defaults.items()]
         insts_with_a_parameter = [_ for _ in self.insts if len(_.parameters) > 0]
-        self.p1_scpt = [_.instID for _ in insts_with_a_parameter if 'scpt' in _.parameters[0].type]
-        self.p1_int = [_.instID for _ in insts_with_a_parameter if 'int' in _.parameters[0].type]
+        self.p1_scpt = [_.instruction_id for _ in insts_with_a_parameter if 'scpt' in _.parameters[0].type]
+        self.p1_int = [_.instruction_id for _ in insts_with_a_parameter if 'int' in _.parameters[0].type]
 
 
 if __name__ == '__main__':
@@ -153,5 +153,5 @@ if __name__ == '__main__':
     base_insts = BaseInstLib()
     insts: List[BaseInst] = base_insts.insts
     for i in range(len(insts)):
-        if insts[i].instID != i:
-            print(f'inst at position {i} is {insts[i].instID}')
+        if insts[i].instruction_id != i:
+            print(f'inst at position {i} is {insts[i].instruction_id}')

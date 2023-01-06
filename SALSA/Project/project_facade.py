@@ -44,7 +44,7 @@ class SCTProjectFacade:
             if isinstance(key, dict):
                 for ele_key, ele_value in key.items():
                     if '-' not in ele_key:
-                        tree_list.extend(self._create_tree(group=group, key_list=ele_key, headers=headers, base=base, base_key=base_key, key_only=True))
+                        tree_list.extend(self._create_tree(group=group, key_list=[ele_key], headers=headers, base=base, base_key=base_key, key_only=True))
                         tree_list[-1]['group_type'] = 'element'
                     else:
                         ele_key = ele_key.split('-')
@@ -62,6 +62,7 @@ class SCTProjectFacade:
                 for header in headers:
                     if first:
                         values[header] = key
+                        first = False
                         continue
                     values[header] = ''
                 tree_list.append(values)

@@ -49,8 +49,8 @@ if __name__ == '__main__':
     base_insts = BaseInstLibFacade()
     insts: List[BaseInst] = base_insts.insts
     for i in range(len(insts)):
-        if insts[i].instID != i:
-            print(f'inst at position {i} is {insts[i].instID}')
+        if insts[i].instruction_id != i:
+            print(f'inst at position {i} is {insts[i].instruction_id}')
 
     with open('../../UserSettings/DefaultInstructions.json', 'r') as fh:
         file = fh.read()

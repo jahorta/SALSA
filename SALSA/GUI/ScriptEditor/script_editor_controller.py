@@ -70,9 +70,9 @@ class ScriptEditorController:
             cur_key = tree_parents[cur_key]
             if cur_key == '':
                 break
-        kwargs['headers'] = self.view.get_headers(tree_key=tree_key)
-        tree_list = self.project.get_tree(**kwargs)
         child_tree = tree_children[tree_key]
+        kwargs['headers'] = self.view.get_headers(tree_key=child_tree)
+        tree_list = self.project.get_tree(**kwargs)
         self.update_tree(child_tree, tree_list)
 
     def on_select_instruction(self, instructID):
@@ -104,10 +104,15 @@ class ScriptEditorController:
                 else:
                     raise ValueError(f'SEController: Unknown command in tree list sent to _add_tree_entries')
                 continue
-            kwargs = {'parent': parent_list[-1], 'index': 'end', 'text': ''}
+            kwargs = {'parent': parent_list[-1], 'index': 'end'}
             values = []
+            first = True
             for col in headers:
-                values.append(entry[col])
+                if first:
+                    kwargs['text'] = entry[col]
+                    first = False
+                else:
+                    values.append(entry[col])
                 entry.pop(col)
             kwargs['values'] = values
             kwargs = {**kwargs, **entry}
