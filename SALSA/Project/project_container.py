@@ -111,6 +111,7 @@ class SCTInstruction:
         self.links = []
         self.parameters = {}
         self.loop_parameters = []
+        self.condition = ''
 
     def add_error(self, value: Tuple[str, Union[int, str, bytearray]]):
         self.errors.append(value)
@@ -130,7 +131,7 @@ class SCTInstruction:
         return self.links if len(self.links) > 0 else None
 
     def __repr__(self):
-        return f'{self.instruction_id}: {", ".join([_.__repr__() for _ in self.parameters])}'
+        return f'{self.instruction_id}'
 
     # def get_param_id_by_name(self, name):
     #     param_id = None

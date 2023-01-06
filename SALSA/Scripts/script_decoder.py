@@ -10,6 +10,7 @@ from SALSA.BaseInstructions.bi_container import BaseInstLib, BaseParam
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 from SALSA.Common.byte_array_utils import word2SignedInt, is_a_number, pad_hex, applyHexMask
 from SALSA.Scripts import scpt_arithmetic_fxns as scpt_arithmetic, scpt_compare_fxns as scpt_compare
+from SALSA.Scripts import scpt_condition_changes as cond_changes
 
 ind_entry_len = 0x14
 ind_name_offset = 0x4
@@ -207,6 +208,9 @@ class SCTDecoder:
                 if try_no_refresh and not cur_inst.forced_new_frame:
                     instResult.set_skip_refresh()
                 section.add_instruction(instResult)
+
+                if instResult.instruction_id in [0, 3]:
+                    self._generate_condition(instResult)
 
                 if instResult.instruction_id == 3:
                     if sect_name not in self._switches.keys():
@@ -661,6 +665,38 @@ class SCTDecoder:
             print('Unable to find the EOF, likely the last section is a string or label')
             end_cursor = None
         return end_cursor
+
+    def _generate_condition(self, inst: SCTInstruction):
+        # if the instruction is a switch, just put the value of the choice address
+        if inst.instruction_id == 3:
+            cond = inst.parameters[0].value
+            inst.condition = cond if isinstance(cond, str) else str(cond)
+            return
+
+        # if the instruction is a jmpif, work out a shorthand of the condition
+        condition, cond_type = self._get_subconditions(inst.parameters[0].value)
+        inst.condition = condition
+
+    def _get_subconditions(self, cond_dict):
+        result_str = ''
+        result_type = 'float'
+        if not isinstance(cond_dict, dict):
+            return cond_dict if isinstance(cond_dict, str) else str(cond_dict), result_type
+
+        for key, value in cond_dict.items():
+            if key in cond_changes.scpt_types.keys():
+                result_type = cond_changes.scpt_types[key]
+            result_1, result_type_1 = self._get_subconditions(value['1'])
+            result_2, result_type_2 = self._get_subconditions(value['2'])
+            if key in cond_changes.scpt_log_changes.keys():
+                param_key = f'{result_type_1}-{result_type_2}'
+                if param_key in cond_changes.scpt_log_changes[key]:
+                    key = cond_changes.scpt_log_changes[key][param_key]
+            temp_result = key.replace('(1)', result_1)
+            result_str = temp_result.replace('(2)', result_2)
+
+
+        return result_str, result_type
 
     def test_for_string(self):
         cursor = self._cursor
@@ -1367,7 +1403,6 @@ class SCTDecoder:
 
         for i in changes['jmps']:
             self._jmp_if_falses[changes['sect_name']].append(i + offset)
-
 
 
 if __name__ == '__main__':
