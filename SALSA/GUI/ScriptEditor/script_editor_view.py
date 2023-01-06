@@ -41,7 +41,6 @@ class ScriptEditorView(tk.Frame):
         self.scripts_tree.grid(row=1, column=0, sticky='NSEW')
         for header in self.headers['script']:
             self.scripts_tree.heading(header, text=header)
-        self.scripts_tree['show'] = 'headings'
         script_tree_frame.rowconfigure(1, weight=1)
         script_tree_frame.columnconfigure(1, weight=1)
 
@@ -55,7 +54,6 @@ class ScriptEditorView(tk.Frame):
         self.sections_tree.grid(row=1, column=0, sticky='NSEW')
         for header in self.headers['section']:
             self.sections_tree.heading(header, text=header)
-        self.sections_tree['show'] = 'headings'
         section_tree_frame.rowconfigure(1, weight=1)
         section_tree_frame.columnconfigure(1, weight=1)
 
@@ -69,7 +67,6 @@ class ScriptEditorView(tk.Frame):
         self.insts_tree.grid(row=1, column=0, sticky='NSEW')
         for header in self.headers['instruction']:
             self.insts_tree.heading(header, text=header)
-        self.insts_tree['show'] = 'headings'
         inst_tree_frame.rowconfigure(1, weight=1)
         inst_tree_frame.columnconfigure(1, weight=1)
 
