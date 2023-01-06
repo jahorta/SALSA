@@ -615,13 +615,12 @@ class CustomTree2(ttk.Treeview):
         self.selection_order = []
 
         self.bind("<Double-ButtonPress-1>", self.open_entry)
-        self.unbind_all('<ButtonPress-1>')
-        self.unbind_all('<<TreeviewSelect>>')
         self.bind("<ButtonPress-1>", self.bDown)
         self.bind("<ButtonRelease-1>", self.bUp, add='+')
-        self.bind("<B1-Motion>", self.bMove, add='+')
-        self.bind("<Shift-ButtonPress-1>", self.bDown_Shift, add='+')
-        self.bind("<Shift-ButtonRelease-1>", self.bUp_Shift, add='+')
+        self.bind("<Control-ButtonPress-1>", self.bDown_Ctrl)
+        self.bind('<Control-ButtonRelease-1>', self.bUp_Ctrl)
+        # self.bind("<Shift-ButtonPress-1>", self.bDown_Shift, add='+')
+        # self.bind("<Shift-ButtonRelease-1>", self.bUp_Shift, add='+')
 
     def add_callback(self, key, callback):
         self.callbacks[key] = callback
@@ -632,15 +631,19 @@ class CustomTree2(ttk.Treeview):
         if row_data is not None:
             self.callbacks['select'](self.name, row_data)
 
-    def bDown_Shift(self, event):
-        select = [self.index(s) for s in self.selection()]
-        select.append(self.index(self.identify_row(event.y)))
-        select.sort()
-        self.cur_selection = []
-        for i in range(select[0], select[-1] + 1, 1):
-            self.selection_add(self.get_children()[i])
-            self.cur_selection.append(i)
-        self.cur_selection = list(set(self.cur_selection))
+    # For multiple selection, to fix later along with the move function
+    # def bDown_Shift(self, event):
+    #     select = [self.index(s) for s in self.selection()]
+    #     select.append(self.index(self.identify_row(event.y)))
+    #     select.sort()
+    #     self.cur_selection = []
+    #     for i in range(select[0], select[-1] + 1, 1):
+    #         self.selection_add(self.get_children()[i])
+    #         self.cur_selection.append(i)
+    #     self.cur_selection = list(set(self.cur_selection))
+    #
+    # def bUp_Shift(self, event):
+    #     pass
 
     def bDown(self, event):
         if self.index(self.identify_row(event.y)) not in self.cur_selection:
@@ -656,12 +659,10 @@ class CustomTree2(ttk.Treeview):
             self.selection_add(self.get_children()[int(s)])
 
     def bUp(self, event):
+        self.unbind("<B1-Motion")
         if self.identify_row(event.y) in self.selection():
             self.selection_set(self.identify_row(event.y))
             self.cur_selection = [self.identify_row(event.y)]
-
-    def bUp_Shift(self, event):
-        pass
 
     def bMove(self, event):
         iid = self.identify_row(event.y)
@@ -673,6 +674,12 @@ class CustomTree2(ttk.Treeview):
         parent_iid = self.parent(iid)
         for s in self.selection():
             self.move(s, parent_iid, moveto)
+
+    def bDown_Ctrl(self):
+        self.bind("<B1-Motion>", self.bMove, add='+')
+
+    def bUp_Ctrl(self):
+        self.unbind("<B1-Motion")
 
     def insert_entry(self, parent, text, values, group_type=None, row_data=None, **kwargs):
         iid = str(len(self.row_data))
