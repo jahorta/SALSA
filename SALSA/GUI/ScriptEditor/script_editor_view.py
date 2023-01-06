@@ -6,13 +6,13 @@ import SALSA.GUI.widgets as w
 default_headers = {
     'script': ('Name',),
     'section': ('Name',),
-    'instruction': ('Name', 'Instruction ID')
+    'instruction': ('Name', 'Condition', 'Instruction ID')
 }
 
 available_headers = {
     'script': ('Name', 'Sections'),
     'section': ('Name', 'Relative Offset', 'Offset'),
-    'instruction': ('Name', 'Instruction ID', 'Relative Offset', 'Offset', 'Synopsis')
+    'instruction': ('Name', 'Condition', 'Instruction ID', 'Relative Offset', 'Offset', 'Synopsis')
 }
 
 
