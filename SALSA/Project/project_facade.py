@@ -2,8 +2,9 @@ import os
 from typing import Union, Tuple
 
 from Project.jsonize_project import jsonize_project
-from Project.project_container import SCTProject
+from Project.project_container import SCTProject, SCTSection
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
+from SALSA.Settings.settings import settings
 
 
 class SCTProjectFacade:
@@ -14,6 +15,9 @@ class SCTProjectFacade:
         self.project = None
         self.callbacks = {}
         self.base_insts = base_insts
+        self.set_key = 'Project'
+        if self.set_key not in settings.keys():
+            settings[self.set_key] = {}
 
     def load_project(self, prj_dict):
         self.project = SCTProject.from_dict(prj_dict)
@@ -69,6 +73,9 @@ class SCTProjectFacade:
 
             else:
                 element = group[key]
+                if isinstance(element, SCTSection):
+                    if element.type == 'String':
+                        continue
                 element_dict = element.__dict__
                 values = {'row_data': key}
                 for header in headers:

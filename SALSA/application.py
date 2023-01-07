@@ -11,7 +11,7 @@ from GUI.gui_controller import GUIController
 from BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.GUI import menus
 from Project.project_container import SCTProject
-from SALSA.Settings.settings import Settings
+from SALSA.Settings.settings import Settings, settings
 from Scripts.script_decoder import SCTDecoder
 from Project.project_facade import SCTProjectFacade
 
@@ -114,27 +114,25 @@ class Application(tk.Tk):
         if self.project_filepath == '':
             self.on_save_as_project()
             return
-        project = self.project_facade.get_cur_project_json()
-        self.project_facade.project = project
+        project_dict = self.project_facade.get_cur_project_json()
+        self.proj_model.save_project(project_dict, indent=True)
 
     def on_load_project(self):
-        default_dir = self.settings.get_script_dir()
-        prev_file = self.settings.get_sct_file()
-        script = filedialog.askopenfilename(initialdir=default_dir, initialfile=prev_file,
-                                            filetypes=(('Project File', '*.prj'),), title='Open a project file')
-        if script == '':
+        default_dir = self.proj_model.get_project_directory()
+
+        kwargs = {'filetypes': (('Project File', '*.prj'),), 'title': 'Open a project file'}
+        if default_dir is not None:
+            kwargs['initialdir'] = default_dir
+        project_file = filedialog.askopenfilename(**kwargs)
+        if project_file == '':
             print('no file selected')
             return
 
-        new_file_name = os.path.basename(script)
-        self.settings.set_sct_file(new_file_name)
+        new_file_name = os.path.basename(project_file)
+        self.proj_model.add_recent_file(project_file)
         with open(os.path.join(default_dir, new_file_name), 'rb') as fh:
-            sct = fh.read()
-
-        active_project = SCTProject()
-        active_project.add_script(new_file_name, SCTDecoder.decode_sct_from_file(name=script, sct=sct,
-                                                                                 inst_lib=self.base_insts))
-        self.project_facade.project = active_project
+            prj_dict = fh.read()
+        self.project_facade.load_project(prj_dict)
         self.gui.enable_script_view()
 
     def on_print_debug(self):
