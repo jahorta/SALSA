@@ -659,7 +659,7 @@ class CustomTree2(ttk.Treeview):
             self.selection_add(self.get_children()[int(s)])
 
     def bUp(self, event):
-        self.unbind("<B1-Motion")
+        self.unbind("<B1-Motion>")
         if self.identify_row(event.y) in self.selection():
             self.selection_set(self.identify_row(event.y))
             self.cur_selection = [self.identify_row(event.y)]
@@ -675,11 +675,14 @@ class CustomTree2(ttk.Treeview):
         for s in self.selection():
             self.move(s, parent_iid, moveto)
 
-    def bDown_Ctrl(self):
+    def bDown_Ctrl(self, e):
         self.bind("<B1-Motion>", self.bMove, add='+')
+        if self.identify_row(e.y) != '':
+            self.cur_selection = [self.identify_row(e.y)]
+            self.after(10, self.set_selection_list)
 
-    def bUp_Ctrl(self):
-        self.unbind("<B1-Motion")
+    def bUp_Ctrl(self, e):
+        self.unbind("<B1-Motion>")
 
     def insert_entry(self, parent, text, values, group_type=None, row_data=None, **kwargs):
         iid = str(len(self.row_data))
