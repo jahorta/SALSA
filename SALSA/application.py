@@ -96,21 +96,20 @@ class Application(tk.Tk):
         project_dict = self.project_facade.get_cur_project_json()
         self.proj_model.save_project(project_dict, indent=True)
 
-    def on_load_project(self):
-        default_dir = self.proj_model.get_project_directory()
+    def on_load_project(self, filepath=''):
+        if filepath == '':
+            default_dir = self.proj_model.get_project_directory()
+            kwargs = {'filetypes': (('Project File', '*.prj'),), 'title': 'Open a project file'}
+            if default_dir is not None:
+                kwargs['initialdir'] = default_dir
+            filepath = filedialog.askopenfile(**kwargs)
+            if filepath == '':
+                print('no file selected')
+                return
 
-        kwargs = {'filetypes': (('Project File', '*.prj'),), 'title': 'Open a project file'}
-        if default_dir is not None:
-            kwargs['initialdir'] = default_dir
-        project_file = filedialog.askopenfilename(**kwargs)
-        if project_file == '':
-            print('no file selected')
-            return
-
-        new_file_name = os.path.basename(project_file)
-        self.proj_model.add_recent_file(project_file)
-        with open(os.path.join(default_dir, new_file_name), 'rb') as fh:
-            prj_dict = fh.read()
+        self.proj_model.add_recent_file(filepath)
+        with open(filepath, 'r') as prj:
+            prj_dict = prj.read()
         self.project_facade.load_project(prj_dict)
         self.gui.enable_script_view()
 
