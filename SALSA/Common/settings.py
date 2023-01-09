@@ -4,10 +4,7 @@ import configparser
 
 class Settings(configparser.ConfigParser):
     defaults = {
-        'DEFAULT': {
-            'previous_prj_file': '',
-            'script_directory': './scripts/'
-        }
+        'DEFAULT': {}
     }
 
     def __init__(self):
