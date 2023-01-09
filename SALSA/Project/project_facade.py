@@ -1,6 +1,6 @@
 from typing import Union, Tuple
 
-from Project.jsonize_project import jsonize_project
+from Project.dictize_project import dictize_project
 from Project.project_container import SCTProject, SCTSection
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from Common.settings import settings
@@ -18,11 +18,22 @@ class SCTProjectFacade:
         if self.set_key not in settings.keys():
             settings[self.set_key] = {}
 
-    def load_project(self, prj_dict):
-        self.project = SCTProject.from_dict(prj_dict)
+    def load_project(self, prj, pickled=False):
+        if pickled:
+            self.project = prj
+            return
+        self.project = SCTProject.from_dict(prj)
 
     def create_new_project(self):
         self.project = SCTProject()
+
+    def set_filepath(self, filepath):
+        if filepath == '' or filepath is None:
+            return
+        self.project.filepath = filepath
+
+    def get_filepath(self):
+        return self.project.filepath
 
     def get_tree(self, headers: Tuple[str], script=None, section=None, style='grouped'):
         if self.project is None:
@@ -115,8 +126,8 @@ class SCTProjectFacade:
         else:
             pass
 
-    def get_cur_project_json(self):
-        project = jsonize_project(self.project)
+    def get_cur_project_dict(self):
+        project = dictize_project(self.project)
         return project
 
     def add_script_to_project(self, script_name, script):

@@ -13,20 +13,20 @@ class MainMenu(tk.Menu):
             self.recent_files = ['No Recent Files']
 
         self.parent = parent
-        file_menu = tk.Menu(self, tearoff=False)
-        file_menu.add_command(label='New Project', command=callbacks['file->new_prj'])
-        file_menu.add_command(label='Save Project', command=callbacks['file->save_prj'])
-        file_menu.add_command(label='Load Project', command=callbacks['file->load_prj'])
+        self.file_menu = tk.Menu(self, tearoff=False)
+        self.file_menu.add_command(label='New Project', command=callbacks['file->new_prj'])
+        self.file_menu.add_command(label='Save Project', command=callbacks['file->save_prj'])
+        self.file_menu.add_command(label='Load Project', command=callbacks['file->load_prj'])
 
-        self.recent_menu = tk.Menu(file_menu, tearoff=False)
+        self.recent_menu = tk.Menu(self.file_menu, tearoff=False)
         for file in self.recent_files:
             self.recent_menu.add_command(label=file, command=lambda x=file: self.load_recent_project(x))
         if self.no_recents:
             self.recent_menu.entryconfig('No Recent Files', state='disabled')
-        file_menu.add_cascade(label='Load Recent File', menu=self.recent_menu)
+        self.file_menu.add_cascade(label='Load Recent File', menu=self.recent_menu)
 
-        file_menu.add_command(label='Quit', command=callbacks['file->quit'])
-        self.add_cascade(label='File', menu=file_menu)
+        self.file_menu.add_command(label='Quit', command=callbacks['file->quit'])
+        self.add_cascade(label='File', menu=self.file_menu)
 
         self.project_menu = tk.Menu(self, tearoff=False)
         self.project_menu.add_command(label='Add SCT File', command=callbacks['prj->add_script'])
@@ -52,24 +52,25 @@ class MainMenu(tk.Menu):
         self.view_menu.entryconfig('Variable editor', state='disabled')
         self.view_menu.entryconfig('String editor', state='disabled')
         self.project_menu.entryconfig('Add SCT File', state='disabled')
+        self.file_menu.entryconfig('Save Project', state='disabled')
 
     def enable_script_commands(self):
         self.view_menu.entryconfig('Variable editor', state='normal')
         self.view_menu.entryconfig('String editor', state='normal')
         self.project_menu.entryconfig('Add SCT File', state='normal')
+        self.file_menu.entryconfig('Save Project', state='normal')
 
     def load_recent_project(self, file):
         pass
 
     def update_recents(self, recent_files):
-        for file in self.recent_files:
-            self.recent_menu.deletecommand(file)
-
+        self.no_recents = False
         self.recent_files = recent_files
         if len(self.recent_files) == 0:
             self.no_recents = True
             self.recent_files = ['No Recent Files']
 
+        self.recent_menu = tk.Menu(self.file_menu, tearoff=False)
         for file in self.recent_files:
             self.recent_menu.add_command(label=file, command=lambda x=file: self.load_recent_project(x))
         if self.no_recents:

@@ -1,56 +1,66 @@
 import json
 import os.path
+import pickle
 
 from Common.settings import settings
 
 
 class ProjectModel:
 
+    log_key = 'PrjFileModel'
+
     def __init__(self):
         self.callbacks = {}
-        self.set_key = 'ProjectModel'
-        if self.set_key not in settings.keys():
-            settings[self.set_key] = {}
-        self.filepath = ""
+        if self.log_key not in settings.keys():
+            settings[self.log_key] = {}
         self.recent_files = []
         self.max_recents = 10
         self._load_recent_filelist()
 
-    def load_project(self, filepath=None):
-        if filepath is not None:
-            self.filepath = filepath
-        if self.filepath == '':
+    def load_project(self, filepath, pickled=False):
+        if filepath == '' or filepath is None:
             print('Unable to save file, no filepath')
             return
-        if not os.path.exists(self.filepath):
+        if not os.path.exists(filepath):
             print('File does not exist')
             return
 
-        settings[self.set_key]['directory'] = os.path.dirname(filepath)
-        with open(self.filepath, 'r') as fh:
-            proj_dict = json.loads(fh.read())
+        settings[self.log_key]['directory'] = os.path.dirname(filepath)
+        if pickled:
+            with open(filepath, 'rb') as fh:
+                proj = pickle.load(fh)
+
+        else:
+            with open(filepath, 'r') as fh:
+                proj = json.loads(fh.read())
 
         self.add_recent_file(filepath=filepath)
-        return proj_dict
+        return proj
 
-    def save_project(self, proj_dict, filepath=None, indent=False):
-        if filepath is not None:
-            self.filepath = filepath
+    def save_project(self, proj, filepath, indent=False, pickled=False):
+        if filepath is None or filepath == '':
+            print('No file path for saving')
+            return
 
-        with open(self.filepath, 'w') as fh:
+        if pickled:
+            with open(filepath, 'wb') as file:
+                pickle.dump(proj, file)
+            return
+
+        with open(filepath, 'w') as fh:
             kwargs = {}
             if indent:
                 kwargs['indent'] = 2
-            fh.write(json.dumps(proj_dict, **kwargs))
+            fh.write(json.dumps(proj, **kwargs))
 
     def get_project_directory(self):
-        return settings[self.set_key].get('directory', None)
+        return settings[self.log_key].get('directory', None)
 
     def add_recent_file(self, filepath):
         if filepath in self.recent_files:
             file_index = self.recent_files.index(filepath)
             self.recent_files.pop(file_index)
-        self.recent_files.insert(filepath, 0)
+        self.recent_files.insert(0, filepath)
         if len(self.recent_files) > self.max_recents:
             self.recent_files.pop()
         self._save_recent_filelist()
@@ -60,20 +70,20 @@ class ProjectModel:
         for i in range(0, self.max_recents):
             key = f'recent_file_{i}'
             if i >= len(self.recent_files):
-                if key in settings[self.set_key].keys():
-                    settings[self.set_key].pop(key)
+                if key in settings[self.log_key].keys():
+                    settings[self.log_key].pop(key)
                 continue
             cur_path = self.recent_files[i]
-            settings[self.set_key][key] = cur_path
+            settings[self.log_key][key] = cur_path
 
     def _load_recent_filelist(self):
         self.recent_files = []
         update_settings_recent = False
         for i in range(0, self.max_recents):
             key = f'recent_file_{i}'
-            if key not in settings[self.set_key].keys():
+            if key not in settings[self.log_key].keys():
                 break
-            filepath = settings[self.set_key].get(key, None)
+            filepath = settings[self.log_key].get(key, None)
             if filepath is None:
                 break
             if not os.path.exists(filepath):

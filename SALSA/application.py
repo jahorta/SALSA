@@ -1,3 +1,4 @@
+import json
 import threading
 import tkinter as tk
 from tkinter import filedialog
@@ -83,49 +84,55 @@ class Application(tk.Tk):
         self.gui.enable_script_view()
 
     def on_save_as_project(self):
-        filepath = filedialog.asksaveasfile(filetypes=(('Project File', '*.prj'),), title='Save a project file')
-        if filepath == '':
+        filepath = filedialog.asksaveasfilename(filetypes=(('Project File', '*.prj'),), title='Save a project file')
+        if filepath == '' or filepath is None:
             return
-        self.project_filepath = filepath
+        if filepath[-4:] != '.prj':
+            filepath += '.prj'
+        self.project_facade.set_filepath(filepath=filepath)
         self.on_save_project()
 
     def on_save_project(self):
-        if self.project_filepath == '':
+        filepath = self.project_facade.get_filepath()
+        if filepath == '' or filepath is None:
             self.on_save_as_project()
             return
-        project_dict = self.project_facade.get_cur_project_json()
-        self.proj_model.save_project(project_dict, indent=True)
+        project_dict = self.project_facade.project
+        self.proj_model.save_project(proj=project_dict, filepath=filepath, indent=True, pickled=True)
+        self.proj_model.add_recent_file(filepath=filepath)
 
     def on_load_project(self, filepath=''):
-        if filepath == '':
+        if filepath == '' or filepath is None:
             default_dir = self.proj_model.get_project_directory()
             kwargs = {'filetypes': (('Project File', '*.prj'),), 'title': 'Open a project file'}
             if default_dir is not None:
                 kwargs['initialdir'] = default_dir
-            filepath = filedialog.askopenfile(**kwargs)
-            if filepath == '':
+            filepath = filedialog.askopenfilename(**kwargs)
+            if filepath == '' or filepath is None:
                 print('no file selected')
                 return
 
-        self.proj_model.add_recent_file(filepath)
-        with open(filepath, 'r') as prj:
-            prj_dict = prj.read()
-        self.project_facade.load_project(prj_dict)
+        prj = self.proj_model.load_project(filepath=filepath, pickled=True)
+        self.project_facade.load_project(prj, pickled=True)
         self.gui.enable_script_view()
 
     def on_load_recent_project(self, index):
         self.on_load_project(self.proj_model.get_recent_filepath(index=index))
 
-
     def on_print_debug(self):
         print(f'\nWindow Dimensions:\nHeight: {self.winfo_height()}\nWidth: {self.winfo_width()}')
 
     def add_script(self):
-        script = filedialog.askopenfile()
-        if script == '':
+        kwargs = {'filetypes': (('Script File', '*.sct'),), 'title': 'Select script(s) to add to the current project'}
+        base_dir = self.sct_model.get_default_directory()
+        if base_dir != '':
+            kwargs['initialdir'] = base_dir
+        script_paths = filedialog.askopenfilenames(**kwargs)
+        if script_paths == '' or script_paths is None:
             return
-        name, script = self.sct_model.load_sct(self.base_insts, file=script.name)
-        self.project_facade.add_script_to_project(name, script)
+        for script in script_paths:
+            name, script = self.sct_model.load_sct(self.base_insts, file=script)
+            self.project_facade.add_script_to_project(name, script)
 
     def set_script_dir(self):
         script_dir = filedialog.askdirectory()

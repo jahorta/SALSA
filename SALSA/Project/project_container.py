@@ -295,11 +295,13 @@ class SCTScript:
 
     @classmethod
     def from_dict(cls, script_dict):
-        script = cls(name=script_dict['name'], index=script_dict['index'], header=script_dict['header'])
+        header = script_dict['header']
+        if isinstance(header, dict):
+            header = bytearray.fromhex(header['data'])
+        script = cls(name=script_dict['name'], index=script_dict['index'], header=header)
         for link in script_dict['links']:
             script.links.append(SCTLink(**link))
             script.links[-1].set_id(link['ID'])
-
         for key, value in script_dict['sections'].items():
             script.sections[key] = SCTSection.from_dict(value, script.links)
         script.section_groups = script_dict['section_groups']
@@ -327,6 +329,7 @@ class SCTProject:
     def __init__(self):
         self.scripts = {}
         self.file_name = 'Untitled.prj'
+        self.filepath = None
 
     def add_script(self, filename: str, script: SCTScript):
         self.scripts[filename] = script
@@ -334,7 +337,10 @@ class SCTProject:
     @classmethod
     def from_dict(cls, proj_dict):
         project = cls()
-        for key, script in proj_dict['scripts'].items():
+        scripts = proj_dict['scripts']
+        for key, script in scripts.items():
             project.scripts[key] = SCTScript.from_dict(script)
         project.filename = proj_dict['file_name']
+        project.filepath = proj_dict['file_path']
+
         return project
