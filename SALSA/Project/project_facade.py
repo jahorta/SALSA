@@ -1,4 +1,3 @@
-import os
 from typing import Union, Tuple
 
 from Project.jsonize_project import jsonize_project

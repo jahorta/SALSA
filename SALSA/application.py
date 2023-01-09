@@ -1,4 +1,3 @@
-import os
 import threading
 import tkinter as tk
 from tkinter import filedialog
@@ -10,9 +9,6 @@ from GUI.ScriptEditor.script_editor_view import ScriptEditorView
 from GUI.gui_controller import GUIController
 from BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.GUI import menus
-from Project.project_container import SCTProject
-from SALSA.Settings.settings import Settings, settings
-from Scripts.script_decoder import SCTDecoder
 from Project.project_facade import SCTProjectFacade
 
 
