@@ -25,28 +25,6 @@ class Application(tk.Tk):
         # Load base instructions
         self.base_insts = BaseInstLibFacade()
 
-        # Define callbacks for the different views
-        # self.instruction_callbacks = {
-        #     'on_inst_lib_save': self.save_inst_lib,
-        #     'on_select_instruction': self.on_select_instruction,
-        #     'on_instruction_commit': self.on_instruction_commit,
-        #     'on_select_parameter': self.on_select_parameter,
-        #     'on_parameter_num_change': self.on_param_num_change
-        # }
-
-        # self.script_callbacks = {
-        #     'on_save_project': self.save_project,
-        # }
-
-        #
-        # self.exporter_callbacks = {
-        #     'on_export': self.on_data_export,
-        #     'on_close': self.about_window_close,
-        #     'on_write_to_csv': self.export_as_csv
-        # }
-
-        # Initialize popup window variables
-
         # Setup window parameters
         self.title(self.title_text)
         self.resizable(width=True, height=True)
