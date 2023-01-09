@@ -41,6 +41,11 @@ class Application(tk.Tk):
         self.gui = GUIController(parent=self, scpt_editor_view=self.script_edit_view,
                                  project_facade=self.project_facade, inst_lib_facade=self.base_insts)
 
+        # Create Models
+        self.proj_model = ProjectModel()
+        self.sct_model = SCTModel()
+        recent_files = self.proj_model.get_recent_filenames()
+
         self.menu_callbacks = {
             'file->new_prj': self.on_new_project,
             'file->save_prj': self.on_save_project,
@@ -68,10 +73,6 @@ class Application(tk.Tk):
         })
 
         self.gui.disable_script_view()
-
-        # Create Models
-        self.proj_model = ProjectModel()
-        self.sct_model = SCTModel()
 
     def on_new_project(self):
         self.project_facade.create_new_project()
