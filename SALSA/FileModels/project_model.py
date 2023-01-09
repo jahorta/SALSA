@@ -1,7 +1,7 @@
 import json
 import os.path
 
-from SALSA.Settings.settings import settings
+from Common.settings import settings
 
 
 class ProjectModel:

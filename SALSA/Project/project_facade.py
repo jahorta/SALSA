@@ -4,7 +4,7 @@ from typing import Union, Tuple
 from Project.jsonize_project import jsonize_project
 from Project.project_container import SCTProject, SCTSection
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
-from SALSA.Settings.settings import settings
+from Common.settings import settings
 
 
 class SCTProjectFacade:
