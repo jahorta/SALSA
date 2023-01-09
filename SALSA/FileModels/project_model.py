@@ -7,6 +7,7 @@ from Common.settings import settings
 class ProjectModel:
 
     def __init__(self):
+        self.callbacks = []
         self.set_key = 'ProjectModel'
         if self.set_key not in settings.keys():
             settings[self.set_key] = {}
@@ -53,6 +54,7 @@ class ProjectModel:
         if len(self.recent_files) > self.max_recents:
             self.recent_files.pop()
         self._save_recent_filelist()
+        self.callbacks['menu->update_recents'](self.get_recent_filenames())
 
     def _save_recent_filelist(self):
         for i in range(0, self.max_recents):
@@ -82,6 +84,13 @@ class ProjectModel:
         if update_settings_recent:
             self._save_recent_filelist()
 
-    def load_recent(self, index):
-        return self.load_project(self.recent_files[index])
+    def get_recent_filepath(self, index):
+        if index >= len(self.recent_files):
+            raise IndexError(f'Recent File number {index} outside of recent file list: max entry is {len(self.recent_files)-1}')
+        return self.recent_files[index]
 
+    def get_recent_filenames(self):
+        return [os.path.basename(_) for _ in self.recent_files]
+
+    def add_callback(self, name, callback):
+        self.callbacks[name] = callback

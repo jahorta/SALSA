@@ -51,6 +51,7 @@ class Application(tk.Tk):
             'file->save_prj': self.on_save_project,
             'file->save_as_prj': self.on_save_as_project,
             'file->load_prj': self.on_load_project,
+            'file->load_recent': self.on_load_recent_project,
             'file->settings': self.gui.show_settings,
             'file->quit': self.on_quit,
             'prj->add_script': self.add_script,
@@ -63,8 +64,11 @@ class Application(tk.Tk):
         }
 
         # Implement Menu
-        self.menu = menus.MainMenu(self, self.menu_callbacks)
+        self.menu = menus.MainMenu(parent=self, callbacks=self.menu_callbacks, recent_files=recent_files)
         self.config(menu=self.menu)
+
+        # Connect recent files in proj_model to menu
+        self.proj_model.add_callback('menu->update_recents', self.menu.update_recents)
 
         # Set menu options available only when in script mode
         self.gui.add_callbacks({
@@ -109,6 +113,10 @@ class Application(tk.Tk):
             prj_dict = fh.read()
         self.project_facade.load_project(prj_dict)
         self.gui.enable_script_view()
+
+    def on_load_recent_project(self, index):
+        self.on_load_project(self.proj_model.get_recent_filepath(index=index))
+
 
     def on_print_debug(self):
         print(f'\nWindow Dimensions:\nHeight: {self.winfo_height()}\nWidth: {self.winfo_width()}')
