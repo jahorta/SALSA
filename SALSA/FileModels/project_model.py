@@ -7,7 +7,7 @@ from Common.settings import settings
 class ProjectModel:
 
     def __init__(self):
-        self.callbacks = []
+        self.callbacks = {}
         self.set_key = 'ProjectModel'
         if self.set_key not in settings.keys():
             settings[self.set_key] = {}
