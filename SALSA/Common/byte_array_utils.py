@@ -108,19 +108,11 @@ def word2Float(s: str):
     return f
 
 
-def word2SignedInt(val, swap_endian=False):
+def word2SignedInt(val):
     if isinstance(val, bytearray) or isinstance(val, bytes):
         val = '0x' + val.hex()
     if val[:2] != '0x':
         val = '0x'+val
-    if swap_endian:
-        val = val[2:]
-        if len(val) % 2 != 0:
-            val = '0'+val
-        bytes_ = []
-        for i in range(0, len(val), 2):
-            bytes_.append(val[i:i+2])
-        val = '0x' + ''.join(reversed(bytes_))
 
     uintval = int(val, 16)
     bits = 4 * (len(val) - 2)
