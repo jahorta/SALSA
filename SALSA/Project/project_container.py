@@ -192,6 +192,8 @@ class SCTSection:
         self.garbage = {}
         self.string = ''
         self.jump_loops = []
+        self.internal_sections_inst = {}
+        self.internal_sections_curs = {}
 
     def add_string(self, pos: int, string: str):
         self.strings[pos] = string
@@ -234,7 +236,7 @@ class SCTSection:
     def get_inst_list(self, style):
         return self.instructions_ids_grouped if style == 'grouped' else self.instruction_ids_ungrouped
 
-    def get_instruction_by_position(self, pos=-1):
+    def get_instruction_by_index(self, pos=-1):
         return self.instructions[self.instruction_ids_ungrouped[pos]]
 
 
@@ -259,6 +261,7 @@ class SCTScript:
 
     def __init__(self, name: str, index: Union[None, Dict[str, Tuple[int, int]]] = None,
                  header: Union[None, bytearray] = None):
+        self.folded_sections = {}
         self.name = name
         self.index = {k: v[0] for k, v in index.items()} if index is not None else {}
         self.header = header if header is not None else bytearray(b'/x07/xd2/x00/x06/x00/x0e/x00/x00')
