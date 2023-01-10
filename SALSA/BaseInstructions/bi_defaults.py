@@ -153,7 +153,7 @@ inst_defaults = {
             0: {
                 "Name": "Offset",
                 "Type": "int",
-                "Mask": 0x0000ffff,
+                "Mask": 0xfffffffc,
                 "Signed": True,
             }
         }
