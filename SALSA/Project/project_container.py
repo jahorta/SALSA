@@ -7,8 +7,8 @@ from typing import List, Union, Dict, Tuple
 @dataclass
 class SCTLink:
     type: str
-    trace: List[Union[int, str]]
     origin: int
+    origin_trace: List[Union[int, str]]
     target: int
     target_trace: Union[List[Union[int, str]], None] = None
     ID: int = dc_field(default_factory=lambda counter=count(): next(counter))
@@ -17,7 +17,7 @@ class SCTLink:
         self.ID = _id
 
     def __repr__(self):
-        return f'Link: {self.ID} - {self.trace[0]}:{self.trace[1]}:{self.trace[2]}' \
+        return f'Link: {self.ID} - {self.origin_trace[0]}:{self.origin_trace[1]}:{self.origin_trace[2]}' \
                f'\n\torigin: {self.origin}, target: {self.target}'
 
 
