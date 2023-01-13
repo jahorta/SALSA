@@ -1,11 +1,7 @@
 import os
-import re
 
 from SALSA.Common.settings import settings
 from SALSA.AKLZ.aklz import Aklz
-from SALSA.Common.byte_array_utils import getString, getWord, deriveStringLength, word2Float, applyHexMask, padded_hex, \
-    word2SignedInt, toInt
-from SALSA.Common.constants import FieldTypes as FT
 from SALSA.Scripts.script_decoder import SCTDecoder
 
 
