@@ -80,6 +80,19 @@ class BaseInst:
         self.loop_iter = inst_values.get('Loop Iterations', None)
         self.loop_cond = inst_values.get('Loop Break Condition', None)
 
+        self.params_before = list(self.parameters.keys()) if self.loop is None else []
+        self.params_after = []
+        hit_loop = False
+        if self.loop is not None:
+            for p in list(self.parameters.keys()):
+                if p in self.loop:
+                    hit_loop = True
+                    continue
+                if hit_loop:
+                    self.params_after.append(p)
+                else:
+                    self.params_before.append(p)
+
         self.warning = inst_values.get('Warning', None)
 
     def get_all(self):
