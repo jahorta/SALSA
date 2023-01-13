@@ -34,7 +34,6 @@ class ProjectModel:
             with open(filepath, 'r') as fh:
                 proj = json.loads(fh.read())
 
-        self.add_recent_file(filepath=filepath)
         return proj
 
     def save_project(self, proj, filepath, indent=False, pickled=False):
@@ -45,13 +44,15 @@ class ProjectModel:
         if pickled:
             with open(filepath, 'wb') as file:
                 pickle.dump(proj, file)
-            return
 
-        with open(filepath, 'w') as fh:
-            kwargs = {}
-            if indent:
-                kwargs['indent'] = 2
-            fh.write(json.dumps(proj, **kwargs))
+        else:
+            with open(filepath, 'w') as fh:
+                kwargs = {}
+                if indent:
+                    kwargs['indent'] = 2
+                fh.write(json.dumps(proj, **kwargs))
+
+        print(f'{self.log_key}: Project Saved: {filepath}')
 
     def get_project_directory(self):
         return settings[self.log_key].get('directory', None)
