@@ -330,7 +330,9 @@ class SCTScript:
         return script
 
     def get_sect_list(self, style):
-        return self.grouped_sections if style == 'grouped' else list(self.sections.keys())
+        if style == 'grouped':
+            return self.grouped_sections
+        return [section.name for section in self.sections.values() if section.type != 'String']
 
 
 class SCTProject:
