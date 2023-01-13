@@ -93,7 +93,7 @@ def deriveStringLength(file: bytearray, pos: int, terminators=None):
     return lengths
 
 
-def word2Float(s: str):
+def hex2Float(s: str):
     if not isinstance(s, str):
         print("unable to convert {0} to float - Not a string,  {1}".format(s, type(s)))
         return s
