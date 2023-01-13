@@ -240,6 +240,7 @@ class SCTDecoder:
                             garbage += self.getWord(self._cursor * 4)
                             self._cursor += 1
                         instResult.add_error(('Garbage', garbage))
+                        instResult.add_garbage(garbage)
                     elif switch_end < min_case_start:
                         raise IndexError(f'{self.log_key}: Switch incomplete, switch end < min case start')
 
@@ -437,6 +438,7 @@ class SCTDecoder:
             scriptCompare = self.getInt(self._cursor * 4)
             if scriptCompare in overrideCompare:
                 cur_param.set_value(overrideResult)
+                cur_param.set_override(self.getWord(self._cursor * 4))
                 self._cursor += 1
                 return cur_param
 
@@ -445,7 +447,9 @@ class SCTDecoder:
             if isinstance(scptResult, dict) or isinstance(scptResult, bytearray):
                 done = True
             elif isinstance(scptResult, str):
-                if not is_a_number(scptResult):
+                if scptResult[:2] == '0x':
+                    done = True
+                elif not is_a_number(scptResult):
                     done = True
                 else:
                     scptResult = float(scptResult)
@@ -453,47 +457,56 @@ class SCTDecoder:
                 done = True
                 cur_param.add_error('Error: No value generated...')
 
-            if not done:
-                if 'int' in param_type:
-                    scptResult = int(scptResult)
-                elif 'short' in param_type:
-                    scptResult = int(scptResult) & 0xffff
-                elif 'byte' in param_type:
-                    scptResult = int(scptResult) & 0xff
+            if not done and 'float' not in param_type:
+                signed = scptResult < 0
+                scptResult = int(scptResult)
+                if 'int' not in param_type:
+                    scptResult = bytearray(scptResult.to_bytes(4, 'big', signed=signed)).hex()
+                    if 'short' in param_type:
+                        scptResult = applyHexMask(scptResult, '0xffff')[2:]
+                    elif 'byte' in param_type:
+                        scptResult = applyHexMask(scptResult, '0xff')[2:]
+
+                    scptResult = int.from_bytes(bytes=bytearray.fromhex(scptResult), byteorder='big', signed=signed)
 
             cur_param.set_value(scptResult)
 
-        elif param_type == 'int':
+        elif 'int' in param_type:
             currWord = self.getWord(self._cursor * 4)
             if self._cur_endian == 'little':
                 currWord = bytearray(reversed(currWord))
-            raw = currWord
-            cur_param.add_raw(raw)
-            if base_param.mask is not None:
-                cur_param.type += '-masked'
-                mask = base_param.mask
-                currWord = bytearray.fromhex(applyHexMask(currWord.hex(), hex(mask))[2:])
-            if base_param.isSigned:
-                cur_param.type += '-signed'
-                cur_value = word2SignedInt(currWord)
+
+            if 'code' in param_type:
+                param_value = self._resolve_SCPT_code_only()
+                cur_param.set_value(param_value)
             else:
-                cur_value = int.from_bytes(currWord, byteorder=self._cur_endian)
-            cur_param.set_value(cur_value)
-            if base_param.link_type is not None:
-                link_type = base_param.link_type
-                origin = self._cursor * 4
-                target = self._cursor * 4 + cur_value
-                newLink = SCTLink(type=link_type, origin=origin, target=target, origin_trace=trace)
-                cur_param.link = newLink
-                if link_type == 'String':
-                    if target > self._last_sect_pos:
-                        self._str_foot_links.append(newLink)
-                    else:
-                        self._str_sect_links.append(newLink)
+                raw = currWord
+                cur_param.add_raw(raw)
+                if base_param.mask is not None:
+                    cur_param.type += '-masked'
+                    mask = base_param.mask
+                    currWord = bytearray.fromhex(applyHexMask(currWord.hex(), hex(mask))[2:])
+                if base_param.isSigned:
+                    cur_param.type += '-signed'
+                    cur_value = word2SignedInt(currWord)
                 else:
-                    self._scpt_links.append(newLink)
-                    if cur_value < 0:
-                        self._debug_log.append(f'Negative link: {newLink}')
+                    cur_value = int.from_bytes(currWord, byteorder=self._cur_endian)
+                cur_param.set_value(cur_value)
+                if base_param.link_type is not None:
+                    link_type = base_param.link_type
+                    origin = self._cursor * 4
+                    target = self._cursor * 4 + cur_value
+                    newLink = SCTLink(type=link_type, origin=origin, target=target, origin_trace=trace)
+                    cur_param.link = newLink
+                    if link_type == 'String':
+                        if target > self._last_sect_pos:
+                            self._str_foot_links.append(newLink)
+                        else:
+                            self._str_sect_links.append(newLink)
+                    else:
+                        self._scpt_links.append(newLink)
+                        if cur_value < 0:
+                            self._debug_log.append(f'Negative link: {newLink}')
 
             self._cursor += 1
 
@@ -503,6 +516,21 @@ class SCTDecoder:
             self._cursor += 1
 
         return cur_param
+
+    def _resolve_SCPT_code_only(self):
+        currWord = self.getInt(self._cursor * 4)
+        action = None
+        # Determine the input type from the input_cutoffs table
+        for key in self._p_codes.input_cutoffs.keys():
+            if currWord >= key:
+                action = key
+                break
+
+        value = ''
+        value += self._p_codes.input_cutoffs[action]
+        value += str(currWord & 0x00ffffff)
+
+        return value
 
     def _SCPT_analyze(self, param: SCTParameter):
 
@@ -516,10 +544,10 @@ class SCTDecoder:
             raw = bytearray(reversed(currentWord))
 
         # First check that the first word is not a special value
-        if int.from_bytes(currentWord, byteorder=self._cur_endian) in self._p_codes.no_loop:
+        if int.from_bytes(currentWord, byteorder=self._cur_endian) in self._p_codes.no_loop.keys():
             param.add_raw(raw)
             self._cursor += 1
-            return currentWord
+            return self._p_codes.no_loop[int.from_bytes(currentWord, byteorder=self._cur_endian)]
 
         raw = bytearray(b'')
         # Resolve the SCPT analysis
@@ -558,26 +586,28 @@ class SCTDecoder:
             elif currentWord in self._p_codes.compare.keys():
                 currVals = {'1': result_stack[stack_index], '2': result_stack[stack_index + 1]}
                 cur_result = {self._p_codes.compare[currentWord]: currVals}
-                result_stack[stack_index] = cur_result
-                stack_index -= 1
                 if currentWord == 0x0000000a:
                     stack_index += 1
+                result_stack[stack_index] = cur_result
+                stack_index -= 1
             elif currentWord in self._p_codes.arithmetic.keys():
                 currVals = {'1': result_stack[stack_index], '2': result_stack[stack_index + 1]}
                 inputs = []
                 cur_result = {self._p_codes.arithmetic[currentWord]: currVals}
+                nones = 0
                 for v in currVals.values():
-                    if isinstance(v, str):
+                    if v is None:
+                        nones += 1
+                    elif isinstance(v, str):
                         v = str(v)
                         if is_a_number(v):
                             inputs.append(v)
-                    elif not (isinstance(v, dict) or isinstance(v, bytearray) or v is None):
+                    elif not (isinstance(v, dict) or isinstance(v, bytearray)):
                         inputs.append(v)
                 if len(inputs) == 2:
                     result = self._scpt_arithmetic_fxns[self._p_codes.arithmetic[currentWord][3]](inputs[0], inputs[1])
-                    result_stack[stack_index] = result
-                else:
-                    result_stack[stack_index] = cur_result
+                    param.set_arithmetic_result(result)
+                result_stack[stack_index+nones] = cur_result
                 stack_index -= 1
 
             # If not, current action is to input a value
@@ -605,9 +635,9 @@ class SCTDecoder:
                         raw.extend(word)
                         result = self.getFloat(self._cursor * 4)
                     elif action == 0x08000000:
-                        obtainedValue = currentWord & 0xffff00
-                        obtainedValue += (currentWord & 0xff) / 256
-                        result = obtainedValue
+                        obtainedValue = str((currentWord & 0xffff00) >> 8)
+                        obtainedValue += f'/{(currentWord & 0xff)}'
+                        result = self._p_codes.input_cutoffs[action] + f'{obtainedValue}'
                     else:
                         obtainedValue = currentWord & 0x00ffffff
                         result = self._p_codes.input_cutoffs[action] + f'{obtainedValue}'
@@ -623,7 +653,7 @@ class SCTDecoder:
                         result_stack[(stack_index + 2)] = result
                         cur_result = result
                     else:
-                        offset = masked_currentWord * 4
+                        offset = masked_currentWord
                         cur_result = self._p_codes.input_cutoffs[action] + f'{offset}'
                         result_stack[(stack_index + 2)] = cur_result
                         if masked_currentWord == 0xf:
@@ -784,26 +814,27 @@ class SCTDecoder:
         for group in groups_to_remove:
             decoded_sct.section_groups.pop(group)
 
-        new_groups = {}
         for name, group in decoded_sct.section_groups.items():
             if 'logical' not in name:
                 continue
             new_name = group[0]
-            for sect_name in group[1:]:
-                match = difflib.SequenceMatcher(None, new_name.lower(),
-                                                sect_name.lower()).find_longest_match(0, len(new_name), 0, len(sect_name))
-                if match.size < 3:
-                    continue
-                new_name = new_name[match.a: match.a + match.size]
+            if new_name[:2] != 'me':
 
-            if new_name in decoded_sct.sections:
-                i = 0
-                while True:
-                    test_name = f'{new_name}({i})'
-                    if test_name not in decoded_sct.sections:
-                        break
-                    i += 1
-                new_name = test_name
+                for sect_name in group[1:]:
+                    match = difflib.SequenceMatcher(None, new_name.lower(),
+                                                    sect_name.lower()).find_longest_match(0, len(new_name), 0, len(sect_name))
+                    if match.size < 3:
+                        continue
+                    new_name = new_name[match.a: match.a + match.size]
+
+                if new_name in decoded_sct.sections:
+                    i = 0
+                    while True:
+                        test_name = f'{new_name}({i})'
+                        if test_name not in decoded_sct.sections:
+                            break
+                        i += 1
+                    new_name = test_name
 
             # Setup combined logical section
             new_section: SCTSection = decoded_sct.sections[group[0]]
@@ -1026,6 +1057,7 @@ class SCTDecoder:
         cur_group_name = ''
         cur_group = []
         has_header = False
+        i = 0
         for name, section in decoded_sct.sections.items():
             if section.type == 'Label':
                 has_header = True
@@ -1035,15 +1067,30 @@ class SCTDecoder:
                 else:
                     if len(cur_group) > 0:
                         strs = '\n'.join(cur_group)
-                        # print(f'Strings present before string groups will not be assigned a group: {strs}')
+                        print(f'Strings present before string groups will not be assigned a group: {strs}')
                 cur_group_name = section.name
             elif section.type == 'String':
-                # if not has_header:
-                #     print(f'This string is not located contiguously under a label: {section.name}')
+                if not has_header:
+                    if len(cur_group) > 0:
+                        decoded_sct.string_groups[cur_group_name] = cur_group
+                        cur_group = []
+                    cur_group_name = f'Untitled({i})'
+                    has_header = True
+                    i += 1
+                    print(f'This string is not located contiguously under a label: {section.name}, new group created: {cur_group_name}')
                 cur_group.append(section.name)
+                decoded_sct.string_locations[section.name] = cur_group_name
                 decoded_sct.strings[section.name] = section.string
             elif section.type == 'Script':
                 has_header = False
+
+        for name in list(decoded_sct.string_groups.keys()):
+            if len(decoded_sct.string_groups[name]) == 0:
+                decoded_sct.string_groups.pop(name)
+
+        for name in list(decoded_sct.sections.keys()):
+            if decoded_sct.sections[name].type == 'String':
+                decoded_sct.sections.pop(name)
 
     @staticmethod
     def _detect_unused_sections(decoded_sct: SCTScript):
@@ -1532,13 +1579,14 @@ if __name__ == '__main__':
 
     insts.set_inst_all_fields(file_json)
 
-    # file_of_interest = None
-    file_of_interest = 'me103b.sct'
+    file_of_interest = None
+    # file_of_interest = 'me103b.sct'
 
     if input('Run all scripts?') not in ['Y', 'y']:
 
         f = file_of_interest if file_of_interest is not None else 'me002a.sct'
         file = os.path.join('./../../scripts/', f)
+
         with open(file, 'rb') as fh:
             file_ba = bytearray(fh.read())
 
