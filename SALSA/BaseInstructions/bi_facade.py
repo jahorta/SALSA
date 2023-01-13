@@ -41,13 +41,13 @@ class BaseInstLibFacade:
         self.lib.insts[inst_id].set_inst_details(details)
 
     def save_user_insts(self):
-        self.inst_model.save_instructions()
+        self.inst_model.save_instructions(inst_dict=self.get_inst_details(), inst_type=self.user_identifier)
 
 
 if __name__ == '__main__':
 
     base_insts = BaseInstLibFacade()
-    insts: List[BaseInst] = base_insts.insts
+    insts: List[BaseInst] = base_insts.lib.insts
     for i in range(len(insts)):
         if insts[i].instruction_id != i:
             print(f'inst at position {i} is {insts[i].instruction_id}')
