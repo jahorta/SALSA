@@ -5,8 +5,8 @@ from tkinter import filedialog
 
 from FileModels.project_model import ProjectModel
 from FileModels.sct_model import SCTModel
-from GUI.ScriptEditor.script_editor_controller import ScriptEditorController
-from GUI.ScriptEditor.script_editor_view import ScriptEditorView
+from GUI.ProjectEditor.project_editor_controller import ProjectEditorController
+from GUI.ProjectEditor.project_editor_view import ProjectEditorView
 from GUI.gui_controller import GUIController
 from BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.GUI import menus
@@ -31,16 +31,16 @@ class Application(tk.Tk):
         self.resizable(width=True, height=True)
 
         # Setup project details
-        self.project_facade = SCTProjectFacade(self.base_insts)
+        self.project = SCTProjectFacade(self.base_insts)
         self.project_filepath = ''
 
         # Setup script editor view and controller
-        self.script_edit_view = ScriptEditorView(self)
+        self.script_edit_view = ProjectEditorView(self)
         self.script_edit_view.grid(row=0, column=0, sticky='NSEW', pady=5)
-        self.script_edit_controller = ScriptEditorController(self.script_edit_view, self.project_facade)
+        self.script_edit_controller = ProjectEditorController(self.script_edit_view, self.project)
 
         self.gui = GUIController(parent=self, scpt_editor_view=self.script_edit_view,
-                                 project_facade=self.project_facade, inst_lib_facade=self.base_insts)
+                                 project_facade=self.project, inst_lib_facade=self.base_insts)
 
         # Create Models
         self.proj_model = ProjectModel()
@@ -80,7 +80,7 @@ class Application(tk.Tk):
         self.gui.disable_script_view()
 
     def on_new_project(self):
-        self.project_facade.create_new_project()
+        self.project.create_new_project()
         self.gui.enable_script_view()
 
     def on_save_as_project(self):
@@ -89,15 +89,15 @@ class Application(tk.Tk):
             return
         if filepath[-4:] != '.prj':
             filepath += '.prj'
-        self.project_facade.set_filepath(filepath=filepath)
+        self.project.set_filepath(filepath=filepath)
         self.on_save_project()
 
     def on_save_project(self):
-        filepath = self.project_facade.get_filepath()
+        filepath = self.project.get_filepath()
         if filepath == '' or filepath is None:
             self.on_save_as_project()
             return
-        project_dict = self.project_facade.project
+        project_dict = self.project.project
         self.proj_model.save_project(proj=project_dict, filepath=filepath, indent=True, pickled=True)
         self.proj_model.add_recent_file(filepath=filepath)
 
@@ -113,7 +113,7 @@ class Application(tk.Tk):
                 return
 
         prj = self.proj_model.load_project(filepath=filepath, pickled=True)
-        self.project_facade.load_project(prj, pickled=True)
+        self.project.load_project(prj, pickled=True)
         self.gui.enable_script_view()
 
     def on_load_recent_project(self, index):
@@ -132,7 +132,7 @@ class Application(tk.Tk):
             return
         for script in script_paths:
             name, script = self.sct_model.load_sct(self.base_insts, file=script)
-            self.project_facade.add_script_to_project(name, script)
+            self.project.add_script_to_project(name, script)
 
     def set_script_dir(self):
         script_dir = filedialog.askdirectory()

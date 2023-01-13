@@ -16,7 +16,9 @@ available_headers = {
 }
 
 
-class ScriptEditorView(tk.Frame):
+class ProjectEditorView(tk.Frame):
+
+    log_name = 'PrjEditorView'
 
     def __init__(self, parent, *args, headers=None, **kwargs):
         self.headers = default_headers if headers is None else headers

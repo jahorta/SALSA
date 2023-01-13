@@ -1,6 +1,6 @@
 from typing import Union, Dict, Tuple
 
-from GUI.ScriptEditor.script_editor_view import ScriptEditorView
+from GUI.ProjectEditor.project_editor_view import ProjectEditorView
 from GUI.widgets import CustomTree2
 from Project.project_facade import SCTProjectFacade
 
@@ -15,11 +15,11 @@ tree_children = {
 tree_parents = {v: k for k, v in tree_children.items()}
 
 
-class ScriptEditorController:
-    log_name = 'Script Editor Controller'
+class ProjectEditorController:
+    log_name = 'PrjEditorCtrl'
 
-    def __init__(self, view: ScriptEditorView, facade: SCTProjectFacade):
-        self.view: ScriptEditorView = view
+    def __init__(self, view: ProjectEditorView, facade: SCTProjectFacade):
+        self.view: ProjectEditorView = view
         self.project: SCTProjectFacade = facade
         self.current: Dict[str, Union[int, None]] = {
             'script': None,
