@@ -1,58 +1,374 @@
+import struct
+from typing import Union
+
+from BaseInstructions.bi_facade import BaseInstLibFacade
+from Project.project_container import SCTScript
+from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
+from SALSA.Scripts.scpt_compare_fxns import is_equal, not_equal
 
 
 class ScriptEncoder:
-    compare_codes = {
-        '0x00000000': '(1)<(2)',
-        '0x00000001': '(1)<=(2)',
-        '0x00000002': '(1)>(2)',
-        '0x00000003': '(1)>=(2)',
-        '0x00000004': '(1)==(2)',
-        '0x00000005': '(1)==(2)[5]',
-        '0x00000006': '(1)&(2)',
-        '0x00000007': '(1)|(2)',
-        '0x00000008': '(1)!=0 and (2)!=0',
-        '0x00000009': '(1)!=0 or (2)!=0',
-        '0x0000000a': 'overwrites (1) with (2)',
-    }
+    log_key = 'SCTEncoder'
+    skip_refresh = 13
+    _placeholder = bytearray(b'\x7f\x7f\xff\xff')
+    _str_label = b'\x00\x00\x00\x09\x04\x00\x00\x00\x3f\x80\x00\x00\x00\x00\x00\x1d'
+    endian_struct_format = {'big': '>', 'little': '<'}
+    _header_offset_length = 0x4
+    _header_name_length = 0x10
+    _default_header_start = bytearray(b'\x07\xd2\x00\x06\x00\x0e\x00\x00')
 
-    arithmetic_codes = {
-        '0x0000000b': '(1)*(2)',
-        '0x0000000c': '(1)/(2)',
-        '0x0000000d': '(1)%(2)',
-        '0x0000000e': '(1)+(2)',
-        '0x0000000f': '(1)-(2)',
-    }
+    use_garbage: bool
+    combine_footer_links: bool
+    add_spurious_refresh: bool
 
-    noLoop = [
-        # Special: returns first value, doesn't enter scpt loop
-        '0x7f7fffff',
-        '0x00800000',
-        '0x7fffffff'
-    ]
+    param_tests = {'==': is_equal, '!=': not_equal}
 
-    input_cutoffs = {
-        '0x50000000': 'Word: *add[0x8030e3e4,',
-        '0x40000000': 'Word: *add[0x803e514,',
-        '0x20000000': 'starting from 80310b3c, Bit: ',
-        '0x10000000': 'Byte: *add[0x80310a1c,',
-        '0x08000000': 'decimal: ',
-        '0x04000000': 'float: ',
-    }
+    def __init__(self, script: SCTScript, base_insts: BaseInstLibFacade, endian='big'):
+        self.script = script
+        self.bi = base_insts
+        self.sct = bytearray()
+        self.sct_body = bytearray()
+        self.sct_head = self.script.header if self.script.header is not None else self._default_header_start
+        self.sct_foot = bytearray()
+        self.header_dict = {}
+        self.footer_dict = {}
+        self.added_string_groups = []
+        self.endian = endian
+        self.param_code = SCPTParamCodes(is_decoder=False)
 
-    """Specific secondary code checks: code <= 0x07, code < 0x21, code == 0x4a"""
-    secondary_codes = {
-        '0x00000000': 'gold amt',
-        '0x00000001': 'Reputation',
-        '0x00000002': 'Vyse.curHP',
-        '0x00000003': 'Aika.curHP',
-        '0x00000004': 'Fina.curHP',
-        '0x00000005': 'Drachma.curHP',
-        '0x00000006': 'Enrique.curHP',
-        '0x00000007': 'Gilder.curHP',
-        '0x0000004a': 'Vyse.lvl'
-    }
+        # Links will start off being a dictionary with origin_offset: (string or section or jmp_target)
+        # They will then be iterated upon to replace the value with the location of the target
+        # Finally, they will be used to replace the original
+        self.sct_links = {}
+        self.string_links = {}
+        self.footer_links = {}
+        self.inst_positions = {}
 
     @classmethod
-    def construct_param(cls, param_type, param_dict):
-        out = bytearray(b'')
-        return out
+    def encode_sct_file_from_project_script(cls, project_script: SCTScript, base_insts: BaseInstLibFacade, use_garbage=True, add_spurious_refresh=True):
+        encoder = cls(script=project_script, base_insts=base_insts)
+        encoder.encode_sct_file(use_garbage=use_garbage, add_spurious_refresh=add_spurious_refresh)
+        return encoder.sct
+
+    def encode_sct_file(self, use_garbage=True, combine_footer_links=False, add_spurious_refresh=False):
+        self.use_garbage = use_garbage
+        self.combine_footer_links = combine_footer_links
+        self.add_spurious_refresh = add_spurious_refresh
+
+        # encode sections in order
+        for name, section in self.script.sections.items():
+            self._encode_section(name=name, section=section)
+
+            # if string group header is added, add strings below it
+            if name in self.script.string_groups.keys():
+                self.added_string_groups.append(name)
+                self._add_strings(name)
+
+        # If there are strings remaining, add to end?
+        for name in self.script.string_groups.keys():
+            if name in self.added_string_groups:
+                continue
+            self._add_strings(name)
+
+        # Resolve through jmp_links
+        for link_offset, jmp_to in self.sct_links.items():
+            jmp_to_parts = jmp_to.split('-')
+            jmp_to_sect = jmp_to_parts[0]
+            jmp_to_inst_id = self.script.sections[jmp_to_sect].instruction_ids_ungrouped[int(jmp_to_parts[1])]
+            jmp_to_pos = self.inst_positions[jmp_to_inst_id]
+            jmp_offset = self._make_word(i=(jmp_to_pos - link_offset), signed=True)
+            self._sct_body_replace_hex(location=link_offset, value=jmp_offset, validation=self._placeholder)
+
+        # Resolve string links
+        for link_offset, section in self.string_links.items():
+            str_pos = self.header_dict[section]
+            str_offset = str_pos - link_offset
+            str_offset_word = self._make_word(i=str_offset, signed=True)
+            self._sct_body_replace_hex(location=link_offset, value=str_offset_word, validation=self._placeholder)
+
+        # Add footer entries in order by links while resolving links
+        for offset, string in self.footer_links.items():
+            str_pos = len(self.sct_body) + len(self.sct_foot)
+            str_offset = str_pos - offset
+            str_offset_word = self._make_word(i=str_offset)
+            self.sct_foot.extend(self._encode_string(string=string, align=False))
+            self._sct_body_replace_hex(location=offset, value=str_offset_word, validation=self._placeholder)
+
+        # Build header
+        header_len = self._make_word(len(self.header_dict))
+        self.sct_head.extend(header_len)
+        for name, offset in self.header_dict.items():
+            self.sct_head.extend(self._make_word(offset))
+            self.sct_head.extend(self._encode_string(string=name, align=False, size=self._header_name_length))
+
+        # Combine file portions together
+        self.sct = self.sct_head + self.sct_body + self.sct_foot
+
+        return self.sct
+
+    def _add_strings(self, string_group_name):
+        string_group = self.script.string_groups[string_group_name]
+        for name in string_group:
+            self.header_dict[name] = len(self.sct_body)
+            self.sct_body.extend(self._str_label)
+            string = self.script.strings[name]
+
+            # Add String using encode string
+            self.sct_body.extend(self._encode_string(string=string, align=True))
+
+    def _encode_section(self, name, section):
+        # If the section is a label, just add the entry to the header and add a string label
+        if section.type == 'Label':
+            self.header_dict[name] = len(self.sct_body)
+            self.sct_body.extend(self._str_label)
+            return
+
+        sect_list = [name]
+        if len(section.internal_sections_inst.keys()) > 0:
+            sect_list = list(section.internal_sections_inst)
+        for inst_id in section.instruction_ids_ungrouped:
+            inst = section.instructions[inst_id]
+            if inst.instruction_id == 9:
+                self.header_dict[sect_list[0]] = len(self.sct_body)
+                sect_list.pop(0)
+            self._encode_instruction(inst)
+
+        # add garbage at end of section if needed
+        if self.use_garbage:
+            if 'end' in section.garbage.keys():
+                self.sct_body.extend(section.garbage['end'])
+
+    def _encode_instruction(self, instruction):
+        self.inst_positions[instruction.ID] = len(self.sct_body)
+        base_inst = base_insts.get_inst(instruction.instruction_id)
+
+        # add 13 code if needed or wanted
+        if instruction.skip_refresh:
+            if self.add_spurious_refresh or (not base_inst.no_new_frame and not base_inst.forced_new_frame):
+                self.sct_body.extend(self._make_word(self.skip_refresh))
+
+        # add instruction code to sct_body
+        self.sct_body.extend(self._make_word(instruction.instruction_id))
+
+        loop_iter_param_location = None
+        loop_iter_param_value = None
+        # cycle through and add parameters
+        for p_id in base_inst.params_before:
+            if base_inst.loop_iter is not None:
+                if p_id == base_inst.loop_iter:
+                    loop_iter_param_location = len(self.sct_body)
+                    loop_iter_param_value = instruction.parameters[p_id].value
+            self._encode_param(param=instruction.parameters[p_id], base_param=base_inst.parameters[p_id])
+
+        do_loop = True
+        has_loop_cond = False
+        # Check for an external loop bypass
+        if base_inst.loop_cond is not None:
+            if base_inst.loop_cond['Location'] == 'External':
+                value1 = instruction.parameters[base_inst.loop_cond['Parameter']].value
+                if not isinstance(value1, int):
+                    value1 = int(value1)
+                value2 = base_inst.loop_cond['Value']
+                if not isinstance(value2, int):
+                    value2 = int(value2)
+                test = base_inst.loop_cond['Test']
+                do_loop = not self.param_tests[test](value1, value2)
+            else:
+                has_loop_cond = True
+
+        break_loops = False
+        loop_iters_performed = 0
+        if do_loop:
+            for loop in instruction.loop_parameters:
+                for p_id, param in loop.items():
+                    self._encode_param(param=param, base_param=base_inst.parameters[p_id])
+
+                    # Check internal loop conditions
+                    if not has_loop_cond:
+                        continue
+
+                    if p_id == base_inst.loop_cond['Parameter']:
+                        value1 = param.value
+                        if not isinstance(value1, int):
+                            value1 = int(value1)
+                        value2 = base_inst.loop_cond['Value']
+                        if not isinstance(value2, int):
+                            value2 = int(value2)
+                        test = base_inst.loop_cond['Test']
+                        if self.param_tests[test](value1, value2):
+                            break_loops = True
+                            break
+                loop_iters_performed += 1
+                if break_loops:
+                    break
+
+        if loop_iter_param_value is not None:
+            if loop_iters_performed != loop_iter_param_value:
+                self._sct_body_replace_hex(location=loop_iter_param_location, value=self._make_word(loop_iters_performed))
+
+        for p_id in base_inst.params_after:
+            self._encode_param(param=instruction.parameters[p_id], base_param=base_inst.parameters[p_id])
+
+        # add garbage at then of instruction if needed
+        garbage_index = None
+        for i, e in enumerate(instruction.errors):
+            if e[0] == 'Garbage':
+                garbage_index = i
+                break
+
+        if garbage_index is not None and self.use_garbage:
+            garbage = instruction.errors[garbage_index][1]
+            self.sct_body.extend(garbage)
+
+    def _encode_param(self, param, base_param):
+        # if needed, setup link and use 0x7fffffff as placeholder
+        if param.link is not None:
+            link_value = param.link_value
+            if link_value[0] == 'Footer':
+                self.footer_links[len(self.sct_body)] = self.script.footer[link_value[1]]
+            elif link_value[0] == 'String':
+                self.string_links[len(self.sct_body)] = link_value[1]
+            elif link_value[0] == 'SCT':
+                self.sct_links[len(self.sct_body)] = link_value[1]
+            else:
+                print(f'{self.log_key}: Unknown param link type: {link_value[0]}')
+            self.sct_body.extend(self._placeholder)
+            return
+
+        # generate parameter with encode scpt if needed
+        if 'scpt' in base_param.type:
+            if param.override is not None:
+                value = param.override
+            else:
+                no_loop = False
+                if isinstance(param.value, str):
+                    if param.value in self.param_code.no_loop.keys():
+                        no_loop = True
+
+                if no_loop:
+                    value = self._make_word(self.param_code.no_loop[param.value])
+                else:
+                    value = self._encode_scpt_param(param=param.value)
+                    value.extend(self._make_word(self.param_code.stop_code))
+        else:
+            if 'code' in base_param.type:
+                value = self._encode_scpt_param(param.value)
+            else:
+                value = self._make_word(param.value)
+
+        # add parameter
+        self.sct_body.extend(value)
+
+    def _encode_scpt_param(self, param):
+        param_bytes = bytearray()
+
+        if param is None:
+            return param_bytes
+
+        # if parameter is an integer, it should be stored as a float within the script files, so convert to float
+        if isinstance(param, int):
+            param = float(param)
+
+        # If the parameter is a float, enter the float into script file
+        if isinstance(param, float):
+            param_bytes.extend(self._make_word(self.param_code.input_cutoffs['float: ']))
+            param_bytes.extend(self._float2Hex(param))
+
+        # if the parameter is complex, go through the requisite parameter dictionary encoding values then keys
+        elif isinstance(param, dict):
+            for key, value in param.items():
+                param_bytes.extend(self._encode_scpt_param(value))
+                if key in self.param_code.compare:
+                    param_bytes.extend(self._make_word(self.param_code.compare[key]))
+                if key in self.param_code.arithmetic:
+                    param_bytes.extend(self._make_word(self.param_code.arithmetic[key]))
+
+        # If the parameter is a string, it is likely located in input headers or secondary locations
+        elif isinstance(param, str):
+            if param in self.param_code.secondary:
+                cutoff = self.param_code.input_cutoffs['IntVar: ']
+                value = self.param_code.secondary[param]
+            else:
+                param_parts = param.split(' ')
+                cutoff = self.param_code.input_cutoffs[param_parts[0]+' ']
+                if cutoff == self.param_code.input_cutoffs['decimal: ']:
+                    d_parts = param_parts[1].split('/')
+                    value = int(d_parts[0]) << 8
+                    value = value | int(d_parts[1])
+                else:
+                    value = int(param_parts[1])
+            param_bytes.extend(self._make_word(cutoff | value))
+
+        else:
+            print(f'unknown code?')
+
+        return param_bytes
+
+    def _make_word(self, i: int, signed=False):
+        return bytearray(i.to_bytes(length=4, byteorder=self.endian, signed=signed))
+
+    def _float2Hex(self, f: float):
+        form = f'{self.endian_struct_format[self.endian]}f'
+        return bytearray(struct.pack(form, f))
+
+    def _encode_string(self, string, encoding='shiftjis', align=True, size=-1):
+        str_bytes = bytearray(string.encode(encoding=encoding, errors='backslashreplace'))
+
+        if size > 0:
+            if len(str_bytes) > size:
+                return str_bytes[:size]
+            extra_bytes = b'\x00' * (size - len(str_bytes))
+            str_bytes.extend(extra_bytes)
+            return str_bytes
+
+        str_bytes.extend(b'\x00')
+        if not align:
+            return str_bytes
+
+        extra_bytes = b''
+        if len(str_bytes) % 4 != 0:
+            extra_bytes = b'\x00' * (4 - len(str_bytes) % 4)
+        str_bytes.extend(extra_bytes)
+        return str_bytes
+
+    def _sct_body_replace_hex(self, location: int, value: bytearray, validation: Union[None, bytearray] = None):
+        if validation is None:
+            valid = True
+        else:
+            valid = validation.hex() == self.sct_body[location: location+len(validation)].hex()
+
+        if not valid:
+            print(f'{self.log_key}: Validation failed for hex replacement in sct_body: {self.sct_body[location: location+len(validation)-1].hex()} != {validation.hex()}')
+            return
+
+        self.sct_body = self.sct_body[:location] + value + self.sct_body[location+len(value):]
+
+
+if __name__ == '__main__':
+    import os
+
+    cur_dir = os.path.dirname(__file__)
+    os.chdir(os.path.pardir)
+    os.chdir(os.path.pardir)
+
+    from SALSA.FileModels.sct_model import SCTModel
+    from SALSA.FileModels.project_model import ProjectModel
+    from SALSA.Project.project_facade import SCTProjectFacade
+
+    os.chdir(cur_dir)
+
+    project_file_path = './test_files/test_prj_1.prj'
+    project_model = ProjectModel()
+    base_insts = BaseInstLibFacade()
+
+    project = SCTProjectFacade(base_insts=base_insts)
+    project_pickled = project_model.load_project(filepath=project_file_path, pickled=True)
+    project.load_project(prj=project_pickled, pickled=True)
+
+    sct_name, script = project.get_project_script_by_index(0)
+    sct = ScriptEncoder.encode_sct_file_from_project_script(project_script=script, base_insts=base_insts, use_garbage=True)
+
+    script_file_path = f'./test_files/{sct_name}_out.sct'
+    sct_model = SCTModel()
+    sct_model.save_sct(filepath=script_file_path, sct_file=sct)
+
