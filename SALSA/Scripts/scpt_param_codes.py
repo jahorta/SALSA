@@ -66,10 +66,13 @@ class SCPTParamCodes:
             self.input_cutoffs = {_[0]: _[1] for _ in input_cutoffs}
             self.secondary = {_[0]: _[1] for _ in secondary}
             self.cutoff_prefixes = [(_ & 0xff000000) for _ in list(self.input_cutoffs.keys())]
-            self.primary_keys = [*list(self.compare.keys()), *list(self.arithmetic.keys())]
+            self.no_loop = {_[0]: _[1] for _ in no_loop}
         else:
             self.compare = {_[1]: _[0] for _ in compare}
             self.arithmetic = {_[1]: _[0] for _ in arithmetic}
             self.input_cutoffs = {_[1]: _[0] for _ in input_cutoffs}
             self.secondary = {_[1]: _[0] for _ in secondary}
-        self.no_loop = no_loop
+            self.no_loop = {_[1]: _[0] for _ in no_loop}
+        self.primary_keys = [*list(self.compare.keys()), *list(self.arithmetic.keys())]
+        self.stop_code = stop_code
+
