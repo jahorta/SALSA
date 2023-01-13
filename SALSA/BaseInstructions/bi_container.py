@@ -123,7 +123,7 @@ class BaseInst:
                 else:
                     self.parameters[key-loop_count].set_parameter_details(param_details=param_details)
 
-    def get_inst_details(self):
+    def get_user_inst_details(self):
         fields = {}
         if 'Name' not in self.locked_fields:
             fields['Name'] = self.name
