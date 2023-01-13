@@ -32,7 +32,7 @@ class BaseInstLibFacade:
         return self.lib.insts[inst_id]
 
     def get_inst_details(self):
-        return {k: v.get_inst_details() for k, v in enumerate(self.lib.insts)}
+        return {k: v.get_user_inst_details() for k, v in enumerate(self.lib.insts)}
 
     def get_all_insts(self):
         return self.lib.insts
