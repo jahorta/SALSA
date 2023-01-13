@@ -272,7 +272,7 @@ class SCTScript:
         self.folded_sections = {}
         self.name = name
         self.index = {k: v[0] for k, v in index.items()} if index is not None else {}
-        self.header = header if header is not None else bytearray(b'/x07/xd2/x00/x06/x00/x0e/x00/x00')
+        self.header = header
         self.sections = {}
         self.section_groups = {}
         self.section_group_keys = {}
