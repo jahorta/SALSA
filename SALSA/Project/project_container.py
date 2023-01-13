@@ -283,6 +283,7 @@ class SCTScript:
         self.footer = []
         self.strings = {}
         self.string_groups = {}
+        self.string_locations = {}
         self.unused_sections = []
         self.errors = []
         self.error_sections = {}
