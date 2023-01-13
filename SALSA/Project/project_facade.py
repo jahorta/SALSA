@@ -9,14 +9,14 @@ from Common.settings import settings
 class SCTProjectFacade:
 
     project: Union[SCTProject, None]
+    log_key = 'PrjFacade'
 
     def __init__(self, base_insts: BaseInstLibFacade):
         self.project = None
         self.callbacks = {}
         self.base_insts = base_insts
-        self.set_key = 'Project'
-        if self.set_key not in settings.keys():
-            settings[self.set_key] = {}
+        if self.log_key not in settings.keys():
+            settings[self.log_key] = {}
 
     def load_project(self, prj, pickled=False):
         if pickled:
