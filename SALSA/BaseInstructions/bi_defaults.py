@@ -77,7 +77,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Offset",
-                "Type": "int",
+                "Type": "int-code",
                 "Mask": 0x0000ffff,
                 "Signed": False,
             },
@@ -95,7 +95,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Offset",
-                "Type": "int",
+                "Type": "int-code",
                 "Mask": 0x0000ffff,
                 "Signed": False,
             },
@@ -113,7 +113,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Offset",
-                "Type": "int",
+                "Type": "int-code",
                 "Mask": 0x0000ffff,
                 "Signed": False,
             },
