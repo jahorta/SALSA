@@ -22,6 +22,14 @@ class SCTModel:
             return settings[self.log_key]['directory']
         return ''
 
+    def save_sct(self, filepath, sct_file):
+        path_dir = os.path.dirname(filepath)
+        if not os.path.exists(path_dir):
+            print(f'{self.log_key}: Unable to save, directory does not exist: {path_dir}')
+
+        with open(filepath, 'wb') as sct:
+            sct.write(sct_file)
+
     def load_sct(self, insts, file: str):
         out = self._read_sct_file(file)
         if out is None:
