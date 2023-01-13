@@ -9,7 +9,7 @@ from BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.GUI.AnalysisPopup.analysis_view import AnalysisView
 from SALSA.GUI.HelpPopup.help_view import HelpView
 from SALSA.GUI.InstructionEditor.instruction_editor_view import InstructionEditorView
-from SALSA.GUI.ScriptEditor.script_editor_view import ScriptEditorView
+from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
 from Project.project_facade import SCTProjectFacade
 from Common.containers import Vector2
 
@@ -19,14 +19,14 @@ class GUIController:
     parent: tk.Tk
     instruction_view: Union[None, InstructionEditorView]
     instruction_controller: Union[None, InstructionEditorController]
-    scpt_view: ScriptEditorView
+    scpt_view: ProjectEditorView
     analysis_view: Union[None, AnalysisView]
     analysis_controller: Union[None, AnalysisController]
     help_view: Union[None, HelpView]
     help_controller: Union[None, HelpController]
     about_view: Union[None, AboutView]
 
-    def __init__(self, parent, scpt_editor_view: ScriptEditorView, project_facade: SCTProjectFacade,
+    def __init__(self, parent, scpt_editor_view: ProjectEditorView, project_facade: SCTProjectFacade,
                  inst_lib_facade: BaseInstLibFacade):
 
         self.parent = parent
