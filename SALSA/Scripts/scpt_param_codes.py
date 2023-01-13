@@ -29,9 +29,9 @@ arithmetic = [
 
 no_loop = [
     # Special: returns first value, doesn't enter scpt loop
-    0x7f7fffff,
-    0x00800000,
-    0x7fffffff
+    (0x7f7fffff, '0x7f7fffff'),
+    (0x00800000, '0x00800000'),
+    (0x7fffffff, '0x7fffffff')
 ]
 
 input_cutoffs = [
