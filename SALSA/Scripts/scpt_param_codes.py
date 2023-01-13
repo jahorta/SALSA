@@ -57,6 +57,9 @@ secondary = [
 ]
 
 
+stop_code = 0x0000001d
+
+
 class SCPTParamCodes:
 
     def __init__(self, is_decoder=True):
