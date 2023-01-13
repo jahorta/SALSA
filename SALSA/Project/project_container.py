@@ -40,6 +40,8 @@ class SCTParameter:
         self.formatted_value = ''
         self.raw_bytes = bytearray(b'')
         self.link_result = ('',)
+        self.override = None
+        self.arithmetic_value = None
 
     def set_value(self, value: Union[int, float, str, dict, bytearray]):
         self.value = value
@@ -90,6 +92,12 @@ class SCTParameter:
         param.raw_bytes = bytearray.fromhex(param_dict['raw_bytes'])
         param.link_result = param_dict['link_result']
         return param
+
+    def set_override(self, o_value: bytearray):
+        self.override = o_value
+
+    def set_arithmetic_result(self, result):
+        self.arithmetic_value = result
 
 
 class SCTInstruction:
