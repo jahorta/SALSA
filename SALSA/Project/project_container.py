@@ -284,6 +284,7 @@ class SCTScript:
         self.strings = {}
         self.string_groups = {}
         self.string_locations = {}
+        self.string_sections = {}
         self.unused_sections = []
         self.errors = []
         self.error_sections = {}

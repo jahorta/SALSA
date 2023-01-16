@@ -1,4 +1,5 @@
 import copy
+import math
 import os
 import re
 import struct
@@ -82,9 +83,18 @@ class SCTDecoder:
         ind_entries: int = int.from_bytes(self._sct[8:12], byteorder=self._cur_endian)
         self._sct = self._sct[12:]
         self._index = {}
+        used_names = []
         for i in range(ind_entries):
             start = self.getInt(pos=i * ind_entry_len)
             sect_name = self.getString(pos=i * ind_entry_len + ind_name_offset, max_len=ind_name_max_len)
+            if sect_name in used_names:
+                j = 0
+                test_name = f'{sect_name}({j})'
+                while test_name in used_names:
+                    j += 1
+                    test_name = f'{sect_name}({j})'
+                sect_name = test_name
+            used_names.append(sect_name)
             if i < ind_entries - 1:
                 next_start = self.getInt(pos=(i + 1) * ind_entry_len)
             else:
@@ -158,9 +168,8 @@ class SCTDecoder:
 
         if length == 16:
             section.set_type('Label')
-            return section
 
-        if self.test_for_string():
+        elif self.test_for_string():
             currWord = self.getInt(self._cursor * 4)
             while not currWord == 0x0000001d:
                 self._cursor += 1
@@ -171,6 +180,9 @@ class SCTDecoder:
                 section.add_error('Length of string == 0')
             section.set_type('String')
             section.add_string(self._cursor * 4, string)
+            garbage = self._get_garbage_after_string(bounds=bounds)
+            if len(garbage) > 0:
+                section.add_garbage('end', garbage)
             return section
 
         else:
@@ -207,7 +219,7 @@ class SCTDecoder:
                     currWord_int = self.getInt(self._cursor * 4)
                 instResult = self._decode_instruction(currWord_int, inst_pos, sct_start_pos, [sect_name, inst_list_id])
                 cur_inst = self._inst_lib.get_inst(instResult.instruction_id)
-                if try_no_refresh and not cur_inst.forced_new_frame:
+                if try_no_refresh:
                     instResult.set_skip_refresh()
                 section.add_instruction(instResult)
 
@@ -240,7 +252,6 @@ class SCTDecoder:
                             garbage += self.getWord(self._cursor * 4)
                             self._cursor += 1
                         instResult.add_error(('Garbage', garbage))
-                        instResult.add_garbage(garbage)
                     elif switch_end < min_case_start:
                         raise IndexError(f'{self.log_key}: Switch incomplete, switch end < min case start')
 
@@ -250,12 +261,9 @@ class SCTDecoder:
                         next_inst = self.getInt(self._cursor * 4)
                         if not ((0 < next_inst < 265) or (next_inst in [4, 8])):
                             section.add_error('Garbage: garbage instruction after return')
-                            self._cursor += 1
-                            garbage = bytearray(b'')
-                            while self._cursor < end_cursor:
-                                garbage += self.getWord(self._cursor * 4)
-                                self._cursor += 1
-                            section.add_garbage('End', garbage)
+                            garbage = self._sct[self._cursor*4:bounds[1]]
+                            self._cursor = bounds[1]//4
+                            section.add_garbage('end', garbage)
 
                 if instResult.instruction_id == 0xa:
                     end_cursor = bounds[1] // 4
@@ -459,7 +467,7 @@ class SCTDecoder:
 
             if not done and 'float' not in param_type:
                 signed = scptResult < 0
-                scptResult = int(scptResult)
+                scptResult = math.floor(scptResult)
                 if 'int' not in param_type:
                     scptResult = bytearray(scptResult.to_bytes(4, 'big', signed=signed)).hex()
                     if 'short' in param_type:
@@ -586,10 +594,14 @@ class SCTDecoder:
             elif currentWord in self._p_codes.compare.keys():
                 currVals = {'1': result_stack[stack_index], '2': result_stack[stack_index + 1]}
                 cur_result = {self._p_codes.compare[currentWord]: currVals}
+                nones = 0
+                for v in currVals.values():
+                    if v is None:
+                        nones += 1
+                result_stack[stack_index+nones] = cur_result
+                stack_index -= 1
                 if currentWord == 0x0000000a:
                     stack_index += 1
-                result_stack[stack_index] = cur_result
-                stack_index -= 1
             elif currentWord in self._p_codes.arithmetic.keys():
                 currVals = {'1': result_stack[stack_index], '2': result_stack[stack_index + 1]}
                 inputs = []
@@ -763,6 +775,32 @@ class SCTDecoder:
                     break
         str_bytes = self._sct[pos: pos + size]
         return str_bytes.decode(encoding=encoding, errors='backslashreplace')
+
+    def _get_garbage_after_string(self, bounds):
+        offset = 0
+        end_of_string = -1
+        garbage = bytearray()
+        first_zero = True
+        expected_zeros = -1
+        while (self._cursor * 4) + offset < bounds[1]:
+            cur_byte = self._sct[self._cursor*4+offset].to_bytes(length=1, byteorder=self._cur_endian)
+
+            if end_of_string > 0:
+                garbage.extend(cur_byte)
+
+            elif cur_byte == b'\x00':
+                if first_zero:
+                    first_zero = False
+                    expected_zeros = 1
+                    if (offset + expected_zeros) % 4 != 0:
+                        expected_zeros += (4 - ((offset + expected_zeros) % 4))
+                expected_zeros -= 1
+                if expected_zeros == 0:
+                    end_of_string = offset
+
+            offset += 1
+
+        return garbage
 
     def getWord(self, pos) -> bytearray:
         return self._sct[pos: pos + 4]
@@ -1050,6 +1088,7 @@ class SCTDecoder:
             f_ind = decoded_sct.add_footer_entry(foot_str)
             origin_inst = decoded_sct.sections[link.origin_trace[0]].get_instruction_by_index(link.origin_trace[1])
             param: SCTParameter = origin_inst.parameters[int(link.origin_trace[2])]
+            param.link_result = foot_str
             param.link_value = ('Footer', f_ind)
 
     @staticmethod
@@ -1058,8 +1097,11 @@ class SCTDecoder:
         cur_group = []
         has_header = False
         i = 0
+        new_section_order = []
+        new_sections = {}
         for name, section in decoded_sct.sections.items():
             if section.type == 'Label':
+                new_section_order.append(name)
                 has_header = True
                 if cur_group_name != '':
                     decoded_sct.string_groups[cur_group_name] = cur_group
@@ -1075,22 +1117,37 @@ class SCTDecoder:
                         decoded_sct.string_groups[cur_group_name] = cur_group
                         cur_group = []
                     cur_group_name = f'Untitled({i})'
+                    new_section_order.append(cur_group_name)
+                    new_sections[cur_group_name] = (SCTSection(cur_group_name, 0, section.start_offset))
+                    new_sections[cur_group_name].set_type('Label')
                     has_header = True
                     i += 1
                     print(f'This string is not located contiguously under a label: {section.name}, new group created: {cur_group_name}')
                 cur_group.append(section.name)
                 decoded_sct.string_locations[section.name] = cur_group_name
                 decoded_sct.strings[section.name] = section.string
+                new_section_order.append(name)
             elif section.type == 'Script':
                 has_header = False
+                new_section_order.append(name)
+
+        if has_header:
+            decoded_sct.string_groups[cur_group_name] = cur_group
 
         for name in list(decoded_sct.string_groups.keys()):
             if len(decoded_sct.string_groups[name]) == 0:
                 decoded_sct.string_groups.pop(name)
 
-        for name in list(decoded_sct.sections.keys()):
-            if decoded_sct.sections[name].type == 'String':
-                decoded_sct.sections.pop(name)
+        new_sections_dict = {}
+        for name in new_section_order:
+            if name in decoded_sct.sections.keys():
+                if decoded_sct.sections[name].type == 'String':
+                    decoded_sct.string_sections[name] = decoded_sct.sections[name]
+                    continue
+                new_sections_dict[name] = decoded_sct.sections[name]
+                continue
+            new_sections_dict[name] = new_sections[name]
+        decoded_sct.sections = new_sections_dict
 
     @staticmethod
     def _detect_unused_sections(decoded_sct: SCTScript):
@@ -1573,14 +1630,14 @@ if __name__ == '__main__':
 
     insts = BaseInstLibFacade()
 
-    with open('../../UserSettings/DefaultInstructions.json', 'r') as fh:
-        file = fh.read()
-        file_json = json.loads(file)
+    # with open('../../UserSettings/DefaultInstructions.json', 'r') as fh:
+    #     file = fh.read()
+    #     file_json = json.loads(file)
+    #
+    # insts.set_inst_all_fields(file_json)
 
-    insts.set_inst_all_fields(file_json)
-
-    file_of_interest = None
-    # file_of_interest = 'me103b.sct'
+    # file_of_interest = None
+    file_of_interest = 'me004a.sct'
 
     if input('Run all scripts?') not in ['Y', 'y']:
 

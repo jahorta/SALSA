@@ -13,7 +13,6 @@ class Settings(configparser.ConfigParser):
         self._load_settings()
 
     def _load_settings(self):
-
         if not os.path.exists(self.filename):
             self._new_settings_file()
 
@@ -26,9 +25,13 @@ class Settings(configparser.ConfigParser):
         with open(self.filename, 'w') as configfile:
             self.write(configfile)
 
-    def save_settings(self):
+    def _save_settings(self):
         with open(self.filename, 'w') as configfile:
             self.write(configfile)
+
+    def set_setting(self, group, setting, value):
+        self[group][setting] = value
+        self._save_settings()
 
 
 settings = Settings()

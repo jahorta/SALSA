@@ -2,7 +2,7 @@ import json
 import os.path
 import pickle
 
-from Common.settings import settings
+from Common.setting_class import settings
 
 
 class ProjectModel:

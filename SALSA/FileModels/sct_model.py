@@ -1,8 +1,9 @@
 import os
 
-from SALSA.Common.settings import settings
+from SALSA.Common.setting_class import settings
 from SALSA.AKLZ.aklz import Aklz
 from SALSA.Scripts.script_decoder import SCTDecoder
+from SALSA.Scripts.script_encoder import SCTEncoder
 
 
 class SCTModel:
@@ -22,16 +23,27 @@ class SCTModel:
             return settings[self.log_key]['directory']
         return ''
 
-    def save_sct(self, filepath, sct_file):
+    def export_script_as_sct(self, filepath, script, base_insts, options, compress=False):
+        print(f'Exporting {script.name}...', end='\r')
+        sct_file = SCTEncoder.encode_sct_file_from_project_script(project_script=script, base_insts=base_insts, **options)
+        self.save_sct_file(filepath=filepath, sct_file=sct_file, compress=compress)
+
+    def save_sct_file(self, filepath, sct_file, compress=False):
         path_dir = os.path.dirname(filepath)
         if not os.path.exists(path_dir):
             print(f'{self.log_key}: Unable to save, directory does not exist: {path_dir}')
+            return
+
+        if compress:
+            sct_file = Aklz().compress(sct_file)
 
         with open(filepath, 'wb') as sct:
             sct.write(sct_file)
 
+        print(f'{self.log_key}: SCT file saved to {filepath}')
+
     def load_sct(self, insts, file: str):
-        out = self._read_sct_file(file)
+        out = self.read_sct_file(file)
         if out is None:
             return None
         name = out[0]
@@ -39,7 +51,7 @@ class SCTModel:
         sct_out = SCTDecoder.decode_sct_from_file(name=name, sct=sct_raw, inst_lib=insts)
         return name, sct_out
 
-    def _read_sct_file(self, filepath: str):
+    def read_sct_file(self, filepath: str):
         if '/' not in filepath:
             filename = filepath.split('.')[0]
             if 'directory' not in settings[self.log_key]:

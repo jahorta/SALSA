@@ -1,8 +1,11 @@
-from typing import Union, Dict, Tuple
+from typing import Union, Dict
+import tkinter as tk
 
-from GUI.ProjectEditor.project_editor_view import ProjectEditorView
-from GUI.widgets import CustomTree2
-from Project.project_facade import SCTProjectFacade
+from Common.setting_class import settings
+from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
+from SALSA.GUI.ProjectEditor.sct_export_popup import SCTExportPopup
+from SALSA.GUI.widgets import CustomTree2
+from SALSA.Project.project_facade import SCTProjectFacade
 
 
 tree_children = {
@@ -18,9 +21,29 @@ tree_parents = {v: k for k, v in tree_children.items()}
 class ProjectEditorController:
     log_name = 'PrjEditorCtrl'
 
-    def __init__(self, view: ProjectEditorView, facade: SCTProjectFacade):
+    popup_names = {
+        SCTExportPopup: 'SCTExport'
+    }
+
+    sct_export_popup: Union[None, SCTExportPopup] = None
+
+    default_settings = {
+        'style': 'grouped'
+    }
+
+    def __init__(self, parent: tk.Tk, view: ProjectEditorView, facade: SCTProjectFacade, callbacks):
+        self.parent: tk.Tk = parent
         self.view: ProjectEditorView = view
         self.project: SCTProjectFacade = facade
+        self.callbacks = callbacks
+
+        if self.log_name not in settings:
+            settings[self.log_name] = {}
+
+        for s, v in self.default_settings.items():
+            if s not in settings[self.log_name]:
+                settings[self.log_name][s] = v
+
         self.current: Dict[str, Union[int, None]] = {
             'script': None,
             'section': None,
@@ -33,24 +56,11 @@ class ProjectEditorController:
             'instruction': self.view.insts_tree
         }
 
-        self.settings = {
-            'group_insts': True,
-            'group_sects': True
-        }
-
         self.project.set_callback(key='update_scripts', callback=lambda: self.update_tree('script', self.project.get_tree(self.view.get_headers('script'))))
 
         self.trees['script'].add_callback('select', self.on_select_tree_entry)
         self.trees['section'].add_callback('select', self.on_select_tree_entry)
         self.trees['instruction'].add_callback('select', self.on_select_tree_entry)
-
-        self.style = 'grouped'
-
-    def update_setting(self, setting, value):
-        if setting not in self.settings.keys():
-            print(f"{self.log_name}: {setting} not in settings, wasn't set")
-            return
-        self.settings['setting'] = value
 
     def load_project(self):
         for key in list(self.current.keys()):
@@ -62,7 +72,7 @@ class ProjectEditorController:
     def on_select_tree_entry(self, tree_key, entry):
         if tree_key == 'instruction':
             return self.on_select_instruction(entry)
-        kwargs = {'style': self.style}
+        kwargs = {'style': settings[self.log_name]['style']}
         self.current[tree_key] = entry
         cur_key = tree_key
         while True:
@@ -130,11 +140,50 @@ class ProjectEditorController:
     def on_set_inst_start(self, start, newID):
         pass
 
-    def show_variables(self):
+    # ################################ #
+    # Project Editing Popup Controller #
+    # ################################ #
+
+    # ---------------------------------- #
+    # Instruction Editor Popup Functions #
+    # ---------------------------------- #
+
+    def show_instructions_popup(self):
         pass
 
-    def show_strings(self):
+    # ------------------------------- #
+    # Variable Editor Popup Functions #
+    # ------------------------------- #
+
+    def show_variables_popup(self):
         pass
+
+    # ----------------------------- #
+    # String Editor Popup Functions #
+    # ----------------------------- #
+
+    def show_strings_popup(self):
+        pass
+
+    # -------------------------- #
+    # SCT Export Popup Functions #
+    # -------------------------- #
+
+    def show_sct_export_popup(self, selected=None):
+        callbacks = {
+            'export': self.callbacks['export_sct'], 'cancel': self.close_popup,
+            'get_tree': lambda: self.project.get_tree(self.view.get_headers('script'))
+            }
+        self.sct_export_popup = SCTExportPopup(self.parent, callbacks=callbacks, name=self.popup_names[SCTExportPopup], selected=selected)
+
+    # ----------------------- #
+    # General popup functions #
+    # ----------------------- #
+
+    def close_popup(self, name):
+        if name == self.popup_names[SCTExportPopup]:
+            self.sct_export_popup.destroy()
+            self.sct_export_popup = None
 
     def show_right_click_menu(self):
         pass

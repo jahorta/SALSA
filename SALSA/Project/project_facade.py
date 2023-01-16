@@ -3,7 +3,7 @@ from typing import Union, Tuple
 from Project.dictize_project import dictize_project
 from Project.project_container import SCTProject, SCTSection
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
-from Common.settings import settings
+from Common.setting_class import settings
 
 
 class SCTProjectFacade:
@@ -132,7 +132,7 @@ class SCTProjectFacade:
 
     def add_script_to_project(self, script_name, script):
         self.project.scripts[script_name] = script
-        script_keys = sorted(list(self.project.scripts.keys()))
+        script_keys = sorted(list(self.project.scripts.keys()), key=str.casefold)
         self.project.scripts = {k: self.project.scripts[k] for k in script_keys}
         if 'update_scripts' not in self.callbacks:
             return
@@ -147,3 +147,9 @@ class SCTProjectFacade:
             return None
         name = list(self.project.scripts.keys())[index]
         return name, self.project.scripts[name]
+
+    def get_project_script_by_name(self, name):
+        if name not in self.project.scripts.keys():
+            print(f'{self.log_key}: No script loaded with the name: {name}')
+            return None
+        return self.project.scripts[name]

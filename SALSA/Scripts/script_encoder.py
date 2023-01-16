@@ -2,12 +2,13 @@ import struct
 from typing import Union
 
 from BaseInstructions.bi_facade import BaseInstLibFacade
-from Project.project_container import SCTScript
+from Project.project_container import SCTScript, SCTSection
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 from SALSA.Scripts.scpt_compare_fxns import is_equal, not_equal
+from SALSA.Scripts.validation_strings import me249a_foot
 
 
-class ScriptEncoder:
+class SCTEncoder:
     log_key = 'SCTEncoder'
     skip_refresh = 13
     _placeholder = bytearray(b'\x7f\x7f\xff\xff')
@@ -16,6 +17,17 @@ class ScriptEncoder:
     _header_offset_length = 0x4
     _header_name_length = 0x10
     _default_header_start = bytearray(b'\x07\xd2\x00\x06\x00\x0e\x00\x00')
+    _additions = {
+        'M04523-177-1': b'\x50\x00\x00\x01',
+        'M04524-177-1': b'\x50\x00\x00\x01',
+        'M04525-177-1': b'\x50\x00\x00\x01',
+        'K08cut8-136-1': b'\x50\x00\x00\x01',
+        'l01cut6-134-0': b'\x50\x00\x00\x01',
+        'l01cut7-134-0': b'\x50\x00\x00\x01'
+    }
+
+    # This variable sets whether validation bytes are added, should be false in production
+    validation: bool = True
 
     use_garbage: bool
     combine_footer_links: bool
@@ -24,10 +36,20 @@ class ScriptEncoder:
     param_tests = {'==': is_equal, '!=': not_equal}
 
     def __init__(self, script: SCTScript, base_insts: BaseInstLibFacade, endian='big'):
+        self.sct_body = bytearray()
+        # for decoder, encoder validation only
+        if self.validation:
+            if '099' in script.name:
+                self.sct_body = bytearray(b'\x4F\x00\x00\x00\x00\x00\x00\x04\x00\x00\x66\x43\x1D\x00\x00\x00\x00\x00\x00\x04'
+                                          b'\x00\x00\x34\x43\x1D\x00\x00\x00\x00\x00\x00\x04\x00\x00\x16\x43\x1D\x00\x00\x00'
+                                          b'\x00\x00\x00\x04\x00\x00\x80\x3F\x1D\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00'
+                                          b'\x1D\x00\x00\x00\x00\x00\x00\x04\x00\xC0\x0F\xC5\x1D\x00\x00\x00\x00\x00\x00\x04'
+                                          b'\x00\x00\x80\x3F\x1D\x00\x00\x00')
+            if '241a' in script.name:
+                self.sct_body = bytearray(b'\x0b\x00\x00\x00\xc4\xe2\x00\x00')
         self.script = script
         self.bi = base_insts
         self.sct = bytearray()
-        self.sct_body = bytearray()
         self.sct_head = self.script.header if self.script.header is not None else self._default_header_start
         self.sct_foot = bytearray()
         self.header_dict = {}
@@ -45,9 +67,13 @@ class ScriptEncoder:
         self.inst_positions = {}
 
     @classmethod
-    def encode_sct_file_from_project_script(cls, project_script: SCTScript, base_insts: BaseInstLibFacade, use_garbage=True, add_spurious_refresh=True):
+    def encode_sct_file_from_project_script(cls, project_script: SCTScript, base_insts: BaseInstLibFacade,
+                                            use_garbage=True, combine_footer_links=True, add_spurious_refresh=True):
+
         encoder = cls(script=project_script, base_insts=base_insts)
-        encoder.encode_sct_file(use_garbage=use_garbage, add_spurious_refresh=add_spurious_refresh)
+        encoder.encode_sct_file(use_garbage=use_garbage, combine_footer_links=combine_footer_links,
+                                add_spurious_refresh=add_spurious_refresh)
+
         return encoder.sct
 
     def encode_sct_file(self, use_garbage=True, combine_footer_links=False, add_spurious_refresh=False):
@@ -63,12 +89,6 @@ class ScriptEncoder:
             if name in self.script.string_groups.keys():
                 self.added_string_groups.append(name)
                 self._add_strings(name)
-
-        # If there are strings remaining, add to end?
-        for name in self.script.string_groups.keys():
-            if name in self.added_string_groups:
-                continue
-            self._add_strings(name)
 
         # Resolve through jmp_links
         for link_offset, jmp_to in self.sct_links.items():
@@ -87,8 +107,12 @@ class ScriptEncoder:
             self._sct_body_replace_hex(location=link_offset, value=str_offset_word, validation=self._placeholder)
 
         # Add footer entries in order by links while resolving links
+        added_footer_entries = {}
         for offset, string in self.footer_links.items():
-            str_pos = len(self.sct_body) + len(self.sct_foot)
+            if combine_footer_links and string in added_footer_entries:
+                str_pos = added_footer_entries[string]
+            else:
+                str_pos = len(self.sct_body) + len(self.sct_foot)
             str_offset = str_pos - offset
             str_offset_word = self._make_word(i=str_offset)
             self.sct_foot.extend(self._encode_string(string=string, align=False))
@@ -116,31 +140,33 @@ class ScriptEncoder:
             # Add String using encode string
             self.sct_body.extend(self._encode_string(string=string, align=True))
 
+            string_sect: SCTSection = self.script.string_sections[name]
+            if 'end' in string_sect.garbage:
+                self.sct_body.extend(string_sect.garbage['end'])
+
     def _encode_section(self, name, section):
         # If the section is a label, just add the entry to the header and add a string label
-        if section.type == 'Label':
-            self.header_dict[name] = len(self.sct_body)
-            self.sct_body.extend(self._str_label)
-            return
-
         sect_list = [name]
         if len(section.internal_sections_inst.keys()) > 0:
             sect_list = list(section.internal_sections_inst)
+        sect_name = name
         for inst_id in section.instruction_ids_ungrouped:
             inst = section.instructions[inst_id]
             if inst.instruction_id == 9:
-                self.header_dict[sect_list[0]] = len(self.sct_body)
+                sect_name = sect_list[0]
+                self.header_dict[sect_name] = len(self.sct_body)
                 sect_list.pop(0)
-            self._encode_instruction(inst)
+            self._encode_instruction(inst, trace=[sect_name])
 
         # add garbage at end of section if needed
         if self.use_garbage:
             if 'end' in section.garbage.keys():
                 self.sct_body.extend(section.garbage['end'])
 
-    def _encode_instruction(self, instruction):
+    def _encode_instruction(self, instruction, trace):
         self.inst_positions[instruction.ID] = len(self.sct_body)
-        base_inst = base_insts.get_inst(instruction.instruction_id)
+        base_inst = self.bi.get_inst(instruction.instruction_id)
+        trace.append(str(instruction.instruction_id))
 
         # add 13 code if needed or wanted
         if instruction.skip_refresh:
@@ -158,7 +184,8 @@ class ScriptEncoder:
                 if p_id == base_inst.loop_iter:
                     loop_iter_param_location = len(self.sct_body)
                     loop_iter_param_value = instruction.parameters[p_id].value
-            self._encode_param(param=instruction.parameters[p_id], base_param=base_inst.parameters[p_id])
+            self._encode_param(param=instruction.parameters[p_id], base_param=base_inst.parameters[p_id],
+                               trace=[*trace, str(p_id)])
 
         do_loop = True
         has_loop_cond = False
@@ -181,7 +208,8 @@ class ScriptEncoder:
         if do_loop:
             for loop in instruction.loop_parameters:
                 for p_id, param in loop.items():
-                    self._encode_param(param=param, base_param=base_inst.parameters[p_id])
+                    self._encode_param(param=loop[p_id], base_param=base_inst.parameters[p_id],
+                                       trace=[*trace, str(p_id)])
 
                     # Check internal loop conditions
                     if not has_loop_cond:
@@ -189,6 +217,9 @@ class ScriptEncoder:
 
                     if p_id == base_inst.loop_cond['Parameter']:
                         value1 = param.value
+                        if isinstance(value1, dict):
+                            if isinstance(param.arithmetic_value, float):
+                                value1 = param.arithmetic_value
                         if not isinstance(value1, int):
                             value1 = int(value1)
                         value2 = base_inst.loop_cond['Value']
@@ -207,7 +238,8 @@ class ScriptEncoder:
                 self._sct_body_replace_hex(location=loop_iter_param_location, value=self._make_word(loop_iters_performed))
 
         for p_id in base_inst.params_after:
-            self._encode_param(param=instruction.parameters[p_id], base_param=base_inst.parameters[p_id])
+            self._encode_param(param=instruction.parameters[p_id], base_param=base_inst.parameters[p_id],
+                               trace=[*trace, str(p_id)])
 
         # add garbage at then of instruction if needed
         garbage_index = None
@@ -220,7 +252,7 @@ class ScriptEncoder:
             garbage = instruction.errors[garbage_index][1]
             self.sct_body.extend(garbage)
 
-    def _encode_param(self, param, base_param):
+    def _encode_param(self, param, base_param, trace):
         # if needed, setup link and use 0x7fffffff as placeholder
         if param.link is not None:
             link_value = param.link_value
@@ -247,14 +279,20 @@ class ScriptEncoder:
 
                 if no_loop:
                     value = self._make_word(self.param_code.no_loop[param.value])
+                    if self.validation:
+                        self._check_additions(trace, value)
                 else:
                     value = self._encode_scpt_param(param=param.value)
+                    if self.validation:
+                        self._check_additions(trace, value)
                     value.extend(self._make_word(self.param_code.stop_code))
         else:
             if 'code' in base_param.type:
                 value = self._encode_scpt_param(param.value)
             else:
                 value = self._make_word(param.value)
+            if self.validation:
+                self._check_additions(trace, value)
 
         # add parameter
         self.sct_body.extend(value)
@@ -303,6 +341,11 @@ class ScriptEncoder:
             print(f'unknown code?')
 
         return param_bytes
+
+    def _check_additions(self, trace, ba: bytearray):
+        key = '-'.join(trace)
+        if key in self._additions:
+            ba.extend(self._additions[key])
 
     def _make_word(self, i: int, signed=False):
         return bytearray(i.to_bytes(length=4, byteorder=self.endian, signed=signed))
@@ -366,9 +409,9 @@ if __name__ == '__main__':
     project.load_project(prj=project_pickled, pickled=True)
 
     sct_name, script = project.get_project_script_by_index(0)
-    sct = ScriptEncoder.encode_sct_file_from_project_script(project_script=script, base_insts=base_insts, use_garbage=True)
+    sct = SCTEncoder.encode_sct_file_from_project_script(project_script=script, base_insts=base_insts, use_garbage=True)
 
     script_file_path = f'./test_files/{sct_name}_out.sct'
     sct_model = SCTModel()
-    sct_model.save_sct(filepath=script_file_path, sct_file=sct)
+    sct_model.save_sct_file(filepath=script_file_path, sct_file=sct)
 

@@ -1,4 +1,5 @@
 import json
+import os
 import threading
 import tkinter as tk
 from tkinter import filedialog
@@ -16,7 +17,7 @@ from Project.project_facade import SCTProjectFacade
 class Application(tk.Tk):
     """Controls the links between the data models and views"""
     test = True
-    title_text = "Skies of Arcadia Legends - Script Assistant"
+    title_text = "Skies of Arcadia Legends Script Assistant"
     default_sct_file = 'me002a.sct'
     export_thread: threading.Thread
 
@@ -35,11 +36,13 @@ class Application(tk.Tk):
         self.project_filepath = ''
 
         # Setup script editor view and controller
-        self.script_edit_view = ProjectEditorView(self)
-        self.script_edit_view.grid(row=0, column=0, sticky='NSEW', pady=5)
-        self.script_edit_controller = ProjectEditorController(self.script_edit_view, self.project)
+        self.project_edit_view = ProjectEditorView(self)
+        self.project_edit_view.grid(row=0, column=0, sticky='NSEW', pady=5)
 
-        self.gui = GUIController(parent=self, scpt_editor_view=self.script_edit_view,
+        project_edit_callbacks = {'export_sct': self.on_export_scts}
+        self.project_edit_controller = ProjectEditorController(self, self.project_edit_view, self.project, project_edit_callbacks)
+
+        self.gui = GUIController(parent=self, scpt_editor_view=self.project_edit_view,
                                  project_facade=self.project, inst_lib_facade=self.base_insts)
 
         # Create Models
@@ -56,10 +59,11 @@ class Application(tk.Tk):
             'file->settings': self.gui.show_settings,
             'file->quit': self.on_quit,
             'prj->add_script': self.add_script,
+            'prj->export_script': self.project_edit_controller.show_sct_export_popup,
+            'prj->variable': self.project_edit_controller.show_variables_popup,
+            'prj->string': self.project_edit_controller.show_strings_popup,
             'analysis->export': self.gui.show_analysis_view,
             'view->inst': self.gui.show_instruction_view,
-            'view->variable': self.script_edit_controller.show_variables,
-            'view->string': self.script_edit_controller.show_strings,
             'help->help': self.gui.show_help,
             'help->about': self.gui.show_about,
         }
@@ -114,6 +118,7 @@ class Application(tk.Tk):
 
         prj = self.proj_model.load_project(filepath=filepath, pickled=True)
         self.project.load_project(prj, pickled=True)
+        self.project_edit_controller.load_project()
         self.gui.enable_script_view()
 
     def on_load_recent_project(self, index):
@@ -142,3 +147,18 @@ class Application(tk.Tk):
 
     def on_quit(self):
         pass
+
+    def on_export_scts(self, directory, scripts, options):
+        compress = options['compress_aklz']
+        options.pop('compress_aklz')
+
+        for script in scripts:
+            script_file = script
+            if script_file[-4:] != '.sct':
+                script_file += '.sct'
+            script = self.project.get_project_script_by_name(script)
+            filepath = os.path.join(directory, script_file)
+            self.sct_model.export_script_as_sct(filepath=filepath, script=script, base_insts=self.base_insts,
+                                                options=options, compress=compress)
+
+        self.project_edit_controller.close_popup('SCTExport')
