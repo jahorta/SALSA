@@ -998,7 +998,7 @@ class SCTDecoder:
                         if link.target < first_start:
                             internal = True
                             break
-                        new_error = e[1][first_start - inst.inst_pos:link.target - inst.inst_pos]
+                        new_error = e[1][:link.target - first_start]
                         error_ind = i
                         break
 

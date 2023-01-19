@@ -5,7 +5,6 @@ from BaseInstructions.bi_facade import BaseInstLibFacade
 from Project.project_container import SCTScript, SCTSection
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 from SALSA.Scripts.scpt_compare_fxns import is_equal, not_equal
-from SALSA.Scripts.validation_strings import me249a_foot
 
 
 class SCTEncoder:
@@ -17,16 +16,8 @@ class SCTEncoder:
     _header_offset_length = 0x4
     _header_name_length = 0x10
     _default_header_start = bytearray(b'\x07\xd2\x00\x06\x00\x0e\x00\x00')
-    _additions = {
-        'M04523-177-1': b'\x50\x00\x00\x01',
-        'M04524-177-1': b'\x50\x00\x00\x01',
-        'M04525-177-1': b'\x50\x00\x00\x01',
-        'K08cut8-136-1': b'\x50\x00\x00\x01',
-        'l01cut6-134-0': b'\x50\x00\x00\x01',
-        'l01cut7-134-0': b'\x50\x00\x00\x01'
-    }
 
-    # This variable sets whether validation bytes are added, should be false in production
+    # These variables are for validation purposes only, validation should be false in production
     validation: bool = True
 
     use_garbage: bool
@@ -40,13 +31,37 @@ class SCTEncoder:
         # for decoder, encoder validation only
         if self.validation:
             if '099' in script.name:
-                self.sct_body = bytearray(b'\x4F\x00\x00\x00\x00\x00\x00\x04\x00\x00\x66\x43\x1D\x00\x00\x00\x00\x00\x00\x04'
-                                          b'\x00\x00\x34\x43\x1D\x00\x00\x00\x00\x00\x00\x04\x00\x00\x16\x43\x1D\x00\x00\x00'
-                                          b'\x00\x00\x00\x04\x00\x00\x80\x3F\x1D\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00'
-                                          b'\x1D\x00\x00\x00\x00\x00\x00\x04\x00\xC0\x0F\xC5\x1D\x00\x00\x00\x00\x00\x00\x04'
-                                          b'\x00\x00\x80\x3F\x1D\x00\x00\x00')
+                self.sct_body = bytearray(b'\x4F\x00\x00\x00\x00\x00\x00\x04\x00\x00\x66\x43\x1D\x00\x00\x00\x00\x00\x00'
+                                          b'\x04\x00\x00\x34\x43\x1D\x00\x00\x00\x00\x00\x00\x04\x00\x00\x16\x43\x1D\x00'
+                                          b'\x00\x00\x00\x00\x00\x04\x00\x00\x80\x3F\x1D\x00\x00\x00\x00\x00\x00\x04\x00'
+                                          b'\x00\x00\x00\x1D\x00\x00\x00\x00\x00\x00\x04\x00\xC0\x0F\xC5\x1D\x00\x00\x00'
+                                          b'\x00\x00\x00\x04\x00\x00\x80\x3F\x1D\x00\x00\x00')
             if '241a' in script.name:
                 self.sct_body = bytearray(b'\x0b\x00\x00\x00\xc4\xe2\x00\x00')
+            if '513a' in script.name or '576a' in script.name:
+                self.sct_body = bytearray(b'\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00'
+                                          b'\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00'
+                                          b'\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D'
+                                          b'\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00')
+            self._additions = {
+                'M04523-177-1': b'\x50\x00\x00\x01',
+                'M04524-177-1': b'\x50\x00\x00\x01',
+                'M04525-177-1': b'\x50\x00\x00\x01',
+                'K08cut8-136-1': b'\x50\x00\x00\x01',
+                'l01cut6-134-0': b'\x50\x00\x00\x01',
+                'l01cut7-134-0': b'\x50\x00\x00\x01',
+                'doc00_init01-136-1': b'\x50\x00\x00\x01',
+                'hama_big01-136-1': b'\x50\x00\x00\x01',
+                'hama_change01-136-1': b'\x50\x00\x00\x01',
+                'me260aq02-136-1': {'ind': [1], 'value': b'\x50\x00\x00\x01'},
+                'me260aq03-136-1': {'ind': [1], 'value': b'\x50\x00\x00\x01'},
+                'q04a_start-136-1': {'ind': [1], 'value': b'\x50\x00\x00\x01'},
+                'me260aq05-136-1': {'ind': [1], 'value': b'\x50\x00\x00\x01'},
+                'camb02-232-3': {'ind': [8], 'value': b'\x04\x00\x00\x00\x42\x80\x00\x00'},
+                'camb02-224-13': {'ind': [10], 'value': b'\x04\x00\x00\x00\x42\xF9\x00\x00'},
+                '_EV_VER2-50-0': {'ind': [2], 'value': b'\x50\x00\x00\x01'}
+            }
+
         self.script = script
         self.bi = base_insts
         self.sct = bytearray()
@@ -345,7 +360,16 @@ class SCTEncoder:
     def _check_additions(self, trace, ba: bytearray):
         key = '-'.join(trace)
         if key in self._additions:
-            ba.extend(self._additions[key])
+            addition = self._additions[key]
+            if isinstance(addition, dict):
+                will_add = False
+                if 0 in addition['ind']:
+                    will_add = True
+                addition['ind'] = [_-1 for _ in addition['ind']]
+                if not will_add:
+                    return
+                addition = addition['value']
+            ba.extend(addition)
 
     def _make_word(self, i: int, signed=False):
         return bytearray(i.to_bytes(length=4, byteorder=self.endian, signed=signed))
