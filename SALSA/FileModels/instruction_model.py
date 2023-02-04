@@ -1,10 +1,6 @@
 import json
 import os
 
-from SALSA.Common.constants import FieldTypes as FT
-from SALSA.Common.constants import OverrideTypes as OT
-
-
 class InstructionModel:
     fields = {
         'Instruction ID': {'req': True, 'type': FT.integer, 'min': 0, 'max': 270},
