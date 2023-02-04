@@ -18,7 +18,7 @@ class Settings(configparser.ConfigParser):
             self._new_settings_file()
 
         with open(self.filename, 'r') as configfile:
-            self.read(configfile)
+            self.read_file(configfile)
 
     def _new_settings_file(self):
         for name, group in self.defaults.items():
@@ -29,6 +29,10 @@ class Settings(configparser.ConfigParser):
     def _save_settings(self):
         with open(self.filename, 'w') as configfile:
             self.write(configfile)
+
+    def _add_section(self, section):
+        self[section] = {}
+        self._save_settings()
 
     def set_single(self, group, setting, value):
         self[group][setting] = value
