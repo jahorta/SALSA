@@ -25,7 +25,7 @@ class ProjectModel:
             print('File does not exist')
             return
 
-        settings[self.log_key]['directory'] = os.path.dirname(filepath)
+        settings.set_single(self.log_key, 'directory', os.path.dirname(filepath))
         if pickled:
             with open(filepath, 'rb') as fh:
                 proj = pickle.load(fh)
@@ -68,6 +68,7 @@ class ProjectModel:
         self.callbacks['menu->update_recents'](self.get_recent_filenames())
 
     def _save_recent_filelist(self):
+        set_list = []
         for i in range(0, self.max_recents):
             key = f'recent_file_{i}'
             if i >= len(self.recent_files):
@@ -75,7 +76,8 @@ class ProjectModel:
                     settings[self.log_key].pop(key)
                 continue
             cur_path = self.recent_files[i]
-            settings[self.log_key][key] = cur_path
+            set_list.append([self.log_key, key, cur_path])
+        settings.set_multiple(set_list)
 
     def _load_recent_filelist(self):
         self.recent_files = []
