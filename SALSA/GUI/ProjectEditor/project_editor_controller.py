@@ -90,10 +90,28 @@ class ProjectEditorController:
         details = self.project.get_instruction_details(**self.current)
         self.set_instruction_details(details)
 
+    def clear_tree(self, tree: str):
+        if tree in self.trees.keys():
+            self.trees[tree].clear_all_entries()
+
     def update_tree(self, tree, tree_dict: Union[dict, None]):
-        self.trees[tree].clear_all_entries()
+        if tree is None:
+            for tree in self.trees.keys():
+                self.clear_tree(tree)
+            return
+
+        # Clear the current tree and all child trees to prevent desync
+        cur_tree = tree
+        trees_to_clear = [cur_tree]
+        while cur_tree in tree_children.keys():
+            trees_to_clear.append(tree_children[cur_tree])
+            cur_tree = tree_children[cur_tree]
+        for t in trees_to_clear:
+            self.clear_tree(t)
+
         if tree_dict is None:
             return
+
         self._add_tree_entries(tree, tree_dict)
 
     def _add_tree_entries(self, tree_key: str, tree_list):
@@ -187,3 +205,4 @@ class ProjectEditorController:
 
     def show_right_click_menu(self):
         pass
+
