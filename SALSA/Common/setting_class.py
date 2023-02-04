@@ -1,5 +1,6 @@
 import os
 import configparser
+from typing import Tuple, List
 
 
 class Settings(configparser.ConfigParser):
@@ -29,8 +30,13 @@ class Settings(configparser.ConfigParser):
         with open(self.filename, 'w') as configfile:
             self.write(configfile)
 
-    def set_setting(self, group, setting, value):
+    def set_single(self, group, setting, value):
         self[group][setting] = value
+        self._save_settings()
+
+    def set_multiple(self, setting_list: List[Tuple]):
+        for s in setting_list:
+            self[s[0]][s[1]] = s[2]
         self._save_settings()
 
 
