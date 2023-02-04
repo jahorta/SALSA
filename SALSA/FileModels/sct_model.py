@@ -16,7 +16,7 @@ class SCTModel:
 
     def set_default_directory(self, directory):
         if os.path.exists(directory) and os.path.isdir(directory):
-            settings[self.log_key]['directory'] = directory
+            settings.set_single(self.log_key, 'directory', directory)
 
     def get_default_directory(self):
         if 'directory' in settings[self.log_key]:
