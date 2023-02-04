@@ -8,9 +8,10 @@ class MainMenu(tk.Menu):
         super().__init__(parent, **kwargs)
 
         self.recent_files = recent_files
-        if len(self.recent_files) == 0:
-            self.no_recents = True
-            self.recent_files = ['No Recent Files']
+        self.no_recents = True if len(self.recent_files) == 0 else False
+        self.recent_files = ['No Recent Files'] if len(self.recent_files) == 0 else recent_files
+
+        self.callbacks = callbacks
 
         self.parent = parent
         self.file_menu = tk.Menu(self, tearoff=False)
@@ -19,11 +20,11 @@ class MainMenu(tk.Menu):
         self.file_menu.add_command(label='Load Project', command=callbacks['file->load_prj'])
 
         self.recent_menu = tk.Menu(self.file_menu, tearoff=False)
-        for file in self.recent_files:
-            self.recent_menu.add_command(label=file, command=lambda x=file: self.load_recent_project(x))
+        for i, file in enumerate(self.recent_files):
+            self.recent_menu.add_command(label=file, command=lambda x=i: self.callbacks['file->load_recent'](x))
         if self.no_recents:
-            self.recent_menu.entryconfig('No Recent Files', state='disabled')
-        self.file_menu.add_cascade(label='Load Recent File', menu=self.recent_menu)
+            self.recent_menu.entryconfig('No Recent Projects', state='disabled')
+        self.file_menu.add_cascade(label='Recent Projects...', menu=self.recent_menu)
 
         self.file_menu.add_command(label='Quit', command=callbacks['file->quit'])
         self.add_cascade(label='File', menu=self.file_menu)
@@ -64,18 +65,12 @@ class MainMenu(tk.Menu):
         self.project_menu.entryconfig('Export SCT file(s)', state='normal')
         self.file_menu.entryconfig('Save Project', state='normal')
 
-    def load_recent_project(self, file):
-        pass
-
     def update_recents(self, recent_files):
-        self.no_recents = False
-        self.recent_files = recent_files
-        if len(self.recent_files) == 0:
-            self.no_recents = True
-            self.recent_files = ['No Recent Files']
+        self.no_recents = True if len(self.recent_files) == 0 else False
+        self.recent_files = ['No Recent Files'] if len(self.recent_files) == 0 else recent_files
 
-        self.recent_menu = tk.Menu(self.file_menu, tearoff=False)
-        for file in self.recent_files:
-            self.recent_menu.add_command(label=file, command=lambda x=file: self.load_recent_project(x))
+        self.recent_menu.delete(0, 'end')
+        for i, file in enumerate(self.recent_files):
+            self.recent_menu.add_command(label=file, command=lambda x=i: self.callbacks['file->load_recent'](x))
         if self.no_recents:
             self.recent_menu.entryconfig('No Recent Files', state='disabled')

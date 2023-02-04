@@ -118,6 +118,9 @@ class Application(tk.Tk):
                 return
 
         prj = self.proj_model.load_project(filepath=filepath, pickled=True)
+        self.proj_model.add_recent_file(filepath=filepath)
+        self.menu.update_recents(self.proj_model.get_recent_filenames())
+
         self.project.load_project(prj, pickled=True)
         self.project_edit_controller.load_project()
         self.gui.enable_script_view()
