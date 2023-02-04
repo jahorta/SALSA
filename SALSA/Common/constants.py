@@ -28,7 +28,12 @@ class OverrideTypes:
 
 
 class KnownMemAddresses:
-    Script_types = {'^me5.+.sct$': 'Ship_battles'}
+    Script_types = {'^me5.+.sct$': 'Ship_battles',
+                    '^me099.+.sct$': 'Overworld',
+                    '^me0.+.sct$': 'Towns',
+                    '^me1.+.sct$': 'Dungeons',
+                    '^me2.+.sct$': 'Cutscenes',
+                    '^me3.+.sct$': 'Debug'}
     Ship_Battles = {'0x80310b21': 'Player HP (%)',
                     '0x80310b22': 'Enemy HP (%)',
                     '0x80310a9d': 'Battle State Control,Is 1 during turn setup',
