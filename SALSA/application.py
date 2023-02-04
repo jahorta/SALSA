@@ -86,6 +86,7 @@ class Application(tk.Tk):
     def on_new_project(self):
         self.project.create_new_project()
         self.gui.enable_script_view()
+        self.project_edit_controller.update_tree(None, None)
 
     def on_save_as_project(self):
         filepath = filedialog.asksaveasfilename(filetypes=(('Project File', '*.prj'),), title='Save a project file')
