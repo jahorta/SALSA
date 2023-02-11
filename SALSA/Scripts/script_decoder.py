@@ -61,7 +61,8 @@ class SCTDecoder:
     def decode_sct_from_file(cls, name, sct, inst_lib: BaseInstLibFacade):
         sct_decoder = cls()
         decoded_sct = sct_decoder._decode_sct(name, sct, inst_lib)
-        sct_decoder._organize_sct(decoded_sct)
+        decoded_sct = sct_decoder._organize_sct(decoded_sct)
+        sct_decoder._finalize_sct(decoded_sct)
         return decoded_sct
 
     def _init(self):
@@ -71,6 +72,7 @@ class SCTDecoder:
         self._index = {}
         self._jmp_if_falses = {}
         self._switches = {}
+        self._variables = {}
 
     def _decode_sct(self, script_name: str, sct: bytearray, inst_lib: BaseInstLibFacade) -> SCTScript:
         self._init()
@@ -1624,6 +1626,49 @@ class SCTDecoder:
         for i in changes['jmps']:
             self._jmp_if_falses[changes['sect_name']].append(i + offset)
 
+    # ---------------------------------------------------------- #
+    # Add useful fields for script manipulation and organization #
+    # ---------------------------------------------------------- #
+
+    def _finalize_sct(self, decoded_sct):
+
+        self._setup_variables(decoded_sct)
+
+    def _setup_variables(self, sct):
+        for s_name, section in sct.sections.items():
+            for inst_key, inst in section.instructions.items():
+                for pID, param in inst.parameters.items():
+                    if isinstance(param.value, dict):
+                        vars = self._extract_variables(param.value)
+                        self._add_variable_locations(vars, (s_name, inst_key, f'{pID}'))
+                for l, loop in enumerate(inst.loop_parameters):
+                    for pID, param in loop.items():
+                        if isinstance(param.value, dict):
+                            vars = self._extract_variables(param.value)
+                            self._add_variable_locations(vars, (s_name, inst_key, f'{l}-{pID}'))
+
+        sct.variables = self._variables
+
+    def _extract_variables(self, cur_element, vars=None):
+        if vars is None:
+            vars = []
+        if isinstance(cur_element, dict):
+            for value in cur_element.values():
+                vars = self._extract_variables(value, vars=vars)
+        elif isinstance(cur_element, str):
+            if 'Var:' in cur_element:
+                vars.append(cur_element)
+        return vars
+
+    def _add_variable_locations(self, var_list, trace):
+        for var in var_list:
+            keys = var.split(': ')
+            if keys[0] not in self._variables.keys():
+                self._variables[keys[0]] = {}
+            key_1 = int(keys[1])
+            if key_1 not in self._variables[keys[0]]:
+                self._variables[keys[0]][key_1] = {'alias': '', 'usage': []}
+            self._variables[keys[0]][key_1]['usage'].append(trace)
 
 if __name__ == '__main__':
     import json

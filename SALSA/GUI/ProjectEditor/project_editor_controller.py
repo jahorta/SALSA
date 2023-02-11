@@ -2,6 +2,7 @@ from typing import Union, Dict
 import tkinter as tk
 
 from Common.setting_class import settings
+from GUI.ProjectEditor.variable_editor_popup import VariablePopup
 from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
 from SALSA.GUI.ProjectEditor.sct_export_popup import SCTExportPopup
 from SALSA.GUI.widgets import CustomTree2
@@ -22,10 +23,12 @@ class ProjectEditorController:
     log_name = 'PrjEditorCtrl'
 
     popup_names = {
-        SCTExportPopup: 'SCTExport'
+        SCTExportPopup: 'SCTExport',
+        VariablePopup: 'Variable'
     }
 
     sct_export_popup: Union[None, SCTExportPopup] = None
+    var_popup: Union[None, VariablePopup] = None
 
     default_settings = {
         'style': 'grouped'
@@ -174,7 +177,14 @@ class ProjectEditorController:
     # ------------------------------- #
 
     def show_variables_popup(self):
-        pass
+        callbacks = {
+            'get_scripts': lambda: self.project.get_tree(self.view.get_headers('script')),
+            'get_variables': self.project.get_script_variables_with_aliases,
+            'set_alias': self.project.set_variable_alias,
+            'get_var_usage': self.project.get_variable_usages,
+            'close': self.close_popup
+        }
+        self.var_popup = VariablePopup(self.parent, callbacks=callbacks, name=self.popup_names[VariablePopup])
 
     # ----------------------------- #
     # String Editor Popup Functions #
@@ -202,6 +212,9 @@ class ProjectEditorController:
         if name == self.popup_names[SCTExportPopup]:
             self.sct_export_popup.destroy()
             self.sct_export_popup = None
+        elif name == self.popup_names[VariablePopup]:
+            self.var_popup.destroy()
+            self.var_popup = None
 
     def show_right_click_menu(self):
         pass

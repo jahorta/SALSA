@@ -288,6 +288,7 @@ class SCTScript:
         self.unused_sections = []
         self.errors = []
         self.error_sections = {}
+        self.variables = []
 
     def add_section(self, section: SCTSection):
         name = section.name

@@ -153,3 +153,18 @@ class SCTProjectFacade:
             print(f'{self.log_key}: No script loaded with the name: {name}')
             return None
         return self.project.scripts[name]
+
+    def get_script_variables_with_aliases(self, script):
+        var_dict = {}
+        for var_type, var_list in self.project.scripts[script].variables.items():
+            var_dict[var_type] = {}
+            var_order = sorted(list(var_list.keys()))
+            for key in var_order:
+                var_dict[var_type][key] = var_list[key]['alias']
+        return var_dict
+
+    def set_variable_alias(self, script, var_type, var_id, alias):
+        self.project.scripts[script].variables[var_type][var_id]['alias'] = alias
+
+    def get_variable_usages(self, script, var_type, var_id):
+        return self.project.scripts[script].variables[var_type][var_id]['usage']
