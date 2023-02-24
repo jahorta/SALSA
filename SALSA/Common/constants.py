@@ -47,3 +47,18 @@ class ScriptEditorTrees:
     script = 0
     section = 1
     instruction = 2
+
+
+class ReservedVars:
+    IntVar = {
+        15: 'Pre-script Context'
+    }
+    ByteVar = {}
+    BitVar = {}
+    FloatVar = {}
+    var_type_dict = {
+        'IntVar': IntVar,
+        'ByteVar': ByteVar,
+        'BitVar': BitVar,
+        'FloatVar': FloatVar
+    }
