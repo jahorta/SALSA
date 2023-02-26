@@ -1,7 +1,9 @@
 import tkinter as tk
 import tkinter.ttk as ttk
+import json
 
 import SALSA.GUI.widgets as w
+from SALSA.Common.setting_class import settings
 
 default_headers = {
     'script': ('Name',),
@@ -24,6 +26,16 @@ class ProjectEditorView(tk.Frame):
         self.headers = default_headers if headers is None else headers
 
         super().__init__(parent, *args, **kwargs)
+        if self.log_name not in settings.keys():
+            settings[self.log_name] = {}
+
+        # if 'headers' not in settings[self.log_name].keys():
+        settings.set_single(self.log_name, 'headers', json.dumps(default_headers))
+
+        self.visible_headers = json.loads(settings[self.log_name]['headers'])
+
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
 
         button_frame = tk.Frame(self)
         button_frame.grid(row=0, column=0, sticky=tk.W)
