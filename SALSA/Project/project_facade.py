@@ -108,6 +108,9 @@ class SCTProjectFacade:
         instruction_details = {}
         return instruction_details
 
+    def get_link_details(self, link):
+        pass
+
     def remove_element_from_group(self, script, element, group, section=None):
         if section is None:
             pass
