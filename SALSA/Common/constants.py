@@ -63,4 +63,8 @@ class ReservedVars:
         'FloatVar': FloatVar
     }
 
+
 sep = '_'
+
+
+alt_sep = '-'

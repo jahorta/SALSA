@@ -2,6 +2,7 @@ import uuid
 from itertools import count
 from dataclasses import dataclass, field as dc_field
 from typing import List, Union, Dict, Tuple
+from SALSA.Common.constants import sep as c_sep, alt_sep as c_alt_sep
 
 
 @dataclass
@@ -109,7 +110,7 @@ class SCTInstruction:
     loop_parameters: List[Dict[int, SCTParameter]]
 
     def __init__(self, script_pos: int, inst_pos: int, inst_id: int):
-        self.ID: str = str(uuid.uuid4()).replace('-', '_')
+        self.ID: str = str(uuid.uuid4()).replace(c_sep, c_alt_sep)
         self.instruction_id = inst_id
         self.absolute_offset = inst_pos
         self.script_pos = script_pos
@@ -290,6 +291,7 @@ class SCTScript:
         self.errors = []
         self.error_sections = {}
         self.variables = []
+        self.section_num = 0
 
     def add_section(self, section: SCTSection):
         name = section.name
@@ -299,6 +301,7 @@ class SCTScript:
             self.inst_locations[inst].append(name)
         if len(section.errors) > 0:
             self.error_sections[name] = section.errors
+        self.section_num += 1
 
     def add_link(self, link: SCTLink) -> int:
         self.links.append(link)
