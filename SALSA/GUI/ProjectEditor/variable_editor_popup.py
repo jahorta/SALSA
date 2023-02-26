@@ -38,6 +38,9 @@ class VariablePopup(tk.Toplevel):
 
         self.script_tree = w.CustomTree2(script_frame, 'script', tree_callbacks, can_open=True, can_move=False,
                                          click_multiple=False)
+        anchor = tk.CENTER
+        self.script_tree.heading('#0', text='Script', anchor=anchor)
+        self.script_tree.column('#0', anchor=anchor, minwidth=10, width=100, stretch=True)
         self.script_tree.grid(row=0, column=0, sticky='NSEW')
         script_tree_scroll = tk.Scrollbar(script_frame, orient='vertical', command=self.script_tree.yview)
         script_tree_scroll.grid(row=0, column=1, sticky=tk.N + tk.S)
