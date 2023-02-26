@@ -257,6 +257,62 @@ class ScrollCanvas(tk.Frame):
         self.canvas.configure(width=width - self.canvas_scrollbar.winfo_width(), height=height)
 
 
+class ScrollLabelCanvas(tk.LabelFrame):
+
+    def __init__(self, parent, size: dict, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+        self.parent = parent
+        self.canvas = tk.Canvas(self, width=size['width'], height=size['height'])
+        self.canvas.grid(row=0, column=0, sticky='NSEW')
+        self.canvas_scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.canvas_scrollbar.set)
+        self.canvas.config(scrollregion=self.canvas.bbox("all"))
+        self.canvas_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+
+        self.canvas.bind('<Enter>', self.onEnter)  # bind wheel events when the cursor enters the control
+        self.canvas.bind('<Leave>', self.onLeave)  # unbind wheel events when the cursor leaves the control
+
+    # whenever the size of the frame changes, alter the scroll region respectively.
+    def onCanvasContentChange(self, event):
+        """Reset the scroll region to encompass the canvas contents"""
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    # cross platform scroll wheel event
+    def onMouseWheel(self, event):
+        if platform.system() == 'Windows':
+            self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        elif platform.system() == 'Darwin':
+            self.canvas.yview_scroll(int(-1 * event.delta), "units")
+        else:
+            if event.num == 4:
+                self.canvas.yview_scroll(-1, "units")
+            elif event.num == 5:
+                self.canvas.yview_scroll(1, "units")
+
+    # bind wheel events when the cursor enters the control
+    def onEnter(self, event):
+        if platform.system() == 'Linux':
+            self.canvas.bind_all("<Button-4>", self.onMouseWheel)
+            self.canvas.bind_all("<Button-5>", self.onMouseWheel)
+        else:
+            self.canvas.bind_all("<MouseWheel>", self.onMouseWheel)
+
+    # unbind wheel events when the cursorl leaves the control
+    def onLeave(self, event):
+        if platform.system() == 'Linux':
+            self.canvas.unbind_all("<Button-4>")
+            self.canvas.unbind_all("<Button-5>")
+        else:
+            self.canvas.unbind_all("<MouseWheel>")
+
+    def resize(self):
+        width = self.parent.winfo_width()
+        height = self.parent.winfo_height()
+        self.canvas.configure(width=width - self.canvas_scrollbar.winfo_width(), height=height)
+
+
 class ScrollTextCanvas(ScrollCanvas):
 
     def __init__(self, parent, size: dict, text_offset: dict, text: str):
@@ -268,6 +324,31 @@ class ScrollTextCanvas(ScrollCanvas):
 
 
 class ScrollFrame(ScrollCanvas):
+
+    def __init__(self, parent, size=None, *args, **kwargs):
+        size = {'width': 100, 'height': 100} if size is None else size
+        super().__init__(parent, size, *args, **kwargs)
+
+        self.viewport = tk.Frame(self.canvas)
+        self.canvas_window = self.canvas.create_window(0, 0, window=self.viewport, anchor=tk.N + tk.W,
+                                                       tags='self.viewport')
+
+        # bind an event whenever the size of the viewPort frame changes.
+        self.viewport.bind("<Configure>", self.onCanvasContentChange)
+
+        # bind an event whenever the size of the canvas frame changes.
+        self.canvas.bind("<Configure>", self.onCanvasConfigure)
+
+        self.onCanvasContentChange(None)
+
+    # whenever the size of the canvas changes alter the window region respectively.
+    def onCanvasConfigure(self, event):
+        """Reset the canvas window to encompass inner frame when required"""
+        canvas_width = event.width
+        self.canvas.itemconfig(self.canvas_window, width=canvas_width)
+
+
+class ScrollLabelFrame(ScrollLabelCanvas):
 
     def __init__(self, parent, size=None, *args, **kwargs):
         size = {'width': 100, 'height': 100} if size is None else size
