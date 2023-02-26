@@ -6,9 +6,9 @@ import SALSA.GUI.widgets as w
 from SALSA.Common.setting_class import settings
 
 default_headers = {
-    'script': ('Name',),
-    'section': ('Name',),
-    'instruction': ('Name', 'Condition', 'Instruction ID')
+    'script': ['name'],
+    'section': ['name'],
+    'instruction': ['name', 'condition', 'instruction_id']
 }
 
 available_headers = {
