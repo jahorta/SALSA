@@ -165,8 +165,11 @@ class ProjectEditorView(tk.Frame):
         inst_top_frame.grid(row=1, column=0, sticky=tk.E+tk.W)
         inst_top_frame.columnconfigure(0, weight=1)
 
-        skip_frame = tk.Frame(inst_frame)
-        skip_frame.grid(row=1, column=1, sticky=tk.E, rowspan=2)
+        self.inst_label = tk.Label(inst_top_frame, text='ID - Name')
+        self.inst_label.grid(row=0, column=0, sticky=tk.W+tk.N)
+
+        skip_frame = tk.Frame(inst_top_frame)
+        skip_frame.grid(row=0, column=1, sticky=tk.E)
 
         self.skip_ckeck_var = tk.IntVar()
         skip_check = tk.Checkbutton(skip_frame, variable=self.skip_ckeck_var)
@@ -176,18 +179,40 @@ class ProjectEditorView(tk.Frame):
         self.skip_error_label = tk.Label(skip_frame, text='')
         self.skip_error_label.grid(row=1, column=0, columnspan=2, sticky='NSEW')
 
-        inst_desc_label = tk.Label(inst_frame, text='Description')
-        inst_desc_label.grid(row=2, column=0, sticky=tk.W)
+        inst_desc_frame = w.ScrollLabelFrame(inst_frame, text='Description', size={'width': 100, 'height': 50})
+        inst_desc_frame.grid(row=2, column=0, sticky='NSEW')
+        inst_desc_frame.columnconfigure(0, weight=1)
+        inst_desc_frame.rowconfigure(0, weight=1)
 
-        self.inst_description = tk.Text(inst_frame, height=20)
-        self.inst_description.grid(row=3, column=0, columnspan=2, sticky='NSEW')
+        self.inst_description = tk.Label(inst_desc_frame)
+        self.inst_description.grid(row=0, column=0, sticky='NSEW')
 
         param_frame = tk.LabelFrame(inst_frame, text='Parameter Values')
-        param_frame.grid(row=4, column=0, columnspan=2, sticky='NSEW')
-        self.param_scroll_frame = w.ScrollFrame(param_frame, size={'width': 300, 'height': 300})
-        self.param_scroll_frame.grid(row=0, column=0)
+        param_frame.grid(row=3, column=0, sticky='NSEW')
+        param_frame.columnconfigure(0, weight=1)
+        param_frame.rowconfigure(0, weight=1)
 
-        self.after(50, self.param_scroll_frame.resize)
+        self.param_scroll_frame = w.ScrollFrame(param_frame, size={'width': 100, 'height': 200})
+        self.param_scroll_frame.grid(row=0, column=0, sticky='NSEW')
+        self.param_scroll_frame.columnconfigure(0, weight=1)
+        self.param_scroll_frame.rowconfigure(0, weight=1)
+
+        link_frame = tk.LabelFrame(inst_frame, text='Links')
+        link_frame.grid(row=4, column=0, sticky='NSEW')
+        link_frame.columnconfigure(0, weight=1)
+
+        link_out_label = tk.Label(link_frame, text='Outgoing Links')
+        link_out_label.grid(row=0, column=0, sticky=tk.W)
+        self.link_out = tk.Label(link_frame, text='')
+        self.link_out.grid(row=1, column=0, sticky=tk.W)
+
+        link_sep = ttk.Separator(link_frame, orient='horizontal')
+        link_sep.grid(row=2, column=0, sticky=tk.W+tk.E)
+
+        link_in_label = tk.Label(link_frame, text='Incoming Links')
+        link_in_label.grid(row=3, column=0, sticky=tk.W)
+        self.link_in = tk.Label(link_frame, text='')
+        self.link_in.grid(row=4, column=0, sticky=tk.W)
 
     def get_headers(self, tree_key=None):
         if tree_key is None:
