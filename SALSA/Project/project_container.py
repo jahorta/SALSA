@@ -111,15 +111,16 @@ class SCTInstruction:
     def __init__(self, script_pos: int, inst_pos: int, inst_id: int):
         self.ID: str = str(uuid.uuid4()).replace('-', '_')
         self.instruction_id = inst_id
-        self.inst_pos = inst_pos
+        self.absolute_offset = inst_pos
         self.script_pos = script_pos
-        self.overall_pos = self.inst_pos + script_pos
+        self.relative_offset = self.absolute_offset - script_pos
         self.skip_refresh = False
         self.errors = []
         self.links = []
         self.parameters = {}
         self.loop_parameters = []
         self.condition = ''
+        self.synopsis = ''
 
     def add_error(self, value: Tuple[str, Union[int, str, bytearray]]):
         self.errors.append(value)
