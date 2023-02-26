@@ -88,18 +88,17 @@ class SCTProjectFacade:
                         continue
                 element_dict = element.__dict__
                 values = {'row_data': key}
-                for header in headers:
-                    header_key = header.replace(' ', '_').lower()
+                for header_key in headers:
                     value_dict = element_dict
                     if header_key not in element_dict:
                         if base is None or base_key is None:
-                            raise KeyError(f'PrjFacade: {header} not in {element}, no base_element_group or base_key given')
+                            raise KeyError(f'PrjFacade: {header_key} not in {element}, no base_element_group or base_key given')
                         base_inst_key = element_dict[base_key]
                         base_dict = base[base_inst_key].__dict__
                         if header_key not in base_dict:
-                            raise KeyError(f'PrjFacade: {header} not in {element} or {base[base_key]}')
+                            raise KeyError(f'PrjFacade: {header_key} not in {element} or {base[base_key]}')
                         value_dict = base_dict
-                    values[header] = value_dict[header_key] if isinstance(value_dict[header_key], str) else str(value_dict[header_key])
+                    values[header_key] = value_dict[header_key] if isinstance(value_dict[header_key], str) else str(value_dict[header_key])
                 tree_list.append(values)
         return tree_list
 
