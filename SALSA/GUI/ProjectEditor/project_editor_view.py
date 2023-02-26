@@ -35,6 +35,9 @@ class ProjectEditorView(tk.Frame):
 
         script_tree_frame = tk.Frame(self.main_frame, highlightthickness=1, highlightbackground='#DEDEDE', width=400)
         script_tree_frame.grid(row=1, column=0, sticky='NSEW')
+        script_tree_frame.rowconfigure(1, weight=1)
+        script_tree_frame.columnconfigure(0, weight=1)
+
         script_tree_label = tk.Label(script_tree_frame, text='Project Scripts')
         script_tree_label.grid(row=0, column=0, sticky=tk.W)
         self.main_frame.add(script_tree_frame, weight=1)
@@ -53,6 +56,9 @@ class ProjectEditorView(tk.Frame):
 
         section_tree_frame = tk.Frame(self.main_frame, highlightthickness=1, highlightbackground='#DEDEDE', width=400)
         section_tree_frame.grid(row=0, column=0, sticky='NSEW')
+        section_tree_frame.rowconfigure(1, weight=1)
+        section_tree_frame.columnconfigure(0, weight=1)
+
         section_tree_label = tk.Label(section_tree_frame, text='Sections')
         section_tree_label.grid(row=0, column=0, sticky=tk.W)
         self.main_frame.add(section_tree_frame, weight=1)
@@ -71,6 +77,9 @@ class ProjectEditorView(tk.Frame):
 
         inst_tree_frame = tk.Frame(self.main_frame, highlightthickness=1, highlightbackground='#DEDEDE', width=400)
         inst_tree_frame.grid(row=0, column=0, sticky='NSEW')
+        inst_tree_frame.rowconfigure(1, weight=1)
+        inst_tree_frame.columnconfigure(0, weight=1)
+
         inst_tree_label = tk.Label(inst_tree_frame, text='Instructions')
         inst_tree_label.grid(row=0, column=0, sticky=tk.W)
         self.main_frame.add(inst_tree_frame, weight=1)
@@ -89,12 +98,18 @@ class ProjectEditorView(tk.Frame):
 
         inst_frame = tk.Frame(self.main_frame, highlightthickness=1, highlightbackground='#DEDEDE', width=400)
         inst_frame.grid(row=0, column=0, sticky='NSEW')
+        inst_frame.columnconfigure(0, weight=1)
+        inst_frame.rowconfigure(2, weight=5)
+        inst_frame.rowconfigure(3, weight=1)
+        self.pane_frame.add(inst_frame, weight=3)
+
         inst_frame_label = tk.Label(inst_frame, text='Instruction Details')
         inst_frame_label.grid(row=0, column=0, sticky=tk.W)
         self.main_frame.add(inst_frame, weight=3)
 
-        self.inst_label = tk.Label(inst_frame, text='ID - Name')
-        self.inst_label.grid(row=1, column=0, sticky=tk.W)
+        inst_top_frame = tk.Frame(inst_frame)
+        inst_top_frame.grid(row=1, column=0, sticky=tk.E+tk.W)
+        inst_top_frame.columnconfigure(0, weight=1)
 
         skip_frame = tk.Frame(inst_frame)
         skip_frame.grid(row=1, column=1, sticky=tk.E, rowspan=2)

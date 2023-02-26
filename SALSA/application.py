@@ -38,6 +38,8 @@ class Application(tk.Tk):
         # Setup script editor view and controller
         self.project_edit_view = ProjectEditorView(self)
         self.project_edit_view.grid(row=0, column=0, sticky='NSEW', pady=5)
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
 
         project_edit_callbacks = {'export_sct': self.on_export_scts}
         self.project_edit_controller = ProjectEditorController(self, self.project_edit_view, self.project, project_edit_callbacks)
