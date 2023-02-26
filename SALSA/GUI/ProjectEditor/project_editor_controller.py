@@ -153,7 +153,21 @@ class ProjectEditorController:
             prev_iid = tree.insert_entry(**kwargs)
 
     def set_instruction_details(self, details):
-        pass
+        if details is None:
+            return
+        self.view.inst_label.config(text=f'{details["instruction_id"]} - {details["name"]}')
+        self.view.inst_description.config(text=details['description'])
+        for i in details['params_before']:
+            param: SCTParameter = details['parameters'][i]
+            self.view.add_param(0, i, param, details['base_parameters'][i])
+
+
+        self.view.set_refresh_value(details['no_new_frame'], details['forced_new_frame'], details['skip_refresh'])
+
+        # Guard clause to prevent adding loop parameters if there is no loop in the instruction
+        if details['loop'] is None:
+            return
+
 
     def on_script_display_change(self, mode):
         pass
