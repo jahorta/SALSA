@@ -60,7 +60,7 @@ class BaseInst:
         self.name = inst_values.get('Name', f'Inst{inst_id}')
         self.description = inst_values.get('Description', '\n')
         self.location = inst_values['Location']
-        self.no_new_frame = inst_values['Skip Frame Refresh']
+        self.no_new_frame = bool(inst_values['Skip Frame Refresh'])
         self.forced_new_frame = inst_values['Force Frame Refresh'] if self.no_new_frame == 0 else False
 
         self.link = inst_values.get('Link', None)
