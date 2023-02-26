@@ -18,6 +18,9 @@
         <option value="$MODULE_DIR$/SALSA/Analysis" />
         <option value="$MODULE_DIR$/SALSA/BaseInstructions" />
         <option value="$MODULE_DIR$/SALSA/Scripts" />
+        <option value="$MODULE_DIR$/SALSA/Project" />
+        <option value="$MODULE_DIR$/SALSA/Tools" />
+        <option value="$MODULE_DIR$/SALSA/Help" />
       </list>
     </option>
   </component>
