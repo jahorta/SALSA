@@ -55,7 +55,7 @@ inst_defaults = {
             2: {
                 "Name": "Switch Case",
                 "Type": "int",
-                "Signed": False
+                "Signed": True
             },
             3: {
                 "Name": "Switch Offset",
