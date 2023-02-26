@@ -139,6 +139,9 @@ class ProjectEditorController:
             values = []
             first = True
             for col in headers:
+                if col == 'name':
+                    if 'group_type' in entry.keys():
+                        entry[col] += f' ({entry["group_type"]})'
                 if first:
                     kwargs['text'] = entry[col]
                     first = False
