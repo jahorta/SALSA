@@ -77,6 +77,7 @@ class GUIController:
                     or 'labelframe' in r \
                     or 'customtree' in r\
                     or 'scrollbar' in r\
+                    or 'separator' in r\
                     or 'panedwindow' in r:
                 self.recursive_toggle(child, state)
             else:
