@@ -104,8 +104,16 @@ class SCTProjectFacade:
         return tree_list
 
     def get_instruction_details(self, script, section, instruction):
-        instruction = self.project.scripts[script].sections[section].instructions[instruction]
-        instruction_details = {}
+        try:
+            instruction = self.project.scripts[script].sections[section].instructions[instruction]
+        except KeyError as e:
+            print(self.log_key, e)
+            return None
+        instruction_details = self.base_insts.get_inst(instruction.instruction_id).__dict__
+        instruction_details['base_parameters'] = instruction_details['parameters']
+        for key, value in instruction.__dict__.items():
+            instruction_details[key] = value
+        # format description
         return instruction_details
 
     def get_link_details(self, link):
