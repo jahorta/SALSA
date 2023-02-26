@@ -263,8 +263,8 @@ class SCTDecoder:
                         next_inst = self.getInt(self._cursor * 4)
                         if not ((0 < next_inst < 265) or (next_inst in [4, 8])):
                             section.add_error('Garbage: garbage instruction after return')
-                            garbage = self._sct[self._cursor*4:bounds[1]]
-                            self._cursor = bounds[1]//4
+                            garbage = self._sct[self._cursor * 4:bounds[1]]
+                            self._cursor = bounds[1] // 4
                             section.add_garbage('end', garbage)
 
                 if instResult.instruction_id == 0xa:
@@ -600,7 +600,7 @@ class SCTDecoder:
                 for v in currVals.values():
                     if v is None:
                         nones += 1
-                result_stack[stack_index+nones] = cur_result
+                result_stack[stack_index + nones] = cur_result
                 stack_index -= 1
                 if currentWord == 0x0000000a:
                     stack_index += 1
@@ -621,7 +621,7 @@ class SCTDecoder:
                 if len(inputs) == 2:
                     result = self._scpt_arithmetic_fxns[self._p_codes.arithmetic[currentWord][3]](inputs[0], inputs[1])
                     param.set_arithmetic_result(result)
-                result_stack[stack_index+nones] = cur_result
+                result_stack[stack_index + nones] = cur_result
                 stack_index -= 1
 
             # If not, current action is to input a value
@@ -785,7 +785,7 @@ class SCTDecoder:
         first_zero = True
         expected_zeros = -1
         while (self._cursor * 4) + offset < bounds[1]:
-            cur_byte = self._sct[self._cursor*4+offset].to_bytes(length=1, byteorder=self._cur_endian)
+            cur_byte = self._sct[self._cursor * 4 + offset].to_bytes(length=1, byteorder=self._cur_endian)
 
             if end_of_string > 0:
                 garbage.extend(cur_byte)
@@ -862,7 +862,8 @@ class SCTDecoder:
 
                 for sect_name in group[1:]:
                     match = difflib.SequenceMatcher(None, new_name.lower(),
-                                                    sect_name.lower()).find_longest_match(0, len(new_name), 0, len(sect_name))
+                                                    sect_name.lower()).find_longest_match(0, len(new_name), 0,
+                                                                                          len(sect_name))
                     if match.size < 3:
                         continue
                     new_name = new_name[match.a: match.a + match.size]
@@ -935,7 +936,7 @@ class SCTDecoder:
                 continue
             new_name = decoded_sct.folded_sections[old_name]
             section_offset = decoded_sct.sections[new_name].internal_sections_inst[old_name]
-            new_entries = [_+section_offset for _ in entries]
+            new_entries = [_ + section_offset for _ in entries]
             if new_name not in new_jmps.keys():
                 new_jmps[new_name] = new_entries
             else:
@@ -949,7 +950,7 @@ class SCTDecoder:
                 continue
             new_name = decoded_sct.folded_sections[old_name]
             section_offset = decoded_sct.sections[new_name].internal_sections_inst[old_name]
-            new_entries = [_+section_offset for _ in entries]
+            new_entries = [_ + section_offset for _ in entries]
             if new_name not in new_switches.keys():
                 new_switches[new_name] = new_entries
             else:
@@ -982,13 +983,13 @@ class SCTDecoder:
             target_inst_id = 0
             while target_inst_id < len(target_sct.instructions):
                 inst = target_sct.get_instruction_by_index(target_inst_id)
-                if inst.inst_pos == link.target:
+                if inst.absolute_offset == link.target:
                     break
                 if target_inst_id == len(target_sct.instructions) - 1:
                     inst_end = target_sct.start_offset + target_sct.length
                 else:
-                    inst_end = target_sct.get_instruction_by_index(target_inst_id + 1).inst_pos
-                if inst.inst_pos < link.target < inst_end:
+                    inst_end = target_sct.get_instruction_by_index(target_inst_id + 1).absolute_offset
+                if inst.absolute_offset < link.target < inst_end:
                     internal = True
                     new_error = None
                     error_ind = None
@@ -1026,7 +1027,9 @@ class SCTDecoder:
                     insts_added = len(target_sct.instruction_ids_ungrouped) - insts_before
                     self._set_changes(changes, insts_added)
                     target_sct.instruction_ids_ungrouped += suffix_insts
-                    print(f'{self.log_key}: New instructions decoded at {target_sct.name}:{target_inst_id + 1}. Restarting Link setup...', end='\r')
+                    print(
+                        f'{self.log_key}: New instructions decoded at {target_sct.name}:{target_inst_id + 1}. Restarting Link setup...',
+                        end='\r')
                     return False
 
                 target_inst_id += 1
@@ -1124,7 +1127,8 @@ class SCTDecoder:
                     new_sections[cur_group_name].set_type('Label')
                     has_header = True
                     i += 1
-                    print(f'This string is not located contiguously under a label: {section.name}, new group created: {cur_group_name}')
+                    print(
+                        f'This string is not located contiguously under a label: {section.name}, new group created: {cur_group_name}')
                 cur_group.append(section.name)
                 decoded_sct.string_locations[section.name] = cur_group_name
                 decoded_sct.strings[section.name] = section.string
@@ -1204,7 +1208,7 @@ class SCTDecoder:
                 if prev_inst.parameters[0].value < 0:
                     group_key = f'{jmp_id}-while'
                     decoded_sct.sections[sect_name].instructions_ids_grouped[group_key] = (f'{sect_name}-{jmp_id}',
-                                                                                     f'{prev_sect_name}-{prev_to_id}')
+                                                                                           f'{prev_sect_name}-{prev_to_id}')
                     decoded_sct.sections[sect_name].jump_loops.append(group_key)
                     continue
 
@@ -1214,13 +1218,14 @@ class SCTDecoder:
 
                 group_key = f'{jmp_id}-if'
                 decoded_sct.sections[sect_name].instructions_ids_grouped[group_key] = (f'{sect_name}-{jmp_id}',
-                                                                                 f'{prev_sect_name}-{prev_to_id}')
+                                                                                       f'{prev_sect_name}-{prev_to_id}')
 
                 if jmp_to_id == jmp_end_id or jmp_to_sect_name != jmp_end_sect:
                     continue
                 group_key = f'{jmp_id}-else'
-                decoded_sct.sections[sect_name].instructions_ids_grouped[group_key] = (f'{jmp_to_sect_name}-{jmp_to_id}',
-                                                                                 f'{jmp_end_sect}-{jmp_end_id}')
+                decoded_sct.sections[sect_name].instructions_ids_grouped[group_key] = (
+                f'{jmp_to_sect_name}-{jmp_to_id}',
+                f'{jmp_end_sect}-{jmp_end_id-1}')
 
     def _group_switches(self, decoded_sct):
 
@@ -1447,14 +1452,14 @@ class SCTDecoder:
         for entry in full_list:
             if entry in skips:
                 continue
-            matching_groups = {}
+            matching_groups = []
             for key in groups.keys():
                 if str(entry) == key.split('-')[0]:
-                    matching_groups[key] = groups[key]
+                    matching_groups += [{key: groups[key]}]
             if len(matching_groups) == 0:
                 heirarchy.append(entry)
                 continue
-            heirarchy.append(matching_groups)
+            heirarchy = heirarchy + matching_groups
             skips.extend(self._get_heirarchy_skips(matching_groups))
         return heirarchy
 
@@ -1520,7 +1525,7 @@ class SCTDecoder:
             new_entries.append((i, new_entry))
         for entry in new_entries:
             group.insert(entry[0], entry[1])
-            group.pop(entry[0]+1)
+            group.pop(entry[0] + 1)
         return group
 
     @staticmethod
@@ -1546,9 +1551,9 @@ class SCTDecoder:
                 print(
                     f'SCPT Decoder: Find Inst: Entry not found: {origin_sect_name}:{origin_element_id} - {target_pos}')
                 return
-            if cur_inst.inst_pos == target_pos:
+            if cur_inst.absolute_offset == target_pos:
                 break
-            if cur_inst.inst_pos < target_pos < inst_list[cur_id + 1].inst_pos:
+            if cur_inst.absolute_offset < target_pos < inst_list[cur_id + 1].absolute_offset:
                 print(
                     f'SCPT Decoder: Find Inst: Target pos in middle of entry {origin_sect_name}:{origin_element_id} - {target_pos}')
                 break
@@ -1670,19 +1675,12 @@ class SCTDecoder:
                 self._variables[keys[0]][key_1] = {'alias': '', 'usage': []}
             self._variables[keys[0]][key_1]['usage'].append(trace)
 
-if __name__ == '__main__':
-    import json
 
+if __name__ == '__main__':
     insts = BaseInstLibFacade()
 
-    # with open('../../UserSettings/DefaultInstructions.json', 'r') as fh:
-    #     file = fh.read()
-    #     file_json = json.loads(file)
-    #
-    # insts.set_inst_all_fields(file_json)
-
     # file_of_interest = None
-    file_of_interest = 'me004a.sct'
+    file_of_interest = 'me547a.sct'
 
     if input('Run all scripts?') not in ['Y', 'y']:
 
