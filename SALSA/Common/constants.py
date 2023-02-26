@@ -62,3 +62,5 @@ class ReservedVars:
         'BitVar': BitVar,
         'FloatVar': FloatVar
     }
+
+sep = '_'
