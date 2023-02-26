@@ -130,10 +130,10 @@ class ProjectEditorController:
                     parent_list.append(prev_iid)
                 elif entry == 'ungroup':
                     if len(parent_list) == 1:
-                        raise RuntimeError(f'SEController: unable to lower group level, not enough groups left')
+                        raise RuntimeError(f'{self.log_name}: unable to lower group level, not enough groups left')
                     parent_list.pop()
                 else:
-                    raise ValueError(f'SEController: Unknown command in tree list sent to _add_tree_entries')
+                    raise ValueError(f'{self.log_name}: Unknown command in tree list sent to _add_tree_entries')
                 continue
             kwargs = {'parent': parent_list[-1], 'index': 'end'}
             values = []
