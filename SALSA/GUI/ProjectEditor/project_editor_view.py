@@ -216,5 +216,26 @@ class ProjectEditorView(tk.Frame):
 
     def get_headers(self, tree_key=None):
         if tree_key is None:
-            return self.headers
-        return self.headers[tree_key]
+            return {k: list(header_settings[k].keys()) for k in header_settings.keys()}
+        return list(header_settings[tree_key].keys())
+
+    def add_param(self, indent, key, param, base_param):
+        pass
+
+    def add_loop_params(self, key, param_list, base_list):
+        pass
+
+    def set_refresh_value(self, never_refresh, always_refresh, cur_refresh_choice):
+        self.skip_ckeck_var.set(int(cur_refresh_choice))
+        if never_refresh:
+            self.skip_error_label.config(text='This instruction never skips')
+        elif always_refresh:
+            self.skip_error_label.config(text='This instruction always skips')
+        else:
+            self.skip_error_label.config(text='')
+
+    def add_link(self, link_type, link_text, link_callback):
+        pass
+
+
+
