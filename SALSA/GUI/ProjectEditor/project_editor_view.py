@@ -41,9 +41,7 @@ class ProjectEditorView(tk.Frame):
 
     log_name = 'PrjEditorView'
 
-    def __init__(self, parent, *args, headers=None, **kwargs):
-        self.headers = default_headers if headers is None else headers
-
+    def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         if self.log_name not in settings.keys():
             settings[self.log_name] = {}
