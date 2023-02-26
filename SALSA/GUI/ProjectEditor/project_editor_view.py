@@ -11,11 +11,30 @@ default_headers = {
     'instruction': ['name', 'condition', 'instruction_id']
 }
 
-available_headers = {
-    'script': ('Name', 'Sections'),
-    'section': ('Name', 'Relative Offset', 'Offset'),
-    'instruction': ('Name', 'Condition', 'Instruction ID', 'Relative Offset', 'Offset', 'Synopsis')
+header_settings = {
+    'script': {
+        'name': {'label': 'Name', 'width': 80, 'stretch': True},
+        'section_num': {'label': 'Section #', 'width': 50, 'stretch': True}
+    },
+    'section': {
+        'name': {'label': 'Name', 'width': 100, 'stretch': True},
+        'start_offset': {'label': 'Start Offset', 'width': 50, 'stretch': True}
+    },
+    'instruction': {
+        'name': {'label': 'Name', 'width': 270, 'stretch': True},
+        'condition': {'label': 'Condition', 'width': 300, 'stretch': True},
+        'instruction_id': {'label': 'ID', 'width': 25, 'stretch': False},
+        'synopsis': {'label': 'Synopsis', 'width': 50, 'stretch': True},
+        'absolute_offset': {'label': 'Offset', 'width': 50, 'stretch': True},
+        'relative_offset': {'label': 'Relative Offset', 'width': 50, 'stretch': True}
+    }
 }
+
+default_tree_width = 100
+default_tree_minwidth = 10
+default_tree_anchor = tk.CENTER
+default_tree_stretch = False
+default_tree_label = ''
 
 
 class ProjectEditorView(tk.Frame):
@@ -54,17 +73,25 @@ class ProjectEditorView(tk.Frame):
         script_tree_label.grid(row=0, column=0, sticky=tk.W)
         self.main_frame.add(script_tree_frame, weight=1)
 
-        self.scripts_tree = w.CustomTree2(script_tree_frame, name='script', columns=self.headers['script'][1:])
+        columns = list(header_settings['script'].keys())[1:]
+        self.scripts_tree = w.CustomTree2(script_tree_frame, name='script', columns=columns)
         self.scripts_tree.grid(row=1, column=0, sticky='NSEW')
         first = True
-        for header in self.headers['script']:
-            header_text = header
+        for name, d in header_settings['script'].items():
+            label = d.get('label', default_tree_label)
+            anchor = d.get('anchor', default_tree_anchor)
+            minwidth = d.get('minwidth', default_tree_minwidth)
+            width = d.get('width', default_tree_width)
+            stretch = d.get('stretch', default_tree_stretch)
             if first:
-                header = '#0'
+                name = '#0'
                 first = False
-            self.scripts_tree.heading(header, text=header_text)
-        script_tree_frame.rowconfigure(1, weight=1)
-        script_tree_frame.columnconfigure(1, weight=1)
+            self.scripts_tree.heading(name, text=label, anchor=anchor)
+            self.scripts_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
+        self.scripts_tree['displaycolumns'] = self.visible_headers['script'][1:]
+        script_tree_scrollbar = tk.Scrollbar(script_tree_frame, orient='vertical', command=self.scripts_tree.yview)
+        script_tree_scrollbar.grid(row=1, column=1, sticky=tk.N+tk.S)
+        self.scripts_tree.config(yscrollcommand=script_tree_scrollbar.set)
 
         section_tree_frame = tk.Frame(self.main_frame, highlightthickness=1, highlightbackground='#DEDEDE', width=400)
         section_tree_frame.grid(row=0, column=0, sticky='NSEW')
@@ -75,17 +102,26 @@ class ProjectEditorView(tk.Frame):
         section_tree_label.grid(row=0, column=0, sticky=tk.W)
         self.main_frame.add(section_tree_frame, weight=1)
 
-        self.sections_tree = w.CustomTree2(section_tree_frame, name='section', columns=self.headers['section'][1:])
+        columns = list(header_settings['section'].keys())[1:]
+        self.sections_tree = w.CustomTree2(section_tree_frame, name='section', columns=columns)
+        self.sections_tree.configure('columns')
         self.sections_tree.grid(row=1, column=0, sticky='NSEW')
         first = True
-        for header in self.headers['section']:
-            header_text = header
+        for name, d in header_settings['section'].items():
+            label = d.get('label', default_tree_label)
+            anchor = d.get('anchor', default_tree_anchor)
+            minwidth = d.get('minwidth', default_tree_minwidth)
+            width = d.get('width', default_tree_width)
+            stretch = d.get('stretch', default_tree_stretch)
             if first:
-                header = '#0'
+                name = '#0'
                 first = False
-            self.sections_tree.heading(header, text=header_text)
-        section_tree_frame.rowconfigure(1, weight=1)
-        section_tree_frame.columnconfigure(1, weight=1)
+            self.sections_tree.heading(name, text=label, anchor=anchor)
+            self.sections_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
+        self.sections_tree['displaycolumns'] = self.visible_headers['section'][1:]
+        section_tree_scrollbar = tk.Scrollbar(section_tree_frame, orient='vertical', command=self.sections_tree.yview)
+        section_tree_scrollbar.grid(row=1, column=1, sticky=tk.N+tk.S)
+        self.sections_tree.config(yscrollcommand=section_tree_scrollbar.set)
 
         inst_tree_frame = tk.Frame(self.main_frame, highlightthickness=1, highlightbackground='#DEDEDE', width=400)
         inst_tree_frame.grid(row=0, column=0, sticky='NSEW')
@@ -96,17 +132,25 @@ class ProjectEditorView(tk.Frame):
         inst_tree_label.grid(row=0, column=0, sticky=tk.W)
         self.main_frame.add(inst_tree_frame, weight=1)
 
-        self.insts_tree = w.CustomTree2(inst_tree_frame, name='instruction', columns=self.headers['instruction'][1:])
+        columns = list(header_settings['instruction'].keys())[1:]
+        self.insts_tree = w.CustomTree2(inst_tree_frame, name='instruction', columns=columns)
         self.insts_tree.grid(row=1, column=0, sticky='NSEW')
         first = True
-        for header in self.headers['instruction']:
-            header_text = header
+        for name, d in header_settings['instruction'].items():
+            label = d.get('label', default_tree_label)
+            anchor = d.get('anchor', default_tree_anchor)
+            minwidth = d.get('minwidth', default_tree_minwidth)
+            width = d.get('width', default_tree_width)
+            stretch = d.get('stretch', default_tree_stretch)
             if first:
-                header = '#0'
+                name = '#0'
                 first = False
-            self.insts_tree.heading(header, text=header_text)
-        inst_tree_frame.rowconfigure(1, weight=1)
-        inst_tree_frame.columnconfigure(1, weight=1)
+            self.insts_tree.heading(name, text=label, anchor=anchor)
+            self.insts_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
+        self.insts_tree['displaycolumns'] = self.visible_headers['instruction'][1:]
+        inst_tree_scrollbar = tk.Scrollbar(inst_tree_frame, orient='vertical', command=self.insts_tree.yview)
+        inst_tree_scrollbar.grid(row=1, column=1, sticky=tk.N+tk.S)
+        self.insts_tree.config(yscrollcommand=inst_tree_scrollbar.set)
 
         inst_frame = tk.Frame(self.main_frame, highlightthickness=1, highlightbackground='#DEDEDE', width=400)
         inst_frame.grid(row=0, column=0, sticky='NSEW')
