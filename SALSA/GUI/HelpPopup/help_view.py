@@ -30,8 +30,8 @@ class HelpView(tk.Toplevel):
         notebook.grid(row=0, column=0)
 
         for i, (k, v) in enumerate(about_text.items()):
-            tab_frame = w.ScrollTextCanvas(notebook, size=self.size, text_offset=self.text_offset,
-                                           text=v)
+            tab_frame = w.TextScrollLabelCanvas(notebook, size=self.size, canvas_text_offset=self.text_offset,
+                                                canvas_text=v)
             notebook.add(tab_frame)
             notebook.tab(i, text=k)
 

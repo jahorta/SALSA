@@ -5,7 +5,7 @@ from Common.setting_class import settings
 from GUI.ProjectEditor.variable_editor_popup import VariablePopup
 from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
 from SALSA.GUI.ProjectEditor.sct_export_popup import SCTExportPopup
-from SALSA.GUI.widgets import CustomTree2
+from SALSA.GUI.widgets import DataTreeview
 from SALSA.Project.project_facade import SCTProjectFacade
 from SALSA.Project.project_container import SCTParameter
 from SALSA.BaseInstructions.bi_container import BaseParam

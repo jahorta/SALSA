@@ -72,7 +72,7 @@ class ProjectEditorView(tk.Frame):
         self.pane_frame.add(script_tree_frame, weight=1)
 
         columns = list(header_settings['script'].keys())[1:]
-        self.scripts_tree = w.CustomTree2(script_tree_frame, name='script', columns=columns)
+        self.scripts_tree = w.DataTreeview(script_tree_frame, name='script', columns=columns)
         self.scripts_tree.grid(row=1, column=0, sticky='NSEW')
         first = True
         for name, d in header_settings['script'].items():
@@ -101,7 +101,7 @@ class ProjectEditorView(tk.Frame):
         self.pane_frame.add(section_tree_frame, weight=1)
 
         columns = list(header_settings['section'].keys())[1:]
-        self.sections_tree = w.CustomTree2(section_tree_frame, name='section', columns=columns)
+        self.sections_tree = w.DataTreeview(section_tree_frame, name='section', columns=columns)
         self.sections_tree.configure('columns')
         self.sections_tree.grid(row=1, column=0, sticky='NSEW')
         first = True
@@ -131,7 +131,7 @@ class ProjectEditorView(tk.Frame):
         self.pane_frame.add(inst_tree_frame, weight=1)
 
         columns = list(header_settings['instruction'].keys())[1:]
-        self.insts_tree = w.CustomTree2(inst_tree_frame, name='instruction', columns=columns)
+        self.insts_tree = w.DataTreeview(inst_tree_frame, name='instruction', columns=columns)
         self.insts_tree.grid(row=1, column=0, sticky='NSEW')
         first = True
         for name, d in header_settings['instruction'].items():
@@ -179,10 +179,10 @@ class ProjectEditorView(tk.Frame):
         self.skip_error_label = tk.Label(skip_frame, text='')
         self.skip_error_label.grid(row=1, column=0, columnspan=2, sticky='NSEW')
 
-        inst_desc_frame = w.ScrollLabelFrame(inst_frame, text='Description', size={'width': 100, 'height': 50})
-        inst_desc_frame.grid(row=2, column=0, sticky='NSEW')
-        inst_desc_frame.columnconfigure(0, weight=1)
-        inst_desc_frame.rowconfigure(0, weight=1)
+        self.inst_desc_frame = w.ScrollLabelFrame(inst_frame, text='Description', size={'width': 100, 'height': 50})
+        self.inst_desc_frame.grid(row=2, column=0, sticky='NSEW')
+        self.inst_desc_frame.columnconfigure(0, weight=1)
+        self.inst_desc_frame.rowconfigure(0, weight=1)
 
         self.inst_description = tk.Label(inst_desc_frame)
         self.inst_description.grid(row=0, column=0, sticky='NSEW')

@@ -70,8 +70,8 @@ class AnalysisView(tk.Toplevel):
             self.export_notebook.add(tab_frame)
             self.export_notebook.tab(i, text=k)
 
-            tab_text = w.ScrollTextCanvas(tab_frame, size=self.size, text_offset=self.text_offset,
-                                          text=v)
+            tab_text = w.TextScrollLabelCanvas(tab_frame, size=self.size, canvas_text_offset=self.text_offset,
+                                               canvas_text=v)
             tab_text.grid(row=0, column=0)
 
             button_frame = tk.Frame(tab_frame)

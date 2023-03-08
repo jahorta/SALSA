@@ -36,8 +36,7 @@ class VariablePopup(tk.Toplevel):
 
         tree_callbacks = {'select': self.script_select}
 
-        self.script_tree = w.CustomTree2(script_frame, 'script', tree_callbacks, can_open=True, can_move=False,
-                                         click_multiple=False)
+        self.script_tree = w.DataTreeview(script_frame, 'script', tree_callbacks)
         anchor = tk.CENTER
         self.script_tree.heading('#0', text='Script', anchor=anchor)
         self.script_tree.column('#0', anchor=anchor, minwidth=10, width=100, stretch=True)
@@ -60,9 +59,9 @@ class VariablePopup(tk.Toplevel):
 
         self.canvases = {}
         for name in self.canvas_names:
-            self.canvases[name] = w.ScrollFrame(self.variable_notebook)
+            self.canvases[name] = w.ScrollLabelFrame(self.variable_notebook)
             self.canvases[name].grid(row=0, column=0, sticky='NSEW')
-            self.canvases[name].viewport.columnconfigure(1, weight=1)
+            self.canvases[name].scroll_frame.columnconfigure(1, weight=1)
             label = name + 's'
             self.variable_notebook.add(self.canvases[name], text=label)
 
@@ -79,7 +78,7 @@ class VariablePopup(tk.Toplevel):
         variable_usage_frame.columnconfigure(0, weight=1)
         variable_usage_frame.rowconfigure(0, weight=1)
 
-        self.variable_usage = w.ScrollFrame(variable_usage_frame)
+        self.variable_usage = w.ScrollLabelFrame(variable_usage_frame)
         self.variable_usage.grid(row=0, column=0, sticky='NSEW')
 
         self.status_label = tk.Label(self, text='')
@@ -104,11 +103,11 @@ class VariablePopup(tk.Toplevel):
 
     def populate_variables(self, var_dict):
         for canvas in self.canvases.values():
-            for item in canvas.viewport.winfo_children():
+            for item in canvas.scroll_frame.winfo_children():
                 item.destroy()
-            header_label_1 = tk.Label(canvas.viewport, text='ID   ')
+            header_label_1 = tk.Label(canvas.scroll_frame, text='ID   ')
             header_label_1.grid(row=0, column=0)
-            header_label_2 = tk.Label(canvas.viewport, text='Alias')
+            header_label_2 = tk.Label(canvas.scroll_frame, text='Alias')
             header_label_2.grid(row=0, column=1)
 
         self.cur_var_dict = var_dict
@@ -118,7 +117,7 @@ class VariablePopup(tk.Toplevel):
             canv_key = var_type[:-3]
             cur_row = 1
             for v_id, v_alias in var_list.items():
-                next_id_label = tk.Label(self.canvases[canv_key].viewport, text=v_id)
+                next_id_label = tk.Label(self.canvases[canv_key].scroll_frame, text=v_id)
                 next_id_label.grid(row=cur_row, column=0)
                 next_id_label.bind("<Double-ButtonPress-1>", lambda event, r=cur_row: self.get_usages(row=r))
                 next_id_label.bind("<Button-3>", lambda event, r=cur_row: self.var_right_click(row=r, event=event))
@@ -130,7 +129,7 @@ class VariablePopup(tk.Toplevel):
                     pass
                 else:
                     self.cur_var_aliases.append(v_alias)
-                next_alias_label = tk.Label(self.canvases[canv_key].viewport, text=v_alias)
+                next_alias_label = tk.Label(self.canvases[canv_key].scroll_frame, text=v_alias)
                 next_alias_label.grid(row=cur_row, column=1, sticky='NSEW')
                 next_alias_label.bind("<Double-ButtonPress-1>", lambda event, r=cur_row: self.edit_alias(row=r))
                 next_alias_label.bind("<Button-3>", lambda event, r=cur_row: self.var_right_click(row=r, event=event))
@@ -152,7 +151,7 @@ class VariablePopup(tk.Toplevel):
         var_type = self.determine_tab()
         row_id = list(self.cur_var_dict[f'{var_type}Var'].keys())[row - 1]
         self.alias_entry_var.set(self.cur_var_dict[f'{var_type}Var'][row_id])
-        self.alias_entry = tk.Entry(self.canvases[var_type].viewport, textvariable=self.alias_entry_var)
+        self.alias_entry = tk.Entry(self.canvases[var_type].scroll_frame, textvariable=self.alias_entry_var)
         self.alias_entry.grid(row=row, column=1)
         self.alias_entry.bind("<Return>", lambda event: self.attempt_create_alias(var_type, row))
         self.alias_entry.focus()
@@ -198,12 +197,12 @@ class VariablePopup(tk.Toplevel):
         self.populate_usages(self.callbacks['get_var_usage'](self.cur_script, f'{var_type}Var', row_id))
 
     def populate_usages(self, usage_list: List[Tuple[str, int, str]]):
-        for child in self.variable_usage.viewport.winfo_children():
+        for child in self.variable_usage.scroll_frame.winfo_children():
             child.destroy()
 
         cur_row = 0
         for usage in usage_list:
-            u_label = tk.Label(self.variable_usage.viewport, text=' - '.join(usage))
+            u_label = tk.Label(self.variable_usage.scroll_frame, text=' - '.join(usage))
             u_label.grid(row=cur_row, column=0, sticky='NSEW')
             cur_row += 1
 

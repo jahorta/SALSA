@@ -75,7 +75,7 @@ class GUIController:
             r = child.__repr__().split('.')[-1]
             if 'frame' in r \
                     or 'labelframe' in r \
-                    or 'customtree' in r\
+                    or 'datatreeview' in r\
                     or 'scrollbar' in r\
                     or 'separator' in r\
                     or 'panedwindow' in r:

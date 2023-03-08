@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from GUI.widgets import CustomTree, RequiredEntry, ScrollFrame, ScrollCanvas
+from GUI.widgets import CustomTree, RequiredEntry, ScrollLabelFrame, DataTreeview
 
 
 class InstructionEditorView(tk.Toplevel):
@@ -67,9 +67,9 @@ class InstructionEditorView(tk.Toplevel):
 
         desc_frame = tk.LabelFrame(top_details_frame, text='Description')
         desc_frame.grid(row=1, column=0, sticky=tk.E, columnspan=2)
-        scroll_frame = ScrollFrame(desc_frame)
+        scroll_frame = ScrollLabelFrame(desc_frame)
         scroll_frame.grid(row=0, column=1)
-        self.details_desc_label = tk.Label(scroll_frame.viewport, text='')
+        self.details_desc_label = tk.Label(scroll_frame.scroll_frame, text='')
         self.details_desc_label.grid(row=0, column=0)
         self.details_desc_variable = tk.StringVar()
         self.details_desc_variable.set('')
@@ -80,5 +80,8 @@ class InstructionEditorView(tk.Toplevel):
 
         parameters_frame = tk.LabelFrame(self.inst_details_frame, text='Parameters')
         parameters_frame.grid(row=5, column=1, columnspan=2)
-        param_list_frame = ScrollCanvas(parameters_frame, )
-        param_list_frame.grid(row=0, column=0)
+        param_list_tree = DataTreeview(parameters_frame, name='param_list', callbacks={'select': self.on_select_param})
+        param_list_tree.grid(row=0, column=0)
+
+    def on_select_param(self):
+        pass

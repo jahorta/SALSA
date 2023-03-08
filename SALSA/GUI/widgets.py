@@ -201,83 +201,29 @@ class RequiredIntEntry(RequiredHexEntry):
 # Frame Classes #
 # ------------- #
 
-class ScrollCanvas(tk.Frame):
-
-    def __init__(self, parent, size: dict, *args, **kwargs):
-        super().__init__(parent, *args, **kwargs)
-        self.parent = parent
-        self.canvas = tk.Canvas(self, width=size['width'], height=size['height'])
-        self.canvas.grid(row=0, column=0, sticky='NSEW')
-        self.canvas_scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
-        self.canvas.configure(yscrollcommand=self.canvas_scrollbar.set)
-        self.canvas.config(scrollregion=self.canvas.bbox("all"))
-        self.canvas_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
-
-        self.canvas.bind('<Enter>', self.onEnter)  # bind wheel events when the cursor enters the control
-        self.canvas.bind('<Leave>', self.onLeave)  # unbind wheel events when the cursor leaves the control
-
-    # whenever the size of the frame changes, alter the scroll region respectively.
-    def onCanvasContentChange(self, event):
-        """Reset the scroll region to encompass the canvas contents"""
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
-    # cross platform scroll wheel event
-    def onMouseWheel(self, event):
-        if platform.system() == 'Windows':
-            self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-        elif platform.system() == 'Darwin':
-            self.canvas.yview_scroll(int(-1 * event.delta), "units")
-        else:
-            if event.num == 4:
-                self.canvas.yview_scroll(-1, "units")
-            elif event.num == 5:
-                self.canvas.yview_scroll(1, "units")
-
-    # bind wheel events when the cursor enters the control
-    def onEnter(self, event):
-        if platform.system() == 'Linux':
-            self.canvas.bind_all("<Button-4>", self.onMouseWheel)
-            self.canvas.bind_all("<Button-5>", self.onMouseWheel)
-        else:
-            self.canvas.bind_all("<MouseWheel>", self.onMouseWheel)
-
-    # unbind wheel events when the cursorl leaves the control
-    def onLeave(self, event):
-        if platform.system() == 'Linux':
-            self.canvas.unbind_all("<Button-4>")
-            self.canvas.unbind_all("<Button-5>")
-        else:
-            self.canvas.unbind_all("<MouseWheel>")
-
-    def resize(self):
-        width = self.parent.winfo_width()
-        height = self.parent.winfo_height()
-        self.canvas.configure(width=width - self.canvas_scrollbar.winfo_width(), height=height)
-
-
 class ScrollLabelCanvas(tk.LabelFrame):
 
-    def __init__(self, parent, size: dict, *args, **kwargs):
+    def __init__(self, parent, size: dict, has_label=True, *args, **kwargs):
+        if not has_label:
+            kwargs = kwargs
+            kwargs['text'] = ''
+            if 'bd' not in kwargs:
+                kwargs['bd'] = 0
+
         super().__init__(parent, *args, **kwargs)
+
         self.parent = parent
         self.canvas = tk.Canvas(self, width=size['width'], height=size['height'])
         self.canvas.grid(row=0, column=0, sticky='NSEW')
+
         self.canvas_scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.canvas_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
+
         self.canvas.configure(yscrollcommand=self.canvas_scrollbar.set)
         self.canvas.config(scrollregion=self.canvas.bbox("all"))
-        self.canvas_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
 
         self.canvas.bind('<Enter>', self.onEnter)  # bind wheel events when the cursor enters the control
         self.canvas.bind('<Leave>', self.onLeave)  # unbind wheel events when the cursor leaves the control
-
-    # whenever the size of the frame changes, alter the scroll region respectively.
-    def onCanvasContentChange(self, event):
-        """Reset the scroll region to encompass the canvas contents"""
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     # cross platform scroll wheel event
     def onMouseWheel(self, event):
@@ -299,7 +245,7 @@ class ScrollLabelCanvas(tk.LabelFrame):
         else:
             self.canvas.bind_all("<MouseWheel>", self.onMouseWheel)
 
-    # unbind wheel events when the cursorl leaves the control
+    # unbind wheel events when the cursor leaves the control
     def onLeave(self, event):
         if platform.system() == 'Linux':
             self.canvas.unbind_all("<Button-4>")
@@ -307,70 +253,37 @@ class ScrollLabelCanvas(tk.LabelFrame):
         else:
             self.canvas.unbind_all("<MouseWheel>")
 
-    def resize(self):
-        width = self.parent.winfo_width()
-        height = self.parent.winfo_height()
-        self.canvas.configure(width=width - self.canvas_scrollbar.winfo_width(), height=height)
 
+class TextScrollLabelCanvas(ScrollLabelCanvas):
 
-class ScrollTextCanvas(ScrollCanvas):
+    def __init__(self, parent, size: dict, canvas_text_offset: dict, canvas_text: str, has_label=True):
+        super().__init__(parent, size, has_label=has_label)
 
-    def __init__(self, parent, size: dict, text_offset: dict, text: str):
-        super().__init__(parent, size)
-
-        self.canvas.create_text((text_offset['x'], text_offset['y']),
-                                anchor=tk.NW, text=text,
-                                width=size['width'] - text_offset['x'])
-
-
-class ScrollFrame(ScrollCanvas):
-
-    def __init__(self, parent, size=None, *args, **kwargs):
-        size = {'width': 100, 'height': 100} if size is None else size
-        super().__init__(parent, size, *args, **kwargs)
-
-        self.viewport = tk.Frame(self.canvas)
-        self.canvas_window = self.canvas.create_window(0, 0, window=self.viewport, anchor=tk.N + tk.W,
-                                                       tags='self.viewport')
-
-        # bind an event whenever the size of the viewPort frame changes.
-        self.viewport.bind("<Configure>", self.onCanvasContentChange)
-
-        # bind an event whenever the size of the canvas frame changes.
-        self.canvas.bind("<Configure>", self.onCanvasConfigure)
-
-        self.onCanvasContentChange(None)
-
-    # whenever the size of the canvas changes alter the window region respectively.
-    def onCanvasConfigure(self, event):
-        """Reset the canvas window to encompass inner frame when required"""
-        canvas_width = event.width
-        self.canvas.itemconfig(self.canvas_window, width=canvas_width)
+        self.text = self.canvas.create_text((canvas_text_offset['x'], canvas_text_offset['y']),
+                                            anchor=tk.NW, text=canvas_text,
+                                            width=size['width'] - canvas_text_offset['x'])
 
 
 class ScrollLabelFrame(ScrollLabelCanvas):
 
-    def __init__(self, parent, size=None, *args, **kwargs):
+    def __init__(self, parent, size=None, has_label=True, *args, **kwargs):
         size = {'width': 100, 'height': 100} if size is None else size
-        super().__init__(parent, size, *args, **kwargs)
+        super().__init__(parent, size, has_label=has_label, *args, **kwargs)
 
-        self.viewport = tk.Frame(self.canvas)
-        self.canvas_window = self.canvas.create_window(0, 0, window=self.viewport, anchor=tk.N + tk.W,
+        self.scroll_frame = tk.Frame(self.canvas)
+
+        self.canvas_window = self.canvas.create_window(0, 0, window=self.scroll_frame, anchor=tk.N + tk.W,
                                                        tags='self.viewport')
 
         # bind an event whenever the size of the viewPort frame changes.
-        self.viewport.bind("<Configure>", self.onCanvasContentChange)
-
-        # bind an event whenever the size of the canvas frame changes.
-        self.canvas.bind("<Configure>", self.onCanvasConfigure)
+        self.scroll_frame.bind("<Configure>", self.onCanvasContentChange)
 
         self.onCanvasContentChange(None)
 
-    # whenever the size of the canvas changes alter the window region respectively.
-    def onCanvasConfigure(self, event):
-        """Reset the canvas window to encompass inner frame when required"""
-        canvas_width = event.width
-        self.canvas.itemconfig(self.canvas_window, width=canvas_width)
+    # whenever the size of the frame changes, alter the scroll region respectively.
+    def onCanvasContentChange(self, event):
+        """Reset the scroll region to encompass the canvas contents"""
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
 
 # ----- #
@@ -479,12 +392,13 @@ class TreeEntry:
             self.canvas.tag_lower(below_id)
 
 
-class CustomTree(ScrollCanvas):
+class CustomTree(ScrollLabelCanvas):
     """A Canvas with a grid of elements. If an element is selected, will generate a '<<Select>>' event"""
 
     row_height = 20
 
-    def __init__(self, parent,  headers: List[str], *args, name='', header_widths=None, size=None, color='#FFFFFF', highlight='#AAAAFF',
+    def __init__(self, parent, headers: List[str], *args, name='', header_widths=None, size=None, color='#FFFFFF',
+                 highlight='#AAAAFF',
                  pcnt_height=98, pcnt_width=100, dragable=False, **kwargs):
         size = {'width': 100, 'height': 100} if size is None else size
         super().__init__(parent, size, *args, **kwargs)
@@ -495,10 +409,10 @@ class CustomTree(ScrollCanvas):
         self.header_list = headers
         self.header_widths = header_widths
         if header_widths is None or len(header_widths) != len(self.header_list):
-            self.header_widths = [50]*len(self.header_list)
+            self.header_widths = [50] * len(self.header_list)
         x = 0
         for i, header in enumerate(self.header_list):
-            self.header_canvas.create_text(x+(self.header_widths[i]//2), 0, text=header, anchor='n')
+            self.header_canvas.create_text(x + (self.header_widths[i] // 2), 0, text=header, anchor='n')
             x += self.header_widths[i]
 
         self.color = color
@@ -553,13 +467,13 @@ class CustomTree(ScrollCanvas):
 
     def start_group(self, group_name, row=-1, row_data=None, **kwargs):
         self.cur_indent += 1
-        text = [group_name].extend(['']*(len(self.header_list)-1))
-        self.add_row(text=text, row=row, row_data=row_data)
+        text = [group_name, [''] * (len(self.header_list) - 1)]
+        self.add_row(text, row=row, row_data=row_data, **kwargs)
 
     def end_group(self):
         self.cur_indent -= 1
 
-    def add_row(self, text, row=-1, row_data=None, **kwargs):
+    def add_row(self, text: List[str], row=-1, row_data=None, **kwargs):
         if len(text) > len(self.header_list):
             err = f'CustomTree: More text values than header fields:\n\tRow text: ' + ', '.join(text)
             err += f'\n\n\tHeaders: '
@@ -569,7 +483,7 @@ class CustomTree(ScrollCanvas):
         new_row = TreeEntry(self.canvas, text=text, indent_level=self.cur_indent, **kwargs)
         row = row if row > 0 else len(self.rows)
         if row > 0:
-            new_row.lower(self.rows[row-1].get_layer())
+            new_row.lower(self.rows[row - 1].get_layer())
         self.rows.insert(row, new_row)
         if row_data is not None:
             self.row_ids[new_row] = row_data
@@ -682,10 +596,10 @@ class CustomTree(ScrollCanvas):
         return self.header_list
 
 
-class CustomTree2(ttk.Treeview):
+class DataTreeview(ttk.Treeview):
 
-    def __init__(self, parent, name, callbacks=None, can_open=True, can_move=True, click_multiple=False, **kwargs):
-        super().__init__(parent, **kwargs)
+    def __init__(self, parent, name, callbacks=None, can_open=True, **kwargs):
+        super().__init__(parent, selectmode='browse', **kwargs)
 
         self._parent = parent
         self.name = name
@@ -696,88 +610,20 @@ class CustomTree2(ttk.Treeview):
         self.selection_order = []
 
         self.can_open = can_open
-        self.can_move = can_move
-        self.click_multiple = click_multiple
 
         if can_open:
-            self.bind("<Double-ButtonPress-1>", self.open_entry)
-
-        self.bind("<ButtonPress-1>", self.bDown)
-        self.bind("<ButtonRelease-1>", self.bUp, add='+')
-
-        if can_move:
-            self.bind("<Control-ButtonPress-1>", self.bDown_Ctrl)
-            self.bind('<Control-ButtonRelease-1>', self.bUp_Ctrl)
-        # self.bind("<Shift-ButtonPress-1>", self.bDown_Shift, add='+')
-        # self.bind("<Shift-ButtonRelease-1>", self.bUp_Shift, add='+')
+            self.bind("<ButtonRelease-1>", self.select_entry, add='+')
 
     def add_callback(self, key, callback):
         self.callbacks[key] = callback
 
-    def open_entry(self, event):
+    def select_entry(self, event):
+        if 'select' not in self.callbacks:
+            raise RuntimeError(f'{type(self)}: no "select" callback given')
         widget = self.identify_row(event.y)
         row_data = self.row_data[widget]
         if row_data is not None:
             self.callbacks['select'](self.name, row_data)
-
-    # # For multiple selection, to fix later along with the move function
-    # def bDown_Shift(self, event):
-    #     select = [self.index(s) for s in self.selection()]
-    #     select.append(self.index(self.identify_row(event.y)))
-    #     select.sort()
-    #     self.cur_selection = []
-    #     for i in range(select[0], select[-1] + 1, 1):
-    #         self.selection_add(self.get_children()[i])
-    #         self.cur_selection.append(i)
-    #     self.cur_selection = list(set(self.cur_selection))
-    #
-    # def bUp_Shift(self, event):
-    #     pass
-
-    def bDown(self, event):
-        if self.index(self.identify_row(event.y)) not in self.cur_selection:
-            self.selection_set(self.identify_row(event.y))
-            self.cur_selection = [self.identify_row(event.y)]
-        else:
-            self.after(10, self.set_selection_list)
-
-    def set_selection_list(self, select_list=None):
-        select_list = select_list if select_list is not None else self.cur_selection
-        self.selection_clear()
-        for s in select_list:
-            self.selection_add(self.get_children()[int(s)])
-
-    def bUp(self, event):
-        if self.click_multiple:
-            cur_row = self.index(self.identify_row(event.y))
-            if cur_row in self.cur_selection:
-                self.cur_selection.pop(cur_row)
-            self.after(10, self.set_selection_list)
-            return
-        self.unbind("<B1-Motion>")
-        if self.identify_row(event.y) in self.selection():
-            self.selection_set(self.identify_row(event.y))
-            self.cur_selection = [self.identify_row(event.y)]
-
-    def bMove(self, event):
-        iid = self.identify_row(event.y)
-        if iid == '':
-            return
-        if iid in self.selection():
-            return
-        moveto = self.index(iid)
-        parent_iid = self.parent(iid)
-        for s in self.selection():
-            self.move(s, parent_iid, moveto)
-
-    def bDown_Ctrl(self, e):
-        self.bind("<B1-Motion>", self.bMove, add='+')
-        if self.identify_row(e.y) != '':
-            self.cur_selection = [self.identify_row(e.y)]
-            self.after(10, self.set_selection_list)
-
-    def bUp_Ctrl(self, e):
-        self.unbind("<B1-Motion>")
 
     def insert_entry(self, parent, text, values, group_type=None, row_data=None, **kwargs):
         iid = str(len(self.row_data))
@@ -792,3 +638,7 @@ class CustomTree2(ttk.Treeview):
 
     def get_selection(self):
         return [self.row_data[self.get_children()[int(s)]] for s in self.cur_selection]
+
+
+class GridReorganizer(ScrollLabelFrame):
+    pass
