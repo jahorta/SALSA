@@ -28,7 +28,7 @@ class OverrideTypes:
 
 
 class KnownMemAddresses:
-    Script_types = {'^me5.+.sct$': 'Ship_battles',
+    Script_types = {'^me5.+.sct$': 'Ship Battles',
                     '^me099.+.sct$': 'Overworld',
                     '^me0.+.sct$': 'Towns',
                     '^me1.+.sct$': 'Dungeons',
@@ -68,3 +68,6 @@ sep = '_'
 
 
 alt_sep = '-'
+
+
+lock = '🔒'
