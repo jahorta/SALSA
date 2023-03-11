@@ -91,4 +91,8 @@ class InstructionEditorController:
         pass
 
     def on_save_changes(self):
-        pass
+        for key, value in self.changed_values.items():
+            key_parts = key.split(sep)
+            kwargs = {'inst_id': key_parts[0], 'field': key_parts[-1],
+                      'param_id': key_parts[1] if len(key_parts) > 2 else None}
+            self.inst_lib.set_inst_details(value=value, **kwargs)

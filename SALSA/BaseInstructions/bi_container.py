@@ -75,6 +75,12 @@ class BaseParam:
             fields['Default'] = self.default_value
         return fields
 
+    def set_parameter_detail(self, field, value):
+        if locked_conversions[field] not in self.locked_fields:
+            temp_dict = self.__dict__
+            temp_dict[field] = value
+            self.__dict__ = temp_dict
+
 
 class BaseInst:
 
@@ -147,6 +153,14 @@ class BaseInst:
                     loop_count += 1
                 else:
                     self.parameters[key-loop_count].set_parameter_details(param_details=param_details)
+
+    def set_inst_field(self, field, value, param_id=None):
+        if param_id is not None:
+            return self.parameters[param_id].set_parameter_detail(field, value)
+        if locked_conversions[field] not in self.locked_fields:
+            temp_dict = self.__dict__
+            temp_dict[field] = value
+            self.__dict__ = temp_dict
 
     def get_user_inst_details(self):
         fields = {}

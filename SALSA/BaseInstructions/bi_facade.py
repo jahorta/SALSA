@@ -40,6 +40,10 @@ class BaseInstLibFacade:
     def set_inst_detail(self, inst_id, details: dict):
         self.lib.insts[inst_id].set_inst_details(details)
 
+    # Used to set details with the instruction editor
+    def set_single_inst_detail(self, inst_id, field, value, param_id=None):
+        self.lib.insts[inst_id].set_inst_field(field, value, param_id)
+
     def save_user_insts(self):
         self.inst_model.save_instructions(inst_dict=self.get_inst_details(), inst_type=self.user_identifier)
 
