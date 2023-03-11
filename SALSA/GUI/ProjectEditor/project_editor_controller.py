@@ -25,14 +25,6 @@ tree_parents = {v: k for k, v in tree_children.items()}
 class ProjectEditorController:
     log_name = 'PrjEditorCtrl'
 
-    popup_names = {
-        SCTExportPopup: 'SCTExport',
-        VariablePopup: 'Variable'
-    }
-
-    sct_export_popup: Union[None, SCTExportPopup] = None
-    var_popup: Union[None, VariablePopup] = None
-
     default_settings = {
         'style': 'grouped'
     }
@@ -177,7 +169,6 @@ class ProjectEditorController:
         if details['loop'] is None:
             return
 
-
     def on_script_display_change(self, mode):
         pass
 
@@ -186,61 +177,6 @@ class ProjectEditorController:
 
     def on_set_inst_start(self, start, newID):
         pass
-
-    # ################################ #
-    # Project Editing Popup Controller #
-    # ################################ #
-
-    # ---------------------------------- #
-    # Instruction Editor Popup Functions #
-    # ---------------------------------- #
-
-    def show_instructions_popup(self):
-        pass
-
-    # ------------------------------- #
-    # Variable Editor Popup Functions #
-    # ------------------------------- #
-
-    def show_variables_popup(self):
-        callbacks = {
-            'get_scripts': lambda: self.project.get_tree(self.view.get_headers('script')),
-            'get_variables': self.project.get_script_variables_with_aliases,
-            'set_alias': self.project.set_variable_alias,
-            'get_var_usage': self.project.get_variable_usages,
-            'close': self.close_popup
-        }
-        self.var_popup = VariablePopup(self.parent, callbacks=callbacks, name=self.popup_names[VariablePopup])
-
-    # ----------------------------- #
-    # String Editor Popup Functions #
-    # ----------------------------- #
-
-    def show_strings_popup(self):
-        pass
-
-    # -------------------------- #
-    # SCT Export Popup Functions #
-    # -------------------------- #
-
-    def show_sct_export_popup(self, selected=None):
-        callbacks = {
-            'export': self.callbacks['export_sct'], 'cancel': self.close_popup,
-            'get_tree': lambda: self.project.get_tree(self.view.get_headers('script'))
-            }
-        self.sct_export_popup = SCTExportPopup(self.parent, callbacks=callbacks, name=self.popup_names[SCTExportPopup], selected=selected)
-
-    # ----------------------- #
-    # General popup functions #
-    # ----------------------- #
-
-    def close_popup(self, name):
-        if name == self.popup_names[SCTExportPopup]:
-            self.sct_export_popup.destroy()
-            self.sct_export_popup = None
-        elif name == self.popup_names[VariablePopup]:
-            self.var_popup.destroy()
-            self.var_popup = None
 
     def show_right_click_menu(self):
         pass
