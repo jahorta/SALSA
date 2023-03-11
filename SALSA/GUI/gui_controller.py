@@ -1,5 +1,5 @@
 import tkinter as tk
-from typing import Union
+from typing import Union, TypedDict, Literal
 
 from GUI.AnalysisPopup.analysis_controller import AnalysisController
 from GUI.HelpPopup.help_controller import HelpController
@@ -10,21 +10,26 @@ from SALSA.GUI.AnalysisPopup.analysis_view import AnalysisView
 from SALSA.GUI.HelpPopup.help_view import HelpView
 from SALSA.GUI.InstructionEditor.instruction_editor_view import InstructionEditorView
 from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
+from SALSA.GUI.ProjectEditor.sct_export_popup import SCTExportPopup
+from SALSA.GUI.ProjectEditor.variable_editor_popup import VariablePopup
+from SALSA.GUI.ProjectEditor.string_editor_popup import StringPopup
 from Project.project_facade import SCTProjectFacade
 from Common.containers import Vector2
 
 
-class GUIController:
+class PopupTypes(TypedDict):
+    inst: Union[None, InstructionEditorController]
+    analysis: Union[None, AnalysisController]
+    help: Union[None, HelpController]
+    about: Union[None, AboutView]
+    variable: Union[None, VariablePopup]
+    string: Union[None, StringPopup]
+    export: Union[None, SCTExportPopup]
 
+
+class GUIController:
     parent: tk.Tk
-    instruction_view: Union[None, InstructionEditorView]
-    instruction_controller: Union[None, InstructionEditorController]
     scpt_view: ProjectEditorView
-    analysis_view: Union[None, AnalysisView]
-    analysis_controller: Union[None, AnalysisController]
-    help_view: Union[None, HelpView]
-    help_controller: Union[None, HelpController]
-    about_view: Union[None, AboutView]
 
     def __init__(self, parent, scpt_editor_view: ProjectEditorView, project_facade: SCTProjectFacade,
                  inst_lib_facade: BaseInstLibFacade):
@@ -34,33 +39,24 @@ class GUIController:
         self.project = project_facade
         self.base_lib = inst_lib_facade
 
-        self.popup_cleanup = {
-            InstructionEditorView: self._inst_view_cleanup,
-            AnalysisView: self._analysis_view_cleanup,
-            HelpView: self._help_view_cleanup,
-            AboutView: self._about_view_cleanup
-        }
+        self.popups: PopupTypes = {'inst': None, 'analysis': None, 'help': None, 'about': None,
+                                   'variable': None, 'string': None, 'export': None}
 
         self.popup_close_check = {
             InstructionEditorView: self._instruction_edit_check,
             AnalysisView: self._no_check,
             HelpView: self._no_check,
-            AboutView: self._no_check
+            AboutView: self._no_check,
+            VariablePopup: self._no_check,
+            StringPopup: self._no_check,
+            SCTExportPopup: self._no_check,
         }
 
         self.callbacks = {}
 
-    def show_instruction_view(self, inst_lib, callbacks, position):
-        self.instruction_view = InstructionEditorView(self.parent, inst_lib, callbacks, position)
-        self.instruction_controller = InstructionEditorController(view=self.instruction_view, callbacks=callbacks,
-                                                                  inst_lib_facade=inst_lib, position=position)
-
-    def show_analysis_view(self):
-        self.analysis_view = AnalysisView(self.parent)
-        self.analysis_controller = AnalysisController(self.analysis_view)
-
-    def update_all_views(self):
-        self.scpt_view.refresh_views()
+    # ------------------------------------------------------------- #
+    # Functions to inactivate script view when no project is loaded #
+    # ------------------------------------------------------------- #
 
     def enable_script_view(self):
         self.recursive_toggle(self.scpt_view, 'normal')
@@ -84,9 +80,28 @@ class GUIController:
             else:
                 child.configure(state=state)
 
+    # ------------------------ #
+    # Functions to show popups #
+    # ------------------------ #
+
+    def show_instruction_view(self):
+        if self.popups['inst'] is not None:
+            self.popups['inst'].view.tkraise()
+            return
+
+        callbacks = {
+            'close': self.close_popup
+        }
+        self.popups['inst'] = InstructionEditorController(parent=self.parent, callbacks=callbacks,
+                                                          inst_lib_facade=self.base_lib, name='inst')
+
+    def show_analysis_view(self):
+        # self.popups['analysis'] = AnalysisController()
+        pass
+
     def show_about(self):
         position = Vector2(x=self.parent.winfo_x(), y=self.parent.winfo_y())
-        self.about_view = AboutView(parent=self.parent, position=position, callback=self.close_popup)
+        self.popups['about'] = AboutView(parent=self.parent, position=position, callback=self.close_popup)
 
     def show_help(self):
         pass
@@ -96,35 +111,50 @@ class GUIController:
     def show_settings(self):
         pass
 
+    def show_variables_popup(self):
+        if self.popups['variable'] is not None:
+            self.popups['variable'].tkraise()
+            return
+        callbacks = {
+            'get_scripts': lambda: self.project.get_tree(self.scpt_view.get_headers('script')),
+            'get_variables': self.project.get_script_variables_with_aliases,
+            'set_alias': self.project.set_variable_alias,
+            'get_var_usage': self.project.get_variable_usages,
+            'close': self.close_popup
+        }
+        self.popups['variable'] = VariablePopup(self.parent, callbacks=callbacks, name='variable')
+
+    def show_strings_popup(self):
+        pass
+
+    def show_sct_export_popup(self, selected=None):
+        if self.popups['export'] is not None:
+            self.popups['export'].tkraise()
+            return
+        callbacks = {
+            'export': self.callbacks['export_sct'], 'cancel': self.close_popup,
+            'get_tree': lambda: self.project.get_tree(self.scpt_view.get_headers('script'))
+        }
+        self.popups['export'] = SCTExportPopup(self.parent, callbacks=callbacks, name='export', selected=selected)
+
+    # ----------------------- #
+    # Popup cleanup functions #
+    # ----------------------- #
+
+    def close_popup(self, name: Literal['inst', 'analysis', 'help', 'about', 'variable', 'string', 'export'],
+                    popup: Union[InstructionEditorView, AnalysisView, HelpView, AboutView, SCTExportPopup, VariablePopup, StringPopup]):
+        p_type = type(popup)
+        if not self.popup_close_check[p_type]():
+            return
+        popup.destroy()
+        self.popups[name] = None
+
     def _instruction_edit_check(self):
+        # TODO - Create popup to save changes if there are changes
         pass
 
     def _no_check(self):
         pass
 
-    def _inst_view_cleanup(self):
-        self.instruction_view = None
-        self.instruction_controller = None
-
-    def _analysis_view_cleanup(self):
-        self.analysis_view = None
-        self.analysis_controller = None
-
-    def _help_view_cleanup(self):
-        self.help_view = None
-        self.help_controller = None
-
-    def _about_view_cleanup(self):
-        self.about_view = None
-
-    def close_popup(self, popup: Union[InstructionEditorView, AnalysisView, HelpView, AboutView]):
-        p_type = type(popup)
-        if not self.popup_close_check[p_type]():
-            return
-        popup.destroy()
-        self.popup_cleanup[p_type]()
-
     def add_callbacks(self, callbacks):
         self.callbacks = {**self.callbacks, **callbacks}
-        print('added')
-
