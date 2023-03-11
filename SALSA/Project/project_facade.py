@@ -4,6 +4,7 @@ from Project.dictize_project import dictize_project
 from Project.project_container import SCTProject, SCTSection
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from Common.setting_class import settings
+from Common.constants import sep
 
 
 class SCTProjectFacade:
