@@ -8,7 +8,8 @@ from SALSA.Common.setting_class import settings
 default_headers = {
     'script': ['name'],
     'section': ['name'],
-    'instruction': ['name', 'condition', 'instruction_id']
+    'instruction': ['name', 'condition', 'instruction_id'],
+    'parameter': ['ID', 'name', 'type', 'value']
 }
 
 header_settings = {
@@ -27,6 +28,13 @@ header_settings = {
         'synopsis': {'label': 'Synopsis', 'width': 50, 'stretch': True},
         'absolute_offset': {'label': 'Offset', 'width': 50, 'stretch': True},
         'relative_offset': {'label': 'Relative Offset', 'width': 50, 'stretch': True}
+    },
+    'parameter': {
+        'ID': {'label': 'ID', 'width': 30, 'stretch': True},
+        'name': {'label': 'Condition', 'width': 70, 'stretch': True},
+        'type': {'label': 'Parameter Type', 'width': 70, 'stretch': True},
+        'value': {'label': 'Value', 'width': 120, 'stretch': False},
+        'formatted_value': {'label': 'ID', 'width': 50, 'stretch': False}
     }
 }
 
@@ -187,15 +195,30 @@ class ProjectEditorView(tk.Frame):
         self.inst_description = tk.Label(inst_desc_frame)
         self.inst_description.grid(row=0, column=0, sticky='NSEW')
 
-        param_frame = tk.LabelFrame(inst_frame, text='Parameter Values')
+        param_frame = tk.LabelFrame(inst_frame, text='Parameters')
         param_frame.grid(row=3, column=0, sticky='NSEW')
         param_frame.columnconfigure(0, weight=1)
         param_frame.rowconfigure(0, weight=1)
 
-        self.param_scroll_frame = w.ScrollFrame(param_frame, size={'width': 100, 'height': 200})
-        self.param_scroll_frame.grid(row=0, column=0, sticky='NSEW')
-        self.param_scroll_frame.columnconfigure(0, weight=1)
-        self.param_scroll_frame.rowconfigure(0, weight=1)
+        columns = list(header_settings['parameter'].keys())[1:]
+        self.param_tree = w.DataTreeview(param_frame, name='parameter', columns=columns)
+        self.param_tree.grid(row=0, column=0, sticky='NSEW')
+        first = True
+        for name, d in header_settings['parameter'].items():
+            label = d.get('label', default_tree_label)
+            anchor = d.get('anchor', default_tree_anchor)
+            minwidth = d.get('minwidth', default_tree_minwidth)
+            width = d.get('width', default_tree_width)
+            stretch = d.get('stretch', default_tree_stretch)
+            if first:
+                name = '#0'
+                first = False
+            self.param_tree.heading(name, text=label, anchor=anchor)
+            self.param_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
+        self.param_tree['displaycolumns'] = self.visible_headers['parameter'][1:]
+        param_tree_scrollbar = tk.Scrollbar(param_frame, orient='vertical', command=self.param_tree.yview)
+        param_tree_scrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
+        self.param_tree.config(yscrollcommand=param_tree_scrollbar.set)
 
         link_frame = tk.LabelFrame(inst_frame, text='Links')
         link_frame.grid(row=4, column=0, sticky='NSEW')
@@ -218,12 +241,6 @@ class ProjectEditorView(tk.Frame):
         if tree_key is None:
             return {k: list(header_settings[k].keys()) for k in header_settings.keys()}
         return list(header_settings[tree_key].keys())
-
-    def add_param(self, indent, key, param, base_param):
-        pass
-
-    def add_loop_params(self, key, param_list, base_list):
-        pass
 
     def set_refresh_value(self, never_refresh, always_refresh, cur_refresh_choice):
         self.skip_ckeck_var.set(int(cur_refresh_choice))
