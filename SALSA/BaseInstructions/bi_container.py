@@ -3,6 +3,31 @@ import json
 from SALSA.BaseInstructions.bi_defaults import inst_defaults
 
 
+locked_conversions = {
+    'instruction': {
+        'loop': 'Loop',
+        'loop_iter': 'Loop Iterations',
+        'loop_cond': 'Loop Break Condition',
+        'name': 'Name',
+        'description': 'Description',
+        'location': 'Location',
+        'no_new_frame': 'Skip Frame Refresh',
+        'forced_new_frame': 'Force Frame Refresh',
+        'link': 'Link',
+        'link_type': 'Link Type',
+        'param2': 'Hard parameter two',
+        'notes': 'Notes'
+    },
+    'parameter': {
+        'name': 'Name',
+        'type': 'Type',
+        'default_value': 'Default',
+        'mask': 'Mask',
+        'is_signed': 'Signed'
+    }
+}
+
+
 class BaseParam:
 
     def __init__(self, param_id, param_dict, default_name, link_type=None):
