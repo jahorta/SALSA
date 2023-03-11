@@ -619,8 +619,10 @@ class DataTreeview(ttk.Treeview):
 
     def select_entry(self, event):
         if 'select' not in self.callbacks:
-            raise RuntimeError(f'{type(self)}: no "select" callback given')
+            raise RuntimeError(f'{type(self)}-{self.name}: no "select" callback given')
         widget = self.identify_row(event.y)
+        if widget == '':
+            return
         row_data = self.row_data[widget]
         if row_data is not None:
             self.callbacks['select'](self.name, row_data)

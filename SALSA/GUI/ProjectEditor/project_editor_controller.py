@@ -48,7 +48,7 @@ class ProjectEditorController:
             'instruction': None
         }
 
-        self.trees: Dict[str, CustomTree2] = {
+        self.trees: Dict[str, DataTreeview] = {
             'script': self.view.scripts_tree,
             'section': self.view.sections_tree,
             'instruction': self.view.insts_tree,
