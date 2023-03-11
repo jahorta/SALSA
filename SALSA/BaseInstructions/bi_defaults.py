@@ -23,6 +23,7 @@ inst_defaults = {
         "Location": "0x801f60f0",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
+        "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {}
     },
     2: {
