@@ -192,7 +192,8 @@ class ProjectEditorView(tk.Frame):
         self.inst_desc_frame.columnconfigure(0, weight=1)
         self.inst_desc_frame.rowconfigure(0, weight=1)
 
-        self.inst_description = tk.Label(inst_desc_frame)
+        self.inst_description = tk.Message(self.inst_desc_frame.scroll_frame)
+        self.inst_desc_frame.canvas.bind("<Configure>", lambda e: self.inst_description.configure(width=e.width - 10), add='+')
         self.inst_description.grid(row=0, column=0, sticky='NSEW')
 
         param_frame = tk.LabelFrame(inst_frame, text='Parameters')
