@@ -8,12 +8,12 @@ class BaseParam:
     def __init__(self, param_id, param_dict, default_name, link_type=None):
 
         self.locked_fields = [k for k in param_dict.keys()]
-        self.paramID = param_id
+        self.param_ID = param_id
         self.name = param_dict.get('Name', default_name)
         self.type = param_dict['Type']
         self.default_value = param_dict.get('Default', None)
         self.mask = param_dict.get('Mask', None)
-        self.isSigned = param_dict.get('Signed', None)
+        self.is_signed = param_dict.get('Signed', None)
         self.link_type = link_type
 
         # # Use for finding unused keys in instruct defaults
@@ -34,7 +34,7 @@ class BaseParam:
                 else:
                     self.mask = param_details.get('Mask', self.mask)
         if 'Signed' not in self.locked_fields:
-            self.isSigned = param_details.get('Signed', self.isSigned)
+            self.is_signed = param_details.get('Signed', self.is_signed)
         if 'Default' not in self.locked_fields and self.type != 'int':
             self.default_value = param_details.get('Default', self.default_value)
 
@@ -43,7 +43,7 @@ class BaseParam:
         if 'Name' not in self.locked_fields:
             fields['Name'] = self.name
         if 'Signed' not in self.locked_fields:
-            fields['Signed'] = self.isSigned
+            fields['Signed'] = self.is_signed
         if 'Mask' not in self.locked_fields and self.mask is not None:
             fields['Mask'] = self.mask
         if 'Default' not in self.locked_fields and self.default_value is not None:
@@ -142,8 +142,8 @@ class BaseInst:
     def get_param_names(self, param_list):
         names = {}
         for param in self.parameters.values():
-            if int(param.paramID) in param_list:
-                names[int(param.paramID)] = param.name
+            if int(param.param_ID) in param_list:
+                names[int(param.param_ID)] = param.name
         return names
 
     def __repr__(self):

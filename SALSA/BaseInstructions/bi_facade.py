@@ -2,9 +2,9 @@ import json
 import os.path
 from typing import List
 
-from BaseInstructions.bi_container import BaseInstLib, BaseInst
-
-from FileModels.instruction_model import InstructionModel
+from SALSA.BaseInstructions.bi_container import BaseInstLib, BaseInst, locked_conversions
+from SALSA.FileModels.instruction_model import InstructionModel
+from SALSA.Common.constants import sep
 
 
 class BaseInstLibFacade:

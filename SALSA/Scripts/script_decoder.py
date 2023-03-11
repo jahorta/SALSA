@@ -301,7 +301,7 @@ class SCTDecoder:
                                         if mask is not None:
                                             p1 = int(applyHexMask(hex(p1), hex(mask)), 16)
                                             p1_little = int(applyHexMask(hex(p1_little), hex(mask)), 16)
-                                        if self._inst_lib.lib.insts[next_i_id].parameters[0].isSigned:
+                                        if self._inst_lib.lib.insts[next_i_id].parameters[0].is_signed:
                                             p1 = word2SignedInt(hex(p1))
                                             p1_little = word2SignedInt(hex(p1_little))
                                         if 0 <= self._cursor * 4 + p1 < self._sctLength:
@@ -401,8 +401,8 @@ class SCTDecoder:
             while not done and cur_iter < max_iter:
                 param_group = {}
                 for p in loop_parameters:
-                    param = self._decode_param(p, [*trace, f'{cur_iter}{sep}{p.paramID}'])
-                    param_group[p.paramID] = param
+                    param = self._decode_param(p, [*trace, f'{cur_iter}{sep}{p.param_ID}'])
+                    param_group[p.param_ID] = param
                     if param.link is not None:
                         cur_inst.links.append(param.link)
 
@@ -430,7 +430,7 @@ class SCTDecoder:
         return cur_inst
 
     def _decode_param(self, base_param: BaseParam, trace):
-        cur_param = SCTParameter(_id=base_param.paramID, _type=base_param.type)
+        cur_param = SCTParameter(_id=base_param.param_ID, _type=base_param.type)
         param_type = base_param.type
         if 'scpt' in param_type:
             overrideCompare = [0x7f7fffff]
@@ -497,7 +497,7 @@ class SCTDecoder:
                     cur_param.type += f'{sep}masked'
                     mask = base_param.mask
                     currWord = bytearray.fromhex(applyHexMask(currWord.hex(), hex(mask))[2:])
-                if base_param.isSigned:
+                if base_param.is_signed:
                     cur_param.type += f'{sep}signed'
                     cur_value = word2SignedInt(currWord)
                 else:
