@@ -15,7 +15,8 @@ tree_children = {
     '': 'script',
     'script': 'section',
     'section': 'instruction',
-    'instruction': 'detail'
+    'instruction': 'detail',
+    'parameter': ''
 }
 
 tree_parents = {v: k for k, v in tree_children.items()}
@@ -58,7 +59,8 @@ class ProjectEditorController:
         self.trees: Dict[str, CustomTree2] = {
             'script': self.view.scripts_tree,
             'section': self.view.sections_tree,
-            'instruction': self.view.insts_tree
+            'instruction': self.view.insts_tree,
+            'parameter': self.view.param_tree
         }
 
         self.project.set_callback(key='update_scripts', callback=lambda: self.update_tree('script', self.project.get_tree(self.view.get_headers('script'))))
@@ -77,6 +79,8 @@ class ProjectEditorController:
     def on_select_tree_entry(self, tree_key, entry):
         if tree_key == 'instruction':
             return self.on_select_instruction(entry)
+        if tree_key == 'parameter':
+            return self.on_select_parameter(entry)
         kwargs = {'style': settings[self.log_name]['style']}
         self.current[tree_key] = entry
         cur_key = tree_key
@@ -94,6 +98,10 @@ class ProjectEditorController:
         self.current['instruction'] = instructID
         details = self.project.get_instruction_details(**self.current)
         self.set_instruction_details(details)
+
+    def on_select_parameter(self, paramID):
+        self.current['parameter'] = paramID
+        param_details = self.project.get_parameter_details(**self.current)
 
     def clear_tree(self, tree: str):
         if tree in self.trees.keys():
@@ -161,8 +169,7 @@ class ProjectEditorController:
         self.view.inst_description.config(text=details['description'])
         for i in details['params_before']:
             param: SCTParameter = details['parameters'][i]
-            self.view.add_param(0, i, param, details['base_parameters'][i])
-
+            self.view.param_tree.insert_entry(0, i, param, details['base_parameters'][i])
 
         self.view.set_refresh_value(details['no_new_frame'], details['forced_new_frame'], details['skip_refresh'])
 
