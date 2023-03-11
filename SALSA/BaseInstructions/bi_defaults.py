@@ -2,7 +2,7 @@ inst_defaults = {
     0: {
         "Name": "If ",
         "Location": "0x801f6044",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Link": 1,
         "Link Type": "Jump",
@@ -21,20 +21,20 @@ inst_defaults = {
     },
     1: {
         "Location": "0x801f60f0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {}
     },
     2: {
         "Location": "0x801f60f0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {}
     },
     3: {
         "Location": "0x801f5f50",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Link": 3,
         "Link Type": "Switch",
@@ -66,13 +66,13 @@ inst_defaults = {
     },
     4: {
         "Location": "0x801f60f0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {}
     },
     5: {
         "Location": "0x801f5eb4",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
@@ -90,7 +90,7 @@ inst_defaults = {
     },
     6: {
         "Location": "0x801f5d7c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
@@ -108,7 +108,7 @@ inst_defaults = {
     },
     7: {
         "Location": "0x801f5d08",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
@@ -126,14 +126,14 @@ inst_defaults = {
     },
     8: {
         "Location": "0x801f60f0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {}
     },
     9: {
         "Location": "0x801f60c4",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
@@ -147,7 +147,7 @@ inst_defaults = {
         "Link": 0,
         "Link Type": "Jump",
         "Location": "0x801f5ccc",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
@@ -161,7 +161,7 @@ inst_defaults = {
     11: {
         "Name": "Load Subscript",
         "Location": "0x801f5c30",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Link": 0,
         "Link Type": "Jump",
@@ -176,7 +176,7 @@ inst_defaults = {
     12: {
         "Name": "Return",
         "Location": "0x801f5bd0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00000000,
         "Parameters": {}
@@ -185,7 +185,7 @@ inst_defaults = {
         "Name": "code_error",
         "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis is never used as an instruction. It is used to set a flag to try to prevent a frame refresh after the next instruction",
         "Location": "0x801f60f0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {}
       },
@@ -193,7 +193,7 @@ inst_defaults = {
         "Name": "code_error",
         "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call\n\n***Not used in the game***",
         "Location": "0x801f60f0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {}
@@ -202,7 +202,7 @@ inst_defaults = {
         "Name": "Force next frame",
         "Description": "***Not used in the game***\n\nThis instruction will set the 0x4 field in the current instruction buffer to zero. This forces the instruction interpreter function to exit allow for the next frame to be drawn. On next frame, any pending instruction buffers will be read.",
         "Location": "0x801f5bb4",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Warning": "Instruction not used in the game, may be buggy",
@@ -211,7 +211,7 @@ inst_defaults = {
     16: {
         "Name": "Sleep",
         "Location": "0x801f570c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
@@ -224,7 +224,7 @@ inst_defaults = {
     17: {
         "Name": "Set Bit",
         "Location": "0x801f5b14",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
@@ -238,7 +238,7 @@ inst_defaults = {
         "Name": "Unset Bit",
         "Description": "Unsets a bit in the bit field at 0x80310b3c\nBit: *add[<Offset>,0]*\n\n(Sets the bit to 0)",
         "Location": "0x801f5a74",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
@@ -252,7 +252,7 @@ inst_defaults = {
         "Name": "Invert Bit",
         "Description": "Inverts a bit in the bit field at 0x80310b3c\nBit: *add[<Offset>,0]*\n\n***Not used in the game***",
         "Location": "0x801f59c0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -268,7 +268,7 @@ inst_defaults = {
         "Name": "Give Item",
         "Description": "Gives an item with item ID: <ItemID>",
         "Location": "0x801f593c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
@@ -282,7 +282,7 @@ inst_defaults = {
         "Name": "Take Item",
         "Description": "Takes item with itemID: <ItemID>",
         "Location": "0x801f58b8",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
@@ -296,7 +296,7 @@ inst_defaults = {
         "Name": "Return 1",
         "Description": "Returns a 1. Does not advance the pointer, so possibly infinite loop...\n\n***Not used in the game***",
         "Location": "0x801f58b0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Warning": "May cause infinite loop in script system, Instruction not used in the game, may be buggy",
         "Parameters": {}
@@ -304,7 +304,7 @@ inst_defaults = {
     23: {
         "Name": "Load *.mld file",
         "Location": "0x801ff13c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00000000,
         "Link": 0,
@@ -319,7 +319,7 @@ inst_defaults = {
     },
     24: {
         "Location": "0x8020a938",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Link": 0,
@@ -334,7 +334,7 @@ inst_defaults = {
     },
     25: {
         "Location": "0x8020a580",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Link": 1,
@@ -353,7 +353,7 @@ inst_defaults = {
     },
     26: {
         "Location": "0x802088d8",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -364,7 +364,7 @@ inst_defaults = {
     },
     27: {
         "Location": "0x80208774",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -375,7 +375,7 @@ inst_defaults = {
     },
     28: {
         "Location": "0x801fbba8",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00020000,
         "Parameters": {
             0: {
@@ -398,7 +398,7 @@ inst_defaults = {
     },
     29: {
         "Location": "0x801fbf90",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00020000,
         "Parameters": {
@@ -422,7 +422,7 @@ inst_defaults = {
     },
     30: {
         "Location": "0x802085cc",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x0002000,
         "Parameters": {
@@ -438,7 +438,7 @@ inst_defaults = {
     },
     31: {
         "Location": "0x80208234",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00050000,
         "Parameters": {
@@ -478,7 +478,7 @@ inst_defaults = {
     },
     32: {
         "Location": "0x80208044",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00050000,
         "Parameters": {
@@ -518,7 +518,7 @@ inst_defaults = {
       },
     33: {
         "Location": "0x80203ffc",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0xfffe0000,
         "Loop": [1, 2, 3, 4, 5, 6, 7],
@@ -561,7 +561,7 @@ inst_defaults = {
     },
     34: {
         "Location": "0x801fc68c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00050000,
         "Loop": [2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -616,7 +616,7 @@ inst_defaults = {
     },
     35: {
         "Location": "0x801fcaac",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00050000,
         "Loop": [2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -671,7 +671,7 @@ inst_defaults = {
     },
     36: {
         "Location": "0x801fc408",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00050000,
         "Parameters": {
@@ -711,7 +711,7 @@ inst_defaults = {
     },
     37: {
         "Location": "0x801fc184",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00050000,
         "Parameters": {
@@ -751,7 +751,7 @@ inst_defaults = {
     },
     38: {
         "Location": "0x80207cd0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00020000,
         "Warning": "Instruction not used in the game, may be buggy",
@@ -780,7 +780,7 @@ inst_defaults = {
     },
     39: {
         "Location": "0x80207ed0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00020000,
         "Parameters": {
@@ -796,7 +796,7 @@ inst_defaults = {
     },
     40: {
         "Location": "0x80206ea8",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -816,7 +816,7 @@ inst_defaults = {
     },
     41: {
         "Location": "0x80207a40",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -827,7 +827,7 @@ inst_defaults = {
     },
     42: {
         "Location": "0x80207830",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Loop": [2],
         "Loop Iterations": 1,
@@ -849,7 +849,7 @@ inst_defaults = {
     },
     43: {
         "Location": "0x802073b4",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00000000,
         "Link": 0,
@@ -867,21 +867,21 @@ inst_defaults = {
         "Name": "Return 1",
         "Description": "Returns a 1. Does not change the script pointer, so may lead to an infinite loop",
         "Location": "0x801fedc8",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00060000,
         "Warning": "May lead to an infinite loop, Instruction not used in the game, may be buggy",
         "Parameters": {}
     },
     45: {
         "Location": "0x8020726c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     46: {
         "Location": "0x8020549c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
@@ -905,7 +905,7 @@ inst_defaults = {
     },
     47: {
         "Location": "0x80204f8c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
@@ -929,7 +929,7 @@ inst_defaults = {
     },
     48: {
         "Location": "0x802051d0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
@@ -943,7 +943,7 @@ inst_defaults = {
     },
     49: {
         "Location": "0x80204f04",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
@@ -957,7 +957,7 @@ inst_defaults = {
     },
     50: {
         "Location": "0x80204cd0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
@@ -988,7 +988,7 @@ inst_defaults = {
     },
     51: {
         "Location": "0x801fa060",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -1011,7 +1011,7 @@ inst_defaults = {
     },
     52: {
         "Location": "0x80204be8",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
@@ -1042,7 +1042,7 @@ inst_defaults = {
     },
     53: {
         "Location": "0x801fa630",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00050000,
         "Parameters": {
             0: {
@@ -1129,7 +1129,7 @@ inst_defaults = {
     },
     54: {
         "Location": "0x801fa4c0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Link": 1,
@@ -1148,7 +1148,7 @@ inst_defaults = {
       },
     55: {
         "Location": "0x801fa398",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -1167,7 +1167,7 @@ inst_defaults = {
     },
     56: {
         "Location": "0x801fa290",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -1180,7 +1180,7 @@ inst_defaults = {
         "Name": "INS_BG Syntax Error",
         "Description": "Just prints: scptINS BG: SYNTAX ERROR!!!",
         "Location": "0x801fef18",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {}
@@ -1189,14 +1189,14 @@ inst_defaults = {
         "Name": "DELL_BG Syntax Error",
         "Description": "Just prints: scptDELL BG: SYNTAX ERROR!!!",
         "Location": "0x801feee8",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {}
     },
     59: {
         "Location": "0x8020170c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -1208,7 +1208,7 @@ inst_defaults = {
     },
     60: {
         "Location": "0x802015ac",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -1220,7 +1220,7 @@ inst_defaults = {
     },
     61: {
         "Location": "0x802021b8",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00040000,
         "Parameters": {
@@ -1240,7 +1240,7 @@ inst_defaults = {
     },
     62: {
         "Location": "0x80202004",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00040000,
         "Parameters": {
@@ -1256,7 +1256,7 @@ inst_defaults = {
     },
     63: {
         "Location": "0x80201e54",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00040000,
         "Parameters": {
@@ -1272,7 +1272,7 @@ inst_defaults = {
     },
     64: {
         "Location": "0x80201ce0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00040000,
         "Parameters": {
@@ -1284,7 +1284,7 @@ inst_defaults = {
     },
     65: {
         "Location": "0x802019f8",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00040000,
         "Parameters": {
@@ -1296,7 +1296,7 @@ inst_defaults = {
     },
     66: {
         "Location": "0x801f9708",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
@@ -1319,7 +1319,7 @@ inst_defaults = {
         "Name": "Kill Syntax Error",
         "Description": "scptKill: SYNTAX ERROR!!!",
         "Location": "0x801ff1e0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
@@ -1327,7 +1327,7 @@ inst_defaults = {
     },
     68: {
         "Location": "0x8020a2c8",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
@@ -1335,7 +1335,7 @@ inst_defaults = {
     },
     69: {
         "Location": "0x801fa1d0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Link": 0,
@@ -1350,7 +1350,7 @@ inst_defaults = {
     },
     70: {
         "Location": "0x80207130",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -1374,7 +1374,7 @@ inst_defaults = {
     },
     71: {
         "Location": "0x80206ff4",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -1398,7 +1398,7 @@ inst_defaults = {
     },
     72: {
         "Location": "0x80206cbc",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -1442,7 +1442,7 @@ inst_defaults = {
     },
     73: {
         "Location": "0x80206ab0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -1490,7 +1490,7 @@ inst_defaults = {
     },
     74: {
         "Location": "0x80206904",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -1526,7 +1526,7 @@ inst_defaults = {
     },
     75: {
         "Location": "0x8020660c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -1582,7 +1582,7 @@ inst_defaults = {
     },
     76: {
         "Location": "0x802056a8",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": True,
         "Force Frame Refresh Condition": "If 0x80346c3c == 2 and 80302f18 == 2, force frame refresh",
         "Hard parameter two": 0x00010000,
@@ -1595,7 +1595,7 @@ inst_defaults = {
     },
     77: {
         "Location": "0x8020a048",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -1623,7 +1623,7 @@ inst_defaults = {
     },
     78: {
         "Location": "0x801fbd9c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00020000,
         "Parameters": {
@@ -1647,7 +1647,7 @@ inst_defaults = {
     },
     79: {
         "Location": "0x80201228",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -1684,13 +1684,13 @@ inst_defaults = {
         "Name": "Reset 80305ba9",
         "Description": "Sets global variable at 80305ba9 to zero",
         "Location": "0x80200f88",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     81: {
         "Location": "0x80200df4",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -1733,7 +1733,7 @@ inst_defaults = {
     },
     82: {
         "Location": "0x80200ce4",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -1756,7 +1756,7 @@ inst_defaults = {
     },
     83: {
         "Location": "0x80200b90",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -1791,7 +1791,7 @@ inst_defaults = {
     },
     84: {
         "Location": "0x802009c4",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -1838,7 +1838,7 @@ inst_defaults = {
     },
     85: {
         "Location": "0x8020d848",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Loop": [2],
         "Loop Iterations": 1,
@@ -1860,7 +1860,7 @@ inst_defaults = {
     },
     86: {
         "Location": "0x8020d668",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Loop": [2],
         "Loop Iterations": 1,
@@ -1882,7 +1882,7 @@ inst_defaults = {
     },
     87: {
         "Location": "0x8020d488",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Loop": [2],
         "Loop Iterations": 1,
@@ -1904,7 +1904,7 @@ inst_defaults = {
     },
     88: {
         "Location": "0x8020d2a8",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Loop": [2],
@@ -1927,7 +1927,7 @@ inst_defaults = {
     },
     89: {
         "Location": "0x801fb664",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00050000,
         "Loop": [2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -1982,7 +1982,7 @@ inst_defaults = {
     },
     90: {
         "Location": "0x801fb120",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00050000,
         "Loop": [2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -2040,7 +2040,7 @@ inst_defaults = {
     },
     91: {
         "Location": "0x8020d1c0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -2055,7 +2055,7 @@ inst_defaults = {
     },
     92: {
         "Location": "0x801ffef0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -2066,7 +2066,7 @@ inst_defaults = {
     },
     93: {
         "Location": "0x801ffe3c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -2077,7 +2077,7 @@ inst_defaults = {
     },
     94: {
         "Location": "0x801ffdb4",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -2088,7 +2088,7 @@ inst_defaults = {
     },
     95: {
         "Location": "0x80206424",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -2124,7 +2124,7 @@ inst_defaults = {
     },
     96: {
         "Location": "0x8020623c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -2159,7 +2159,7 @@ inst_defaults = {
     },
     97: {
         "Location": "0x80208a20",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -2178,7 +2178,7 @@ inst_defaults = {
     },
     98: {
         "Location": "0x801ffc20",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Loop": [1],
         "Loop Iterations": 0,
@@ -2196,7 +2196,7 @@ inst_defaults = {
     },
     99: {
         "Location": "0x801ffa60",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Loop": [1],
         "Loop Iterations": 0,
@@ -2214,7 +2214,7 @@ inst_defaults = {
     },
     100: {
         "Location": "0x80208c08",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
@@ -2235,7 +2235,7 @@ inst_defaults = {
     },
     101: {
         "Location": "0x801f984c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -2246,7 +2246,7 @@ inst_defaults = {
     },
     102: {
         "Location": "0x801f9668",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -2258,13 +2258,13 @@ inst_defaults = {
     },
     103: {
         "Location": "0x801f9614",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     104: {
         "Location": "0x801f9454",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
@@ -2283,7 +2283,7 @@ inst_defaults = {
     },
     105: {
         "Location": "0x801f934c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
@@ -2294,7 +2294,7 @@ inst_defaults = {
     },
     106: {
         "Location": "0x801f9120",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -2337,7 +2337,7 @@ inst_defaults = {
     },
     107: {
         "Location": "0x801f8f7c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -2352,7 +2352,7 @@ inst_defaults = {
     },
     108: {
         "Location": "0x801fabdc",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00050000,
         "Loop": [2, 3, 4, 5, 6, 7, 8, 9, 10],
         "Loop Iterations": 1,
@@ -2406,7 +2406,7 @@ inst_defaults = {
     },
     109: {
         "Location": "0x80200fc4",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -2449,7 +2449,7 @@ inst_defaults = {
     },
     110: {
         "Location": "0x801ff0f8",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Link": 0,
         "Link Type": "String",
@@ -2463,7 +2463,7 @@ inst_defaults = {
     },
     111: {
         "Location": "0x802060d4",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
@@ -2479,7 +2479,7 @@ inst_defaults = {
     112: {
         "Name": "Trigger Battle",
         "Location": "0x801ff210",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -2502,7 +2502,7 @@ inst_defaults = {
     },
     113: {
         "Location": "0x801ff05c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Link": 0,
@@ -2517,7 +2517,7 @@ inst_defaults = {
     },
     114: {
         "Location": "0x801fef80",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -2533,14 +2533,14 @@ inst_defaults = {
     },
     115: {
         "Location": "0x801fef48",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     116: {
         "Location": "0x801f9ea8",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
@@ -2577,7 +2577,7 @@ inst_defaults = {
     },
     117: {
         "Location": "0x80208d9c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -2593,7 +2593,7 @@ inst_defaults = {
     },
     118: {
         "Location": "0x80209330",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Loop": [2],
@@ -2622,7 +2622,7 @@ inst_defaults = {
     },
     119: {
         "Location": "0x80209028",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Loop": [2],
@@ -2651,7 +2651,7 @@ inst_defaults = {
     },
     120: {
         "Location": "0x801f8608",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00020000,
         "Warning": "Instruction not used in the game, may be buggy",
@@ -2688,7 +2688,7 @@ inst_defaults = {
     },
     121: {
         "Location": "0x802034b0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0xfffe0000,
         "Loop": [1, 2, 3, 4, 5, 6, 7],
@@ -2731,7 +2731,7 @@ inst_defaults = {
     },
     122: {
         "Location": "0x80205f14",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -2759,7 +2759,7 @@ inst_defaults = {
     },
     123: {
         "Location": "0x8020527c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
@@ -2775,7 +2775,7 @@ inst_defaults = {
     },
     124: {
         "Location": "0x80204e28",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
@@ -2792,14 +2792,14 @@ inst_defaults = {
     },
     125: {
         "Location": "0x8020731c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0xfffe0000,
         "Parameters": {}
     },
     126: {
         "Location": "0x80207554",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Loop": [1],
@@ -2818,7 +2818,7 @@ inst_defaults = {
     },
     127: {
         "Location": "0x80207630",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Loop": [1],
@@ -2837,7 +2837,7 @@ inst_defaults = {
     },
     128: {
         "Location": "0x801f8d0c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00020000,
         "Parameters": {
@@ -2870,7 +2870,7 @@ inst_defaults = {
     129: {
         "Name": "Schedule Inst",
         "Location": "0x801f57f8",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -2888,7 +2888,7 @@ inst_defaults = {
     },
     130: {
         "Location": "0x801f88d4",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00050000,
         "Loop": [2, 3, 4, 5, 6, 7, 8],
@@ -2935,7 +2935,7 @@ inst_defaults = {
     },
     131: {
         "Location": "0x80200634",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Loop": [1, 2, 3, 4],
@@ -2967,7 +2967,7 @@ inst_defaults = {
     },
     132: {
         "Location": "0x80200460",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Loop": [1, 2, 3, 4, 5, 6, 7],
@@ -3011,7 +3011,7 @@ inst_defaults = {
     },
     133: {
         "Location": "0x802001f8",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Loop": [2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -3066,7 +3066,7 @@ inst_defaults = {
     },
     134: {
         "Location": "0x80209548",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00020000,
         "Parameters": {
@@ -3125,7 +3125,7 @@ inst_defaults = {
     },
     136: {
         "Location": "0x80209b94",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00050000,
         "Parameters": {
@@ -3153,7 +3153,7 @@ inst_defaults = {
     },
     137: {
         "Location": "0x80207c2c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00050000,
         "Parameters": {
@@ -3167,14 +3167,14 @@ inst_defaults = {
         "Name": "Display Save Menu",
         "Description": "Sets 803473b4 to 1, activating the save menu on the next available frame",
         "Location": "0x801fed58",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     139: {
         "Location": "0x80202dec",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0xfffe0000,
         "Loop": [1, 2, 3, 4, 5, 6, 7],
@@ -3217,7 +3217,7 @@ inst_defaults = {
     },
     140: {
         "Location": "0x801fe960",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -3229,7 +3229,7 @@ inst_defaults = {
     },
     141: {
         "Location": "0x801fe7a0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -3241,7 +3241,7 @@ inst_defaults = {
     },
     142: {
         "Location": "0x801fe560",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -3271,7 +3271,7 @@ inst_defaults = {
         "Name": "Return 0",
         "Description": "This only returns a zero.",
         "Location": "0x8020a72c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Warning": "May cause an infinite loop. Instruction not used in the game, may be buggy",
@@ -3280,7 +3280,7 @@ inst_defaults = {
     144: {
         "Name": "Display Message",
         "Location": "0x8020a734",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Link": 0,
@@ -3300,7 +3300,7 @@ inst_defaults = {
     145: {
         "Name": "Roll Rand",
         "Location": "0x801fe21c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -3312,7 +3312,7 @@ inst_defaults = {
     },
     146: {
         "Location": "0x801fe06c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -3324,7 +3324,7 @@ inst_defaults = {
     },
     147: {
         "Location": "0x801f9c18",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -3372,7 +3372,7 @@ inst_defaults = {
     },
     148: {
         "Location": "0x802007c0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Loop": [1, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -3423,7 +3423,7 @@ inst_defaults = {
     },
     149: {
         "Location": "0x801ff604",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -3435,7 +3435,7 @@ inst_defaults = {
     },
     150: {
         "Location": "0x801ff470",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -3447,7 +3447,7 @@ inst_defaults = {
     },
     151: {
         "Location": "0x801ff380",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -3463,7 +3463,7 @@ inst_defaults = {
     },
     152: {
         "Location": "0x8020ceb4",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Loop": [1],
@@ -3482,7 +3482,7 @@ inst_defaults = {
     },
     153: {
         "Location": "0x801fd264",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Loop": [1, 2, 3],
         "Loop Iterations": 0,
@@ -3514,7 +3514,7 @@ inst_defaults = {
     },
     154: {
         "Location": "0x8020c390",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -3527,7 +3527,7 @@ inst_defaults = {
     155: {
         "Name": "Select Choice",
         "Location": "0x8020a338",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Link": 1,
@@ -3550,7 +3550,7 @@ inst_defaults = {
     },
     156: {
         "Location": "0x801fed04",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
@@ -3558,7 +3558,7 @@ inst_defaults = {
     157: {
         "Name": "Add Party Member",
         "Location": "0x801fec80",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -3571,7 +3571,7 @@ inst_defaults = {
     158: {
         "Name": "Remove Party Member",
         "Location": "0x801febfc",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -3583,7 +3583,7 @@ inst_defaults = {
     },
     159: {
         "Location": "0x802023bc",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0xfffe0000,
         "Loop": [1, 2, 3, 4, 5, 6, 7, 8],
@@ -3630,7 +3630,7 @@ inst_defaults = {
     },
     160: {
         "Location": "0x8020a168",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -3666,7 +3666,7 @@ inst_defaults = {
     },
     161: {
         "Location": "0x801f8158",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00050000,
         "Warning": "Instruction not used in the game, may be buggy",
@@ -3722,7 +3722,7 @@ inst_defaults = {
     },
     162: {
         "Location": "0x80205e48",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -3733,7 +3733,7 @@ inst_defaults = {
     },
     163: {
         "Location": "0x80205c24",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -3776,7 +3776,7 @@ inst_defaults = {
     },
     164: {
         "Location": "0x8020184c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
           0: {
@@ -3791,7 +3791,7 @@ inst_defaults = {
     },
     165: {
         "Location": "0x80215590",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -3874,7 +3874,7 @@ inst_defaults = {
     },
     166: {
         "Location": "0x80215368",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -3889,13 +3889,13 @@ inst_defaults = {
     },
     167: {
         "Location": "0x802150bc",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     168: {
         "Location": "0x801fdf0c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -3906,7 +3906,7 @@ inst_defaults = {
     },
     169: {
         "Location": "0x801fde70",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -3929,19 +3929,19 @@ inst_defaults = {
     },
     170: {
         "Location": "0x8021507c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     171: {
         "Location": "0x8021503c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     172: {
         "Location": "0x80214fac",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -3952,7 +3952,7 @@ inst_defaults = {
     },
     173: {
         "Location": "0x80214f1c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -3963,7 +3963,7 @@ inst_defaults = {
     },
     174: {
         "Location": "0x80214e8c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -3974,7 +3974,7 @@ inst_defaults = {
     },
     175: {
         "Location": "0x801f5468",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
@@ -3991,7 +3991,7 @@ inst_defaults = {
     },
     176: {
         "Location": "0x80209974",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -4023,7 +4023,7 @@ inst_defaults = {
     },
     177: {
         "Location": "0x8020dd1c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -4083,7 +4083,7 @@ inst_defaults = {
     },
     178: {
         "Location": "0x802049bc",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4122,7 +4122,7 @@ inst_defaults = {
     },
     179: {
         "Location": "0x802058f8",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4145,7 +4145,7 @@ inst_defaults = {
     },
     180: {
         "Location": "0x80201b6c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -4157,7 +4157,7 @@ inst_defaults = {
     },
     181: {
         "Location": "0x801fddb0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -4169,7 +4169,7 @@ inst_defaults = {
     },
     182: {
         "Location": "0x801f60f0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Warning": "This instruction does nothing. Instruction not used in the game, may be buggy",
@@ -4177,7 +4177,7 @@ inst_defaults = {
     },
     183: {
         "Location": "0x801fdfb8",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
           0: {
@@ -4188,7 +4188,7 @@ inst_defaults = {
     },
     184: {
         "Location": "0x802057e0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4203,7 +4203,7 @@ inst_defaults = {
     },
     185: {
         "Location": "0x8020bcf4",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4214,7 +4214,7 @@ inst_defaults = {
     },
     186: {
         "Location": "0x8020bc38",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4225,7 +4225,7 @@ inst_defaults = {
     },
     187: {
         "Location": "0x8020bb8c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -4237,7 +4237,7 @@ inst_defaults = {
     },
     188: {
         "Location": "0x8020bae0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -4249,7 +4249,7 @@ inst_defaults = {
     },
     189: {
         "Location": "0x801f60f0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
@@ -4257,7 +4257,7 @@ inst_defaults = {
     },
     190: {
         "Location": "0x802097c0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4276,7 +4276,7 @@ inst_defaults = {
     },
     191: {
         "Location": "0x80214dfc",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4287,7 +4287,7 @@ inst_defaults = {
     },
     192: {
         "Location": "0x80214d6c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -4299,7 +4299,7 @@ inst_defaults = {
     },
     193: {
         "Location": "0x80214cdc",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -4311,7 +4311,7 @@ inst_defaults = {
     },
     194: {
         "Location": "0x80214c04",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -4327,7 +4327,7 @@ inst_defaults = {
     },
     195: {
         "Location": "0x801fdab8",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -4343,13 +4343,13 @@ inst_defaults = {
     },
     196: {
         "Location": "0x80207368",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     197: {
         "Location": "0x8021528c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4364,7 +4364,7 @@ inst_defaults = {
     },
     198: {
         "Location": "0x80209ed8",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4379,7 +4379,7 @@ inst_defaults = {
     },
     199: {
         "Location": "0x80209d74",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4390,7 +4390,7 @@ inst_defaults = {
     },
     200: {
         "Location": "0x801f60f0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
@@ -4400,7 +4400,7 @@ inst_defaults = {
         "Name": "Restore Health All",
         "Description": "Restores everyone's health to max",
         "Location": "0x801fd9b0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
@@ -4408,13 +4408,13 @@ inst_defaults = {
         "Name": "Restore Magic All",
         "Description": "Restores all of the party members' magic to full",
         "Location": "0x801fd8f0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     203: {
         "Location": "0x801f98e8",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -4426,7 +4426,7 @@ inst_defaults = {
     },
     204: {
         "Location": "0x80214b28",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -4442,7 +4442,7 @@ inst_defaults = {
     },
     205: {
         "Location": "0x80214aa0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -4454,13 +4454,13 @@ inst_defaults = {
     },
     206: {
         "Location": "0x80214a60",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     207: {
         "Location": "0x8020bdb0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -4480,7 +4480,7 @@ inst_defaults = {
     },
     208: {
         "Location": "0x80214a20",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
@@ -4492,7 +4492,7 @@ inst_defaults = {
     },
     210: {
         "Location": "0x80214994",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Link": 0,
         "Link Type": "String",
@@ -4507,13 +4507,13 @@ inst_defaults = {
     211: {
         "Name": "Return to Overworld",
         "Location": "0x80214954",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     212: {
         "Location": "0x802150fc",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4540,7 +4540,7 @@ inst_defaults = {
     },
     213: {
         "Location": "0x80215444",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4615,7 +4615,7 @@ inst_defaults = {
     },
     214: {
         "Location": "0x80207428",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Link": 0,
@@ -4630,7 +4630,7 @@ inst_defaults = {
     },
     215: {
         "Location": "0x801fee54",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Link": 1,
         "Link Type": "String",
@@ -4648,7 +4648,7 @@ inst_defaults = {
     },
     216: {
         "Location": "0x801fedd0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4659,7 +4659,7 @@ inst_defaults = {
     },
     217: {
         "Location": "0x8020b9ec",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
           0: {
@@ -4670,7 +4670,7 @@ inst_defaults = {
     },
     218: {
         "Location": "0x8020b94c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4681,7 +4681,7 @@ inst_defaults = {
     },
     219: {
         "Location": "0x801fd850",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4692,7 +4692,7 @@ inst_defaults = {
     },
     220: {
         "Location": "0x801fd668",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4735,7 +4735,7 @@ inst_defaults = {
     },
     221: {
         "Location": "0x801fd584",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -4751,7 +4751,7 @@ inst_defaults = {
     },
     222: {
         "Location": "0x8020b8ac",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4762,7 +4762,7 @@ inst_defaults = {
     },
     223: {
         "Location": "0x80214270",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
           0: {
@@ -4869,7 +4869,7 @@ inst_defaults = {
     },
     224: {
         "Location": "0x80213fe8",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -4976,7 +4976,7 @@ inst_defaults = {
     },
     225: {
         "Location": "0x80213dd0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -5011,7 +5011,7 @@ inst_defaults = {
     },
     226: {
         "Location": "0x80213920",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -5026,7 +5026,7 @@ inst_defaults = {
     },
     227: {
         "Location": "0x801feb78",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -5040,7 +5040,7 @@ inst_defaults = {
         "Name": "Swap player group",
         "Description": "If the player characters have been split into two groups, this switches the active group.",
         "Location": "0x801feb40",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
@@ -5048,13 +5048,13 @@ inst_defaults = {
         "Name": "Unify player groups",
         "Description": "If the player characters have been split into two groups, this recombines the two groups into one. Only seems to be used at Daccat's isle, so not sure if it is specific to Aika/Fina and Vyse/Gilder groups, or if it can be used for other groups as well.",
         "Location": "0x801feb08",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     230: {
         "Location": "0x80205a3c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -5089,7 +5089,7 @@ inst_defaults = {
     },
     231: {
         "Location": "0x801fdcdc",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -5101,7 +5101,7 @@ inst_defaults = {
     },
     232: {
         "Location": "0x802139f8",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -5164,7 +5164,7 @@ inst_defaults = {
     },
     233: {
         "Location": "0x8020cba4",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -5180,7 +5180,7 @@ inst_defaults = {
     },
     234: {
         "Location": "0x801fed3c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Warning": "This instruction does nothing and returns zero. Instruction not used in the game, may be buggy",
@@ -5188,7 +5188,7 @@ inst_defaults = {
     },
     235: {
         "Location": "0x8020b80c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -5199,7 +5199,7 @@ inst_defaults = {
     },
     236: {
         "Location": "0x8020b670",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -5231,14 +5231,14 @@ inst_defaults = {
     },
     237: {
         "Location": "0x801fd54c",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     238: {
         "Location": "0x802074b0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -5258,7 +5258,7 @@ inst_defaults = {
     },
     239: {
         "Location": "0x801fd1d0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -5270,7 +5270,7 @@ inst_defaults = {
     },
     240: {
         "Location": "0x801f7d2c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -5301,13 +5301,13 @@ inst_defaults = {
     },
     241: {
         "Location": "0x801f7cd8",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     242: {
         "Location": "0x801fcff0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -5326,7 +5326,7 @@ inst_defaults = {
     },
     243: {
         "Location": "0x801f9988",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -5374,7 +5374,7 @@ inst_defaults = {
     },
     244: {
         "Location": "0x8020bee8",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
@@ -5391,7 +5391,7 @@ inst_defaults = {
     },
     245: {
         "Location": "0x801ff8d4",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Loop": [1],
         "Loop Iterations": 0,
@@ -5409,7 +5409,7 @@ inst_defaults = {
     },
     246: {
         "Location": "0x801ff714",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Loop": [1],
         "Loop Iterations": 0,
@@ -5427,14 +5427,14 @@ inst_defaults = {
     },
     247: {
         "Location": "0x801f95c0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     248: {
         "Location": "0x801f7c18",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Link": 0,
@@ -5449,7 +5449,7 @@ inst_defaults = {
     },
     249: {
         "Location": "0x80208424",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -5464,7 +5464,7 @@ inst_defaults = {
     },
     250: {
         "Location": "0x801f7b14",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Link": 0,
@@ -5479,7 +5479,7 @@ inst_defaults = {
     },
     251: {
         "Location": "0x8020014c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -5495,7 +5495,7 @@ inst_defaults = {
     },
     252: {
         "Location": "0x802000a0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
@@ -5510,7 +5510,7 @@ inst_defaults = {
     },
     253: {
         "Location": "0x801fffa4",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
@@ -5526,19 +5526,19 @@ inst_defaults = {
     },
     254: {
         "Location": "0x802138e0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     255: {
         "Location": "0x802138a0",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     256: {
         "Location": "0x801fdc70",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
@@ -5551,7 +5551,7 @@ inst_defaults = {
     },
     257: {
         "Location": "0x80214908",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Link": 0,
         "Link Type": "String",
@@ -5565,7 +5565,7 @@ inst_defaults = {
     },
     258: {
         "Location": "0x801fd44c",
-        "Skip Frame Refresh": 0x00000001,
+        "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Loop": [1],
         "Loop Iterations": 0,
@@ -5585,7 +5585,7 @@ inst_defaults = {
         "Name": "Hamachou Hermit Stat Dialog",
         "Description": "Helper instruction for Hamachou Hermit. Displays a text box containing current stats of a certain type.\n\nDialog display index: <DISP_ID>\n\nBattles - (0, 1, 10, 2)\nRuns - (3, 4)\nKnocked Unconscious - (5, 6)\nTreasure Chests - (7, 8)\nFish - (9)\n\nTechnically, Domingo's discovery text can also be displayed using this instruction using 100 as the parameter.",
         "Location": "0x8020b4ac",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -5599,7 +5599,7 @@ inst_defaults = {
     260: {
         "Name": "Restore Ship Health All",
         "Location": "0x801fda70",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
@@ -5608,7 +5608,7 @@ inst_defaults = {
         "Name": "Domingo Discovery Dialog",
         "Description": "Instruction to display a textbox from Domingo with the current number of discoveries. Uses the same function as INST_259 but with a 100 as the parameter to force Domingo's text.",
         "Location": "0x8020ae04",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
@@ -5617,7 +5617,7 @@ inst_defaults = {
         "Name": "Activate Screen Overlay",
         "Description": "Fades out into a color as defined below:\n\nRed (0-255): <Red>\nGreen (0-255): <Green>\nBlue (0-255): <Blue>\nDistance from Camera: <Distance>\nTransition Time: <Transition_Time>\n\nDistance in direction camera is pointing is negative, and reverse is positive. Text boxes appear at -1, so distance should be less than -1 to show text boxes.",
         "Location": "0x801fe310",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
@@ -5650,7 +5650,7 @@ inst_defaults = {
     },
     263: {
         "Location": "0x802137d0",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Loop": [1],
@@ -5669,7 +5669,7 @@ inst_defaults = {
     },
     264: {
         "Location": "0x801f7f98",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00050000,
         "Parameters": {
@@ -5710,7 +5710,7 @@ inst_defaults = {
     265: {
         "Name": "Valuan Piracy List Dialog",
         "Location": "0x8020aaa8",
-        "Skip Frame Refresh": 0x00000000,
+        "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Link": 1,
