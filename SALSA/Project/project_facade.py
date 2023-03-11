@@ -102,7 +102,7 @@ class SCTProjectFacade:
                 tree_list.append(values)
         return tree_list
 
-    def get_instruction_details(self, script, section, instruction):
+    def get_instruction_details(self, script, section, instruction, **kwargs):
         try:
             instruction = self.project.scripts[script].sections[section].instructions[instruction]
         except KeyError as e:
@@ -114,6 +114,19 @@ class SCTProjectFacade:
             instruction_details[key] = value
         # format description
         return instruction_details
+
+    def get_parameter_details(self, script, section, instruction, parameter):
+        try:
+            if '-' in parameter:
+                loop = int(parameter.split('-')[0])
+                param = int(parameter.split('-')[1])
+                parameter = self.project.scripts[script].sections[section].instructions[instruction].loop_parameters[loop][param]
+            else:
+                parameter = self.project.scripts[script].sections[section].instructions[instruction].parameters[int(parameter)]
+
+        except KeyError as e:
+            print(self.log_key, e)
+            return None
 
     def get_link_details(self, link):
         pass
