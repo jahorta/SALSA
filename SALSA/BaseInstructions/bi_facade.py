@@ -37,7 +37,8 @@ class BaseInstLibFacade:
     def get_all_insts(self):
         return self.lib.insts
 
-    def set_inst_detail(self, inst_id, details: dict):
+    # Used to set details from a json file
+    def set_inst_details(self, inst_id, details: dict):
         self.lib.insts[inst_id].set_inst_details(details)
 
     # Used to set details with the instruction editor
