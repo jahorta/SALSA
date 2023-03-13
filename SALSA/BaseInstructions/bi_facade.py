@@ -4,7 +4,7 @@ from typing import List
 
 from SALSA.BaseInstructions.bi_container import BaseInstLib, BaseInst, locked_conversions
 from SALSA.FileModels.instruction_model import InstructionModel
-from SALSA.Common.constants import sep
+from SALSA.Common.constants import LOCK
 
 
 class BaseInstLibFacade:
@@ -43,7 +43,7 @@ class BaseInstLibFacade:
 
     # Used to set details with the instruction editor
     def set_single_inst_detail(self, inst_id, field, value, param_id=None):
-        self.lib.insts[inst_id].set_inst_field(field, value, param_id)
+        self.lib.insts[int(inst_id)].set_inst_field(field, value, param_id)
 
     def save_user_insts(self):
         self.inst_model.save_instructions(inst_dict=self.get_inst_details(), inst_type=self.user_identifier)
@@ -68,6 +68,9 @@ class BaseInstLibFacade:
                 if item not in element:
                     raise KeyError(f'Item not present in inst dict: {item}')
                 entry[item] = element[item]
+                if inst_id is not None:
+                    if self.check_locked([inst_id, i, item]):
+                        entry[item] = f'{LOCK} {entry[item]}'
             tree.append(entry)
         return tree
 
@@ -76,10 +79,12 @@ class BaseInstLibFacade:
         element = self.lib.insts[inst_id]
         locked_key = 'instruction'
         if len(item_code) > 1:
-            param_id = item_code.pop(0)
+            param_id = int(item_code.pop(0))
             element = element.parameters[param_id]
             locked_key = 'parameter'
-        return locked_conversions[locked_key][item_code[0]] in element.locked_fields
+        field = locked_conversions[locked_key][item_code[0]]
+        result = field in element.locked_fields
+        return result
 
 
 if __name__ == '__main__':
