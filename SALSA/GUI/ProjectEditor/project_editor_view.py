@@ -18,7 +18,7 @@ header_settings = {
         'section_num': {'label': 'Section #', 'width': 50, 'stretch': True}
     },
     'section': {
-        'name': {'label': 'Name', 'width': 100, 'stretch': True},
+        'name': {'label': 'Name', 'width': 180, 'stretch': True},
         'start_offset': {'label': 'Start Offset', 'width': 50, 'stretch': True}
     },
     'instruction': {
@@ -31,8 +31,8 @@ header_settings = {
     },
     'parameter': {
         'ID': {'label': 'ID', 'width': 30, 'stretch': True},
-        'name': {'label': 'Condition', 'width': 70, 'stretch': True},
-        'type': {'label': 'Parameter Type', 'width': 70, 'stretch': True},
+        'name': {'label': 'Name', 'width': 150, 'stretch': True},
+        'type': {'label': 'Type', 'width': 70, 'stretch': True},
         'value': {'label': 'Value', 'width': 120, 'stretch': False},
         'formatted_value': {'label': 'ID', 'width': 50, 'stretch': False}
     }
@@ -40,7 +40,7 @@ header_settings = {
 
 default_tree_width = 100
 default_tree_minwidth = 10
-default_tree_anchor = tk.CENTER
+default_tree_anchor = tk.W
 default_tree_stretch = False
 default_tree_label = ''
 
