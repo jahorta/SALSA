@@ -42,16 +42,6 @@ class GUIController:
         self.popups: PopupTypes = {'inst': None, 'analysis': None, 'help': None, 'about': None,
                                    'variable': None, 'string': None, 'export': None}
 
-        self.popup_close_check = {
-            InstructionEditorView: self._instruction_edit_check,
-            AnalysisView: self._no_check,
-            HelpView: self._no_check,
-            AboutView: self._no_check,
-            VariablePopup: self._no_check,
-            StringPopup: self._no_check,
-            SCTExportPopup: self._no_check,
-        }
-
         self.callbacks = {}
 
     # ------------------------------------------------------------- #
@@ -143,18 +133,8 @@ class GUIController:
 
     def close_popup(self, name: Literal['inst', 'analysis', 'help', 'about', 'variable', 'string', 'export'],
                     popup: Union[InstructionEditorView, AnalysisView, HelpView, AboutView, SCTExportPopup, VariablePopup, StringPopup]):
-        p_type = type(popup)
-        if not self.popup_close_check[p_type]():
-            return
         popup.destroy()
         self.popups[name] = None
-
-    def _instruction_edit_check(self):
-        # TODO - Create popup to save changes if there are changes
-        pass
-
-    def _no_check(self):
-        pass
 
     def add_callbacks(self, callbacks):
         self.callbacks = {**self.callbacks, **callbacks}
