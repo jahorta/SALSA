@@ -141,6 +141,10 @@ class GUIController:
     def add_callbacks(self, callbacks):
         self.callbacks = {**self.callbacks, **callbacks}
 
+    # ---------------------- #
+    # Status popup functions #
+    # ---------------------- #
+
     def show_status_popup(self, title, msg):
         height = 50
         width = 300
