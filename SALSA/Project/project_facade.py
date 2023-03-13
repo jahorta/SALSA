@@ -105,6 +105,28 @@ class SCTProjectFacade:
                 tree_list.append(values)
         return tree_list
 
+    def get_parameter_tree(self, script, section, instruction, headings, **kwargs):
+        inst = self.project.scripts[script].sections[section].instructions[instruction]
+        base_inst = self.base_insts.get_inst(inst.instruction_id)
+
+        tree = self._create_tree(inst.parameters, base_inst.params_before, headings, base=base_inst.parameters, base_key='ID')
+
+        if base_inst.loop is None:
+            return tree
+
+        for loop, params in enumerate(inst.loop_parameters):
+            temp_tree = self._create_tree(params, [f'loop{loop}'], headings, key_only=True)
+            temp_tree += ['group']
+            temp_tree += self._create_tree(params, base_inst.loop, headings, base=base_inst.parameters, base_key='ID')
+            for item in temp_tree:
+                if 'row_data' not in item:
+                    continue
+                item['row_data'] = f'{loop}{sep}{item["row_data"]}'
+            temp_tree += ['ungroup']
+            tree += temp_tree
+
+        tree += self._create_tree(inst.parameters, base_inst.params_after, headings, base=base_inst.parameters, base_key='ID')
+
     def get_instruction_details(self, script, section, instruction, **kwargs):
         try:
             instruction = self.project.scripts[script].sections[section].instructions[instruction]
