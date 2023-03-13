@@ -45,7 +45,7 @@ def parse_desc_func(desc, char_ind):
         return None, char_ind
 
     cur_pos += 3
-    result = desc[char_ind, cur_pos]
+    result = desc[char_ind: cur_pos]
 
     if desc[cur_pos] != '[':
         return result, cur_pos
