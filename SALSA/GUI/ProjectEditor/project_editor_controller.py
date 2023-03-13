@@ -111,7 +111,7 @@ class ProjectEditorController:
         # Clear the current tree and all child trees to prevent desync
         cur_tree = tree
         trees_to_clear = [cur_tree]
-        while cur_tree in tree_children.keys():
+        while cur_tree != '':
             trees_to_clear.append(tree_children[cur_tree])
             cur_tree = tree_children[cur_tree]
         for t in trees_to_clear:
