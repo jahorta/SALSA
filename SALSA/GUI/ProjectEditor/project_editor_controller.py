@@ -15,7 +15,7 @@ tree_children = {
     '': 'script',
     'script': 'section',
     'section': 'instruction',
-    'instruction': 'detail',
+    'instruction': 'parameter',
     'parameter': ''
 }
 
@@ -45,7 +45,8 @@ class ProjectEditorController:
         self.current: Dict[str, Union[int, None]] = {
             'script': None,
             'section': None,
-            'instruction': None
+            'instruction': None,
+            'parameter': None
         }
 
         self.trees: Dict[str, DataTreeview] = {
@@ -60,6 +61,7 @@ class ProjectEditorController:
         self.trees['script'].add_callback('select', self.on_select_tree_entry)
         self.trees['section'].add_callback('select', self.on_select_tree_entry)
         self.trees['instruction'].add_callback('select', self.on_select_tree_entry)
+        self.trees['parameter'].add_callback('select', self.on_select_tree_entry)
 
     def load_project(self):
         for key in list(self.current.keys()):
@@ -88,6 +90,7 @@ class ProjectEditorController:
 
     def on_select_instruction(self, instructID):
         self.current['instruction'] = instructID
+        self.current['parameter'] = None
         details = self.project.get_instruction_details(**self.current)
         self.set_instruction_details(details)
 
@@ -161,7 +164,8 @@ class ProjectEditorController:
         self.view.inst_description.config(text=details['description'])
         for i in details['params_before']:
             param: SCTParameter = details['parameters'][i]
-            self.view.param_tree.insert_entry(0, i, param, details['base_parameters'][i])
+            self._add_tree_entries('parameter', )
+            self.view.param_tree.insert_entry(parent='', text=i, values=param)
 
         self.view.set_refresh_value(details['no_new_frame'], details['forced_new_frame'], details['skip_refresh'])
 
