@@ -903,7 +903,7 @@ class SCTDecoder:
             keys_before = []
             keys_after = []
             hit_name = False
-            for key in list(decoded_sct.sections.keys()):
+            for key in decoded_sct.section_names_ungrouped:
                 if key in group:
                     hit_name = True
                     continue
@@ -916,6 +916,9 @@ class SCTDecoder:
             sections[new_name] = new_section
             sections = {**sections, **{k: decoded_sct.sections[k] for k in keys_after}}
             decoded_sct.sections = sections
+
+            decoded_sct.section_names_ungrouped = [*keys_before, new_name, *keys_after]
+
             for s in group:
                 decoded_sct.folded_sections[s] = new_name
 
@@ -1105,7 +1108,9 @@ class SCTDecoder:
         i = 0
         new_section_order = []
         new_sections = {}
-        for name, section in decoded_sct.sections.items():
+        for name in decoded_sct.section_names_ungrouped:
+
+            section = decoded_sct.sections[name]
             if section.type == 'Label':
                 new_section_order.append(name)
                 has_header = True
@@ -1146,15 +1151,19 @@ class SCTDecoder:
                 decoded_sct.string_groups.pop(name)
 
         new_sections_dict = {}
+        new_sections_ungrouped = []
         for name in new_section_order:
             if name in decoded_sct.sections.keys():
                 if decoded_sct.sections[name].type == 'String':
                     decoded_sct.string_sections[name] = decoded_sct.sections[name]
                     continue
                 new_sections_dict[name] = decoded_sct.sections[name]
+                new_sections_ungrouped.append(name)
                 continue
             new_sections_dict[name] = new_sections[name]
+            new_sections_ungrouped.append(name)
         decoded_sct.sections = new_sections_dict
+        decoded_sct.section_names_ungrouped = new_sections_ungrouped
 
     @staticmethod
     def _detect_unused_sections(decoded_sct: SCTScript):
@@ -1361,7 +1370,7 @@ class SCTDecoder:
 
         new_groups = self._nest_groups(groups)
         new_groups = self._complete_heirarchy_sections(list(decoded_sct.sections.keys()), new_groups)
-        decoded_sct.grouped_sections = new_groups
+        decoded_sct.sections_grouped = new_groups
 
         # Create grouped instruction heirarchies
         for section in decoded_sct.sections.values():

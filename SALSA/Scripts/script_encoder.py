@@ -97,7 +97,8 @@ class SCTEncoder:
         self.add_spurious_refresh = add_spurious_refresh
 
         # encode sections in order
-        for name, section in self.script.sections.items():
+        for name in self.script.section_names_ungrouped:
+            section = self.script.sections[name]
             self._encode_section(name=name, section=section)
 
             # if string group header is added, add strings below it

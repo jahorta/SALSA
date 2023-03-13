@@ -278,7 +278,8 @@ class SCTScript:
         self.sections = {}
         self.section_groups = {}
         self.section_group_keys = {}
-        self.grouped_sections = {}
+        self.sections_grouped = {}
+        self.section_names_ungrouped = []
         self.inst_locations = [[] for _ in range(266)]
         self.links = []
         self.links_to_sections = {}
@@ -296,6 +297,7 @@ class SCTScript:
     def add_section(self, section: SCTSection):
         name = section.name
         self.sections[name] = section
+        self.section_names_ungrouped.append(name)
         inst_list = self.sections[name].instructions_used.keys()
         for inst in inst_list:
             self.inst_locations[inst].append(name)
@@ -324,7 +326,7 @@ class SCTScript:
             script.sections[key] = SCTSection.from_dict(value, script.links)
         script.section_groups = script_dict['section_groups']
         script.section_group_keys = script_dict['section_group_keys']
-        script.grouped_sections = script_dict['grouped_section_names']
+        script.sections_grouped = script_dict['grouped_section_names']
         script.inst_locations = script_dict['inst_locations']
         script.links_to_sections = script_dict['links_to_sections']
         script.footer = script_dict['footer']
@@ -337,7 +339,7 @@ class SCTScript:
 
     def get_sect_list(self, style):
         if style == 'grouped':
-            return self.grouped_sections
+            return self.sections_grouped
         return [section.name for section in self.sections.values() if section.type != 'String']
 
 
