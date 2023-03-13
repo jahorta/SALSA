@@ -1,8 +1,9 @@
 import tkinter as tk
+from tkinter import messagebox as msg
 
 from GUI.InstructionEditor.instruction_editor_view import InstructionEditorView
 from BaseInstructions.bi_facade import BaseInstLibFacade
-from SALSA.Common.constants import sep
+from SALSA.Common.constants import sep, LOCK
 
 
 class InstructionEditorController:
@@ -53,29 +54,45 @@ class InstructionEditorController:
         newID = int(newID)
         self.cur_inst = newID
         details = self.inst_lib.get_inst(newID)
-        self.view.id_label.config(text=f'{details.instruction_id}')
+        self.view.id_label.config(text=f'{LOCK} {details.instruction_id}')
         skip_type = 'Can skip frame advance after instruction'
         if details.no_new_frame:
             skip_type = 'Frame never advances after instruction'
         elif details.forced_new_frame:
             skip_type = 'Frame always advances after instruction'
-        self.view.skip_label.config(text=f'{skip_type}')
-        self.view.param2_label.config(text=f'{details.param2}')
-        self.view.location_label.config(text=f'{details.location}')
-        self.view.link_label.config(text=f'{details.link_type if details.link_type is not None else "None"}')
-        self.view.loop_params_label.config(text=f'{details.loop if details.loop is not None else "None"}')
+        self.view.skip_label.config(text=f'{LOCK} {skip_type}')
+        self.view.param2_label.config(text=f'{LOCK} {details.param2}')
+        self.view.location_label.config(text=f'{LOCK} {details.location}')
+        self.view.link_label.config(text=f'{LOCK} {details.link_type if details.link_type is not None else "None"}')
+
+        loop_text = "None"
+        if details.loop is not None:
+            loop_items = [str(_) for _ in details.loop]
+            loop_text = ', '.join(loop_items)
+        self.view.loop_params_label.config(text=f'{LOCK} {loop_text}')
         if details.warning is None:
             self.view.no_warning.tkraise()
         else:
-            self.view.warning_label.config(text=f'{details.warning if details.warning is not None else "None"}')
+            self.view.warning_label.config(text=f'{LOCK} {details.warning if details.warning is not None else "None"}')
             self.view.warning_frame.tkraise()
+
+        if self.inst_lib.check_locked([self.cur_inst, 'name']):
+            self.view.details_name_label.config(text=f'{LOCK} {details.name}')
+            self.view.details_name_label.tkraise()
+        else:
+            self.view.details_name_entry.delete(0, tk.END)
+            self.view.details_name_entry.insert(0, f'{details.name}')
+            self.view.details_name_entry.tkraise()
+
+        self.view.details_desc_text.delete(1.0, tk.END)
+        self.view.details_desc_text.insert(tk.INSERT, details.description)
 
         headers = self.view.get_headers('parameter')
         entries = self.inst_lib.get_tree_entries(headers=self.view.get_headers('parameter'), inst_id=newID)
         self.populate_tree(self.view.param_list_tree, headers, entries)
 
     def check_item_is_locked(self, item_code: list):
-        self.inst_lib.check_locked([self.cur_inst, *item_code])
+        return self.inst_lib.check_locked([self.cur_inst, *item_code])
 
     def add_change(self, key, value):
         key = f'{self.cur_inst}{sep}{key}'
@@ -85,14 +102,24 @@ class InstructionEditorController:
         return len(self.changed_values) > 0
 
     def on_close(self):
-        self.callbacks['close'](self.name, self)
+        should_close = True
+        if self.has_changes_remaining():
+            should_close = self.ask_save_changes()
+        if should_close:
+            self.callbacks['close'](self.name, self.view)
 
     def ask_save_changes(self):
-        pass
+        response = msg.askyesnocancel("Instructions have Unsaved Changes", "Some instructions have unsaved changes.\n\nWould you like to save these changes?", parent=self.view)
+        if response is None:
+            return False
+        elif response:
+            self.on_save_changes()
+        return True
 
     def on_save_changes(self):
         for key, value in self.changed_values.items():
             key_parts = key.split(sep)
             kwargs = {'inst_id': key_parts[0], 'field': key_parts[-1],
                       'param_id': key_parts[1] if len(key_parts) > 2 else None}
-            self.inst_lib.set_inst_details(value=value, **kwargs)
+            self.inst_lib.set_single_inst_detail(value=value, **kwargs)
+        self.inst_lib.save_user_insts()

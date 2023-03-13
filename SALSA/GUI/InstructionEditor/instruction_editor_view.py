@@ -1,10 +1,11 @@
 import tkinter as tk
+from tkinter.scrolledtext import ScrolledText
 from tkinter import ttk
 import json
 
 from SALSA.GUI.widgets import RequiredEntry, ScrollLabelFrame, HexEntry
 from SALSA.Common.setting_class import settings
-from SALSA.Common.constants import sep, lock
+from SALSA.Common.constants import sep, LOCK
 
 default_headers = {
     'instruction': ['inst_ID', 'name'],
@@ -27,9 +28,9 @@ header_settings = {
 }
 
 param_edit_fields = {
-    'Name': {'widget': tk.Entry, 'args': {}, 'kwargs': {}},
-    'Mask': {'widget': HexEntry, 'args': {}, 'kwargs': {}},
-    'Signed': {'widget': tk.OptionMenu, 'args': ['True', 'False'], 'kwargs': {}},
+    'name': {'widget': tk.Entry, 'args': {}, 'kwargs': {}},
+    'mask': {'widget': HexEntry, 'args': {}, 'kwargs': {}},
+    'signed': {'widget': tk.OptionMenu, 'args': ['True', 'False'], 'kwargs': {}},
 }
 
 default_tree_width = 100
@@ -59,9 +60,11 @@ class InstructionEditorView(tk.Toplevel):
         self.columnconfigure(1, weight=1)
         self.rowconfigure(1, weight=1)
 
+        self.protocol('WM_DELETE_WINDOW', self.on_close)
+
         # Save, undo, redo buttons
 
-        self.save = tk.Button(self, text='Save', command=None)
+        self.save = tk.Button(self, text='Save', command=self.on_save)
         self.save.grid(row=0, column=0, sticky=tk.W+tk.N, padx=2, pady=2)
 
         inst_tree_frame = tk.Frame(self)
@@ -105,42 +108,42 @@ class InstructionEditorView(tk.Toplevel):
 
         id_frame = tk.Frame(top_details_frame)
         id_frame.grid(row=0, column=0, sticky=tk.W)
-        id_label_label = tk.Label(id_frame, text=f'{lock} Instruction ID: ')
+        id_label_label = tk.Label(id_frame, text=f'Instruction ID: ')
         id_label_label.grid(row=0, column=0)
         self.id_label = tk.Label(id_frame, text='')
         self.id_label.grid(row=0, column=1)
 
         skip_frame = tk.Frame(top_details_frame)
         skip_frame.grid(row=0, column=1, sticky=tk.W)
-        skip_label_label = tk.Label(skip_frame, text=f'{lock} Frame Refresh: ')
+        skip_label_label = tk.Label(skip_frame, text=f'Frame Refresh: ')
         skip_label_label.grid(row=0, column=0)
         self.skip_label = tk.Label(skip_frame, text='')
         self.skip_label.grid(row=0, column=1)
 
         param2_frame = tk.Frame(top_details_frame)
         param2_frame.grid(row=1, column=0, sticky=tk.W)
-        param2_label_label = tk.Label(param2_frame, text=f'{lock} FxnParameter2: ')
+        param2_label_label = tk.Label(param2_frame, text=f'FxnParameter2: ')
         param2_label_label.grid(row=0, column=0)
         self.param2_label = tk.Label(param2_frame, text='')
         self.param2_label.grid(row=0, column=1)
 
         location_frame = tk.Frame(top_details_frame)
         location_frame.grid(row=1, column=1, sticky=tk.W)
-        location_label_label = tk.Label(location_frame, text=f'{lock} Function Location: ')
+        location_label_label = tk.Label(location_frame, text=f'Function Location: ')
         location_label_label.grid(row=0, column=0)
         self.location_label = tk.Label(location_frame, text='')
         self.location_label.grid(row=0, column=1)
 
         link_frame = tk.Frame(top_details_frame)
         link_frame.grid(row=2, column=0, sticky=tk.W)
-        link_label_label = tk.Label(link_frame, text=f'{lock} Link Type: ')
+        link_label_label = tk.Label(link_frame, text=f'Link Type: ')
         link_label_label.grid(row=0, column=0)
         self.link_label = tk.Label(link_frame, text='')
         self.link_label.grid(row=0, column=1)
 
         loop_params_frame = tk.Frame(top_details_frame)
         loop_params_frame.grid(row=3, column=0, sticky=tk.W)
-        loop_params_label_label = tk.Label(loop_params_frame, text=f'{lock} Loop Params: ')
+        loop_params_label_label = tk.Label(loop_params_frame, text=f'Loop Params: ')
         loop_params_label_label.grid(row=0, column=0)
         self.loop_params_label = tk.Label(loop_params_frame, text='')
         self.loop_params_label.grid(row=0, column=1)
@@ -157,25 +160,24 @@ class InstructionEditorView(tk.Toplevel):
         # Instruction details - Editable
 
         name_frame = tk.Frame(top_details_frame)
-        name_frame.grid(row=5, column=0, sticky=tk.W)
+        name_frame.grid(row=5, column=0, columnspan=2, sticky=tk.W+tk.E)
         name_label_label = tk.Label(name_frame, text='Name:')
         name_label_label.grid(row=0, column=0)
-        self.details_name_label = tk.Label(name_frame, text='')
-        self.details_name_label.grid(row=0, column=1)
-        self.details_name_variable = tk.StringVar()
-        self.details_name_variable.set('')
-        self.details_name_entry = RequiredEntry(name_frame)
-        self.details_name_entry.grid(row=0, column=1)
+        self.details_name_entry = tk.Entry(name_frame, text='')
+        self.details_name_entry.grid(row=0, column=1, sticky='nsew')
+        self.details_name_entry.bind('<FocusIn>', self.on_name_focus_in)
+        self.details_name_entry.bind('<FocusOut>', self.on_name_focus_out)
+        self.details_name_label = tk.Label(name_frame, text='', anchor=tk.W)
+        self.details_name_label.grid(row=0, column=1, sticky='nsew')
 
-        desc_frame = ScrollLabelFrame(top_details_frame, text='Description')
+        desc_frame = tk.LabelFrame(top_details_frame, text='Description')
         desc_frame.grid(row=6, column=0, sticky='NSEW', columnspan=2)
         desc_frame.columnconfigure(0, weight=1)
         desc_frame.rowconfigure(0, weight=1)
-        self.details_desc_label = tk.Label(desc_frame.scroll_frame, text='')
-        self.details_desc_label.grid(row=0, column=0, sticky='NSEW')
-        self.details_desc_entry = tk.Text(desc_frame.scroll_frame, wrap=tk.WORD, height=10, width=20)
-        self.details_desc_entry.grid(row=0, column=1, sticky='NSEW')
-        desc_frame.canvas.bind("<Configure>", lambda e: self.details_desc_entry.configure(width=(e.width - 14)//8), add='+')
+        self.details_desc_text = tk.scrolledtext.ScrolledText(desc_frame, wrap=tk.WORD, height=15)
+        self.details_desc_text.grid(row=0, column=1, sticky='NSEW')
+        self.details_desc_text.bind('<FocusIn>', self.on_desc_focus_in)
+        self.details_desc_text.bind('<FocusOut>', self.on_desc_focus_out)
 
         # Instruction parameter setup frame
         self.parameters_frame = tk.LabelFrame(self.inst_details_frame, text='Parameters')
@@ -211,12 +213,30 @@ class InstructionEditorView(tk.Toplevel):
         return list(header_settings[tree_key].keys())
 
     def on_select_instruction(self, e):
-        print(self.details_desc_entry.winfo_width())
+        print(self.details_desc_text.winfo_width())
         if self.inst_list_tree.identify_region(e.x, e.y) == 'heading':
             return
         selected_iid = self.inst_list_tree.focus()
         inst_id = self.inst_list_tree.item(selected_iid).get('text')
         self.callbacks['on_select_instruction'](inst_id)
+
+    def on_name_focus_in(self, e):
+        self.details_name_entry.cur_value = self.details_name_entry.get()
+
+    def on_name_focus_out(self, e):
+        if e.widget.get() == e.widget.cur_value:
+            print('same name')
+            return
+        self.callbacks['set_change'](key='name', value=e.widget.get())
+
+    def on_desc_focus_in(self, e):
+        self.details_desc_text.cur_value = self.details_desc_text.get(1.0, tk.END)
+
+    def on_desc_focus_out(self, e):
+        if e.widget.get(1.0, tk.END) == e.widget.cur_value:
+            print('same desc')
+            return
+        self.callbacks['set_change'](key='description', value=e.widget.get(1.0, tk.END))
 
     def on_param_double_click(self, e):
         # Find the region clicked, only edit if region is a cell
@@ -256,6 +276,9 @@ class InstructionEditorView(tk.Toplevel):
                 # TODO - add indicator that this cannot be changed
                 return
 
+        # get cell bounding box
+        cell_bbox = self.param_list_tree.bbox(selected_iid, column)
+
         edit_widget = widget_details['widget'](self.parameters_frame, *widget_details['args'], **widget_details['kwargs'])
         edit_widget.place(x=cell_bbox[0], y=cell_bbox[1], w=cell_bbox[2], h=cell_bbox[3])
 
@@ -270,7 +293,7 @@ class InstructionEditorView(tk.Toplevel):
         edit_widget.focus()
 
         edit_widget.bind('<FocusOut>', self.on_param_focus_out)
-        edit_widget.bind('<Return', self.on_param_enter_pressed)
+        edit_widget.bind('<Return>', self.on_param_enter_pressed)
 
     def on_param_enter_pressed(self, e):
         new_text = e.widget.get()
@@ -294,5 +317,9 @@ class InstructionEditorView(tk.Toplevel):
     def on_param_focus_out(self, e):
         e.widget.destroy()
 
-    def on_close(self, e):
-        self.callbacks['on_close']()
+    def on_close(self):
+        self.focus()
+        self.after(10, func=self.callbacks['on_close'])
+
+    def on_save(self):
+        self.callbacks['save']()
