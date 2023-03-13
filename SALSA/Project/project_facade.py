@@ -60,11 +60,11 @@ class SCTProjectFacade:
         for key in key_list:
             if isinstance(key, dict):
                 for ele_key, ele_value in key.items():
-                    if '-' not in ele_key:
+                    if sep not in ele_key:
                         tree_list.extend(self._create_tree(group=group, key_list=[ele_key], headers=headers, base=base, base_key=base_key, key_only=True))
                         tree_list[-1]['group_type'] = 'element'
                     else:
-                        ele_key = ele_key.split('-')
+                        ele_key = ele_key.split(sep)
                         tree_list.extend(self._create_tree(group=group, key_list=[ele_key[0]], headers=headers, base=base, base_key=base_key))
                         tree_list[-1]['group_type'] = ele_key[1]
                     tree_list.append('group')
@@ -121,9 +121,9 @@ class SCTProjectFacade:
 
     def get_parameter_details(self, script, section, instruction, parameter):
         try:
-            if '-' in parameter:
-                loop = int(parameter.split('-')[0])
-                param = int(parameter.split('-')[1])
+            if sep in parameter:
+                loop = int(parameter.split(sep)[0])
+                param = int(parameter.split(sep)[1])
                 parameter = self.project.scripts[script].sections[section].instructions[instruction].loop_parameters[loop][param]
             else:
                 parameter = self.project.scripts[script].sections[section].instructions[instruction].parameters[int(parameter)]
