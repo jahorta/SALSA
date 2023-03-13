@@ -76,7 +76,7 @@ class BaseParam:
         return fields
 
     def set_parameter_detail(self, field, value):
-        if locked_conversions[field] not in self.locked_fields:
+        if locked_conversions['parameter'][field] not in self.locked_fields:
             temp_dict = self.__dict__
             temp_dict[field] = value
             self.__dict__ = temp_dict
@@ -145,19 +145,15 @@ class BaseInst:
             self.description = updated_details.get('Description', self.description)
         self.notes = updated_details.get('Notes', self.notes)
         if 'Parameters' in updated_details.keys():
-            loop_count = 0
             for key, param_details in updated_details['Parameters'].items():
                 if isinstance(key, str):
                     key = int(key)
-                if 'loop' in param_details['Type']:
-                    loop_count += 1
-                else:
-                    self.parameters[key-loop_count].set_parameter_details(param_details=param_details)
+                self.parameters[key].set_parameter_details(param_details=param_details)
 
     def set_inst_field(self, field, value, param_id=None):
         if param_id is not None:
-            return self.parameters[param_id].set_parameter_detail(field, value)
-        if locked_conversions[field] not in self.locked_fields:
+            return self.parameters[int(param_id)].set_parameter_detail(field, value)
+        if locked_conversions['instruction'][field] not in self.locked_fields:
             temp_dict = self.__dict__
             temp_dict[field] = value
             self.__dict__ = temp_dict
