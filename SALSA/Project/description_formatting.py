@@ -1,7 +1,7 @@
 from typing import List
 
 from BaseInstructions.bi_container import BaseInst
-from Common.byte_array_utils import getTypeFromString, toInt, asStringOfType, toFloat
+from Common.byte_array_utils import getTypeFromString, toInt, asStringOfType, toFloat, float2Hex, padded_hex
 from Project.project_container import SCTInstruction
 
 
@@ -125,10 +125,15 @@ def multiply_desc_params(param1: str, param2: str):
     return result
 
 
-def hex_desc_params(param1, param2):
-    result_type = getTypeFromString(param1)
-    result = toFloat(param1) * toFloat(param2)
-    result = asStringOfType(result, result_type)
+def hex_desc_params(param1: str, form='>'):
+    result = check_params_are_numeric([param1])
+    if result is not None:
+        return result
+
+    if '.' in param1:
+        result = float2Hex(float(param1), form)
+    else:
+        result = padded_hex(int(param1), 8)
     return result
 
 
