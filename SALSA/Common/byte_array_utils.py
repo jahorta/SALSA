@@ -148,6 +148,10 @@ def is_a_number(num: str):
     return re.search('^[0-9,.]+$', num) is not None and 0 < len(num.split('.')) <= 2
 
 
+def is_hex(num: str):
+    return re.search('^[0-9,a-f]+$', num) or re.search('^0x[0-9,a-f]+$', num)
+
+
 def toInt(string: Union[str, int, float]):
     """Converts either hex, float, or int string into an int. Performs 'Floor' on floats"""
     if isinstance(string, int):
