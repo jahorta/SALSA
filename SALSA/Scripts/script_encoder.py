@@ -2,6 +2,7 @@ import struct
 from typing import Union
 
 from BaseInstructions.bi_facade import BaseInstLibFacade
+from Common.constants import sep
 from Project.project_container import SCTScript, SCTSection
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 from SALSA.Scripts.scpt_compare_fxns import is_equal, not_equal
@@ -108,7 +109,7 @@ class SCTEncoder:
 
         # Resolve through jmp_links
         for link_offset, jmp_to in self.sct_links.items():
-            jmp_to_parts = jmp_to.split('-')
+            jmp_to_parts = jmp_to.split(sep)
             jmp_to_sect = jmp_to_parts[0]
             jmp_to_inst_id = self.script.sections[jmp_to_sect].instruction_ids_ungrouped[int(jmp_to_parts[1])]
             jmp_to_pos = self.inst_positions[jmp_to_inst_id]
