@@ -184,4 +184,3 @@ class ProjectEditorController:
 
     def show_right_click_menu(self):
         pass
-
