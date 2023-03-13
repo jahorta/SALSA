@@ -72,7 +72,7 @@ def parse_desc_func(desc, char_ind):
             cur_param = result
         else:
             cur_param += next_char
-        char_ind += 1
+        cur_pos += 1
 
     return result, cur_pos
 
