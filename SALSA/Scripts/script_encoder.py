@@ -307,7 +307,7 @@ class SCTEncoder:
             if 'code' in base_param.type:
                 value = self._encode_scpt_param(param.value)
             else:
-                value = self._make_word(param.value)
+                value = self._make_word(param.value, signed=base_param.is_signed)
             if self.validation:
                 self._check_additions(trace, value)
 
@@ -373,7 +373,8 @@ class SCTEncoder:
                 addition = addition['value']
             ba.extend(addition)
 
-    def _make_word(self, i: int, signed=False):
+    def _make_word(self, i: int, signed=None):
+        signed = False if signed is None else signed
         return bytearray(i.to_bytes(length=4, byteorder=self.endian, signed=signed))
 
     def _float2Hex(self, f: float):
