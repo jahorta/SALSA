@@ -271,6 +271,7 @@ class SCTProject:
 
     file_name: str
     scripts: Dict[str, SCTScript]
+    version = 1
 
     def __init__(self):
         self.scripts = {}
