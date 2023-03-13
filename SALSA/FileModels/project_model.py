@@ -12,7 +12,7 @@ class ProjectModel:
     def __init__(self):
         self.callbacks = {}
         if self.log_key not in settings.keys():
-            settings._add_section(self.log_key)
+            settings.add_group(self.log_key)
         self.recent_files = []
         self.max_recents = 10
         self._load_recent_filelist()

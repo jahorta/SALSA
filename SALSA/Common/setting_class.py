@@ -30,7 +30,7 @@ class Settings(configparser.ConfigParser):
         with open(self.filename, 'w') as configfile:
             self.write(configfile)
 
-    def _add_section(self, section):
+    def add_group(self, section):
         self[section] = {}
         self._save_settings()
 
