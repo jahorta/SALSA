@@ -412,32 +412,3 @@ class SCTEncoder:
 
         self.sct_body = self.sct_body[:location] + value + self.sct_body[location+len(value):]
 
-
-if __name__ == '__main__':
-    import os
-
-    cur_dir = os.path.dirname(__file__)
-    os.chdir(os.path.pardir)
-    os.chdir(os.path.pardir)
-
-    from SALSA.FileModels.sct_model import SCTModel
-    from SALSA.FileModels.project_model import ProjectModel
-    from SALSA.Project.project_facade import SCTProjectFacade
-
-    os.chdir(cur_dir)
-
-    project_file_path = './test_files/test_prj_1.prj'
-    project_model = ProjectModel()
-    base_insts = BaseInstLibFacade()
-
-    project = SCTProjectFacade(base_insts=base_insts)
-    project_pickled = project_model.load_project(filepath=project_file_path, pickled=True)
-    project.load_project(prj=project_pickled, pickled=True)
-
-    sct_name, script = project.get_project_script_by_index(0)
-    sct = SCTEncoder.encode_sct_file_from_project_script(project_script=script, base_insts=base_insts, use_garbage=True)
-
-    script_file_path = f'./test_files/{sct_name}_out.sct'
-    sct_model = SCTModel()
-    sct_model.save_sct_file(filepath=script_file_path, sct_file=sct)
-
