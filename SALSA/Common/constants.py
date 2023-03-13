@@ -64,7 +64,7 @@ class ReservedVars:
     }
 
 
-sep = '_'
+sep = '|'
 
 
 alt_sep = '-'
