@@ -14,7 +14,7 @@ def description_insert_param_values(inst: SCTInstruction, base_inst: BaseInst):
     desc = base_inst.description
     paramSets = {}
     for key, param in inst.parameters.items():
-        paramSets[base_inst.parameters[key].name] = param.value
+        paramSets[base_inst.parameters[key].name] = param.formatted_value
     for key, value in paramSets.items():
         keyword = f'<{key}>'
         result = str(value)
