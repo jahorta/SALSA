@@ -141,6 +141,7 @@ class SCTProjectFacade:
         return instruction_details
 
     def get_parameter_details(self, script, section, instruction, parameter):
+        parameter = str(parameter)
         try:
             if sep in parameter:
                 loop = int(parameter.split(sep)[0])
