@@ -162,16 +162,12 @@ class ProjectEditorController:
             return
         self.view.inst_label.config(text=f'{details["instruction_id"]} - {details["name"]}')
         self.view.inst_description.config(text=details['description'])
-        for i in details['params_before']:
-            param: SCTParameter = details['parameters'][i]
-            self._add_tree_entries('parameter', )
-            self.view.param_tree.insert_entry(parent='', text=i, values=param)
+
+        self._add_tree_entries('parameter', details['parameter_tree'])
 
         self.view.set_refresh_value(details['no_new_frame'], details['forced_new_frame'], details['skip_refresh'])
 
-        # Guard clause to prevent adding loop parameters if there is no loop in the instruction
-        if details['loop'] is None:
-            return
+
 
     def on_script_display_change(self, mode):
         pass
