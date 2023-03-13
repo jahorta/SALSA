@@ -177,5 +177,3 @@ class Application(tk.Tk):
             filepath = os.path.join(directory, script_file)
             self.sct_model.export_script_as_sct(filepath=filepath, script=script, base_insts=self.base_insts,
                                                 options=options, compress=compress)
-
-        self.project_edit_controller.close_popup('SCTExport')

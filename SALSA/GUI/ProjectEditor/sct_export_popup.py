@@ -23,6 +23,7 @@ class SCTExportPopup(tk.Toplevel):
         super().__init__(parent, *args, **kwargs)
 
         self.parent: tk.Tk = parent
+        self.name = name
         self.callbacks = callbacks
         self.selected = selected
         self.script_ids = {}
@@ -80,7 +81,7 @@ class SCTExportPopup(tk.Toplevel):
         self.export = tk.Button(button_frame, text='Export', command=self.export)
         self.export.grid(row=0, column=0)
 
-        self.quit = tk.Button(button_frame, text='Cancel', command=lambda: self.callbacks['cancel'](name))
+        self.quit = tk.Button(button_frame, text='Cancel', command=self.close)
         self.quit.grid(row=0, column=1)
 
         self.title(self.t)
@@ -114,6 +115,9 @@ class SCTExportPopup(tk.Toplevel):
         self.directory_var.set(new_dir)
         self.tkraise()
 
+    def change_setting(self, setting):
+        settings[self.log_key][setting] = self.option_vars[setting].get()
+
     def export(self):
         directory = self.directory_var.get()
         if not os.path.exists(directory):
@@ -127,7 +131,7 @@ class SCTExportPopup(tk.Toplevel):
         self.callbacks['export'](directory=directory,
                                  scripts=[self.script_ids[int(s)] for s in self.scripts.selection()],
                                  options=options)
+        self.close()
 
-    def change_setting(self, setting):
-        settings[self.log_key][setting] = self.option_vars[setting].get()
-
+    def close(self):
+        self.callbacks['close'](self.name, self)

@@ -124,8 +124,8 @@ class GUIController:
             self.popups['export'].tkraise()
             return
         callbacks = {
-            'export': self.callbacks['export_sct'], 'cancel': self.close_popup,
-            'get_tree': lambda: self.project.get_tree(self.scpt_view.get_headers('script'))
+            'export': self.callbacks['export_sct'], 'close': self.close_popup,
+            'get_tree': lambda: self.project.get_tree(self.scpt_view.get_headers('script')),
         }
         self.popups['export'] = SCTExportPopup(self.parent, callbacks=callbacks, name='export', selected=selected)
 
