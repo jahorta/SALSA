@@ -60,7 +60,7 @@ def parse_desc_func(desc, char_ind):
             cur_param = ''
         elif next_char == ']':
             params.append(cur_param)
-            if not len(params) == func_param_nums[command]:
+            if not len(params) in func_param_nums[command]:
                 return None, char_ind
             result = desc_code_funcs[command](*params)
             cur_pos += 2
@@ -138,7 +138,7 @@ desc_code_funcs = {'add': add_desc_params,
                    'hex': hex_desc_params}
 
 
-func_param_nums = {'add': 2,
-                   'sub': 2,
-                   'mul': 2,
-                   'hex': 1}
+func_param_nums = {'add': [2],
+                   'sub': [2],
+                   'mul': [2],
+                   'hex': [1, 2]}
