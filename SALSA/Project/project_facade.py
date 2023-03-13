@@ -1,5 +1,7 @@
+import copy
 from typing import Union, Tuple
 
+from Project.description_formatting import format_description
 from Project.dictize_project import dictize_project
 from Project.project_container import SCTProject, SCTSection
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
@@ -109,11 +111,12 @@ class SCTProjectFacade:
         except KeyError as e:
             print(self.log_key, e)
             return None
-        instruction_details = self.base_insts.get_inst(instruction.instruction_id).__dict__
+        base_inst = self.base_insts.get_inst(instruction.instruction_id)
+        instruction_details = copy.deepcopy(base_inst.__dict__)
         instruction_details['base_parameters'] = instruction_details['parameters']
         for key, value in instruction.__dict__.items():
             instruction_details[key] = value
-        # format description
+        instruction_details['description'] = format_description(inst=instruction, base_inst=base_inst)
         return instruction_details
 
     def get_parameter_details(self, script, section, instruction, parameter):
