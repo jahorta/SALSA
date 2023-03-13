@@ -44,6 +44,8 @@ class GUIController:
 
         self.callbacks = {}
 
+        self.status_popup: Union[None, tk.Toplevel] = None
+
     # ------------------------------------------------------------- #
     # Functions to inactivate script view when no project is loaded #
     # ------------------------------------------------------------- #
@@ -138,3 +140,26 @@ class GUIController:
 
     def add_callbacks(self, callbacks):
         self.callbacks = {**self.callbacks, **callbacks}
+
+    def show_status_popup(self, title, msg):
+        height = 50
+        width = 300
+        self.status_popup = tk.Toplevel(self.scpt_view)
+        self.status_popup.title = title
+        self.status_popup.overrideredirect(True)
+        self.status_popup.columnconfigure(0, weight=1)
+        self.status_popup.rowconfigure(0, weight=1)
+        msg_lbl = tk.Label(self.status_popup, text=msg, anchor=tk.CENTER)
+        msg_lbl.grid(row=0, column=0)
+
+        cur_geom = (self.scpt_view.winfo_width(), self.scpt_view.winfo_height(), self.scpt_view.winfo_rootx(), self.scpt_view.winfo_rooty())
+        x = cur_geom[2] + cur_geom[0] // 2 - width // 2
+        y = cur_geom[3] + cur_geom[1] // 2 - height // 2
+        new_geom = f'{width}x{height}+{x}+{y}'
+        self.status_popup.geometry(new_geom)
+
+    def stop_status_popup(self):
+        self.status_popup.destroy()
+        self.status_popup = None
+
+

@@ -104,9 +104,18 @@ class Application(tk.Tk):
         if filepath == '' or filepath is None:
             self.on_save_as_project()
             return
-        project_dict = self.project.project
-        self.proj_model.save_project(proj=project_dict, filepath=filepath, indent=True, pickled=True)
+
+        self.gui.show_status_popup(title='Saving Project', msg=f'Loading Project ({os.path.basename(filepath)})')
+        self.after(10, self._continue_save_project, filepath)
+
+    def _continue_save_project(self, filepath):
+        project = self.project.project
+        self.proj_model.save_project(proj=project, filepath=filepath)
         self.proj_model.add_recent_file(filepath=filepath)
+        self.gui.stop_status_popup()
+
+    def on_load_recent_project(self, index):
+        self.on_load_project(self.proj_model.get_recent_filepath(index=index))
 
     def on_load_project(self, filepath=''):
         if filepath == '' or filepath is None:
@@ -119,16 +128,18 @@ class Application(tk.Tk):
                 print('no file selected')
                 return
 
+        self.gui.show_status_popup(title='Loading Project', msg=f'Loading Project ({os.path.basename(filepath)})')
+        self.after(10, self._continue_load_project, filepath)
+
+    def _continue_load_project(self, filepath):
         prj = self.proj_model.load_project(filepath=filepath, pickled=True)
         self.proj_model.add_recent_file(filepath=filepath)
         self.menu.update_recents(self.proj_model.get_recent_filenames())
-
-        self.project.load_project(prj, pickled=True)
+        self.project.load_project(prj)
         self.project_edit_controller.load_project()
-        self.gui.enable_script_view()
+        self.gui.stop_status_popup()
 
-    def on_load_recent_project(self, index):
-        self.on_load_project(self.proj_model.get_recent_filepath(index=index))
+        self.gui.enable_script_view()
 
     def on_print_debug(self):
         print(f'\nWindow Dimensions:\nHeight: {self.winfo_height()}\nWidth: {self.winfo_width()}')
