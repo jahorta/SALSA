@@ -108,6 +108,10 @@ def hex2Float(s: str):
     return f
 
 
+def float2Hex(f: float, form: str):
+    return bytearray(struct.pack(form, f))
+
+
 def word2SignedInt(val):
     if isinstance(val, bytearray) or isinstance(val, bytes):
         val = '0x' + val.hex()

@@ -2,6 +2,7 @@ import struct
 from typing import Union
 
 from BaseInstructions.bi_facade import BaseInstLibFacade
+from Common.byte_array_utils import float2Hex
 from Common.constants import sep
 from Project.project_container import SCTScript, SCTSection
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
@@ -327,7 +328,8 @@ class SCTEncoder:
         # If the parameter is a float, enter the float into script file
         if isinstance(param, float):
             param_bytes.extend(self._make_word(self.param_code.input_cutoffs['float: ']))
-            param_bytes.extend(self._float2Hex(param))
+            form = f'{self.endian_struct_format[self.endian]}f'
+            param_bytes.extend(float2Hex(param, form))
 
         # if the parameter is complex, go through the requisite parameter dictionary encoding values then keys
         elif isinstance(param, dict):
@@ -377,9 +379,6 @@ class SCTEncoder:
         signed = False if signed is None else signed
         return bytearray(i.to_bytes(length=4, byteorder=self.endian, signed=signed))
 
-    def _float2Hex(self, f: float):
-        form = f'{self.endian_struct_format[self.endian]}f'
-        return bytearray(struct.pack(form, f))
 
     def _encode_string(self, string, encoding='shiftjis', align=True, size=-1):
         str_bytes = bytearray(string.encode(encoding=encoding, errors='backslashreplace'))
