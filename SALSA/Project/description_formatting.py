@@ -1,3 +1,5 @@
+from typing import List
+
 from BaseInstructions.bi_container import BaseInst
 from Common.byte_array_utils import getTypeFromString, toInt, asStringOfType, toFloat
 from Project.project_container import SCTInstruction
@@ -75,21 +77,48 @@ def parse_desc_func(desc, char_ind):
     return result, cur_pos
 
 
-def add_desc_params(param1, param2):
+def check_params_are_numeric(paramlist: List[str]):
+    result = ''
+    numeric = True
+    for param in paramlist:
+        if not param.isnumeric():
+            numeric = False
+            result += f'(not numeric){param},'
+        else:
+            result += f'{param}'
+
+    if numeric:
+        return None
+    return result
+
+
+def add_desc_params(param1: str, param2: str):
+    result = check_params_are_numeric([param1, param2])
+    if result is not None:
+        return result
+
     result_type = getTypeFromString(param1)
     result = toInt(param1) + toInt(param2)
     result = asStringOfType(result, result_type)
     return result
 
 
-def subtract_desc_params(param1, param2):
+def subtract_desc_params(param1: str, param2: str):
+    result = check_params_are_numeric([param1, param2])
+    if result is not None:
+        return result
+
     result_type = getTypeFromString(param1)
     result = toInt(param1) - toInt(param2)
     result = asStringOfType(result, result_type)
     return result
 
 
-def multiply_desc_params(param1, param2):
+def multiply_desc_params(param1: str, param2: str):
+    result = check_params_are_numeric([param1, param2])
+    if result is not None:
+        return result
+
     result_type = getTypeFromString(param1)
     result = toFloat(param1) * toFloat(param2)
     result = asStringOfType(result, result_type)
