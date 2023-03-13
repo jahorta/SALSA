@@ -10,7 +10,6 @@ from SALSA.Project.project_facade import SCTProjectFacade
 from SALSA.Project.project_container import SCTParameter
 from SALSA.BaseInstructions.bi_container import BaseParam
 
-
 tree_children = {
     '': 'script',
     'script': 'section',
