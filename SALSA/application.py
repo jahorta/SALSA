@@ -132,7 +132,7 @@ class Application(tk.Tk):
         self.after(10, self._continue_load_project, filepath)
 
     def _continue_load_project(self, filepath):
-        prj = self.proj_model.load_project(filepath=filepath, pickled=True)
+        prj = self.proj_model.load_project(filepath=filepath)
         self.proj_model.add_recent_file(filepath=filepath)
         self.menu.update_recents(self.proj_model.get_recent_filenames())
         self.project.load_project(prj)

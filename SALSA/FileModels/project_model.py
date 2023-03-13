@@ -17,7 +17,7 @@ class ProjectModel:
         self.max_recents = 10
         self._load_recent_filelist()
 
-    def load_project(self, filepath, pickled=False):
+    def load_project(self, filepath):
         if filepath == '' or filepath is None:
             print('Unable to save file, no filepath')
             return
@@ -26,31 +26,18 @@ class ProjectModel:
             return
 
         settings.set_single(self.log_key, 'directory', os.path.dirname(filepath))
-        if pickled:
-            with open(filepath, 'rb') as fh:
-                proj = pickle.load(fh)
-
-        else:
-            with open(filepath, 'r') as fh:
-                proj = json.loads(fh.read())
+        with open(filepath, 'rb') as fh:
+            proj = pickle.load(fh)
 
         return proj
 
-    def save_project(self, proj, filepath, indent=False, pickled=False):
+    def save_project(self, proj, filepath):
         if filepath is None or filepath == '':
             print('No file path for saving')
             return
 
-        if pickled:
-            with open(filepath, 'wb') as file:
-                pickle.dump(proj, file)
-
-        else:
-            with open(filepath, 'w') as fh:
-                kwargs = {}
-                if indent:
-                    kwargs['indent'] = 2
-                fh.write(json.dumps(proj, **kwargs))
+        with open(filepath, 'wb') as file:
+            pickle.dump(proj, file)
 
         print(f'{self.log_key}: Project Saved: {filepath}')
 

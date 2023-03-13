@@ -21,11 +21,11 @@ class SCTProjectFacade:
         if self.log_key not in settings.keys():
             settings[self.log_key] = {}
 
-    def load_project(self, prj, pickled=False):
-        if pickled:
+    def load_project(self, prj: SCTProject):
+        new_project = SCTProject()
+        if prj.version == new_project.version:
             self.project = prj
             return
-        self.project = SCTProject.from_dict(prj)
 
     def create_new_project(self):
         self.project = SCTProject()
@@ -152,10 +152,6 @@ class SCTProjectFacade:
             pass
         else:
             pass
-
-    def get_cur_project_dict(self):
-        project = dictize_project(self.project)
-        return project
 
     def add_script_to_project(self, script_name, script):
         self.project.scripts[script_name] = script

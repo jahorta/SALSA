@@ -79,21 +79,6 @@ class SCTParameter:
     def __repr__(self):
         return f'{self.formatted_value}'
 
-    @classmethod
-    def from_dict(cls, param_dict, links):
-        param = cls(param_dict['ID'], param_dict['type'])
-        for link in links:
-            if param_dict['link']['ID'] == link.ID:
-                param.link = link
-                break
-        param.errors = param_dict['errors']
-        param.analyze_log = param_dict['analyze_log']
-        param.value = param_dict['value']
-        param.formatted_value = param_dict['formatted_value']
-        param.raw_bytes = bytearray.fromhex(param_dict['raw_bytes'])
-        param.link_result = param_dict['link_result']
-        return param
-
     def set_override(self, o_value: bytearray):
         self.override = o_value
 
@@ -154,28 +139,6 @@ class SCTInstruction:
     def set_skip_refresh(self):
         self.skip_refresh = True
 
-    @classmethod
-    def from_dict(cls, inst_dict, links: List[SCTLink]):
-        inst = cls(script_pos=inst_dict['script_pos'], inst_id=inst_dict['inst_id'], inst_pos=inst_dict['inst_pos'])
-        inst.ID = inst_dict['ID']
-        inst.skip_refresh = inst_dict['skip_refresh']
-        inst.errors = inst_dict['errors']
-        inst_links = {}
-        inst_link_ids = [_['ID'] for _ in inst_dict['links']]
-        for link in links:
-            if link.ID in inst_link_ids:
-                inst_links[link.ID] = link
-        for ID in inst_link_ids:
-            inst.links.append(inst_links[ID])
-        for key, param in inst_dict['parameters'].items:
-            inst.parameters[key] = SCTParameter.from_dict(param_dict=param, links=inst.links)
-        for param_group in inst_dict['loop_parameters']:
-            params = {}
-            for key, param in param_group.items():
-                params[key] = SCTParameter.from_dict(param_dict=param, links=inst.links)
-            inst.loop_parameters.append(params)
-        return inst
-
 
 class SCTSection:
 
@@ -227,21 +190,6 @@ class SCTSection:
 
     def add_loop(self, loop_id: int):
         self.jump_loops.append(loop_id)
-
-    @classmethod
-    def from_dict(cls, section_dict, links):
-        section = cls(section_dict['name'], section_dict['length'], section_dict['start_offset'])
-        for inst in section_dict['instructions']:
-            section.instructions.append(SCTInstruction.from_dict(inst, links))
-        section.instructions_ids_grouped = section_dict['instructions_grouped']
-        section.inst_errors = section_dict['inst_errors']
-        section.errors = section_dict['errors']
-        section.strings = section_dict['strings']
-        section.instructions_used = section_dict['instructions_used']
-        section.garbage = section_dict['garbage']
-        section.string = section_dict['string']
-        section.jump_loops = section_dict['jump_loops']
-        return section
 
     def get_inst_list(self, style):
         return self.instructions_ids_grouped if style == 'grouped' else self.instruction_ids_ungrouped
@@ -313,30 +261,6 @@ class SCTScript:
         self.footer.append(entry)
         return len(self.footer) - 1
 
-    @classmethod
-    def from_dict(cls, script_dict):
-        header = script_dict['header']
-        if isinstance(header, dict):
-            header = bytearray.fromhex(header['data'])
-        script = cls(name=script_dict['name'], index=script_dict['index'], header=header)
-        for link in script_dict['links']:
-            script.links.append(SCTLink(**link))
-            script.links[-1].set_id(link['ID'])
-        for key, value in script_dict['sections'].items():
-            script.sections[key] = SCTSection.from_dict(value, script.links)
-        script.section_groups = script_dict['section_groups']
-        script.section_group_keys = script_dict['section_group_keys']
-        script.sections_grouped = script_dict['grouped_section_names']
-        script.inst_locations = script_dict['inst_locations']
-        script.links_to_sections = script_dict['links_to_sections']
-        script.footer = script_dict['footer']
-        script.strings = script_dict['strings']
-        script.string_groups = script_dict['string_groups']
-        script.unused_sections = script_dict['unused_sections']
-        script.errors = script_dict['errors']
-        script.error_sections = script_dict['error_sections']
-        return script
-
     def get_sect_list(self, style):
         if style == 'grouped':
             return self.sections_grouped
@@ -355,14 +279,3 @@ class SCTProject:
 
     def add_script(self, filename: str, script: SCTScript):
         self.scripts[filename] = script
-
-    @classmethod
-    def from_dict(cls, proj_dict):
-        project = cls()
-        scripts = proj_dict['scripts']
-        for key, script in scripts.items():
-            project.scripts[key] = SCTScript.from_dict(script)
-        project.filename = proj_dict['file_name']
-        project.filepath = proj_dict['file_path']
-
-        return project
