@@ -1,6 +1,5 @@
 inst_defaults = {
     0: {
-        "Name": "If ",
         "Location": "0x801f6044",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
@@ -8,14 +7,16 @@ inst_defaults = {
         "Link Type": "Jump",
         "Parameters": {
             0: {
-                "Name": "CompareResult",
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
-                "Name": "Offset",
                 "Type": "int",
                 "Signed": True,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -44,24 +45,28 @@ inst_defaults = {
         "Switch Entry": [2, 3],
         "Parameters": {
             0: {
-                "Name": "Choice",
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
-                "Name": "ChoiceNum",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
-                "Name": "Switch Case",
                 "Type": "int",
-                "Signed": True
+                "Signed": True,
+                "Mask": None,
+                "Default": None
             },
             3: {
-                "Name": "Switch Offset",
                 "Type": "int",
-                "Signed": False
+                "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -77,15 +82,16 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int-code",
                 "Mask": 0x0000ffff,
                 "Signed": False,
+                "Default": None
             },
             1: {
-                "Name": "Value",
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -95,15 +101,16 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int-code",
                 "Mask": 0x0000ffff,
                 "Signed": False,
+                "Default": None
             },
             1: {
-                "Name": "Value",
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -113,15 +120,16 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int-code",
                 "Mask": 0x0000ffff,
                 "Signed": False,
+                "Default": None
             },
             1: {
-                "Name": "Value",
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -140,11 +148,12 @@ inst_defaults = {
             0: {
                 "Type": "scpt-skip",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     10: {
-        "Name": "Jump",
         "Link": 0,
         "Link Type": "Jump",
         "Location": "0x801f5ccc",
@@ -152,15 +161,14 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int",
                 "Mask": 0xfffffffc,
                 "Signed": True,
+                "Default": None
             }
         }
     },
     11: {
-        "Name": "Load Subscript",
         "Location": "0x801f5c30",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
@@ -168,14 +176,14 @@ inst_defaults = {
         "Link Type": "Jump",
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int",
                 "Signed": True,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     12: {
-        "Name": "Return",
         "Location": "0x801f5bd0",
         "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
@@ -183,16 +191,12 @@ inst_defaults = {
         "Parameters": {}
     },
     13: {
-        "Name": "code_error",
-        "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis is never used as an instruction. It is used to set a flag to try to prevent a frame refresh after the next instruction",
         "Location": "0x801f60f0",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {}
-      },
+    },
     14: {
-        "Name": "code_error",
-        "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis should not be an instruction call\n\n***Not used in the game***",
         "Location": "0x801f60f0",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
@@ -200,8 +204,6 @@ inst_defaults = {
         "Parameters": {}
     },
     15: {
-        "Name": "Force next frame",
-        "Description": "***Not used in the game***\n\nThis instruction will set the 0x4 field in the current instruction buffer to zero. This forces the instruction interpreter function to exit allow for the next frame to be drawn. On next frame, any pending instruction buffers will be read.",
         "Location": "0x801f5bb4",
         "Skip Frame Refresh": False,
         "Force Frame Refresh": True,
@@ -210,92 +212,85 @@ inst_defaults = {
         "Parameters": {}
     },
     16: {
-        "Name": "Sleep",
         "Location": "0x801f570c",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Name": "Duration",
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     17: {
-        "Name": "Set Bit",
         "Location": "0x801f5b14",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     18: {
-        "Name": "Unset Bit",
-        "Description": "Unsets a bit in the bit field at 0x80310b3c\nBit: *add[<Offset>,0]*\n\n(Sets the bit to 0)",
         "Location": "0x801f5a74",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     19: {
-        "Name": "Invert Bit",
-        "Description": "Inverts a bit in the bit field at 0x80310b3c\nBit: *add[<Offset>,0]*\n\n***Not used in the game***",
         "Location": "0x801f59c0",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     20: {
-        "Instruction ID": "20",
-        "Name": "Give Item",
-        "Description": "Gives an item with item ID: <ItemID>",
         "Location": "0x801f593c",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Name": "ItemID",
                 "Type": "scpt-short",
-                "Signed": False
+                "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     21: {
-        "Name": "Take Item",
-        "Description": "Takes item with itemID: <ItemID>",
         "Location": "0x801f58b8",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Name": "ItemID",
                 "Type": "scpt-short",
-                "Signed": False
+                "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     22: {
-        "Name": "Return 1",
-        "Description": "Returns a 1. Does not advance the pointer, so possibly infinite loop...\n\n***Not used in the game***",
         "Location": "0x801f58b0",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00000000,
@@ -303,7 +298,6 @@ inst_defaults = {
         "Parameters": {}
     },
     23: {
-        "Name": "Load *.mld file",
         "Location": "0x801ff13c",
         "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
@@ -312,9 +306,10 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int",
                 "Signed": True,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -327,9 +322,10 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int",
-                "Signed": True
+                "Signed": True,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -344,11 +340,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
-                "Name": "Offset",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -360,6 +359,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -371,6 +372,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -382,18 +385,26 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -406,18 +417,26 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -430,10 +449,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -446,34 +469,50 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -483,40 +522,56 @@ inst_defaults = {
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00050000,
         "Parameters": {
-          0: {
-            "Type": "scpt-short",
-            "Signed": False,
-          },
-          1: {
-            "Type": "scpt-float",
-            "Signed": False,
-          },
-          2: {
-            "Type": "scpt-float",
-            "Signed": False,
-          },
-          3: {
-            "Type": "scpt-float",
-            "Signed": False,
-          },
-          4: {
-            "Type": "scpt-float",
-            "Signed": False,
-          },
-          5: {
-            "Type": "scpt-float",
-            "Signed": False,
-          },
-          6: {
-            "Type": "scpt-float",
-            "Signed": False,
-          },
-          7: {
-            "Type": "scpt-int",
-            "Signed": False,
-          }
+            0: {
+                "Type": "scpt-short",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            },
+            1: {
+                "Type": "scpt-float",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            },
+            2: {
+                "Type": "scpt-float",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            },
+            3: {
+                "Type": "scpt-float",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            },
+            4: {
+                "Type": "scpt-float",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            },
+            5: {
+                "Type": "scpt-float",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            },
+            6: {
+                "Type": "scpt-float",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            },
+            7: {
+                "Type": "scpt-int",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            }
         }
-      },
+    },
     33: {
         "Location": "0x80203ffc",
         "Skip Frame Refresh": False,
@@ -529,34 +584,50 @@ inst_defaults = {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
         }
     },
@@ -571,47 +642,69 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             10: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -623,51 +716,73 @@ inst_defaults = {
         "Loop": [2, 3, 4, 5, 6, 7, 8, 9, 10],
         "Loop Iterations": 1,
         "Parameters": {
-          0: {
+            0: {
                 "Type": "scpt-short",
                 "Signed": False,
-          },
-          1: {
+                "Mask": None,
+                "Default": None
+            },
+            1: {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
-          },
-          2: {
+                "Mask": None,
+                "Default": None
+            },
+            2: {
                 "Type": "scpt-float",
                 "Signed": False,
-          },
-          3: {
+                "Mask": None,
+                "Default": None
+            },
+            3: {
                 "Type": "scpt-float",
                 "Signed": False,
-          },
-          4: {
+                "Mask": None,
+                "Default": None
+            },
+            4: {
                 "Type": "scpt-float",
                 "Signed": False,
-          },
-          5: {
+                "Mask": None,
+                "Default": None
+            },
+            5: {
                 "Type": "scpt-float",
                 "Signed": False,
-          },
-          6: {
+                "Mask": None,
+                "Default": None
+            },
+            6: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          7: {
+                "Mask": None,
+                "Default": None
+            },
+            7: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          8: {
+                "Mask": None,
+                "Default": None
+            },
+            8: {
                 "Type": "scpt-float",
                 "Signed": False,
-          },
-          9: {
+                "Mask": None,
+                "Default": None
+            },
+            9: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          10: {
+                "Mask": None,
+                "Default": None
+            },
+            10: {
                 "Type": "scpt-int",
                 "Signed": False,
-          }
+                "Mask": None,
+                "Default": None
+            }
         }
     },
     36: {
@@ -679,34 +794,50 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -719,34 +850,50 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -760,22 +907,32 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -788,10 +945,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -804,14 +965,20 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -823,6 +990,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -835,16 +1004,22 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Type": "scpt-int",
-                "Signed": False
+                "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Name": "Iterations",
                 "Type": "int",
-                "Signed": False
+                "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -858,15 +1033,14 @@ inst_defaults = {
         "Warning": "This instruction will exit the current script and load a new one",
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     44: {
-        "Name": "Return 1",
-        "Description": "Returns a 1. Does not change the script pointer, so may lead to an infinite loop",
         "Location": "0x801fedc8",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00060000,
@@ -889,18 +1063,26 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -913,18 +1095,26 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -936,9 +1126,10 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Name": "Value",
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -949,10 +1140,10 @@ inst_defaults = {
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
-                "Name": "Compare",
                 "Type": "scpt-float",
                 "Default": 60.0,
                 "Signed": False,
+                "Mask": None,
             }
         }
     },
@@ -964,26 +1155,38 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -995,18 +1198,26 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1018,26 +1229,38 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1049,82 +1272,122 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             10: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             11: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             12: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             13: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             14: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             15: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             16: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             17: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             18: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             19: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1139,14 +1402,17 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
-                "Name": "Offset",
                 "Type": "int",
                 "Signed": True,
+                "Mask": None,
+                "Default": None
             }
         }
-      },
+    },
     55: {
         "Location": "0x801fa398",
         "Skip Frame Refresh": True,
@@ -1155,14 +1421,20 @@ inst_defaults = {
             0: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
-                "Signed": False
+                "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1174,12 +1446,12 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     57: {
-        "Name": "INS_BG Syntax Error",
-        "Description": "Just prints: scptINS BG: SYNTAX ERROR!!!",
         "Location": "0x801fef18",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
@@ -1187,8 +1459,6 @@ inst_defaults = {
         "Parameters": {}
     },
     58: {
-        "Name": "DELL_BG Syntax Error",
-        "Description": "Just prints: scptDELL BG: SYNTAX ERROR!!!",
         "Location": "0x801feee8",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
@@ -1204,6 +1474,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1216,6 +1488,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1228,14 +1502,20 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1248,10 +1528,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1264,10 +1548,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1280,6 +1568,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1292,6 +1582,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1305,20 +1597,24 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     67: {
-        "Name": "Kill Syntax Error",
-        "Description": "scptKill: SYNTAX ERROR!!!",
         "Location": "0x801ff1e0",
         "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
@@ -1343,9 +1639,10 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int",
                 "Signed": True,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1358,18 +1655,26 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1382,18 +1687,26 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1406,38 +1719,56 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1450,42 +1781,62 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1498,30 +1849,44 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1534,50 +1899,74 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             10: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             11: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1591,6 +1980,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1603,22 +1994,32 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1631,18 +2032,26 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1654,36 +2063,48 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     80: {
-        "Name": "Reset 80305ba9",
-        "Description": "Sets global variable at 80305ba9 to zero",
         "Location": "0x80200f88",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
@@ -1697,38 +2118,56 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1740,18 +2179,26 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1763,30 +2210,44 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1798,42 +2259,62 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1847,15 +2328,21 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1869,15 +2356,21 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1891,15 +2384,21 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1914,15 +2413,21 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1937,47 +2442,69 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             10: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -1995,47 +2522,69 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             10: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2047,10 +2596,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2062,6 +2615,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2073,6 +2628,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2084,6 +2641,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2096,30 +2655,44 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2131,30 +2704,44 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2166,14 +2753,20 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2188,10 +2781,14 @@ inst_defaults = {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2206,10 +2803,14 @@ inst_defaults = {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2223,14 +2824,20 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2242,6 +2849,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2254,6 +2863,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2271,14 +2882,20 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2290,6 +2907,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2301,38 +2920,56 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2344,10 +2981,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2361,47 +3002,69 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             10: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2413,38 +3076,56 @@ inst_defaults = {
             0: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2456,9 +3137,10 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2470,15 +3152,18 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     112: {
-        "Name": "Trigger Battle",
         "Location": "0x801ff210",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
@@ -2486,18 +3171,26 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2510,9 +3203,10 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2525,10 +3219,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2549,30 +3247,44 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2585,10 +3297,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2609,15 +3325,21 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2638,15 +3360,21 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2660,30 +3388,44 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2699,34 +3441,50 @@ inst_defaults = {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
         }
     },
@@ -2739,22 +3497,32 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2767,10 +3535,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2784,10 +3556,13 @@ inst_defaults = {
                 "Type": "scpt-float",
                 "Default": 60.0,
                 "Signed": False,
+                "Mask": None,
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2810,10 +3585,14 @@ inst_defaults = {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2829,10 +3608,14 @@ inst_defaults = {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2845,45 +3628,58 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     129: {
-        "Name": "Schedule Inst",
         "Location": "0x801f57f8",
         "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Name": "Frames",
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
-                "Name": "Length",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2898,39 +3694,57 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2947,22 +3761,31 @@ inst_defaults = {
                 "Type": "int",
                 "Mask": 0x0000ffff,
                 "Signed": False,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -2979,34 +3802,49 @@ inst_defaults = {
                 "Type": "int",
                 "Mask": 0x0000ffff,
                 "Signed": False,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3022,46 +3860,68 @@ inst_defaults = {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             10: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3074,30 +3934,44 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3109,19 +3983,25 @@ inst_defaults = {
         "Loop": [2],
         "Loop Iterations": 1,
         "Parameters": {
-          0: {
-            "Type": "scpt-int",
-            "Signed": False,
-          },
-          1: {
-            "Name": "Iterations",
-            "Type": "int",
-            "Signed": False,
-          },
-          2: {
-            "Type": "scpt-short",
-            "Signed": False,
-          }
+            0: {
+                "Type": "scpt-int",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            },
+            1: {
+                "Name": "Iterations",
+                "Type": "int",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            },
+            2: {
+                "Type": "scpt-short",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            }
         }
     },
     136: {
@@ -3133,22 +4013,32 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3161,12 +4051,12 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     138: {
-        "Name": "Display Save Menu",
-        "Description": "Sets 803473b4 to 1, activating the save menu on the next available frame",
         "Location": "0x801fed58",
         "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
@@ -3185,34 +4075,50 @@ inst_defaults = {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3225,6 +4131,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3237,6 +4145,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3249,28 +4159,36 @@ inst_defaults = {
             0: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     143: {
-        "Name": "Return 0",
-        "Description": "This only returns a zero.",
         "Location": "0x8020a72c",
         "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
@@ -3279,7 +4197,6 @@ inst_defaults = {
         "Parameters": {}
     },
     144: {
-        "Name": "Display Message",
         "Location": "0x8020a734",
         "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
@@ -3288,18 +4205,20 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int",
                 "Signed": True,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     145: {
-        "Name": "Roll Rand",
         "Location": "0x801fe21c",
         "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
@@ -3308,6 +4227,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3317,10 +4238,12 @@ inst_defaults = {
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
-          0: {
+            0: {
                 "Type": "scpt-int",
                 "Signed": False,
-          }
+                "Mask": None,
+                "Default": None
+            }
         }
     },
     147: {
@@ -3332,42 +4255,62 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3383,42 +4326,62 @@ inst_defaults = {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3431,6 +4394,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3443,6 +4408,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3455,10 +4422,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3474,10 +4445,14 @@ inst_defaults = {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3494,23 +4469,31 @@ inst_defaults = {
             "Location": 'Internal'
         },
         "Parameters": {
-          0: {
+            0: {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
-          },
-          1: {
+                "Mask": None,
+                "Default": None
+            },
+            1: {
                 "Type": "scpt-byte",
                 "Signed": False,
-          },
-          2: {
+                "Mask": None,
+                "Default": None
+            },
+            2: {
                 "Type": "scpt-byte",
                 "Signed": False,
-          },
-          3: {
+                "Mask": None,
+                "Default": None
+            },
+            3: {
                 "Type": "scpt-short",
                 "Signed": False,
-          }
+                "Mask": None,
+                "Default": None
+            }
         }
     },
     154: {
@@ -3522,11 +4505,12 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     155: {
-        "Name": "Select Choice",
         "Location": "0x8020a338",
         "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
@@ -3537,15 +4521,20 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
-                "Name": "Offset",
                 "Type": "int",
                 "Signed": True,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3557,28 +4546,28 @@ inst_defaults = {
         "Parameters": {}
     },
     157: {
-        "Name": "Add Party Member",
         "Location": "0x801fec80",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Name": "PC_ID",
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     158: {
-        "Name": "Remove Party Member",
         "Location": "0x801febfc",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Name": "PC_ID",
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3594,38 +4583,56 @@ inst_defaults = {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3635,34 +4642,48 @@ inst_defaults = {
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
-          0: {
+            0: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          1: {
+                "Mask": None,
+                "Default": None
+            },
+            1: {
                 "Type": "scpt-float",
                 "Signed": False,
-          },
-          2: {
+                "Mask": None,
+                "Default": None
+            },
+            2: {
                 "Type": "scpt-float",
                 "Signed": False,
-          },
-          3: {
+                "Mask": None,
+                "Default": None
+            },
+            3: {
                 "Type": "scpt-float",
                 "Signed": False,
-          },
-          4: {
+                "Mask": None,
+                "Default": None
+            },
+            4: {
                 "Type": "scpt-float",
                 "Signed": False,
-          },
-          5: {
+                "Mask": None,
+                "Default": None
+            },
+            5: {
                 "Type": "scpt-float",
                 "Signed": False,
-          },
-          6: {
+                "Mask": None,
+                "Default": None
+            },
+            6: {
                 "Type": "scpt-float",
                 "Signed": False,
-          }
+                "Mask": None,
+                "Default": None
+            }
         }
     },
     161: {
@@ -3677,47 +4698,69 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             10: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
         }
     },
@@ -3729,6 +4772,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3740,38 +4785,56 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3780,14 +4843,18 @@ inst_defaults = {
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
-          0: {
+            0: {
                 "Type": "scpt-short",
                 "Signed": False,
-          },
-          1: {
+                "Mask": None,
+                "Default": None
+            },
+            1: {
                 "Type": "scpt-int",
                 "Signed": False,
-          }
+                "Mask": None,
+                "Default": None
+            }
         }
     },
     165: {
@@ -3798,78 +4865,116 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             10: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             11: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             12: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             13: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             14: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             15: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             16: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             17: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             18: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3881,10 +4986,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3902,6 +5011,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3913,18 +5024,26 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3948,6 +5067,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3959,6 +5080,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3970,6 +5093,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -3980,14 +5105,18 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
-          0: {
-            "Type": "scpt-short",
-            "Signed": False,
-          },
-          1: {
-            "Type": "scpt-float",
-            "Signed": False,
-          }
+            0: {
+                "Type": "scpt-short",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            },
+            1: {
+                "Type": "scpt-float",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            }
         }
     },
     176: {
@@ -3999,26 +5128,38 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4031,54 +5172,80 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             10: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             11: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             12: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4090,34 +5257,50 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4129,18 +5312,26 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4153,6 +5344,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4165,6 +5358,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4181,10 +5376,12 @@ inst_defaults = {
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
-          0: {
-            "Type": "scpt-short",
-            "Signed": False,
-          }
+            0: {
+                "Type": "scpt-short",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            }
         }
     },
     184: {
@@ -4195,10 +5392,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4210,6 +5411,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4221,6 +5424,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4233,6 +5438,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4245,6 +5452,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4264,14 +5473,20 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4283,6 +5498,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4295,6 +5512,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4307,6 +5526,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4319,10 +5540,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4335,10 +5560,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4356,10 +5585,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4371,10 +5604,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4386,6 +5623,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4398,16 +5637,12 @@ inst_defaults = {
         "Parameters": {}
     },
     201: {
-        "Name": "Restore Health All",
-        "Description": "Restores everyone's health to max",
         "Location": "0x801fd9b0",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     202: {
-        "Name": "Restore Magic All",
-        "Description": "Restores all of the party members' magic to full",
         "Location": "0x801fd8f0",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
@@ -4422,6 +5657,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4434,10 +5671,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4450,6 +5691,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4468,14 +5711,20 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4499,14 +5748,14 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     211: {
-        "Name": "Return to Overworld",
         "Location": "0x80214954",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
@@ -4520,22 +5769,32 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4547,70 +5806,104 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             10: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             11: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             12: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             13: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             14: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             15: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             16: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4623,9 +5916,10 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4636,15 +5930,18 @@ inst_defaults = {
         "Link": 1,
         "Link Type": "String",
         "Parameters": {
-          0: {
+            0: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          1: {
-                "Name": "Offset",
+                "Mask": None,
+                "Default": None
+            },
+            1: {
                 "Type": "int",
                 "Signed": False,
-          }
+                "Mask": None,
+                "Default": None
+            }
         }
     },
     216: {
@@ -4655,6 +5952,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4663,10 +5962,12 @@ inst_defaults = {
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
-          0: {
-            "Type": "scpt-int",
-            "Signed": False,
-          }
+            0: {
+                "Type": "scpt-int",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            }
         }
     },
     218: {
@@ -4677,6 +5978,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4688,6 +5991,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4699,38 +6004,56 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4743,10 +6066,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4758,6 +6085,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4766,106 +6095,156 @@ inst_defaults = {
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {
-          0: {
+            0: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          1: {
+                "Mask": None,
+                "Default": None
+            },
+            1: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          2: {
+                "Mask": None,
+                "Default": None
+            },
+            2: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          3: {
+                "Mask": None,
+                "Default": None
+            },
+            3: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          4: {
+                "Mask": None,
+                "Default": None
+            },
+            4: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          5: {
+                "Mask": None,
+                "Default": None
+            },
+            5: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          6: {
+                "Mask": None,
+                "Default": None
+            },
+            6: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          7: {
+                "Mask": None,
+                "Default": None
+            },
+            7: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          8: {
+                "Mask": None,
+                "Default": None
+            },
+            8: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          9: {
+                "Mask": None,
+                "Default": None
+            },
+            9: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          10: {
+                "Mask": None,
+                "Default": None
+            },
+            10: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          11: {
+                "Mask": None,
+                "Default": None
+            },
+            11: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          12: {
+                "Mask": None,
+                "Default": None
+            },
+            12: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          13: {
+                "Mask": None,
+                "Default": None
+            },
+            13: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          14: {
+                "Mask": None,
+                "Default": None
+            },
+            14: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          15: {
+                "Mask": None,
+                "Default": None
+            },
+            15: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          16: {
+                "Mask": None,
+                "Default": None
+            },
+            16: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          17: {
+                "Mask": None,
+                "Default": None
+            },
+            17: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          18: {
+                "Mask": None,
+                "Default": None
+            },
+            18: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          19: {
+                "Mask": None,
+                "Default": None
+            },
+            19: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          20: {
+                "Mask": None,
+                "Default": None
+            },
+            20: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          21: {
+                "Mask": None,
+                "Default": None
+            },
+            21: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          22: {
+                "Mask": None,
+                "Default": None
+            },
+            22: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          23: {
+                "Mask": None,
+                "Default": None
+            },
+            23: {
                 "Type": "scpt-int",
                 "Signed": False,
-          },
-          24: {
+                "Mask": None,
+                "Default": None
+            },
+            24: {
                 "Type": "scpt-int",
                 "Signed": False,
-          }
+                "Mask": None,
+                "Default": None
+            }
         }
     },
     224: {
@@ -4876,102 +6255,152 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             10: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             11: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             12: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             13: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             14: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             15: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             16: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             17: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             18: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             19: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             20: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             21: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             22: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             23: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             24: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -4983,30 +6412,44 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5018,10 +6461,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5031,23 +6478,20 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Name": "PC_ID",
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     228: {
-        "Name": "Swap player group",
-        "Description": "If the player characters have been split into two groups, this switches the active group.",
         "Location": "0x801feb40",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
         "Parameters": {}
     },
     229: {
-        "Name": "Unify player groups",
-        "Description": "If the player characters have been split into two groups, this recombines the two groups into one. Only seems to be used at Daccat's isle, so not sure if it is specific to Aika/Fina and Vyse/Gilder groups, or if it can be used for other groups as well.",
         "Location": "0x801feb08",
         "Skip Frame Refresh": True,
         "Hard parameter two": 0x00010000,
@@ -5061,30 +6505,44 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5097,6 +6555,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5108,58 +6568,86 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             10: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             11: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             12: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             13: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5172,10 +6660,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5195,6 +6687,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5207,26 +6701,38 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5246,14 +6752,20 @@ inst_defaults = {
             0: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5266,6 +6778,8 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5277,26 +6791,38 @@ inst_defaults = {
             0: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5314,14 +6840,20 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5334,42 +6866,62 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             8: {
                 "Type": "scpt-byte",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             9: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5383,10 +6935,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5401,10 +6957,14 @@ inst_defaults = {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5419,10 +6979,14 @@ inst_defaults = {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5442,9 +7006,10 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5456,10 +7021,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5472,9 +7041,10 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Name": "Offset",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5487,10 +7057,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5502,10 +7076,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5515,14 +7093,18 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
-          0: {
-            "Type": "scpt-int",
-            "Signed": False,
-          },
-          1: {
-            "Type": "scpt-int",
-            "Signed": False,
-          }
+            0: {
+                "Type": "scpt-int",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            },
+            1: {
+                "Type": "scpt-int",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            }
         }
     },
     254: {
@@ -5544,10 +7126,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
-          0: {
-            "Type": "scpt-int",
-            "Signed": False,
-          }
+            0: {
+                "Type": "scpt-int",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            }
         }
     },
     257: {
@@ -5557,11 +7141,12 @@ inst_defaults = {
         "Link": 0,
         "Link Type": "String",
         "Parameters": {
-          0: {
-            "Name": "Offset",
-            "Type": "int",
-            "Signed": False,
-          }
+            0: {
+                "Type": "int",
+                "Signed": False,
+                "Mask": None,
+                "Default": None
+            }
         }
     },
     258: {
@@ -5575,30 +7160,32 @@ inst_defaults = {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     259: {
-        "Name": "Hamachou Hermit Stat Dialog",
-        "Description": "Helper instruction for Hamachou Hermit. Displays a text box containing current stats of a certain type.\n\nDialog display index: <DISP_ID>\n\nBattles - (0, 1, 10, 2)\nRuns - (3, 4)\nKnocked Unconscious - (5, 6)\nTreasure Chests - (7, 8)\nFish - (9)\n\nTechnically, Domingo's discovery text can also be displayed using this instruction using 100 as the parameter.",
         "Location": "0x8020b4ac",
         "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Name": "DISP_ID",
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     260: {
-        "Name": "Restore Ship Health All",
         "Location": "0x801fda70",
         "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
@@ -5606,8 +7193,6 @@ inst_defaults = {
         "Parameters": {}
     },
     261: {
-        "Name": "Domingo Discovery Dialog",
-        "Description": "Instruction to display a textbox from Domingo with the current number of discoveries. Uses the same function as INST_259 but with a 100 as the parameter to force Domingo's text.",
         "Location": "0x8020ae04",
         "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
@@ -5615,37 +7200,40 @@ inst_defaults = {
         "Parameters": {}
     },
     262: {
-        "Name": "Activate Screen Overlay",
-        "Description": "Fades out into a color as defined below:\n\nRed (0-255): <Red>\nGreen (0-255): <Green>\nBlue (0-255): <Blue>\nDistance from Camera: <Distance>\nTransition Time: <Transition_Time>\n\nDistance in direction camera is pointing is negative, and reverse is positive. Text boxes appear at -1, so distance should be less than -1 to show text boxes.",
         "Location": "0x801fe310",
         "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Name": "Red",
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
-                "Name": "Green",
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
-                "Name": "Blue",
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
-                "Name": "Distance",
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
-                "Name": "Transition_Time",
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5661,10 +7249,14 @@ inst_defaults = {
                 "Name": "Iterations",
                 "Type": "int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
@@ -5677,39 +7269,54 @@ inst_defaults = {
             0: {
                 "Type": "scpt-short",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             2: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             3: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             4: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             5: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             6: {
                 "Type": "scpt-float",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             7: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             }
         }
     },
     265: {
-        "Name": "Valuan Piracy List Dialog",
         "Location": "0x8020aaa8",
         "Skip Frame Refresh": False,
         "Force Frame Refresh": False,
@@ -5720,10 +7327,14 @@ inst_defaults = {
             0: {
                 "Type": "scpt-int",
                 "Signed": False,
+                "Mask": None,
+                "Default": None
             },
             1: {
                 "Type": "int",
                 "Signed": True,
+                "Mask": None,
+                "Default": None
             }
         }
     }
