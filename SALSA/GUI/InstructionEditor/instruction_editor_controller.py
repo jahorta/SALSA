@@ -2,8 +2,8 @@ import copy
 import tkinter as tk
 from tkinter import messagebox as msg
 
-from GUI.InstructionEditor.instruction_editor_view import InstructionEditorView
-from BaseInstructions.bi_facade import BaseInstLibFacade
+from SALSA.GUI.InstructionEditor.instruction_editor_view import InstructionEditorView
+from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.constants import sep, LOCK
 
 
