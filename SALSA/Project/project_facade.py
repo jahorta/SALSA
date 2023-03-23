@@ -143,6 +143,8 @@ class SCTProjectFacade:
 
         tree += self._create_tree(inst.parameters, base_inst.params_after, headings, base=base_inst.parameters, base_key='ID')
 
+        return tree
+
     def get_instruction_details(self, script, section, instruction, **kwargs):
         try:
             instruction = self.project.scripts[script].sections[section].instructions[instruction]
