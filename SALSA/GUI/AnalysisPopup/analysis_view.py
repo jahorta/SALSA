@@ -20,7 +20,7 @@ class AnalysisView(tk.Toplevel):
         'y': 10
     }
 
-    def __init__(self, parent, title, export_fields: dict, position, callbacks, *args, **kwargs):
+    def __init__(self, parent, title, position, callbacks, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.callbacks = callbacks
@@ -31,9 +31,9 @@ class AnalysisView(tk.Toplevel):
 
         self.export_frame = tk.Frame(self)
         self.export_frame.grid(row=0, column=0, sticky='NSEW')
-        self.export_selector = w.LabelInput(self.export_frame, 'Name', field_spec=export_fields['types'])
-        self.export_selector.set(export_fields['types']['values'][0])
-        self.export_selector.grid(row=0, column=0)
+        # self.export_selector = w.LabelInput(self.export_frame, 'Name', field_spec=export_fields['types'])
+        # self.export_selector.set(export_fields['types']['values'][0])
+        # self.export_selector.grid(row=0, column=0)
         self.button_extract_data = tk.Button(self.export_frame, text='Extract Data', command=self.export_selected_data)
         self.button_extract_data.grid(row=1, column=0)
 
@@ -89,11 +89,11 @@ class AnalysisView(tk.Toplevel):
     def export_selected_data(self):
         print('export button pressed')
         self.button_extract_data['state'] = 'disabled'
-        export_type = self.export_selector.get()
-        if export_type == '':
-            self.update_progress(0, 'No Export Value Selected...')
-            return
-        self.callbacks['on_export'](export_type=export_type)
+        # export_type = self.export_selector.get()
+        # if export_type == '':
+        #     self.update_progress(0, 'No Export Value Selected...')
+        #     return
+        # self.callbacks['on_export'](export_type=export_type)
 
     def send_to_clipboard(self):
         key = self.export_notebook.tab(self.export_notebook.select(), 'text')
