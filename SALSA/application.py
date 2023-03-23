@@ -105,7 +105,7 @@ class Application(tk.Tk):
             self.on_save_as_project()
             return
 
-        self.gui.show_status_popup(title='Saving Project', msg=f'Loading Project ({os.path.basename(filepath)})')
+        self.gui.show_status_popup(title='Saving Project', msg=f'Saving Project ({os.path.basename(filepath)})')
         self.after(10, self._continue_save_project, filepath)
 
     def _continue_save_project(self, filepath):
