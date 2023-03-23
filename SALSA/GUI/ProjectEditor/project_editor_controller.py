@@ -92,6 +92,8 @@ class ProjectEditorController:
         self.current['instruction'] = instructID
         self.current['parameter'] = None
         details = self.project.get_instruction_details(**self.current)
+        if details is None:
+            return
         details['parameter_tree'] = self.project.get_parameter_tree(headings=self.view.get_headers('parameter'), **self.current)
         self.set_instruction_details(details)
 
