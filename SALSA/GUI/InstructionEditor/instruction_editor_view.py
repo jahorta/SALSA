@@ -163,8 +163,8 @@ class InstructionEditorView(tk.Toplevel):
         name_label_label.grid(row=0, column=0)
         self.details_name_entry = tk.Entry(name_frame, text='')
         self.details_name_entry.grid(row=0, column=1, sticky='nsew')
-        self.details_name_entry.bind('<FocusIn>', self.on_name_focus_in)
-        self.details_name_entry.bind('<FocusOut>', self.on_name_focus_out)
+        self.details_name_entry.bind('<FocusIn>', self.on_entry_focus_in)
+        self.details_name_entry.bind('<FocusOut>', lambda e, k='name': self.on_entry_focus_out(k, e))
         self.details_name_label = tk.Label(name_frame, text='', anchor=tk.W)
         self.details_name_label.grid(row=0, column=1, sticky='nsew')
 
@@ -174,8 +174,8 @@ class InstructionEditorView(tk.Toplevel):
         desc_frame.rowconfigure(0, weight=1)
         self.details_desc_text = tk.scrolledtext.ScrolledText(desc_frame, wrap=tk.WORD, height=15)
         self.details_desc_text.grid(row=0, column=1, sticky='NSEW')
-        self.details_desc_text.bind('<FocusIn>', self.on_desc_focus_in)
-        self.details_desc_text.bind('<FocusOut>', self.on_desc_focus_out)
+        self.details_desc_text.bind('<FocusIn>', self.on_text_focus_in)
+        self.details_desc_text.bind('<FocusOut>', lambda e, k='name': self.on_text_focus_out(k, e))
 
         # Instruction parameter setup frame
         self.parameters_frame = tk.LabelFrame(self.inst_details_frame, text='Parameters')
@@ -218,23 +218,31 @@ class InstructionEditorView(tk.Toplevel):
         inst_id = self.inst_list_tree.item(selected_iid).get('text')
         self.callbacks['on_select_instruction'](inst_id)
 
-    def on_name_focus_in(self, e):
+    # -------------------------------------------------- #
+    # Methods to detect and change entry and text fields #
+    # -------------------------------------------------- #
+
+    def on_entry_focus_in(self, e):
         self.details_name_entry.cur_value = self.details_name_entry.get()
 
-    def on_name_focus_out(self, e):
+    def on_entry_focus_out(self, key, e):
         if e.widget.get() == e.widget.cur_value:
-            print('same name')
+            print('same value')
             return
-        self.callbacks['set_change'](key='name', value=e.widget.get())
+        self.callbacks['set_change'](key=key, value=e.widget.get())
 
-    def on_desc_focus_in(self, e):
+    def on_text_focus_in(self, e):
         self.details_desc_text.cur_value = self.details_desc_text.get(1.0, tk.END)
 
-    def on_desc_focus_out(self, e):
+    def on_text_focus_out(self, key, e):
         if e.widget.get(1.0, tk.END) == e.widget.cur_value:
-            print('same desc')
+            print('same text')
             return
-        self.callbacks['set_change'](key='description', value=e.widget.get(1.0, tk.END))
+        self.callbacks['set_change'](key=key, value=e.widget.get(1.0, tk.END))
+
+    # -------------------------------------------------- #
+    # Methods to detect and change parameter tree values #
+    # -------------------------------------------------- #
 
     def on_param_double_click(self, e):
         # Find the region clicked, only edit if region is a cell
