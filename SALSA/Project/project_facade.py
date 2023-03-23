@@ -74,7 +74,7 @@ class SCTProjectFacade:
                 continue
 
             if key_only:
-                values = {'row_data': key}
+                values = {'row_data': None}
                 first = True
                 for header in headers:
                     if first:
