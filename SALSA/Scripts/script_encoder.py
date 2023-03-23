@@ -376,7 +376,6 @@ class SCTEncoder:
         signed = False if signed is None else signed
         return bytearray(i.to_bytes(length=4, byteorder=self.endian, signed=signed))
 
-
     def _encode_string(self, string, encoding='shiftjis', align=True, size=-1):
         str_bytes = bytearray(string.encode(encoding=encoding, errors='backslashreplace'))
 
