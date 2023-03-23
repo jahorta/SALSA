@@ -111,6 +111,22 @@ class SCTProjectFacade:
 
         tree = self._create_tree(inst.parameters, base_inst.params_before, headings, base=base_inst.parameters, base_key='ID')
 
+        for param in base_inst.params_before:
+            if inst.parameters[param].link is None:
+                continue
+            link_type = inst.parameters[param].link_value[0]
+            if link_type == 'Footer':
+                tree[param]['type'] = 'Footer Entry'
+                tree[param]['value'] = inst.parameters[param].link_result
+            elif link_type == 'SCT':
+                tree[param]['type'] = 'Jump'
+                sect = inst.parameters[param].link_value[1].split(f'{sep}')[0]
+                target_inst = self.project.scripts[script].sections[sect].instructions[inst.parameters[param].link_value[1].split(f'{sep}')[1]]
+                tree[param]['value'] = f'{sect} - {target_inst.ungrouped_position} {self.base_insts.get_inst(target_inst.instruction_id).name}'
+            elif link_type == 'String':
+                tree[param]['type'] = 'String'
+                tree[param]['value'] = inst.parameters[param].link_result
+
         if base_inst.loop is None:
             return tree
 
