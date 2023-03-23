@@ -53,7 +53,8 @@ class InstructionEditorController:
     def on_select_instruction(self, newID):
         newID = int(newID)
         self.cur_inst = newID
-        details = self.inst_lib.get_inst(newID)
+        details = copy.deepcopy(self.inst_lib.get_inst(newID))
+        self.replace_changed_values(details)
         self.view.id_label.config(text=f'{LOCK} {details.instruction_id}')
         skip_type = 'Can skip frame advance after instruction'
         if details.no_new_frame:
@@ -90,6 +91,17 @@ class InstructionEditorController:
         headers = self.view.get_headers('parameter')
         entries = self.inst_lib.get_tree_entries(headers=self.view.get_headers('parameter'), inst_id=newID)
         self.populate_tree(self.view.param_list_tree, headers, entries)
+
+    def replace_changed_values(self, details):
+        if self.cur_inst not in self.changed_values:
+            return
+        for field, value in self.changed_values[self.cur_inst].items():
+            if sep in field:
+                field_parts = field.split(sep)
+                param_id = int(field_parts[0])
+                setattr(details.parameters[param_id], field_parts[1], value)
+            else:
+                setattr(details, field, value)
 
     def check_item_is_locked(self, item_code: list):
         return self.inst_lib.check_locked([self.cur_inst, *item_code])
