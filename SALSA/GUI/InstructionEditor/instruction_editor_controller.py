@@ -117,6 +117,7 @@ class InstructionEditorController:
 
     def on_close(self):
         should_close = True
+        self.prune_changes()
         if self.has_changes_remaining():
             should_close = self.ask_save_changes()
         if should_close:
@@ -138,3 +139,24 @@ class InstructionEditorController:
                           'param_id': field_parts[0] if len(field_parts) > 1 else None}
                 self.inst_lib.set_single_inst_detail(value=value, **kwargs)
         self.inst_lib.save_user_insts()
+
+    def prune_changes(self):
+        actual_changes = {}
+        for inst_id, changes in self.changed_values.items():
+            base_details = self.inst_lib.get_inst(inst_id)
+            for field, value in changes:
+                add = False
+                if sep in field:
+                    field_parts = field.split(sep)
+                    param_id = int(field_parts[0])
+                    if value != getattr(base_details.parameters[param_id], field_parts[1], None):
+                        add = True
+                else:
+                    if value != getattr(base_details, field, None):
+                        add = True
+                if add:
+                    if inst_id not in actual_changes:
+                        actual_changes[inst_id] = {}
+                    actual_changes[inst_id][field] = value
+        self.changed_values = actual_changes
+
