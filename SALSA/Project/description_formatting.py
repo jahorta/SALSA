@@ -12,6 +12,8 @@ def format_description(inst: SCTInstruction, base_inst: BaseInst):
 
 def description_insert_param_values(inst: SCTInstruction, base_inst: BaseInst):
     desc = base_inst.description
+    if '<loop>' in desc:
+        desc = desc.replace('<loop>', get_loop_desc(inst, base_inst))
     paramSets = {}
     for key, param in inst.parameters.items():
         paramSets[base_inst.parameters[key].name] = param.formatted_value
@@ -20,6 +22,20 @@ def description_insert_param_values(inst: SCTInstruction, base_inst: BaseInst):
         result = str(value)
         desc = desc.replace(keyword, result)
     return desc
+
+
+def get_loop_desc(inst, base_inst):
+    result = ''
+    if base_inst.loop is None:
+        return result
+    iterations = inst.parameters[base_inst.loop_iter].value
+    for i in range(iterations):
+        result += f'loop {i}'
+        for param in inst.loop_parameters[i]:
+            param: SCTParameter
+            result += f'\n\t{param.ID}\t{param.formatted_value}'
+        result += '\n'
+    return result
 
 
 def resolveDescriptionFuncs(desc):
