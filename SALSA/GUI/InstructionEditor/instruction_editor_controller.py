@@ -1,3 +1,4 @@
+import copy
 import tkinter as tk
 from tkinter import messagebox as msg
 
@@ -107,8 +108,9 @@ class InstructionEditorController:
         return self.inst_lib.check_locked([self.cur_inst, *item_code])
 
     def add_change(self, key, value):
-        key = f'{self.cur_inst}{sep}{key}'
-        self.changed_values[key] = value
+        if self.cur_inst not in self.changed_values:
+            self.changed_values[self.cur_inst] = {}
+        self.changed_values[self.cur_inst][key] = value
 
     def has_changes_remaining(self):
         return len(self.changed_values) > 0
@@ -129,9 +131,10 @@ class InstructionEditorController:
         return True
 
     def on_save_changes(self):
-        for key, value in self.changed_values.items():
-            key_parts = key.split(sep)
-            kwargs = {'inst_id': key_parts[0], 'field': key_parts[-1],
-                      'param_id': key_parts[1] if len(key_parts) > 2 else None}
-            self.inst_lib.set_single_inst_detail(value=value, **kwargs)
+        for inst_id, changes in self.changed_values.items():
+            for field, value in changes.items():
+                field_parts = field.split(sep)
+                kwargs = {'inst_id': inst_id, 'field': field_parts[0] if len(field_parts) == 1 else field_parts[1],
+                          'param_id': field_parts[0] if len(field_parts) > 1 else None}
+                self.inst_lib.set_single_inst_detail(value=value, **kwargs)
         self.inst_lib.save_user_insts()
