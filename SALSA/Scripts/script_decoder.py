@@ -969,7 +969,6 @@ class SCTDecoder:
 
     @staticmethod
     def _update_link_traces(link, decoded_sct):
-
         if link.origin_trace[0] in decoded_sct.folded_sections:
             old_sect_name = link.origin_trace[0]
             old_inst_pos = link.origin_trace[1]
@@ -1044,9 +1043,6 @@ class SCTDecoder:
 
                 target_inst_id += 1
 
-            origin_inst = decoded_sct.sections[link.origin_trace[0]].get_instruction_by_index(link.origin_trace[1])
-            link_value = ('SCT', f'{target_sct.name}{sep}{target_inst_id}')
-            self.successful_scpt_links.append((link, origin_inst, link_value))
             link.target_trace = [target_sct.name, target_inst_id]
             target_inst = decoded_sct.sections[link.target_trace[0]].get_instruction_by_index(link.target_trace[1])
             link_value = ('SCT', f'{target_sct.name}{sep}{target_inst.ID}')
