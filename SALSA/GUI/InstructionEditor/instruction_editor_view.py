@@ -205,6 +205,10 @@ class InstructionEditorView(tk.Toplevel):
 
         self.param_list_tree.bind('<Double-1>', self.on_param_double_click)
 
+    # ------------------------------------------------------------ #
+    # Methods to generate or use the instruction or parameter tree #
+    # ------------------------------------------------------------ #
+
     def get_headers(self, tree_key):
         if tree_key is None:
             return {k: list(header_settings[k].keys()) for k in header_settings.keys()}
