@@ -1504,7 +1504,7 @@ class SCTDecoder:
             if not isinstance(entry, dict):
                 continue
             inst_list[i][list(entry.keys())[0]] = self._resolve_switches(list(entry.values())[0])
-            if list(entry.keys())[0].split(sep)[1].isnumeric():
+            if list(entry.keys())[0].split(sep)[1].lstrip('-').isnumeric():
                 switch_key = list(entry.keys())[0].split(sep)[0] + f'{sep}switch'
                 if switch_key not in switches.keys():
                     switches[switch_key] = []
