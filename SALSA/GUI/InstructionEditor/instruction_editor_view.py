@@ -260,27 +260,16 @@ class InstructionEditorView(tk.Toplevel):
         current_value = selected_values.get('values')[column_id-1]
         param_id = selected_values.get('text')
 
-        # TODO - Check that the current value is not locked
-        self.callbacks['check_locked']([param_id, column_name])
+        if self.callbacks['check_locked']([param_id, column_name]):
+            print('This field is locked for editing')
+            # Add dialog box to indicate that the selected field is not editable
+            return
 
-        # TODO - Check that the current value is available for editing
-
-        # get cell bounding box
-        cell_bbox = self.param_list_tree.bbox(selected_iid, column)
+        if column_name not in param_edit_fields:
+            print('This column is not available for editing')
+            return
 
         widget_details = param_edit_fields[column_name]
-
-        if isinstance(widget_details['widget'], tk.OptionMenu):
-            widget_details['args'] = [current_value, *widget_details['args']]
-
-        elif isinstance(widget_details['widget'], HexEntry):
-            param_type = selected_values[1]
-            size_indicator = param_type.split('-')[0]
-            if size_indicator != 'int':
-                size_indicator = param_type.split('-')[1]
-            if size_indicator in ('skip', 'float', 'decimal'):
-                # TODO - add indicator that this cannot be changed
-                return
 
         # get cell bounding box
         cell_bbox = self.param_list_tree.bbox(selected_iid, column)
@@ -298,7 +287,7 @@ class InstructionEditorView(tk.Toplevel):
 
         edit_widget.focus()
 
-        edit_widget.bind('<FocusOut>', self.on_param_focus_out)
+        edit_widget.bind('<FocusOut>', lambda event: event.widget.destroy())
         edit_widget.bind('<Return>', self.on_param_enter_pressed)
 
     def on_param_enter_pressed(self, e):
@@ -318,9 +307,6 @@ class InstructionEditorView(tk.Toplevel):
         param_id = self.param_list_tree.item(selected_iid).get('text')
         self.callbacks['set_change'](f'{param_id}{sep}{column_name}')
 
-        e.widget.destroy()
-
-    def on_param_focus_out(self, e):
         e.widget.destroy()
 
     def on_close(self):
