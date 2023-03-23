@@ -25,17 +25,17 @@ header_settings = {
         'ungrouped_position': {'label': 'Pos', 'width': 40, 'stretch': True},
         'name': {'label': 'Name', 'width': 270, 'stretch': True},
         'condition': {'label': 'Condition', 'width': 300, 'stretch': True},
-        'instruction_id': {'label': 'ID', 'width': 25, 'stretch': False},
+        'instruction_id': {'label': 'ID', 'width': 40, 'stretch': False},
         'synopsis': {'label': 'Synopsis', 'width': 50, 'stretch': True},
         'absolute_offset': {'label': 'Offset', 'width': 50, 'stretch': True},
         'relative_offset': {'label': 'Relative Offset', 'width': 50, 'stretch': True}
     },
     'parameter': {
-        'ID': {'label': 'ID', 'width': 30, 'stretch': True},
-        'name': {'label': 'Name', 'width': 150, 'stretch': True},
+        'ID': {'label': 'ID', 'width': 50, 'stretch': False},
+        'name': {'label': 'Name', 'width': 80, 'stretch': True},
         'type': {'label': 'Type', 'width': 70, 'stretch': True},
-        'value': {'label': 'Value', 'width': 120, 'stretch': False},
-        'formatted_value': {'label': 'ID', 'width': 50, 'stretch': False}
+        'value': {'label': 'Value', 'width': 200, 'stretch': True},
+        'formatted_value': {'label': 'ID', 'width': 100, 'stretch': False}
     }
 }
 
