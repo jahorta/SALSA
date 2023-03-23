@@ -109,6 +109,7 @@ class SCTInstruction:
         self.loop_parameters = []
         self.condition = ''
         self.synopsis = ''
+        self.ungrouped_position: int = -1
 
     def add_error(self, value: Tuple[str, Union[int, str, bytearray]]):
         self.errors.append(value)
