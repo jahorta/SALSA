@@ -1107,11 +1107,10 @@ class SCTDecoder:
         # setup footer links
         for link in self._str_foot_links:
             foot_str = self.getString(link.target)
-            f_ind = decoded_sct.add_footer_entry(foot_str)
             origin_inst = decoded_sct.sections[link.origin_trace[0]].get_instruction_by_index(link.origin_trace[1])
             param: SCTParameter = origin_inst.parameters[int(link.origin_trace[2])]
             param.link_result = foot_str
-            param.link_value = ('Footer', f_ind)
+            param.link_value = ('Footer', )
 
     @staticmethod
     def _create_string_groups(decoded_sct):
