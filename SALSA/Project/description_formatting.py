@@ -1,8 +1,8 @@
 from typing import List
 
-from BaseInstructions.bi_container import BaseInst
-from Common.byte_array_utils import getTypeFromString, toInt, asStringOfType, toFloat, float2Hex, padded_hex
-from Project.project_container import SCTInstruction
+from SALSA.BaseInstructions.bi_container import BaseInst
+from SALSA.Common.byte_array_utils import getTypeFromString, toInt, asStringOfType, toFloat, float2Hex, padded_hex, is_hex
+from SALSA.Project.project_container import SCTInstruction, SCTParameter
 
 
 def format_description(inst: SCTInstruction, base_inst: BaseInst):
@@ -56,7 +56,7 @@ def resolveDescriptionFuncs(desc):
 def parse_desc_func(desc, char_ind):
     cur_pos = char_ind
     cur_pos += 1
-    command = desc[cur_pos: cur_pos+3]
+    command = desc[cur_pos: cur_pos + 3]
     if command not in desc_code_funcs.keys():
         return None, char_ind
 
@@ -76,7 +76,7 @@ def parse_desc_func(desc, char_ind):
             cur_param = ''
         elif next_char == ']':
             params.append(cur_param)
-            if not len(params) in func_param_nums[command]:
+            if not len(params) in desc_code_param_nums[command]:
                 return None, char_ind
             result = desc_code_funcs[command](*params)
             cur_pos += 2
@@ -93,6 +93,10 @@ def parse_desc_func(desc, char_ind):
     return result, cur_pos
 
 
+# --------------------------------------------------- #
+# Check that parameter is numeric conversion function #
+# --------------------------------------------------- #
+
 def check_params_are_numeric(paramlist: List[str]):
     result = ''
     numeric = True
@@ -107,6 +111,10 @@ def check_params_are_numeric(paramlist: List[str]):
         return None
     return result
 
+
+# -------------------- #
+# Arithmetic functions #
+# -------------------- #
 
 def add_desc_params(param1: str, param2: str):
     result = check_params_are_numeric([param1, param2])
@@ -140,6 +148,10 @@ def multiply_desc_params(param1: str, param2: str):
     result = asStringOfType(result, result_type)
     return result
 
+
+# ----------------------- #
+# Hex conversion function #
+# ----------------------- #
 
 def hex_desc_params(param1: str, form='>'):
     result = check_params_are_numeric([param1])
