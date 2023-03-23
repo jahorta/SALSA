@@ -233,3 +233,11 @@ class SCTProjectFacade:
 
     def get_variable_usages(self, script, var_type, var_id):
         return self.project.scripts[script].variables[var_type][var_id]['usage']
+
+    def get_inst_ind(self, script, section, inst):
+        return self.project.scripts[script].sections[section].instruction_ids_ungrouped.index(inst)
+
+    def _refresh_inst_positions(self, script, section):
+        section = self.project.scripts[script].sections[section]
+        for i, inst_id in enumerate(section.instruction_ids_ungrouped):
+            section.instructions[inst_id].ungrouped_position = i
