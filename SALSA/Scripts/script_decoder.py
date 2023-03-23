@@ -76,6 +76,8 @@ class SCTDecoder:
         self._variables = {}
 
     def _decode_sct(self, script_name: str, sct: bytearray, inst_lib: BaseInstLibFacade) -> SCTScript:
+        print(f'{self.log_key}: Decoding {script_name}')
+
         self._init()
         self._name = script_name
         self._sct = sct
@@ -1649,6 +1651,8 @@ class SCTDecoder:
     def _finalize_sct(self, decoded_sct):
 
         self._setup_variables(decoded_sct)
+
+        print(f'{self.log_key}: {decoded_sct.name} finished')
 
     def _setup_variables(self, sct):
         for s_name, section in sct.sections.items():
