@@ -243,18 +243,3 @@ class ProjectEditorView(tk.Frame):
         if tree_key is None:
             return {k: list(header_settings[k].keys()) for k in header_settings.keys()}
         return list(header_settings[tree_key].keys())
-
-    def set_refresh_value(self, never_refresh, always_refresh, cur_refresh_choice):
-        self.skip_ckeck_var.set(int(cur_refresh_choice))
-        if never_refresh:
-            self.skip_error_label.config(text='This instruction never skips')
-        elif always_refresh:
-            self.skip_error_label.config(text='This instruction always skips')
-        else:
-            self.skip_error_label.config(text='')
-
-    def add_link(self, link_type, link_text, link_callback):
-        pass
-
-
-
