@@ -91,7 +91,7 @@ class SCTInstruction:
     desc_codes = ['add', 'sub', 'mul']
 
     errors: List[Tuple[str, Union[int, str, bytearray]]]
-    links: List[SCTLink]
+    links_out: List[SCTLink]
     parameters: Dict[int, SCTParameter]
     loop_parameters: List[Dict[int, SCTParameter]]
 
@@ -103,7 +103,8 @@ class SCTInstruction:
         self.relative_offset = self.absolute_offset - script_pos
         self.skip_refresh = False
         self.errors = []
-        self.links = []
+        self.links_out = []
+        self.links_in = []
         self.parameters = {}
         self.loop_parameters = []
         self.condition = ''
@@ -124,7 +125,7 @@ class SCTInstruction:
                 self.errors.append((f'loop-{len(self.loop_parameters)-1}-param', p_id))
 
     def get_links(self):
-        return self.links if len(self.links) > 0 else None
+        return self.links_out if len(self.links_out) > 0 else None
 
     def __repr__(self):
         return f'{self.instruction_id}'
