@@ -1,11 +1,11 @@
 import copy
 from typing import Union, Tuple
 
-from Project.description_formatting import format_description
-from Project.project_container import SCTProject, SCTSection
+from SALSA.Project.description_formatting import format_description
+from SALSA.Project.project_container import SCTProject, SCTSection
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
-from Common.setting_class import settings
-from Common.constants import sep
+from SALSA.Common.setting_class import settings
+from SALSA.Common.constants import sep
 
 
 class SCTProjectFacade:

@@ -1,10 +1,10 @@
 import struct
 from typing import Union
 
-from BaseInstructions.bi_facade import BaseInstLibFacade
-from Common.byte_array_utils import float2Hex
-from Common.constants import sep
-from Project.project_container import SCTScript, SCTSection
+from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
+from SALSA.Common.byte_array_utils import float2Hex
+from SALSA.Common.constants import sep
+from SALSA.Project.project_container import SCTScript, SCTSection
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 from SALSA.Scripts.scpt_compare_fxns import is_equal, not_equal
 

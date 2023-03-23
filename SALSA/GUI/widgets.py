@@ -1,11 +1,8 @@
 import platform
 import re
 import tkinter as tk
-from decimal import Decimal, InvalidOperation
 from tkinter import ttk
 from typing import Dict, List, Union
-
-from SALSA.Common.constants import FieldTypes as FT
 
 # ------ #
 # Mixins #

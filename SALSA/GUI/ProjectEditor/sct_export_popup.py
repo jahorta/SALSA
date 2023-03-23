@@ -2,7 +2,7 @@ import os.path
 import tkinter as tk
 from tkinter import filedialog, ttk
 
-from Common.setting_class import settings
+from SALSA.Common.setting_class import settings
 
 
 class SCTExportPopup(tk.Toplevel):

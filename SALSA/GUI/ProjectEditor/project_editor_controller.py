@@ -1,8 +1,8 @@
 from typing import Union, Dict
 import tkinter as tk
 
-from Common.setting_class import settings
-from GUI.ProjectEditor.variable_editor_popup import VariablePopup
+from SALSA.Common.setting_class import settings
+from SALSA.GUI.ProjectEditor.variable_editor_popup import VariablePopup
 from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
 from SALSA.GUI.ProjectEditor.sct_export_popup import SCTExportPopup
 from SALSA.GUI.widgets import DataTreeview

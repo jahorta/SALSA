@@ -3,9 +3,9 @@ from tkinter.scrolledtext import ScrolledText
 from tkinter import ttk
 import json
 
-from SALSA.GUI.widgets import RequiredEntry, ScrollLabelFrame, HexEntry
+from SALSA.GUI.widgets import ScrollLabelFrame
 from SALSA.Common.setting_class import settings
-from SALSA.Common.constants import sep, LOCK
+from SALSA.Common.constants import sep
 
 default_headers = {
     'instruction': ['inst_ID', 'name'],

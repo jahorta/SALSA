@@ -1,5 +1,4 @@
 from typing import List
-import json
 from SALSA.BaseInstructions.bi_defaults import inst_defaults
 
 

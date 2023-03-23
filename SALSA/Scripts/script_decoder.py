@@ -6,8 +6,8 @@ import struct
 import difflib
 from typing import Dict, Tuple, List, Callable
 
-from BaseInstructions.bi_facade import BaseInstLibFacade
-from Project.project_container import SCTScript, SCTSection, SCTLink, SCTInstruction, SCTParameter
+from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
+from SALSA.Project.project_container import SCTScript, SCTSection, SCTLink, SCTInstruction, SCTParameter
 from SALSA.BaseInstructions.bi_container import BaseInstLib, BaseParam
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 from SALSA.Common.byte_array_utils import word2SignedInt, is_a_number, pad_hex, applyHexMask

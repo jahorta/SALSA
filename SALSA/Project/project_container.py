@@ -2,6 +2,7 @@ import uuid
 from itertools import count
 from dataclasses import dataclass, field as dc_field
 from typing import List, Union, Dict, Tuple
+
 from SALSA.Common.constants import sep as c_sep, alt_sep as c_alt_sep
 
 

@@ -4,14 +4,14 @@ import threading
 import tkinter as tk
 from tkinter import filedialog
 
-from FileModels.project_model import ProjectModel
-from FileModels.sct_model import SCTModel
-from GUI.ProjectEditor.project_editor_controller import ProjectEditorController
-from GUI.ProjectEditor.project_editor_view import ProjectEditorView
-from GUI.gui_controller import GUIController
-from BaseInstructions.bi_facade import BaseInstLibFacade
+from SALSA.FileModels.project_model import ProjectModel
+from SALSA.FileModels.sct_model import SCTModel
+from SALSA.GUI.ProjectEditor.project_editor_controller import ProjectEditorController
+from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
+from SALSA.GUI.gui_controller import GUIController
+from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.GUI import menus
-from Project.project_facade import SCTProjectFacade
+from SALSA.Project.project_facade import SCTProjectFacade
 
 
 class Application(tk.Tk):
