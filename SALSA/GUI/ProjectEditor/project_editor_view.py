@@ -188,7 +188,7 @@ class ProjectEditorView(tk.Frame):
         self.skip_error_label = tk.Label(skip_frame, text='')
         self.skip_error_label.grid(row=1, column=0, columnspan=2, sticky='NSEW')
 
-        self.inst_desc_frame = w.ScrollLabelFrame(inst_frame, text='Description', size={'width': 100, 'height': 50})
+        self.inst_desc_frame = w.ScrollLabelFrame(inst_frame, text='Description', size={'width': 100, 'height': 100})
         self.inst_desc_frame.grid(row=2, column=0, sticky='NSEW')
         self.inst_desc_frame.columnconfigure(0, weight=1)
         self.inst_desc_frame.rowconfigure(0, weight=1)
@@ -228,16 +228,18 @@ class ProjectEditorView(tk.Frame):
 
         link_out_label = tk.Label(link_frame, text='Outgoing Links')
         link_out_label.grid(row=0, column=0, sticky=tk.W)
-        self.link_out = tk.Label(link_frame, text='')
-        self.link_out.grid(row=1, column=0, sticky=tk.W)
+        self.link_out = w.ScrollLabelFrame(link_frame, has_label=False, size={'width': 100, 'height': 50})
+        self.link_out.grid(row=1, column=0, sticky=tk.W+tk.E)
+        self.link_out.columnconfigure(0, weight=1)
 
         link_sep = ttk.Separator(link_frame, orient='horizontal')
         link_sep.grid(row=2, column=0, sticky=tk.W+tk.E)
 
         link_in_label = tk.Label(link_frame, text='Incoming Links')
         link_in_label.grid(row=3, column=0, sticky=tk.W)
-        self.link_in = tk.Label(link_frame, text='')
-        self.link_in.grid(row=4, column=0, sticky=tk.W)
+        self.link_in = w.ScrollLabelFrame(link_frame, has_label=False, size={'width': 100, 'height': 50})
+        self.link_in.grid(row=4, column=0, sticky=tk.W+tk.E)
+        self.link_in.columnconfigure(0, weight=1)
 
     def get_headers(self, tree_key=None):
         if tree_key is None:
