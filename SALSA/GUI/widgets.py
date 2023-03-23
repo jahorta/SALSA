@@ -639,5 +639,5 @@ class DataTreeview(ttk.Treeview):
         return [self.row_data[self.get_children()[int(s)]] for s in self.cur_selection]
 
 
-class GridReorganizer(ScrollLabelFrame):
+class GridReorganizer(ScrollLabelCanvas):
     pass
