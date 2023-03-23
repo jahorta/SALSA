@@ -3,7 +3,7 @@ from itertools import count
 from dataclasses import dataclass, field as dc_field
 from typing import List, Union, Dict, Tuple
 
-from SALSA.Common.constants import sep as c_sep, alt_sep as c_alt_sep
+from SALSA.Common.constants import sep, alt_sep
 
 
 @dataclass
@@ -96,7 +96,7 @@ class SCTInstruction:
     loop_parameters: List[Dict[int, SCTParameter]]
 
     def __init__(self, script_pos: int, inst_pos: int, inst_id: int):
-        self.ID: str = str(uuid.uuid4()).replace(c_sep, c_alt_sep)
+        self.ID: str = str(uuid.uuid4()).replace(sep, alt_sep)
         self.instruction_id = inst_id
         self.absolute_offset = inst_pos
         self.script_pos = script_pos
@@ -122,7 +122,7 @@ class SCTInstruction:
         self.loop_parameters.append(loop_param)
         for p_id, param in loop_param.items():
             if len(param.errors) > 0:
-                self.errors.append((f'loop-{len(self.loop_parameters)-1}-param', p_id))
+                self.errors.append((f'loop{sep}{len(self.loop_parameters)-1}{sep}param', p_id))
 
     def get_links(self):
         return self.links_out if len(self.links_out) > 0 else None
