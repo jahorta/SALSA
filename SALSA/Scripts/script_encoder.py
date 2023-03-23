@@ -272,11 +272,11 @@ class SCTEncoder:
         if param.link is not None:
             link_value = param.link_value
             if link_value[0] == 'Footer':
-                self.footer_links[len(self.sct_body)] = self.script.footer[link_value[1]]
+                self.footer_links[len(self.sct_body)] = param.link_result
             elif link_value[0] == 'String':
                 self.string_links[len(self.sct_body)] = link_value[1]
             elif link_value[0] == 'SCT':
-                self.sct_links[len(self.sct_body)] = link_value[1]
+                self.sct_links[len(self.sct_body)] = param.link.target_trace
             else:
                 print(f'{self.log_key}: Unknown param link type: {link_value[0]}')
             self.sct_body.extend(self._placeholder)

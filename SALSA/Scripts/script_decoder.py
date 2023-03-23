@@ -1089,6 +1089,7 @@ class SCTDecoder:
                 target_sct_id += 1
             origin_inst = decoded_sct.sections[link.origin_trace[0]].get_instruction_by_index(link.origin_trace[1])
             param: SCTParameter = origin_inst.parameters[int(link.origin_trace[2])]
+            param.link_result = decoded_sct.sections[target_sct_str].string
             param.link_value = ('String', target_sct_str)
 
         # setup footer links
