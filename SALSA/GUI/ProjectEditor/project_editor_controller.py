@@ -70,10 +70,11 @@ class ProjectEditorController:
         self.update_tree('script', self.project.get_tree(self.view.get_headers('script')))
 
     def on_select_tree_entry(self, tree_key, entry):
-        if tree_key == 'instruction':
-            return self.on_select_instruction(entry)
         if tree_key == 'parameter':
             return self.on_select_parameter(entry)
+        self.clear_inst_details()
+        if tree_key == 'instruction':
+            return self.on_select_instruction(entry)
         kwargs = {'style': settings[self.log_name]['style']}
         self.current[tree_key] = entry
         cur_key = tree_key
@@ -163,11 +164,49 @@ class ProjectEditorController:
         self.view.inst_label.config(text=f'{details["instruction_id"]} - {details["name"]}')
         self.view.inst_description.config(text=details['description'])
 
-        self._add_tree_entries('parameter', details['parameter_tree'])
+        self.update_tree('parameter', details['parameter_tree'])
 
-        self.view.set_refresh_value(details['no_new_frame'], details['forced_new_frame'], details['skip_refresh'])
+        self.view.skip_ckeck_var.set(int(details['skip_refresh']))
+        if details['no_new_frame']:
+            self.view.skip_error_label.config(text='This instruction never skips')
+        elif details['forced_new_frame']:
+            self.view.skip_error_label.config(text='This instruction always skips')
+        else:
+            self.view.skip_error_label.config(text='')
 
+        for i, link in enumerate(details['links_out']):
+            link: SCTLink
+            if link.target_trace is None:
+                continue
+            tgt_sect = link.target_trace[0]
+            tgt_section = tk.Label(self.view.link_out.scroll_frame, text=tgt_sect)
+            tgt_section.grid(row=i, column=0)
 
+            tgt_inst = self.project.get_inst_ind(script=self.current['script'], section=tgt_sect, inst=link.target_trace[1])
+            tgt_instruction = tk.Label(self.view.link_out.scroll_frame, text=tgt_inst)
+            tgt_instruction.grid(row=i, column=1)
+
+        for i, link in enumerate(details['links_in']):
+            link: SCTLink
+            if link.origin_trace is None:
+                continue
+            ori_sect = link.origin_trace[0]
+            ori_section = tk.Label(self.view.link_in.scroll_frame, text=ori_sect)
+            ori_section.grid(row=i, column=0)
+
+            ori_inst = self.project.get_inst_ind(script=self.current['script'], section=ori_sect, inst=link.origin_trace[1])
+            ori_instruction = tk.Label(self.view.link_in.scroll_frame, text=ori_inst)
+            ori_instruction.grid(row=i, column=1)
+
+    def clear_inst_details(self):
+        self.view.inst_label.config(text='ID - Name')
+        self.view.inst_description.config(text='')
+
+        for child in self.view.link_out.scroll_frame.winfo_children():
+            child.destroy()
+
+        for child in self.view.link_in.scroll_frame.winfo_children():
+            child.destroy()
 
     def on_script_display_change(self, mode):
         pass
