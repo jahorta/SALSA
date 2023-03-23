@@ -1052,7 +1052,10 @@ class SCTDecoder:
 
     def _resolve_scpt_links(self, decoded_sct: SCTScript):
         for link in self.successful_scpt_links:
-            link, origin_inst, link_value = link
+
+            # Insert a value for the link into the parameter which defines it
+            link, link_value = link
+            origin_inst = decoded_sct.sections[link.origin_trace[0]].get_instruction_by_index(link.origin_trace[1])
             if sep in link.origin_trace[2]:
                 p_trace = link.origin_trace[2].split(sep)
                 loop = int(p_trace[0])
