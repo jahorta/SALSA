@@ -133,11 +133,12 @@ class SCTProjectFacade:
         for loop, params in enumerate(inst.loop_parameters):
             temp_tree = self._create_tree(params, [f'loop{loop}'], headings, key_only=True)
             temp_tree += ['group']
-            temp_tree += self._create_tree(params, base_inst.loop, headings, base=base_inst.parameters, base_key='ID')
-            for item in temp_tree:
+            loop_items = self._create_tree(params, base_inst.loop, headings, base=base_inst.parameters, base_key='ID')
+            for item in loop_items:
                 if 'row_data' not in item:
                     continue
                 item['row_data'] = f'{loop}{sep}{item["row_data"]}'
+            temp_tree += loop_items
             temp_tree += ['ungroup']
             tree += temp_tree
 
