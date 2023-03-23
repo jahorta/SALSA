@@ -29,8 +29,6 @@ header_settings = {
 
 param_edit_fields = {
     'name': {'widget': tk.Entry, 'args': {}, 'kwargs': {}},
-    'mask': {'widget': HexEntry, 'args': {}, 'kwargs': {}},
-    'signed': {'widget': tk.OptionMenu, 'args': ['True', 'False'], 'kwargs': {}},
 }
 
 default_tree_width = 100

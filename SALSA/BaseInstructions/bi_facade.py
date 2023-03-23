@@ -71,6 +71,12 @@ class BaseInstLibFacade:
                 if inst_id is not None:
                     if self.check_locked([inst_id, i, item]):
                         entry[item] = f'{LOCK} {entry[item]}'
+
+            # Locks every parameter field except name
+            for key in entry:
+                if LOCK not in entry[key] and key != 'name':
+                    entry[key] = f'{LOCK} {entry[key]}'
+
             tree.append(entry)
         return tree
 
