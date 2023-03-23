@@ -97,7 +97,7 @@ def check_params_are_numeric(paramlist: List[str]):
     result = ''
     numeric = True
     for param in paramlist:
-        if not param.isnumeric():
+        if not param.lstrip('-').isnumeric():
             numeric = False
             result += f'(not numeric){param},'
         else:
