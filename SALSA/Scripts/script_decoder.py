@@ -381,7 +381,7 @@ class SCTDecoder:
                 break
             param = self._decode_param(base_param, [*trace, f'{p_id}'])
             if param.link is not None:
-                cur_inst.links.append(param.link)
+                cur_inst.links_out.append(param.link)
             cur_inst.add_parameter(p_id, param)
             used_params.append(p_id)
             cur_param_num += 1
@@ -406,7 +406,7 @@ class SCTDecoder:
                     param = self._decode_param(p, [*trace, f'{cur_iter}{sep}{p.param_ID}'])
                     param_group[p.param_ID] = param
                     if param.link is not None:
-                        cur_inst.links.append(param.link)
+                        cur_inst.links_out.append(param.link)
 
                 cur_inst.add_loop_parameter(param_group)
 
@@ -427,7 +427,7 @@ class SCTDecoder:
             param = self._decode_param(base_param, [*trace, f'{p_id}'])
             cur_inst.add_parameter(base_param.type, param)
             if param.link is not None:
-                cur_inst.links.append(param.link)
+                cur_inst.links_out.append(param.link)
 
         return cur_inst
 
@@ -846,6 +846,10 @@ class SCTDecoder:
 
         self._create_group_heirarchies(decoded_sct=decoded_sct)
 
+        self._put_inst_ids_into_link_traces(decoded_sct=decoded_sct)
+
+        self._populate_ungrouped_inst_values(decoded_sct=decoded_sct)
+
         return decoded_sct
 
     def _create_logical_sections(self, decoded_sct: SCTScript):
@@ -1044,6 +1048,9 @@ class SCTDecoder:
             link_value = ('SCT', f'{target_sct.name}{sep}{target_inst_id}')
             self.successful_scpt_links.append((link, origin_inst, link_value))
             link.target_trace = [target_sct.name, target_inst_id]
+            target_inst = decoded_sct.sections[link.target_trace[0]].get_instruction_by_index(link.target_trace[1])
+            link_value = ('SCT', f'{target_sct.name}{sep}{target_inst.ID}')
+            self.successful_scpt_links.append((link, link_value))
 
         return True
 
@@ -1060,6 +1067,10 @@ class SCTDecoder:
                 param_i = int(link.origin_trace[2])
                 param: SCTParameter = origin_inst.parameters[param_i]
                 param.link_value = link_value
+
+            # add the origin of a link to its target
+            target_inst = decoded_sct.sections[link.target_trace[0]].get_instruction_by_index(link.target_trace[1])
+            target_inst.links_in.append(link)
 
             # add to dict with places that subscripts are called from
             if link.origin_trace[0] != link.target_trace[0]:
@@ -1201,7 +1212,7 @@ class SCTDecoder:
 
             for jmp_id in jump_list:
                 jmp_inst: SCTInstruction = sect_insts[jmp_id]
-                jmp_link = jmp_inst.links[0]
+                jmp_link = jmp_inst.links_out[0]
                 jmp_to_sect_name = jmp_link.target_trace[0]
                 jmp_to_id = jmp_link.target_trace[1]
                 if jmp_to_id == 0:
@@ -1226,8 +1237,8 @@ class SCTDecoder:
                     continue
 
                 # else, get the end of the false option
-                jmp_end_sect = prev_inst.links[0].target_trace[0]
-                jmp_end_id = prev_inst.links[0].target_trace[1]
+                jmp_end_sect = prev_inst.links_out[0].target_trace[0]
+                jmp_end_id = prev_inst.links_out[0].target_trace[1]
 
                 group_key = f'{jmp_id}{sep}if'
                 decoded_sct.sections[sect_name].instructions_ids_grouped[group_key] = (f'{sect_name}{sep}{jmp_id}',
@@ -1689,6 +1700,20 @@ class SCTDecoder:
             if key_1 not in self._variables[keys[0]]:
                 self._variables[keys[0]][key_1] = {'alias': '', 'usage': []}
             self._variables[keys[0]][key_1]['usage'].append(trace)
+
+    def _put_inst_ids_into_link_traces(self, decoded_sct):
+        for section in decoded_sct.sections.values():
+            for key, inst in section.instructions.items():
+                inst: SCTInstruction
+                for link in inst.links_in:
+                    link.target_trace[1] = key
+                for link in inst.links_out:
+                    link.origin_trace[1] = key
+
+    def _populate_ungrouped_inst_values(self, decoded_sct):
+        for section in decoded_sct.sections.values():
+            for i, key in enumerate(section.instruction_ids_ungrouped):
+                section.instructions[key].ungrouped_position = i
 
 
 if __name__ == '__main__':
