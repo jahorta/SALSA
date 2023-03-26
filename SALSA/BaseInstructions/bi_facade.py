@@ -13,7 +13,8 @@ class BaseInstLibFacade:
         self.lib = BaseInstLib()
         self.inst_model = InstructionModel()
         self.default_inst_details = self.inst_model.load_instructions('default')
-        self.set_inst_all_fields(self.default_inst_details)
+        self.user_identifier = 'default'
+        self.default_lib = self._set_inst_all_fields(self.default_inst_details, BaseInstLib())
         if os.path.exists('./UserSettings/user_is_default.txt'):
             self.user_inst_details = None
             self.user_identifier = 'default'
