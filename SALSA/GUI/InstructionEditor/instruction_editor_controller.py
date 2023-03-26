@@ -137,7 +137,6 @@ class InstructionEditorController:
 
     def on_close(self):
         should_close = True
-        self.prune_changes()
         if self.has_changes_remaining():
             should_close = self.ask_save_changes()
         if should_close:
