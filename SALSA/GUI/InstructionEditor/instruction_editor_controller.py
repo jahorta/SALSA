@@ -152,6 +152,8 @@ class InstructionEditorController:
         return True
 
     def on_save_changes(self):
+        if len(self.changed_values) == 0:
+            return
         for inst_id, changes in self.changed_values.items():
             for field, value in changes.items():
                 field_parts = field.split(sep)
@@ -159,6 +161,7 @@ class InstructionEditorController:
                           'param_id': field_parts[0] if len(field_parts) > 1 else None}
                 self.inst_lib.set_single_inst_detail(value=value, **kwargs)
         self.inst_lib.save_user_insts()
+        self.changed_values = {}
 
     def prune_changes(self):
         actual_changes = {}
