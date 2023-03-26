@@ -15,7 +15,9 @@ locked_conversions = {
         'link': 'Link',
         'link_type': 'Link Type',
         'param2': 'Hard parameter two',
-        'notes': 'Notes'
+        'notes': 'Notes',
+        'user_notes': 'Notes',
+        'default_notes': 'Notes'
     },
     'parameter': {
         'name': 'Name',
@@ -46,7 +48,6 @@ class BaseParam:
         #         print('Extra parameter field present...')
 
     def set_parameter_details(self, param_details):
-
         if 'Name' not in self.locked_fields:
             self.name = param_details.get('Name', self.name)
         if 'Mask' not in self.locked_fields:
@@ -80,6 +81,9 @@ class BaseParam:
             temp_dict[field] = value
             self.__dict__ = temp_dict
 
+    def get_differences(self, other_param):
+        return {'Name': self.name} if self.name != other_param.name else {}
+
 
 class BaseInst:
 
@@ -97,7 +101,8 @@ class BaseInst:
         self.link_type = inst_values.get('Link Type', None)
 
         self.param2 = inst_values['Hard parameter two']
-        self.notes = inst_values.get('Notes', '\n')
+        self.default_notes = ''
+        self.user_notes = None
         self.parameters = {}
         for key, param in inst_values['Parameters'].items():
             link_type = None
@@ -137,17 +142,23 @@ class BaseInst:
 
         return all_fields
 
-    def set_inst_details(self, updated_details):
+    def set_inst_details(self, updated_details, user_id):
         if 'Name' not in self.locked_fields:
             self.name = updated_details.get('Name', self.name)
         if 'Description' not in self.locked_fields:
             self.description = updated_details.get('Description', self.description)
-        self.notes = updated_details.get('Notes', self.notes)
         if 'Parameters' in updated_details.keys():
             for key, param_details in updated_details['Parameters'].items():
                 if isinstance(key, str):
                     key = int(key)
                 self.parameters[key].set_parameter_details(param_details=param_details)
+
+        if user_id == 'default':
+            self.default_notes = updated_details.get('Notes', '')
+        elif user_id == 'user':
+            self.user_notes = updated_details.get('Notes', '')
+        else:
+            raise KeyError(f'BaseInst: Unknown user type: {user_id}')
 
     def set_inst_field(self, field, value, param_id=None):
         if param_id is not None:
@@ -157,13 +168,13 @@ class BaseInst:
             temp_dict[field] = value
             self.__dict__ = temp_dict
 
-    def get_user_inst_details(self):
+    def get_default_inst_details(self):
         fields = {}
         if 'Name' not in self.locked_fields:
             fields['Name'] = self.name
         if 'Description' not in self.locked_fields:
             fields['Description'] = self.description
-        fields['Notes'] = self.notes
+        fields['Notes'] = self.default_notes
         params = {}
         for key, param in self.parameters.items():
             p_dict = param.get_fields()
@@ -183,6 +194,22 @@ class BaseInst:
     def __repr__(self):
         return f'INST({self.instruction_id}: pos:{self.location}'
 
+    def get_differences(self, other_inst):
+        return_diffs = {}
+        if self.name != other_inst.name:
+            return_diffs['Name'] = self.name
+        if self.description != other_inst.description:
+            return_diffs['Description'] = self.description
+        return_diffs['Notes'] = self.user_notes
+        parameter_diffs = {}
+        for key, param in self.parameters.items():
+            diffs = param.get_differences(other_inst.parameters[key])
+            if len(diffs) > 0:
+                parameter_diffs[key] = diffs
+        if len(parameter_diffs) > 0:
+            return_diffs['Parameters'] = parameter_diffs
+        return return_diffs
+
 
 class BaseInstLib:
     """Takes in a dictionary containing instruction information and produces an object containing
@@ -193,6 +220,16 @@ class BaseInstLib:
         insts_with_a_parameter = [_ for _ in self.insts if len(_.parameters) > 0]
         self.p1_scpt = [_.instruction_id for _ in insts_with_a_parameter if 'scpt' in _.parameters[0].type]
         self.p1_int = [_.instruction_id for _ in insts_with_a_parameter if 'int' in _.parameters[0].type]
+
+    def get_differences(self, other_lib):
+        other_lib: BaseInstLib
+        diffs_out = {}
+        for i, inst in enumerate(self.insts):
+            diffs = inst.get_differences(other_lib.insts[i])
+            if len(diffs) != 0:
+                diffs_out[i] = diffs
+
+        return diffs_out
 
 
 if __name__ == '__main__':
