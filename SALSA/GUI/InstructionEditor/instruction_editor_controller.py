@@ -182,3 +182,6 @@ class InstructionEditorController:
                     actual_changes[inst_id][field] = value
         self.changed_values = actual_changes
 
+    def get_user_type(self):
+        return self.inst_lib.get_user_type()
+
