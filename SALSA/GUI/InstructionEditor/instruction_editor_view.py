@@ -178,7 +178,7 @@ class InstructionEditorView(tk.Toplevel):
         self.details_desc_text = tk.scrolledtext.ScrolledText(desc_frame, wrap=tk.WORD, height=15, width=50)
         self.details_desc_text.grid(row=0, column=0, sticky='NSEW')
         self.details_desc_text.bind('<FocusIn>', self.on_text_focus_in)
-        self.details_desc_text.bind('<FocusOut>', lambda e, k='name': self.on_text_focus_out(k, e))
+        self.details_desc_text.bind('<FocusOut>', lambda e, k='description': self.on_text_focus_out(k, e))
 
         # Instruction parameter setup frame
         self.parameters_frame = tk.LabelFrame(self.inst_details_frame, text='Parameters')
