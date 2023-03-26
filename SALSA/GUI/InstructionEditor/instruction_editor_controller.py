@@ -11,16 +11,17 @@ class InstructionEditorController:
 
     def __init__(self, parent, name, inst_lib_facade: BaseInstLibFacade, callbacks):
         self.name = name
+        self.inst_lib = inst_lib_facade
 
         view_callbacks = {
             'on_select_instruction': self.on_select_instruction,
             'save': self.on_save_changes,
             'set_change': self.add_change,
             'on_close': self.on_close,
-            'check_locked': self.check_item_is_locked
+            'check_locked': self.check_item_is_locked,
+            'user_type': self.get_user_type
         }
         self.view = InstructionEditorView(parent=parent, callbacks=view_callbacks)
-        self.inst_lib = inst_lib_facade
         self.callbacks = callbacks
 
         self.cur_inst = None

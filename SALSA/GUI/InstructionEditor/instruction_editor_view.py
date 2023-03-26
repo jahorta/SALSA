@@ -208,6 +208,48 @@ class InstructionEditorView(tk.Toplevel):
 
         self.param_list_tree.bind('<Double-1>', self.on_param_double_click)
 
+        # Instruction notes
+
+        inst_notes_frame = tk.LabelFrame(self, text='Notes')
+        inst_notes_frame.grid(row=1, column=2, sticky='NSEW')
+        inst_notes_frame.rowconfigure(1, weight=1)
+        inst_notes_frame.rowconfigure(3, weight=1)
+        inst_notes_frame.columnconfigure(0, weight=1)
+
+        default_notes_label = tk.Label(inst_notes_frame, text='Instruction Notes')
+        default_notes_label.grid(row=0, column=0, sticky=tk.W)
+
+        self.default_notes_text = tk.scrolledtext.ScrolledText(inst_notes_frame, wrap=tk.WORD, height=15, width=35)
+        self.default_notes_text.grid(row=1, column=0, sticky='NSEW')
+        self.default_notes_text.bind('<FocusIn>', self.on_text_focus_in)
+        self.default_notes_text.bind('<FocusOut>', lambda e, k='default_notes': self.on_text_focus_out(k, e))
+
+        self.default_notes_frame = ScrollLabelFrame(inst_notes_frame, has_label=False, size={'width': 50, 'height': 25})
+        self.default_notes_frame.grid(row=1, column=0, sticky='NSEW')
+
+        self.default_notes_msg = tk.Message(self.default_notes_frame.scroll_frame)
+        self.default_notes_msg.grid(row=0, column=0, sticky='NSEW')
+        self.default_notes_frame.canvas.bind("<Configure>", lambda e: self.default_notes_msg.configure(width=e.width - 10), add='+')
+        self.after(10, lambda: self.default_notes_msg.configure(width=self.default_notes_frame.scroll_frame['width'] - 10))
+
+        user_notes_label = tk.Label(inst_notes_frame, text='User Notes')
+        user_notes_label.grid(row=2, column=0, sticky=tk.W)
+
+        self.user_notes_text = tk.scrolledtext.ScrolledText(inst_notes_frame, wrap=tk.WORD, height=15, width=35)
+        self.user_notes_text.grid(row=3, column=0, sticky='NSEW')
+        self.user_notes_text.bind('<FocusIn>', self.on_text_focus_in)
+        self.user_notes_text.bind('<FocusOut>', lambda e, k='user_notes': self.on_text_focus_out(k, e))
+
+        self.user_notes_blocker = tk.Label(inst_notes_frame, text=' ')
+        self.user_notes_blocker.grid(row=3, column=0, sticky='NSEW')
+
+        user_type = self.callbacks['user_type']()
+
+        if user_type == 'default':
+            self.default_notes_frame.grid_forget()
+        elif user_type == 'user':
+            self.user_notes_blocker.grid_forget()
+
     # ------------------------------------------------------------ #
     # Methods to generate or use the instruction or parameter tree #
     # ------------------------------------------------------------ #
