@@ -102,6 +102,9 @@ class BaseInstLibFacade:
         result = field in element.locked_fields
         return result
 
+    def get_user_type(self):
+        return self.user_identifier
+
 
 if __name__ == '__main__':
 
