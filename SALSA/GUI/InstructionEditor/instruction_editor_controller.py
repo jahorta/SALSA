@@ -111,6 +111,11 @@ class InstructionEditorController:
         if self.cur_inst not in self.changed_values:
             self.changed_values[self.cur_inst] = {}
         self.changed_values[self.cur_inst][key] = value
+        self.prune_changes()
+        if len(self.changed_values) > 0:
+            self.view.save['state'] = 'normal'
+        else:
+            self.view.save['state'] = 'disabled'
 
     def has_changes_remaining(self):
         return len(self.changed_values) > 0

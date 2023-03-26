@@ -66,6 +66,7 @@ class InstructionEditorView(tk.Toplevel):
 
         self.save = tk.Button(self, text='Save', command=self.on_save)
         self.save.grid(row=0, column=0, sticky=tk.W+tk.N, padx=2, pady=2)
+        self.save['state'] = 'disabled'
 
         inst_tree_frame = tk.Frame(self, bd=2)
         inst_tree_frame.grid(row=1, column=0, sticky='NSEW', padx=2, pady='0 2')
