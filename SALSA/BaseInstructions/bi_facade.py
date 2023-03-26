@@ -1,3 +1,4 @@
+import copy
 import json
 import os.path
 from typing import List
@@ -10,30 +11,35 @@ from SALSA.Common.constants import LOCK
 class BaseInstLibFacade:
 
     def __init__(self):
-        self.lib = BaseInstLib()
         self.inst_model = InstructionModel()
         self.default_inst_details = self.inst_model.load_instructions('default')
         self.user_identifier = 'default'
         self.default_lib = self._set_inst_all_fields(self.default_inst_details, BaseInstLib())
         if os.path.exists('./UserSettings/user_is_default.txt'):
             self.user_inst_details = None
-            self.user_identifier = 'default'
+            self.lib = self.default_lib
         else:
             self.user_inst_details = self.inst_model.load_instructions('user')
             self.user_identifier = 'user'
-            self.set_inst_all_fields(self.user_inst_details)
+            self.lib = self._set_inst_all_fields(self.user_inst_details, copy.deepcopy(self.default_lib))
 
-    def set_inst_all_fields(self, inst_dict):
+        self.details_getter_fxns = {
+            'default': self._get_default_inst_details,
+            'user': self._get_user_specific_details
+        }
+
+    def _set_inst_all_fields(self, inst_dict, lib):
         for inst_id, inst_settings in inst_dict.items():
             if isinstance(inst_id, str):
                 inst_id = int(inst_id)
-            self.lib.insts[inst_id].set_inst_details(inst_settings)
+            lib.insts[inst_id].set_inst_details(inst_settings, self.user_identifier)
+        return lib
 
     def get_inst(self, inst_id) -> BaseInst:
         return self.lib.insts[inst_id]
 
-    def get_inst_details(self):
-        return {k: v.get_user_inst_details() for k, v in enumerate(self.lib.insts)}
+    def _get_default_inst_details(self):
+        return {k: v.get_default_inst_details() for k, v in enumerate(self.lib.insts)}
 
     def get_all_insts(self):
         return self.lib.insts
@@ -47,7 +53,10 @@ class BaseInstLibFacade:
         self.lib.insts[int(inst_id)].set_inst_field(field, value, param_id)
 
     def save_user_insts(self):
-        self.inst_model.save_instructions(inst_dict=self.get_inst_details(), inst_type=self.user_identifier)
+        self.inst_model.save_instructions(inst_dict=self.details_getter_fxns[self.user_identifier](), inst_type=self.user_identifier)
+
+    def _get_user_specific_details(self):
+        return self.lib.get_differences(self.default_lib)
 
     def get_tree_entries(self, headers, inst_id=None):
         if inst_id is None:
@@ -64,7 +73,7 @@ class BaseInstLibFacade:
             element = element.__dict__
             for item in headers:
                 if item == id_key:
-                    entry[id_key] = i
+                    entry[id_key] = f'{i}'
                     continue
                 if item not in element:
                     raise KeyError(f'Item not present in inst dict: {item}')
@@ -75,7 +84,7 @@ class BaseInstLibFacade:
 
             # Locks every parameter field except name
             for key in entry:
-                if LOCK not in entry[key] and key != 'name':
+                if LOCK not in entry[key] and key != 'name' and key != id_key:
                     entry[key] = f'{LOCK} {entry[key]}'
 
             tree.append(entry)
