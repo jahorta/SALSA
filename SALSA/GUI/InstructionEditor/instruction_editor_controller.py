@@ -166,7 +166,7 @@ class InstructionEditorController:
         actual_changes = {}
         for inst_id, changes in self.changed_values.items():
             base_details = self.inst_lib.get_inst(inst_id)
-            for field, value in changes:
+            for field, value in changes.items():
                 add = False
                 if sep in field:
                     field_parts = field.split(sep)
