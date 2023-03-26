@@ -111,11 +111,11 @@ if __name__ == '__main__':
         if insts[i].instruction_id != i:
             print(f'inst at position {i} is {insts[i].instruction_id}')
 
-    with open('../../UserSettings/DefaultInstructions.json', 'r') as fh:
+    with open('DefaultInstructions.json', 'r') as fh:
         file = fh.read()
         file_json = json.loads(file)
 
-    base_insts.set_inst_all_fields(file_json)
+    base_insts._set_inst_all_fields(file_json)
 
-    inst_deets = base_insts.get_inst_details()
+    inst_deets = base_insts._get_default_inst_details()
     print('loaded')
