@@ -92,6 +92,18 @@ class InstructionEditorController:
         self.view.details_desc_text.delete(1.0, tk.END)
         self.view.details_desc_text.insert(tk.INSERT, details.description)
 
+        user_type = self.get_user_type()
+
+        if user_type == 'default':
+            self.view.default_notes_text.delete(1.0, tk.END)
+            self.view.default_notes_text.insert(tk.INSERT, f'{details.default_notes}')
+        elif user_type == 'user':
+            self.view.default_notes_msg.config(text=f'{details.default_notes}')
+            self.view.user_notes_text.delete(1.0, tk.END)
+            self.view.user_notes_text.insert(tk.INSERT, f'{details.user_notes}')
+        else:
+            raise KeyError(f'{self.log_name}: Unknown user type: {user_type}')
+
         headers = self.view.get_headers('parameter')
         entries = self.inst_lib.get_tree_entries(headers=self.view.get_headers('parameter'), inst_id=newID)
         self.populate_tree(self.view.param_list_tree, headers, entries)
