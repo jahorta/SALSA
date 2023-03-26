@@ -1,12 +1,13 @@
 import json
 import os
 
+
 class InstructionModel:
 
     def __init__(self):
 
         self.user_filename = "./UserSettings/UserInstructions.json"
-        self.default_filename = "./UserSettings/DefaultInstructions.json"
+        self.default_filename = "./SALSA/BaseInstructions/DefaultInstructions.json"
 
     def load_instructions(self, inst_type):
         filename = self.user_filename if inst_type == 'user' else self.default_filename
