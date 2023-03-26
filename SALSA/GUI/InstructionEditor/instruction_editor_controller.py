@@ -9,6 +9,8 @@ from SALSA.Common.constants import sep, LOCK
 
 class InstructionEditorController:
 
+    log_name = 'InstEditCtrlr'
+
     def __init__(self, parent, name, inst_lib_facade: BaseInstLibFacade, callbacks):
         self.name = name
         self.inst_lib = inst_lib_facade
