@@ -209,6 +209,9 @@ class ScrollLabelCanvas(tk.LabelFrame):
 
         super().__init__(parent, *args, **kwargs)
 
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+
         self.parent = parent
         self.canvas = tk.Canvas(self, width=size['width'], height=size['height'])
         self.canvas.grid(row=0, column=0, sticky='NSEW')
