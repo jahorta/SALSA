@@ -364,3 +364,4 @@ class InstructionEditorView(tk.Toplevel):
 
     def on_save(self):
         self.callbacks['save']()
+        self.save['state'] = 'disabled'
