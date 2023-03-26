@@ -45,6 +45,7 @@ class InstructionEditorView(tk.Toplevel):
     def __init__(self, parent, callbacks, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
+        self.title('SALSA - Instruction Editor')
         self.callbacks = callbacks
 
         if self.log_name not in settings.keys():
@@ -55,8 +56,9 @@ class InstructionEditorView(tk.Toplevel):
 
         self.visible_headers = json.loads(settings[self.log_name]['headers'])
 
-        self.columnconfigure(1, weight=1)
+        self.columnconfigure(1, weight=2)
         self.rowconfigure(1, weight=1)
+        self.columnconfigure(2, weight=1)
 
         self.protocol('WM_DELETE_WINDOW', self.on_close)
 
@@ -65,7 +67,7 @@ class InstructionEditorView(tk.Toplevel):
         self.save = tk.Button(self, text='Save', command=self.on_save)
         self.save.grid(row=0, column=0, sticky=tk.W+tk.N, padx=2, pady=2)
 
-        inst_tree_frame = tk.Frame(self)
+        inst_tree_frame = tk.Frame(self, bd=2)
         inst_tree_frame.grid(row=1, column=0, sticky='NSEW', padx=2, pady='0 2')
         inst_tree_frame.rowconfigure(0, weight=1)
 
@@ -172,8 +174,8 @@ class InstructionEditorView(tk.Toplevel):
         desc_frame.grid(row=6, column=0, sticky='NSEW', columnspan=2)
         desc_frame.columnconfigure(0, weight=1)
         desc_frame.rowconfigure(0, weight=1)
-        self.details_desc_text = tk.scrolledtext.ScrolledText(desc_frame, wrap=tk.WORD, height=15)
-        self.details_desc_text.grid(row=0, column=1, sticky='NSEW')
+        self.details_desc_text = tk.scrolledtext.ScrolledText(desc_frame, wrap=tk.WORD, height=15, width=50)
+        self.details_desc_text.grid(row=0, column=0, sticky='NSEW')
         self.details_desc_text.bind('<FocusIn>', self.on_text_focus_in)
         self.details_desc_text.bind('<FocusOut>', lambda e, k='name': self.on_text_focus_out(k, e))
 
