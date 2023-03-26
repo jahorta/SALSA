@@ -272,7 +272,7 @@ class InstructionEditorView(tk.Toplevel):
     # -------------------------------------------------- #
 
     def on_entry_focus_in(self, e):
-        self.details_name_entry.cur_value = self.details_name_entry.get()
+        e.widget.cur_value = e.widget.get()
 
     def on_entry_focus_out(self, key, e):
         if e.widget.get() == e.widget.cur_value:
@@ -281,7 +281,7 @@ class InstructionEditorView(tk.Toplevel):
         self.callbacks['set_change'](key=key, value=e.widget.get())
 
     def on_text_focus_in(self, e):
-        self.details_desc_text.cur_value = self.details_desc_text.get(1.0, tk.END)
+        e.widget.cur_value = e.widget.get(1.0, tk.END)
 
     def on_text_focus_out(self, key, e):
         if e.widget.get(1.0, tk.END) == e.widget.cur_value:
