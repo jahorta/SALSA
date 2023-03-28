@@ -127,7 +127,7 @@
   },
   "13": {
     "Name": "code_error",
-    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis is never used as an instruction. It is used to set a flag to try to prevent a frame refresh after the next instruction",
+    "Description": "s_scptSTUB:_code_error!_802d4758\n\nThis is never used as an instruction. This is a dunder instruction used to set a flag to try to prevent a frame refresh after the next instruction\n",
     "Notes": "This instruction calls the function 801f60f0\n\nThis function just returns a zero and produces a \ncode error. it is likely that this number is \nreserved for something else.\n\n\nIt looks like this instruction is used during cutscenes to force a frame advance before performing the next cutscene."
   },
   "14": {
@@ -2111,8 +2111,8 @@
   },
   "129": {
     "Name": "Schedule Inst",
-    "Description": "frames: <unknown0>\nentries: *mul[<entries>,0.25]*\n\nSeems to schedule the subsequent instruction for execution after a certain number of frames",
-    "Notes": "only runs if param1 & 1 == 1:\n\nparam:\n1: scpt-int\n2: int\n\nruns 802114ac((1),scptPointer)\n\nseems to add something to a list. It seems to use the information from the script, incrementing down the list for as far as the entries parameter tells it to. Maybe it buffers instructions?\n\n(1) appears to be the frames to wait to perform the instruction\n\n(2) appears to be the length of the instruction to perform\n\nInstructions can likely be performed arbitrarily with this",
+    "Description": "frames: <unknown0>\nentries: *mul[<entries>,0.25]*\n\nSeems to schedule the subsequent instruction for execution after a certain number of frames\n\n*NOTE:* This instruction should not be used on its own, so it is implemented as a checkbox and entry field on each instruction to activate this.\n",
+    "Notes": "only runs if param1 & 1 == 1:\n\nparam:\n1: scpt-int\n2: int\n\n(1) appears to be the frames to wait to perform the instruction\n\n(2) appears to be the length of the instruction to perform\n\nInstructions can likely be performed arbitrarily with this. \n\nThis is now implemented as a checkbox and number entry on any arbitrary\n",
     "Parameters": {
       "0": {
         "Name": "Frames"
