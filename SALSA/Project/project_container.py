@@ -102,6 +102,7 @@ class SCTInstruction:
         self.script_pos = script_pos
         self.relative_offset = self.absolute_offset - script_pos
         self.skip_refresh = False
+        self.frame_delay_param = None
         self.errors = []
         self.links_out = []
         self.links_in = []
@@ -130,17 +131,6 @@ class SCTInstruction:
 
     def __repr__(self):
         return f'{self.instruction_id}'
-
-    # def get_param_id_by_name(self, name):
-    #     param_id = None
-    #     for key, param in self.parameters.items():
-    #         if param.name == name:
-    #             param_id = key
-    #             break
-    #     return param_id
-
-    def set_skip_refresh(self):
-        self.skip_refresh = True
 
 
 class SCTSection:

@@ -179,14 +179,24 @@ class SCTEncoder:
                 self.sct_body.extend(section.garbage['end'])
 
     def _encode_instruction(self, instruction, trace):
-        self.inst_positions[instruction.ID] = len(self.sct_body)
         base_inst = self.bi.get_inst(instruction.instruction_id)
         trace.append(str(instruction.instruction_id))
+        self.inst_positions[instruction.ID] = len(self.sct_body)
 
         # add 13 code if needed or wanted
         if instruction.skip_refresh:
             if self.add_spurious_refresh or (not base_inst.no_new_frame and not base_inst.forced_new_frame):
                 self.sct_body.extend(self._make_word(self.skip_refresh))
+
+        delay_pos = None
+        inst_pos = -1
+        if instruction.frame_delay_param is not None or instruction.frame_delay_param == 0:
+            self.sct_body.extend(self._make_word(129))
+            base_param = self.bi.get_inst(129).parameters[0]
+            self._encode_param(param=instruction.frame_delay_param, base_param=base_param, trace=[*trace, str(-1)])
+            delay_pos = len(self.sct_body)
+            self.sct_body.extend(b'0000')
+            inst_pos = len(self.sct_body)
 
         # add instruction code to sct_body
         self.sct_body.extend(self._make_word(instruction.instruction_id))
@@ -232,14 +242,18 @@ class SCTEncoder:
 
                     if p_id == base_inst.loop_cond['Parameter']:
                         value1 = param.value
-                        if isinstance(value1, dict):
-                            if isinstance(param.arithmetic_value, float):
-                                value1 = param.arithmetic_value
+
+                        if isinstance(value1, dict) and param.arithmetic_value is not None:
+                            value1 = param.arithmetic_value
+
                         if not isinstance(value1, int):
                             value1 = int(value1)
+
                         value2 = base_inst.loop_cond['Value']
+
                         if not isinstance(value2, int):
                             value2 = int(value2)
+
                         test = base_inst.loop_cond['Test']
                         if self.param_tests[test](value1, value2):
                             break_loops = True
@@ -266,6 +280,10 @@ class SCTEncoder:
         if garbage_index is not None and self.use_garbage:
             garbage = instruction.errors[garbage_index][1]
             self.sct_body.extend(garbage)
+
+        if delay_pos is not None:
+            inst_len = len(self.sct_body) - inst_pos
+            self._sct_body_replace_hex(delay_pos, bytearray(self._make_word(inst_len)))
 
     def _encode_param(self, param, base_param, trace):
         # if needed, setup link and use 0x7fffffff as placeholder

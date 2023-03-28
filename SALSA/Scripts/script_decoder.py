@@ -217,15 +217,48 @@ class SCTDecoder:
 
             if is_inst:
                 inst_pos = self._cursor * 4
+
+                # Test for the dunder code to try to not go to the next frame after this instruction
                 try_no_refresh = False
-                if currWord_int == 0x0000000d:
+                if currWord_int == 13:
                     try_no_refresh = True
                     self._cursor += 1
                     currWord_int = self.getInt(self._cursor * 4)
+
+                # Test for the dunder code to delay execution of an instruction
+                delay_inst = None
+                if currWord_int == 129:
+                    delay_inst = self._decode_instruction(currWord_int, inst_pos, sct_start_pos, [sect_name, inst_list_id])
+                    delay_inst.length = self._cursor * 4 - inst_pos
+                    currWord_int = self.getInt(self._cursor * 4)
+
                 instResult = self._decode_instruction(currWord_int, inst_pos, sct_start_pos, [sect_name, inst_list_id])
-                cur_inst = self._inst_lib.get_inst(instResult.instruction_id)
+
                 if try_no_refresh:
-                    instResult.set_skip_refresh()
+                    instResult.skip_refresh = True
+
+                if delay_inst is not None:
+                    instResult.frame_delay_param = delay_inst.parameters[0]
+                    numeric = True
+                    if instResult.frame_delay_param.arithmetic_value is not None:
+                        if not isinstance(instResult.frame_delay_param.arithmetic_value, int):
+                            numeric = False
+                    elif not isinstance(instResult.frame_delay_param.value, int):
+                        if not instResult.frame_delay_param.value.isnumeric():
+                            numeric = False
+                    if not numeric:
+                        instResult.add_error(('frame_delay', 'Non-numeric frame delay given'))
+
+                    inst_size = self._cursor * 4 - instResult.absolute_offset
+                    if inst_size != (delay_inst.parameters[1].value + delay_inst.length):
+                        garbage_size = ((delay_inst.parameters[1].value + delay_inst.length) - inst_size) // 4
+                        garbage = bytearray(b'')
+                        for i in range(self._cursor, self._cursor + garbage_size):
+                            garbage += self.getWord(i * 4)
+                        instResult.add_error(('Garbage', garbage))
+                        instResult.add_error(('frame_delay', 'improper instruction size given, put into garbage'))
+                        self._cursor += garbage_size
+
                 section.add_instruction(instResult)
 
                 if instResult.instruction_id in [0, 3]:
@@ -483,6 +516,21 @@ class SCTDecoder:
                     scptResult = int.from_bytes(bytes=bytearray.fromhex(scptResult), byteorder='big', signed=signed)
 
             cur_param.set_value(scptResult)
+
+            if cur_param.arithmetic_value is not None:
+                arithmetic_result = float(cur_param.arithmetic_value)
+                if 'float' not in param_type:
+                    signed = arithmetic_result < 0
+                    arithmetic_result = math.floor(arithmetic_result)
+                    if 'int' not in param_type:
+                        arithmetic_result = bytearray(arithmetic_result.to_bytes(4, 'big', signed=signed)).hex()
+                        if 'short' in param_type:
+                            arithmetic_result = applyHexMask(arithmetic_result, '0xffff')[2:]
+                        elif 'byte' in param_type:
+                            arithmetic_result = applyHexMask(arithmetic_result, '0xff')[2:]
+
+                        arithmetic_result = int.from_bytes(bytes=bytearray.fromhex(arithmetic_result), byteorder='big', signed=signed)
+                cur_param.arithmetic_value = arithmetic_result
 
         elif 'int' in param_type:
             currWord = self.getWord(self._cursor * 4)
