@@ -25,7 +25,7 @@ def dicts_are_same(dict1, dict2):
 
 def lists_are_same(list1, list2):
     """Checks whether the entirety of list1 and list2 are the same. Only allows for base python classes"""
-    if not isinstance(list1, dict) or not isinstance(list2, dict) or len(list1) != len(list2):
+    if not isinstance(list1, list) or not isinstance(list2, list) or len(list1) != len(list2):
         return False
     for i in range(len(list1)):
         if not isinstance(list1[i], type(list2[i])):
@@ -36,7 +36,7 @@ def lists_are_same(list1, list2):
 
 
 def sets_are_same(set1, set2):
-    if len(set1 - set2) > 0 or len(set2 - set1) > 0:
+    if len(set1 - set2) > 0 or len(set2 - set1) > 0 or not isinstance(set1, set) or not isinstance(set2, set):
         return False
     for item in set1:
         if item not in set2:
