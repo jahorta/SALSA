@@ -3,13 +3,10 @@ import tkinter as tk
 
 from GUI.ProjectEditor.ParamEditorPopups.param_editor_controller import ParamEditController
 from SALSA.Common.setting_class import settings
-from SALSA.GUI.ProjectEditor.variable_editor_popup import VariablePopup
 from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
-from SALSA.GUI.ProjectEditor.sct_export_popup import SCTExportPopup
 from SALSA.GUI.widgets import DataTreeview
 from SALSA.Project.project_facade import SCTProjectFacade
-from SALSA.Project.project_container import SCTParameter, SCTLink
-from SALSA.BaseInstructions.bi_container import BaseParam
+from SALSA.Project.project_container import SCTLink
 
 tree_children = {
     '': 'script',
