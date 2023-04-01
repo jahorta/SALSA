@@ -8,7 +8,7 @@ from SALSA.Common.setting_class import settings
 default_headers = {
     'script': ['name'],
     'section': ['name'],
-    'instruction': ['ungrouped_position', 'name', 'condition', 'instruction_id'],
+    'instruction': ['ungrouped_position', 'name', 'condition', 'frame_delay_param', 'skip_refresh', 'instruction_id'],
     'parameter': ['ID', 'name', 'type', 'value']
 }
 
@@ -26,6 +26,8 @@ header_settings = {
         'name': {'label': 'Name', 'width': 270, 'stretch': True},
         'condition': {'label': 'Condition', 'width': 300, 'stretch': True},
         'instruction_id': {'label': 'ID', 'width': 40, 'stretch': False},
+        'frame_delay_param': {'label': 'Delay', 'width': 50, 'stretch': False},
+        'skip_refresh': {'label': 'SR', 'width': 50, 'stretch': False},
         'synopsis': {'label': 'Synopsis', 'width': 50, 'stretch': True},
         'absolute_offset': {'label': 'Offset', 'width': 50, 'stretch': True},
         'relative_offset': {'label': 'Relative Offset', 'width': 50, 'stretch': True}
