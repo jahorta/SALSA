@@ -2,7 +2,7 @@ import copy
 from typing import Union, Tuple
 
 from SALSA.Project.description_formatting import format_description
-from SALSA.Project.project_container import SCTProject, SCTSection
+from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
 from SALSA.Common.constants import sep
@@ -241,3 +241,32 @@ class SCTProjectFacade:
         section = self.project.scripts[script].sections[section]
         for i, inst_id in enumerate(section.instruction_ids_ungrouped):
             section.instructions[inst_id].ungrouped_position = i
+
+    def get_parameter(self, script, section, instruction, parameter):
+        instruction = self.project.scripts[script].sections[section].instructions[instruction]
+        if parameter == 'delay':
+            return instruction.frame_delay_param
+        if sep in parameter:
+            param_parts = parameter.split(sep)
+            return instruction.loop_parameters[int(param_parts[0])][int(param_parts[1])]
+        return instruction.parameters[int(parameter)]
+
+    def get_inst_id(self, script, section, instruction, **kwargs):
+        return self.project.scripts[script].sections[section].instructions[instruction].instruction_id
+
+    def get_base_parameter(self, inst_id, param_str):
+        if param_str == 'delay':
+            return self.base_insts.get_inst(129).parameters[0]
+        param_parts = param_str.split(sep)
+        b_param_id = param_parts[-1]
+        return self.base_insts.get_inst(inst_id).parameters[int(b_param_id)]
+
+    def add_delay_parameter(self, script, section, instruction, **kwargs):
+        param = SCTParameter(_id=-1, _type='scpt-int')
+        self.project.scripts[script].sections[section].instructions[instruction].frame_delay_param = param
+        return param
+
+    def get_var_alias(self, script, var_type, var_id):
+        if var_id not in self.project.scripts[script].variables[var_type]:
+            return 'No Alias'
+        return self.project.scripts[script].variables[var_type][var_id]['alias']
