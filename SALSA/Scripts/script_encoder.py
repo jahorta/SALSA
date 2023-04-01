@@ -342,7 +342,7 @@ class SCTEncoder:
 
         # If the parameter is a float, enter the float into script file
         if isinstance(param, float):
-            param_bytes.extend(self._make_word(self.param_code.input_cutoffs['float: ']))
+            param_bytes.extend(self._make_word(self.param_code.input['float: ']))
             form = f'{self.endian_struct_format[self.endian]}f'
             param_bytes.extend(float2Hex(param, form))
 
@@ -358,12 +358,12 @@ class SCTEncoder:
         # If the parameter is a string, it is likely located in input headers or secondary locations
         elif isinstance(param, str):
             if param in self.param_code.secondary:
-                cutoff = self.param_code.input_cutoffs['IntVar: ']
+                cutoff = self.param_code.input['IntVar: ']
                 value = self.param_code.secondary[param]
             else:
                 param_parts = param.split(' ')
-                cutoff = self.param_code.input_cutoffs[param_parts[0]+' ']
-                if cutoff == self.param_code.input_cutoffs['decimal: ']:
+                cutoff = self.param_code.input[param_parts[0] + ' ']
+                if cutoff == self.param_code.input['decimal: ']:
                     d_parts = param_parts[1].split('/')
                     value = int(d_parts[0]) << 8
                     value = value | int(d_parts[1])
