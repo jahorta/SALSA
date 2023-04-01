@@ -204,6 +204,8 @@ class ProjectEditorController:
         else:
             self.view.skip_error_label.config(text='')
 
+        self.view.delay_label.config(text=str(details['frame_delay_param']))
+
         for i, link in enumerate(details['links_out']):
             link: SCTLink
             if link.target_trace is None:
