@@ -1,3 +1,11 @@
+SCPT_CLASSES = [
+    'compare',
+    'arithmetic',
+    'input',
+    'secondary'
+]
+
+
 compare = [
     (0x00000000, '(1)<(2)'),
     (0x00000001, '(1)<=(2)'),
@@ -34,7 +42,7 @@ no_loop = [
     (0x7fffffff, '0x7fffffff')
 ]
 
-input_cutoffs = [
+input = [
     (0x50000000, 'IntVar: '),
     (0x40000000, 'FloatVar: '),
     (0x20000000, 'BitVar: '),
@@ -66,16 +74,17 @@ class SCPTParamCodes:
         if is_decoder:
             self.compare = {_[0]: _[1] for _ in compare}
             self.arithmetic = {_[0]: _[1] for _ in arithmetic}
-            self.input_cutoffs = {_[0]: _[1] for _ in input_cutoffs}
+            self.input = {_[0]: _[1] for _ in input}
             self.secondary = {_[0]: _[1] for _ in secondary}
-            self.cutoff_prefixes = [(_ & 0xff000000) for _ in list(self.input_cutoffs.keys())]
+            self.cutoff_prefixes = [(_ & 0xff000000) for _ in list(self.input.keys())]
             self.no_loop = {_[0]: _[1] for _ in no_loop}
         else:
             self.compare = {_[1]: _[0] for _ in compare}
             self.arithmetic = {_[1]: _[0] for _ in arithmetic}
-            self.input_cutoffs = {_[1]: _[0] for _ in input_cutoffs}
+            self.input = {_[1]: _[0] for _ in input}
             self.secondary = {_[1]: _[0] for _ in secondary}
             self.no_loop = {_[1]: _[0] for _ in no_loop}
         self.primary_keys = [*list(self.compare.keys()), *list(self.arithmetic.keys())]
         self.stop_code = stop_code
+        self.classes = SCPT_CLASSES
 
