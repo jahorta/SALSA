@@ -49,7 +49,7 @@ class ProjectEditorController:
             if s not in settings[self.log_name]:
                 settings[self.log_name][s] = v
 
-        self.current: Dict[str, Union[int, None]] = {
+        self.current: Dict[str, Union[str, None]] = {
             'script': None,
             'section': None,
             'instruction': None,
