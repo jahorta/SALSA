@@ -8,7 +8,6 @@ class StringPopup(tk.Toplevel):
     h = 400
 
     option_settings = {}
-    canvas_names = ['Bit', 'Byte', 'Int', 'Float']
 
     def __init__(self, parent, callbacks, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)

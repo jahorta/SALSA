@@ -10,9 +10,9 @@ from SALSA.GUI.AnalysisPopup.analysis_view import AnalysisView
 from SALSA.GUI.HelpPopup.help_view import HelpView
 from SALSA.GUI.InstructionEditor.instruction_editor_view import InstructionEditorView
 from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
-from SALSA.GUI.ProjectEditor.sct_export_popup import SCTExportPopup
-from SALSA.GUI.ProjectEditor.variable_editor_popup import VariablePopup
-from SALSA.GUI.ProjectEditor.string_editor_popup import StringPopup
+from GUI.SCTExport.sct_export_popup import SCTExportPopup
+from GUI.VariableEditor.variable_editor_popup import VariablePopup
+from GUI.StringEditor.string_editor_popup import StringPopup
 from Project.project_facade import SCTProjectFacade
 from Common.containers import Vector2
 
