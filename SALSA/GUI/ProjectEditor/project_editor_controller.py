@@ -247,5 +247,44 @@ class ProjectEditorController:
     def on_set_inst_start(self, start, newID):
         pass
 
-    def show_right_click_menu(self):
+    def show_header_selection_menu(self, e):
+        if e.widget.identify('region', e.x, e.y) != 'heading':
+            return
+        widget_name = e.widget.name
+        m = tk.Menu(self.view, tearoff=0)
+        m.vars = []
+        available_headers = self.view.get_headers(widget_name, get_all=True)
+        header_order = self.view.get_header_order(widget_name)
+        first = True
+        for header in header_order:
+            active = int(header in self.view.visible_headers[widget_name])
+            name = available_headers[header]['label']
+            m.vars.append(tk.IntVar(m, active))
+            m.add_checkbutton(label=name, onvalue=1, offvalue=0, variable=m.vars[-1],
+                              command=lambda h=header: self.toggle_header(widget_name, h))
+            if first:
+                m.entryconfigure(name, state='disabled')
+                first = False
+        m.bind('<Leave>', m.destroy)
+        try:
+            m.tk_popup(e.x_root, e.y_root)
+        finally:
+            m.grab_release()
+
+    def toggle_header(self, tree, header):
+        if header not in self.view.visible_headers[tree]:
+            self.view.visible_headers[tree].append(header)
+            self.view.sort_visible_headers(tree)
+        else:
+            self.view.visible_headers[tree].remove(header)
+        cur_tree = self.trees[tree]
+        display_columns = self.view.visible_headers[tree][1:]
+        cur_tree['displaycolumns'] = display_columns
+        self.view.fit_headers(cur_tree)
+
+    # -------------- #
+    # View Callbacks #
+    # -------------- #
+
+    def update_field(self, field, value):
         pass
