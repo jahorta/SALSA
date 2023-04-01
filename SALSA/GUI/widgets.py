@@ -1,3 +1,4 @@
+import math
 import platform
 import re
 import tkinter as tk
@@ -167,31 +168,77 @@ class RequiredAddrEntry(RequiredHexEntry):
         self.set('0x8')
 
     def _focusout_validate(self, **kwargs):
-        valid = super()
+        valid = super()._focusout_validate(**kwargs)
 
         if not len(self.get()) == self.pattern_length:
             valid = False
             error = f'Final address should be the full '
-            self.error.set(f'')
+            self.error.set(f'error')
         return valid
 
 
-class RequiredByteEntry(RequiredHexEntry):
+class RequiredIntEntry(RequiredEntry):
+    def __init__(self, parent, b_min=-math.inf, b_max=math.inf, *a, **kw):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, hex_max_length=2, **kwargs)
+        super().__init__(parent, *a, **kw)
+
+        self.max = b_max
+        self.min = b_min
+
+    def _focusout_validate(self, **kwargs):
+        valid = super()._focusout_validate(**kwargs)
+
+        if self.get() == '':
+            return False
+
+        return valid
+
+    def _key_validate(self, char, index, current, proposed, action, **kwargs):
+        valid = super()._key_validate(char=char, index=index, current=current, proposed=proposed, action=action, **kwargs)
+
+        if proposed not in '1234567890':
+            return False
+
+        if int(proposed) < self.min or int(proposed) > self.max:
+            return False
+
+        return valid
+
+    def set_bounds(self, b_min=-math.inf, b_max=math.inf):
+        self.min = b_min
+        self.max = b_max
 
 
-class RequiredShortEntry(RequiredHexEntry):
+class RequiredFloatEntry(RequiredEntry):
+    def __init__(self, parent, b_min=-math.inf, b_max=math.inf, *a, **kw):
+        super().__init__(parent, *a, **kw)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, hex_max_length=4, **kwargs)
+        self.max = b_max
+        self.min = b_min
 
+    def _focusout_validate(self, **kwargs):
+        valid = super()._focusout_validate(**kwargs)
 
-class RequiredIntEntry(RequiredHexEntry):
+        if self.get() == '':
+            return False
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, hex_max_length=8, **kwargs)
+        return valid
+
+    def _key_validate(self, char, index, current, proposed, action, **kwargs):
+        valid = super()._key_validate(char=char, index=index, current=current, proposed=proposed, action=action,
+                                      **kwargs)
+
+        if proposed not in '1234567890.':
+            return False
+
+        if float(proposed) < self.min or float(proposed) > self.max:
+            return False
+
+        return valid
+
+    def set_bounds(self, b_min=-math.inf, b_max=math.inf):
+        self.min = b_min
+        self.max = b_max
 
 
 # ------------- #
