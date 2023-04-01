@@ -116,7 +116,18 @@ class ProjectEditorController:
     def on_edit_parameter(self, paramID):
         paramID = str(paramID)
         self.current['parameter'] = paramID
-        param_details = self.project.get_parameter_details(**self.current)
+        param = self.project.get_parameter(**self.current)
+        inst_id = self.project.get_inst_id(**self.current)
+        base_param = self.project.get_base_parameter(inst_id, paramID)
+        if param is None and paramID == 'delay':
+            param = self.project.add_delay_parameter(**self.current)
+        self.param_editor.show_param_editor(param=param, base_param=base_param)
+
+    def on_parameter_changed(self, param):
+        pass
+
+    def get_var_alias(self, var_type, var_id):
+        return self.project.get_var_alias(self.current['script'], var_type, var_id)
 
     def clear_tree(self, tree: str):
         if tree in self.trees.keys():
