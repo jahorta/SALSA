@@ -67,6 +67,7 @@ class GUIController:
                     or 'scrollbar' in r \
                     or 'separator' in r \
                     or 'message' in r \
+                    or 'menu' in r \
                     or 'panedwindow' in r:
                 self.recursive_toggle(child, state)
             else:
