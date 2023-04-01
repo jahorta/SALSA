@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import json
+from typing import List, Dict
 
 import SALSA.GUI.widgets as w
 from SALSA.Common.setting_class import settings
@@ -10,6 +11,13 @@ default_headers = {
     'section': ['name'],
     'instruction': ['ungrouped_position', 'name', 'condition', 'frame_delay_param', 'skip_refresh', 'instruction_id'],
     'parameter': ['ID', 'name', 'type', 'value']
+}
+
+default_header_order = {
+    'script': ['name', 'section_num'],
+    'section': ['name', 'start_offset'],
+    'instruction': ['ungrouped_position', 'name', 'condition', 'instruction_id', 'frame_delay_param', 'skip_refresh', 'synopsis', 'absolute_offset', 'relative_offset'],
+    'parameter': ['name', 'section_num'],
 }
 
 header_settings = {
@@ -62,7 +70,7 @@ class ProjectEditorView(tk.Frame):
         # if 'headers' not in settings[self.log_name].keys():
         settings.set_single(self.log_name, 'headers', json.dumps(default_headers))
 
-        self.visible_headers = json.loads(settings[self.log_name]['headers'])
+        self.visible_headers: Dict[str, List[str]] = json.loads(settings[self.log_name]['headers'])
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
@@ -246,9 +254,14 @@ class ProjectEditorView(tk.Frame):
         self.link_in.grid(row=4, column=0, sticky=tk.W+tk.E)
         self.link_in.columnconfigure(0, weight=1)
 
-    def get_headers(self, tree_key=None):
+    def get_headers(self, tree_key=None, get_all=False):
         if tree_key is None:
+            if get_all:
+                return {k: list(header_settings[k].keys()) for k in header_settings.keys()}
             return {k: list(header_settings[k].keys()) for k in header_settings.keys()}
+
+        if get_all:
+            return header_settings[tree_key]
         return list(header_settings[tree_key].keys())
 
     def update_field(self, field_name, value):

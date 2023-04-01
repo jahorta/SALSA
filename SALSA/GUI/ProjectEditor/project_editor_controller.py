@@ -94,7 +94,18 @@ class ProjectEditorController:
         child_tree = tree_children[tree_key]
         kwargs['headers'] = self.view.get_headers(tree_key=child_tree)
         tree_list = self.project.get_tree(**kwargs)
+        tree_list = self.adjust_tree_entries(tree_list, child_tree)
         self.update_tree(child_tree, tree_list)
+
+    def adjust_tree_entries(self, entries, key):
+        if key == 'instruction':
+            for entry in entries:
+                if not isinstance(entry, dict):
+                    continue
+                entry['frame_delay_param'] = '*' if entry['frame_delay_param'] != 'None' else ''
+                entry['skip_refresh'] = '*' if entry['skip_refresh'] == 'True' else ''
+
+        return entries
 
     def on_select_instruction(self, instructID):
         self.current['instruction'] = instructID
