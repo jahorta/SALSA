@@ -55,6 +55,8 @@ class ProjectEditorView(tk.Frame):
         if self.log_name not in settings.keys():
             settings[self.log_name] = {}
 
+        self.callbacks = None
+
         # if 'headers' not in settings[self.log_name].keys():
         settings.set_single(self.log_name, 'headers', json.dumps(default_headers))
 
@@ -203,7 +205,7 @@ class ProjectEditorView(tk.Frame):
         param_frame.rowconfigure(0, weight=1)
 
         columns = list(header_settings['parameter'].keys())[1:]
-        self.param_tree = w.DataTreeview(param_frame, name='parameter', columns=columns)
+        self.param_tree = w.DataTreeview(param_frame, name='parameter', columns=columns, can_open=False)
         self.param_tree.grid(row=0, column=0, sticky='NSEW')
         first = True
         for name, d in header_settings['parameter'].items():
@@ -221,6 +223,7 @@ class ProjectEditorView(tk.Frame):
         param_tree_scrollbar = tk.Scrollbar(param_frame, orient='vertical', command=self.param_tree.yview)
         param_tree_scrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
         self.param_tree.config(yscrollcommand=param_tree_scrollbar.set)
+        self.param_tree.bind('<Double-1>', lambda e: self.on_param_double_click('param', e))
 
         link_frame = tk.LabelFrame(inst_frame, text='Links')
         link_frame.grid(row=4, column=0, sticky='NSEW')
@@ -245,3 +248,48 @@ class ProjectEditorView(tk.Frame):
         if tree_key is None:
             return {k: list(header_settings[k].keys()) for k in header_settings.keys()}
         return list(header_settings[tree_key].keys())
+
+    def update_field(self, field_name, value):
+        self.callbacks['update_field'](field_name, value)
+
+    def add_and_bind_callbacks(self, callbacks):
+        self.callbacks = callbacks
+        self.scripts_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
+        self.sections_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
+        self.insts_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
+        self.param_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
+
+    def on_param_double_click(self, param, e):
+        if param != 'delay':
+            # get item id and values associated with the item
+            selected_iid = self.param_tree.focus()
+            param = self.param_tree.row_data[selected_iid]
+        self.callbacks['edit_param'](param)
+
+    def sort_visible_headers(self, tree):
+        self.visible_headers[tree] = [_ for _ in default_header_order[tree] if _ in self.visible_headers[tree]]
+
+    def get_header_order(self, tree):
+        return default_header_order[tree]
+
+    def fit_headers(self, cur_tree: w.DataTreeview):
+        widget_width = cur_tree.winfo_width()
+        widths = {}
+        first = '#0'
+        width_sum = 0
+        for col in self.visible_headers[cur_tree.name]:
+            if first:
+                col = first
+                first = ''
+            widths[col] = cur_tree.column(col, 'width')
+            width_sum += widths[col]
+
+        if width_sum == widget_width:
+            return
+
+        width_ratios = {}
+        for k, v in widths.items():
+            width_ratios[k] = v / width_sum
+
+        for k, v in width_ratios.items():
+            cur_tree.column(k, width=int(v*widget_width))

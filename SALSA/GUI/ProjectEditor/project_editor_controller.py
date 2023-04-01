@@ -1,6 +1,7 @@
 from typing import Union, Dict
 import tkinter as tk
 
+from GUI.ProjectEditor.ParamEditorPopups.param_editor_controller import ParamEditController
 from SALSA.Common.setting_class import settings
 from SALSA.GUI.ProjectEditor.variable_editor_popup import VariablePopup
 from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
@@ -31,8 +32,18 @@ class ProjectEditorController:
     def __init__(self, parent: tk.Tk, view: ProjectEditorView, facade: SCTProjectFacade, callbacks):
         self.parent: tk.Tk = parent
         self.view: ProjectEditorView = view
+
+        view_callbacks = {
+            'update_field': self.update_field,
+            'edit_param': self.on_edit_parameter,
+            'show_header_selection_menu': self.show_header_selection_menu
+        }
+        self.view.add_and_bind_callbacks(view_callbacks)
+
         self.project: SCTProjectFacade = facade
         self.callbacks = callbacks
+
+        self.param_editor = ParamEditController(self.view, callbacks={'get_var_alias': self.get_var_alias})
 
         if self.log_name not in settings:
             settings[self.log_name] = {}
@@ -60,7 +71,6 @@ class ProjectEditorController:
         self.trees['script'].add_callback('select', self.on_select_tree_entry)
         self.trees['section'].add_callback('select', self.on_select_tree_entry)
         self.trees['instruction'].add_callback('select', self.on_select_tree_entry)
-        self.trees['parameter'].add_callback('select', self.on_select_tree_entry)
 
     def load_project(self):
         for key in list(self.current.keys()):
@@ -70,8 +80,6 @@ class ProjectEditorController:
         self.update_tree('script', self.project.get_tree(self.view.get_headers('script')))
 
     def on_select_tree_entry(self, tree_key, entry):
-        if tree_key == 'parameter':
-            return self.on_select_parameter(entry)
         self.clear_inst_details()
         if tree_key == 'instruction':
             return self.on_select_instruction(entry)
@@ -97,7 +105,8 @@ class ProjectEditorController:
         details['parameter_tree'] = self.project.get_parameter_tree(headings=self.view.get_headers('parameter'), **self.current)
         self.set_instruction_details(details)
 
-    def on_select_parameter(self, paramID):
+    def on_edit_parameter(self, paramID):
+        paramID = str(paramID)
         self.current['parameter'] = paramID
         param_details = self.project.get_parameter_details(**self.current)
 
