@@ -32,8 +32,7 @@ def get_loop_desc(inst, base_inst):
     iterations = inst.parameters[base_inst.loop_iter].value
     for i in range(iterations):
         result += f'loop {i}'
-        for param in inst.loop_parameters[i]:
-            param: SCTParameter
+        for param in inst.loop_parameters[i].values():
             result += f'\n\t{param.ID}\t{param.formatted_value}'
         result += '\n'
     return result
