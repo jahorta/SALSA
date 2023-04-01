@@ -202,6 +202,13 @@ class ProjectEditorView(tk.Frame):
         self.skip_error_label = tk.Label(skip_frame, text='')
         self.skip_error_label.grid(row=1, column=0, columnspan=2, sticky='NSEW')
 
+        delay_frame = tk.LabelFrame(inst_top_frame, text='Instruction Delay')
+        delay_frame.grid(row=2, column=0, columnspan=2, sticky='NSEW')
+
+        self.delay_label = tk.Label(delay_frame, text=' ')
+        self.delay_label.grid(row=0, column=0, sticky='NSEW')
+        self.delay_label.bind('<Double-1>', lambda e: self.on_param_double_click('delay', e))
+
         self.inst_desc_frame = w.ScrollLabelFrame(inst_frame, text='Description', size={'width': 100, 'height': 100})
         self.inst_desc_frame.grid(row=2, column=0, sticky='NSEW')
         self.inst_desc_frame.columnconfigure(0, weight=1)
