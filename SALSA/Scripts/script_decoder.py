@@ -582,13 +582,13 @@ class SCTDecoder:
         currWord = self.getInt(self._cursor * 4)
         action = None
         # Determine the input type from the input_cutoffs table
-        for key in self._p_codes.input_cutoffs.keys():
+        for key in self._p_codes.input.keys():
             if currWord >= key:
                 action = key
                 break
 
         value = ''
-        value += self._p_codes.input_cutoffs[action]
+        value += self._p_codes.input[action]
         value += str(currWord & 0x00ffffff)
 
         return value
@@ -680,7 +680,7 @@ class SCTDecoder:
                 action = None
 
                 # Determine the input type from the input_cutoffs table
-                for key in self._p_codes.input_cutoffs.keys():
+                for key in self._p_codes.input.keys():
                     if currentWord >= key:
                         action = key
                         break
@@ -690,25 +690,24 @@ class SCTDecoder:
                     # Generate values from current word
                     if action is None:
                         cur_result = f'Unable to interpret SCPT instruction: {currentWord}'
-                        continue
-                    result = None
-                    if action == 0x04000000:
-                        self._cursor += 1
-                        word = self.getWord(self._cursor * 4)
-                        if self._cur_endian == 'little':
-                            word = list(reversed(word))
-                        raw.extend(word)
-                        result = self.getFloat(self._cursor * 4)
-                    elif action == 0x08000000:
-                        obtainedValue = str((currentWord & 0xffff00) >> 8)
-                        obtainedValue += f'/{(currentWord & 0xff)}'
-                        result = self._p_codes.input_cutoffs[action] + f'{obtainedValue}'
                     else:
-                        obtainedValue = currentWord & 0x00ffffff
-                        result = self._p_codes.input_cutoffs[action] + f'{obtainedValue}'
-                    result_stack[stack_index + 2] = result
-                    cur_result = result
-                    stack_index += 1
+                        if action == 0x04000000:
+                            self._cursor += 1
+                            word = self.getWord(self._cursor * 4)
+                            if self._cur_endian == 'little':
+                                word = list(reversed(word))
+                            raw.extend(word)
+                            result = self.getFloat(self._cursor * 4)
+                        elif action == 0x08000000:
+                            obtainedValue = str((currentWord & 0xffff00) >> 8)
+                            obtainedValue += f'+{(currentWord & 0xff)}/256'
+                            result = self._p_codes.input[action] + f'{obtainedValue}'
+                        else:
+                            obtainedValue = currentWord & 0x00ffffff
+                            result = self._p_codes.input[action] + f'{obtainedValue}'
+                        result_stack[stack_index + 2] = result
+                        cur_result = result
+                        stack_index += 1
 
                 # Go through secondary codes and perform a function
                 else:
@@ -719,7 +718,7 @@ class SCTDecoder:
                         cur_result = result
                     else:
                         offset = masked_currentWord
-                        cur_result = self._p_codes.input_cutoffs[action] + f'{offset}'
+                        cur_result = self._p_codes.input[action] + f'{offset}'
                         result_stack[(stack_index + 2)] = cur_result
                         if masked_currentWord == 0xf:
                             flag_stack[(stack_index + 2)] = 1
