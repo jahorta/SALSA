@@ -370,7 +370,7 @@ class SCTEncoder:
                 param_parts = param.split(' ')
                 cutoff = self.param_code.input[param_parts[0] + ' ']
                 if cutoff == self.param_code.input['decimal: ']:
-                    d_parts = param_parts[1].split('/')
+                    d_parts = param_parts[1].split('/')[0].split('+')
                     value = int(d_parts[0]) << 8
                     value = value | int(d_parts[1])
                 else:
