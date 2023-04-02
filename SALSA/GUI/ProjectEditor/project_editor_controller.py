@@ -1,7 +1,7 @@
 from typing import Union, Dict
 import tkinter as tk
 
-from GUI.ProjectEditor.ParamEditorPopups.param_editor_controller import ParamEditController
+from SALSA.GUI.ParamEditorPopups.param_editor_controller import ParamEditController
 from SALSA.Common.setting_class import settings
 from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
 from SALSA.GUI.widgets import DataTreeview
@@ -40,7 +40,9 @@ class ProjectEditorController:
         self.project: SCTProjectFacade = facade
         self.callbacks = callbacks
 
-        self.param_editor = ParamEditController(self.view, callbacks={'get_var_alias': self.get_var_alias})
+        self.param_editor = ParamEditController(self.view, callbacks={'get_var_alias': self.get_var_alias,
+                                                                      'refresh_inst': self.on_refresh_inst,
+                                                                      'update_variables': self.update_var_usage})
 
         if self.log_name not in settings:
             settings[self.log_name] = {}
@@ -63,7 +65,10 @@ class ProjectEditorController:
             'parameter': self.view.param_tree
         }
 
-        self.project.set_callback(key='update_scripts', callback=lambda: self.update_tree('script', self.project.get_tree(self.view.get_headers('script'))))
+        self.project.set_callback(key='update_scripts', callback=lambda: self.update_tree('script',
+                                                                                          self.project.get_tree(
+                                                                                              self.view.get_headers(
+                                                                                                  'script'))))
 
         self.trees['script'].add_callback('select', self.on_select_tree_entry)
         self.trees['section'].add_callback('select', self.on_select_tree_entry)
@@ -110,24 +115,9 @@ class ProjectEditorController:
         details = self.project.get_instruction_details(**self.current)
         if details is None:
             return
-        details['parameter_tree'] = self.project.get_parameter_tree(headings=self.view.get_headers('parameter'), **self.current)
+        details['parameter_tree'] = self.project.get_parameter_tree(headings=self.view.get_headers('parameter'),
+                                                                    **self.current)
         self.set_instruction_details(details)
-
-    def on_edit_parameter(self, paramID):
-        paramID = str(paramID)
-        self.current['parameter'] = paramID
-        param = self.project.get_parameter(**self.current)
-        inst_id = self.project.get_inst_id(**self.current)
-        base_param = self.project.get_base_parameter(inst_id, paramID)
-        if param is None and paramID == 'delay':
-            param = self.project.add_delay_parameter(**self.current)
-        self.param_editor.show_param_editor(param=param, base_param=base_param)
-
-    def on_parameter_changed(self, param):
-        pass
-
-    def get_var_alias(self, var_type, var_id):
-        return self.project.get_var_alias(self.current['script'], var_type, var_id)
 
     def clear_tree(self, tree: str):
         if tree in self.trees.keys():
@@ -214,7 +204,8 @@ class ProjectEditorController:
             tgt_section = tk.Label(self.view.link_out.scroll_frame, text=tgt_sect)
             tgt_section.grid(row=i, column=0)
 
-            tgt_inst = self.project.get_inst_ind(script=self.current['script'], section=tgt_sect, inst=link.target_trace[1])
+            tgt_inst = self.project.get_inst_ind(script=self.current['script'], section=tgt_sect,
+                                                 inst=link.target_trace[1])
             tgt_instruction = tk.Label(self.view.link_out.scroll_frame, text=tgt_inst)
             tgt_instruction.grid(row=i, column=1)
 
@@ -226,7 +217,8 @@ class ProjectEditorController:
             ori_section = tk.Label(self.view.link_in.scroll_frame, text=ori_sect)
             ori_section.grid(row=i, column=0)
 
-            ori_inst = self.project.get_inst_ind(script=self.current['script'], section=ori_sect, inst=link.origin_trace[1])
+            ori_inst = self.project.get_inst_ind(script=self.current['script'], section=ori_sect,
+                                                 inst=link.origin_trace[1])
             ori_instruction = tk.Label(self.view.link_in.scroll_frame, text=ori_inst)
             ori_instruction.grid(row=i, column=1)
 
@@ -283,6 +275,26 @@ class ProjectEditorController:
         display_columns = self.view.visible_headers[tree][1:]
         cur_tree['displaycolumns'] = display_columns
         self.view.fit_headers(cur_tree)
+
+    # ------------------------ #
+    # Parameter editor methods #
+    # ------------------------ #
+
+    def on_edit_parameter(self, paramID):
+        paramID = str(paramID)
+        self.current['parameter'] = paramID
+        param = self.project.get_parameter(**self.current)
+        inst_id = self.project.get_inst_id(**self.current)
+        base_param = self.project.get_base_parameter(inst_id, paramID)
+        if param is None and paramID == 'delay':
+            param = self.project.add_delay_parameter(**self.current)
+        self.param_editor.show_param_editor(param=param, base_param=base_param)
+
+    def get_var_alias(self, var_type, var_id):
+        return self.project.get_var_alias(self.current['script'], var_type, var_id)
+
+    def update_var_usage(self, changes):
+        self.project.update_var_usage(changes, **self.current)
 
     # -------------- #
     # View Callbacks #
