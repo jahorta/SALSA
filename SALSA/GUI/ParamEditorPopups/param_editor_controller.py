@@ -143,6 +143,9 @@ class ParamEditController:
         new_scpt_value = self.convert_scpt_widgets_to_value()
         if not self.scpt_has_changed(new_scpt_value):
             return
+        var_changes = self.get_var_changes(self.param.value, new_scpt_value)
+        if var_changes is not None:
+            self.callbacks['update_variables'](var_changes)
         self.param.value = new_scpt_value
 
     def scpt_has_changed(self, new_scpt_value=None):
@@ -165,8 +168,37 @@ class ParamEditController:
             value = scpt_widget.get_input()
             if 'float' not in self.base_param.type and cur_id == '0':
                 value = int(value)
-
         return value
+
+    def get_var_changes(self, old_param, new_param):
+        old_var_list = self.get_vars(old_param)
+        new_var_list = self.get_vars(new_param)
+        add_list = []
+        for var in new_var_list:
+            if var not in old_var_list:
+                add_list.append(var)
+        remove_list = []
+        for var in old_var_list:
+            if var not in new_var_list:
+                remove_list.append(var)
+        changes = {}
+        if len(add_list) > 0:
+            changes['add'] = add_list
+        if len(remove_list) > 0:
+            changes['remove'] = remove_list
+        return None if len(changes) == 0 else changes
+
+    def get_vars(self, param_value, cur_list=None):
+        if cur_list is None:
+            cur_list = []
+        if isinstance(param_value, dict):
+            for value in param_value.values():
+                cur_list = self.get_vars(value, cur_list=cur_list)
+        elif isinstance(param_value, str):
+            if 'Var: ' not in param_value:
+                return cur_list
+            cur_list.append(param_value)
+        return cur_list
 
     # ---------------------------- #
     # Other parameter type methods #
