@@ -196,8 +196,11 @@ class RequiredIntEntry(RequiredEntry):
     def _key_validate(self, char, index, current, proposed, action, **kwargs):
         valid = super()._key_validate(char=char, index=index, current=current, proposed=proposed, action=action, **kwargs)
 
-        if proposed not in '1234567890':
+        if char not in '1234567890':
             return False
+
+        if proposed == '':
+            return True
 
         if int(proposed) < self.min or int(proposed) > self.max:
             return False
@@ -228,8 +231,11 @@ class RequiredFloatEntry(RequiredEntry):
         valid = super()._key_validate(char=char, index=index, current=current, proposed=proposed, action=action,
                                       **kwargs)
 
-        if proposed not in '1234567890.':
+        if char not in '1234567890.':
             return False
+
+        if proposed == '':
+            return True
 
         if float(proposed) < self.min or float(proposed) > self.max:
             return False
