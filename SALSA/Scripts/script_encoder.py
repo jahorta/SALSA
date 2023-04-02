@@ -88,12 +88,13 @@ class SCTEncoder:
 
     @classmethod
     def encode_sct_file_from_project_script(cls, project_script: SCTScript, base_insts: BaseInstLibFacade,
-                                            use_garbage=True, combine_footer_links=True, add_spurious_refresh=True):
-
-        encoder = cls(script=project_script, base_insts=base_insts)
+                                            use_garbage=True, combine_footer_links=False, add_spurious_refresh=True,
+                                            update_inst_pos=True):
+        print(f'{cls.log_key}: encoding {project_script.name}')
+        encoder = cls(script=project_script, base_insts=base_insts, update_inst_pos=update_inst_pos)
         encoder.encode_sct_file(use_garbage=use_garbage, combine_footer_links=combine_footer_links,
                                 add_spurious_refresh=add_spurious_refresh)
-
+        print(f'{cls.log_key}: finished encoding for {project_script.name}')
         return encoder.sct
 
     def encode_sct_file(self, use_garbage=True, combine_footer_links=False, add_spurious_refresh=False):
