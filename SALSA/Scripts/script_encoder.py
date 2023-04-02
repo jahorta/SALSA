@@ -237,10 +237,10 @@ class SCTEncoder:
         break_loops = False
         loop_iters_performed = 0
         if do_loop:
-            for loop in instruction.loop_parameters:
+            for i, loop in enumerate(instruction.loop_parameters):
                 for p_id, param in loop.items():
                     self._encode_param(param=loop[p_id], base_param=base_inst.parameters[p_id],
-                                       trace=[*trace, str(p_id)])
+                                       trace=[*trace, f'{i}|{p_id}'])
 
                     # Check internal loop conditions
                     if not has_loop_cond:
