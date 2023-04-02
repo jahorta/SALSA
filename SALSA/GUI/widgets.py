@@ -690,6 +690,7 @@ class DataTreeview(ttk.Treeview):
     def clear_all_entries(self):
         for row in self.get_children():
             self.delete(row)
+        self.row_data = {}
 
     def get_selection(self):
         return [self.row_data[self.get_children()[int(s)]] for s in self.cur_selection]
