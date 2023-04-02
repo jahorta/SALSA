@@ -66,8 +66,8 @@ class SCPTEditWidget(tk.Frame):
         self.class_option = tk.OptionMenu(self, self.class_selection, *self.scpt_codes.classes, command=self.update_options)
         self.class_option.grid(row=0, column=1)
 
-        self.option_selection = tk.StringVar(self)
-        self.option_option = tk.OptionMenu(self, self.option_selection, '---', command=self.update_input_entry)
+        self.option_selection = tk.StringVar(self, '---')
+        self.option_option = tk.OptionMenu(self, self.option_selection, '---')
         self.option_option.configure(state='disabled')
         self.option_option.grid(row=0, column=2)
 
@@ -90,15 +90,21 @@ class SCPTEditWidget(tk.Frame):
         self.option_option.configure(state='normal')
         self.option_option['menu'].delete(0, 'end')
         for option in option_list:
-            self.option_option['menu'].add_command(label=option, command=lambda o=option: self.option_selection.set(o))
+            self.option_option['menu'].add_command(label=option, command=lambda o=option: self.choose_option(o))
+
+    def choose_option(self, option):
+        self.option_selection.set(option)
+        self.update_input_entry()
 
     def update_input_entry(self):
-        if self.class_selection in ('compare', 'arithmetic'):
+        if self.class_selection.get() in ('compare', 'arithmetic'):
             # May need to ungrid other entry fields
             self.callbacks['add_child_scpt_rows'](self.key)
             self.set_active_input_widget('')
             return
         self.callbacks['remove_child_scpt_rows'](self.key)
+        if self.class_selection.get() == 'secondary':
+            return
         option_selection = self.option_selection.get()
         widget_type = 'float'
         widget_type = 'var' if 'Var' in option_selection else widget_type
