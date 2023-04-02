@@ -57,6 +57,7 @@ class SCTEncoder:
                 'hama_change01-136-1': b'\x50\x00\x00\x01',
                 'me260aq02-136-1': {'ind': [1], 'value': b'\x50\x00\x00\x01'},
                 'me260aq03-136-1': {'ind': [1], 'value': b'\x50\x00\x00\x01'},
+                'me116fg13-159-0|8': {'ind': [1], 'value': b'\x00\x00\x00\x18'},
                 'q04a_start-136-1': {'ind': [1], 'value': b'\x50\x00\x00\x01'},
                 'me260aq05-136-1': {'ind': [1], 'value': b'\x50\x00\x00\x01'},
                 'camb02-232-3': {'ind': [8], 'value': b'\x04\x00\x00\x00\x42\x80\x00\x00'},
