@@ -147,6 +147,7 @@ class ParamEditController:
         if var_changes is not None:
             self.callbacks['update_variables'](var_changes)
         self.param.value = new_scpt_value
+        self.callbacks['refresh_inst']()
 
     def scpt_has_changed(self, new_scpt_value=None):
         if new_scpt_value is None:
