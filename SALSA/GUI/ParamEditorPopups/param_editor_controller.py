@@ -1,10 +1,10 @@
 from typing import Union, Dict
 
-from BaseInstructions.bi_container import BaseParam
-from Common.constants import sep
-from Common.are_same_checker import are_same
-from Project.project_container import SCTParameter
-from SALSA.GUI.ProjectEditor.ParamEditorPopups.param_editor_popup import ParamEditPopup, SCPTEditWidget
+from SALSA.BaseInstructions.bi_container import BaseParam
+from SALSA.Common.constants import sep
+from SALSA.Common.are_same_checker import are_same
+from SALSA.Project.project_container import SCTParameter
+from SALSA.GUI.ParamEditorPopups.param_editor_popup import ParamEditPopup, SCPTEditWidget
 
 
 class ParamEditController:
