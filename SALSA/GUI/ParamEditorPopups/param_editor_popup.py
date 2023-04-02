@@ -183,7 +183,7 @@ class SCPTEditWidget(tk.Frame):
         if self.active_widget == 'var':
             return f'{self.option_selection.get()}{self.input_vars["var"].get()}'
         elif self.active_widget == 'decimal':
-            return f'{self.input_vars["decimal"][0].get()}+{self.input_vars["decimal"][1].get()}/256'
+            return f'decimal: {self.input_vars["decimal"][0].get()}+{self.input_vars["decimal"][1].get()}/256'
         else:
             return float(self.input_vars['float'].get())
 
