@@ -687,6 +687,12 @@ class DataTreeview(ttk.Treeview):
         super().insert(parent=parent, iid=iid, text=text, values=values, **kwargs)
         return iid
 
+    def select_by_rowdata(self, row_data):
+        for iid, data in self.row_data.items():
+            if row_data == data:
+                self.selection_set(iid)
+                break
+
     def clear_all_entries(self):
         for row in self.get_children():
             self.delete(row)
