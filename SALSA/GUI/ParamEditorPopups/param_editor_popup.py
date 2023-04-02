@@ -150,7 +150,7 @@ class SCPTEditWidget(tk.Frame):
                 all_value_parts = []
                 for part in value_parts:
                     all_value_parts += part.split('+')
-                dec_0 = int(all_value_parts[0])
+                dec_0 = int(all_value_parts[0].split(' ')[1])
                 dec_1 = int(all_value_parts[1])
                 self.input_vars['decimal'][0].set(dec_0)
                 self.input_vars['decimal'][1].set(dec_1)
