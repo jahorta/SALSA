@@ -28,7 +28,7 @@ class SCTEncoder:
 
     param_tests = {'==': is_equal, '!=': not_equal}
 
-    def __init__(self, script: SCTScript, base_insts: BaseInstLibFacade, endian='big'):
+    def __init__(self, script: SCTScript, base_insts: BaseInstLibFacade, update_inst_pos=True, endian='big'):
         self.sct_body = bytearray()
         # for decoder, encoder validation only
         if self.validation:
@@ -63,6 +63,8 @@ class SCTEncoder:
                 'camb02-224-13': {'ind': [10], 'value': b'\x04\x00\x00\x00\x42\xF9\x00\x00'},
                 '_EV_VER2-50-0': {'ind': [2], 'value': b'\x50\x00\x00\x01'}
             }
+
+        self.update_inst_pos = update_inst_pos
 
         self.script = script
         self.bi = base_insts
@@ -182,6 +184,8 @@ class SCTEncoder:
         base_inst = self.bi.get_inst(instruction.instruction_id)
         trace.append(str(instruction.instruction_id))
         self.inst_positions[instruction.ID] = len(self.sct_body)
+        if self.update_inst_pos:
+            instruction.absolute_offset = len(self.sct_body)
 
         # add 13 code if needed or wanted
         if instruction.skip_refresh:
