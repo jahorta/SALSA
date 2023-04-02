@@ -162,9 +162,8 @@ class SCPTEditWidget(tk.Frame):
                 self.update_options(None)
                 self.option_selection.set(f'{var_type}: ')
                 self.set_active_input_widget('var')
-                alias = self.callbacks['get_var_alias'](var_type, var_value)
                 self.input_vars['var'].set(var_value)
-                self.input_widgets['var'].alias_label.config(text=alias)
+                self.input_widgets['var'].load_alias(None)
             else:
                 print(f'unknown value type: {value}')
 
