@@ -41,7 +41,7 @@ class Application(tk.Tk):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
-        project_edit_callbacks = {'export_sct': self.on_export_scts}
+        project_edit_callbacks = {}
         self.project_edit_controller = ProjectEditorController(self, self.project_edit_view, self.project, project_edit_callbacks)
 
         self.gui = GUIController(parent=self, scpt_editor_view=self.project_edit_view,
@@ -80,7 +80,8 @@ class Application(tk.Tk):
         # Set menu options available only when in script mode
         self.gui.add_callbacks({
             'script': self.menu.enable_script_commands,
-            'no_script': self.menu.disable_script_commands
+            'no_script': self.menu.disable_script_commands,
+            'export_sct': self.on_export_scts
         })
 
         self.gui.disable_script_view()
