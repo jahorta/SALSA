@@ -270,3 +270,28 @@ class SCTProjectFacade:
         if var_id not in self.project.scripts[script].variables[var_type]:
             return 'No Alias'
         return self.project.scripts[script].variables[var_type][var_id]['alias']
+
+    def update_var_usage(self, changes, script, section, instruction, parameter):
+        trace = (section, instruction, parameter)
+
+        for change in changes['add']:
+            var_parts = change.split(': ')
+            var_type = var_parts[0]
+            var_key = int(var_parts[1])
+            if var_key in self.project.scripts[script].variables[var_type]:
+                self.project.scripts[script].variables[var_type][var_key]['usage'].append(trace)
+            else:
+                self.project.scripts[script].variables[var_type][var_key] = {'alias': '', 'usage': [trace]}
+
+        for change in changes['remove']:
+            var_parts = change.split(': ')
+            var_type = var_parts[0]
+            var_key = int(var_parts[1])
+            if trace not in self.project.scripts[script].variables[var_type][var_key]['usage']:
+                print(f'{self.log_key}: No variable usage to remove for {trace} in {var_type}: {var_key}')
+                continue
+            self.project.scripts[script].variables[var_type][var_key]['usage'].remove(trace)
+
+    def update_inst_field(self, field, value, script, section, instruction, **kwargs):
+        inst = self.project.scripts[script].sections[section].instructions[instruction]
+        inst.__setattr__(field, value)
