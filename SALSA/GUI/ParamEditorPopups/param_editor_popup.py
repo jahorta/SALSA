@@ -176,7 +176,8 @@ class SCPTEditWidget(tk.Frame):
             self.input_vars['float'].set(value)
 
     def get_var_alias(self):
-        self.callbacks['get_var_alias'](self.option_selection.get(), self.input_vars['var'].get())
+        var_type = self.option_selection.get().split(': ')[0]
+        return self.callbacks['get_var_alias'](var_type, self.input_vars['var'].get())
 
     def get_input(self):
         if self.active_widget == 'var':
@@ -185,7 +186,6 @@ class SCPTEditWidget(tk.Frame):
             return f'{self.input_vars["decimal"][0].get()}+{self.input_vars["decimal"][1].get()}/256'
         else:
             return float(self.input_vars['float'].get())
-
 
 
 # --------------------------- #
