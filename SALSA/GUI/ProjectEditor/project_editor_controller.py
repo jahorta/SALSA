@@ -40,9 +40,11 @@ class ProjectEditorController:
         self.project: SCTProjectFacade = facade
         self.callbacks = callbacks
 
-        self.param_editor = ParamEditController(self.view, callbacks={'get_var_alias': self.get_var_alias,
-                                                                      'refresh_inst': self.on_refresh_inst,
-                                                                      'update_variables': self.update_var_usage})
+        pe_callbacks = {'get_var_alias': self.get_var_alias,
+                        'refresh_inst': self.on_refresh_inst,
+                        'update_variables': self.update_var_usage,
+                        'get_subscript_list': lambda: self.project.get_section_list(self.current['script'])}
+        self.param_editor = ParamEditController(self.view, callbacks=pe_callbacks)
 
         if self.log_name not in settings:
             settings[self.log_name] = {}

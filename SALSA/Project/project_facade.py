@@ -295,3 +295,6 @@ class SCTProjectFacade:
     def update_inst_field(self, field, value, script, section, instruction, **kwargs):
         inst = self.project.scripts[script].sections[section].instructions[instruction]
         inst.__setattr__(field, value)
+
+    def get_section_list(self, script):
+        return list(self.project.scripts[script].sections.keys())
