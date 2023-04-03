@@ -82,7 +82,7 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Type": "int-code",
+                "Type": "int",
                 "Mask": 0x0000ffff,
                 "Signed": False,
                 "Default": None
@@ -101,7 +101,7 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Type": "int-code",
+                "Type": "int",
                 "Mask": 0x0000ffff,
                 "Signed": False,
                 "Default": None
@@ -120,7 +120,7 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Type": "int-code",
+                "Type": "int",
                 "Mask": 0x0000ffff,
                 "Signed": False,
                 "Default": None
@@ -176,7 +176,7 @@ inst_defaults = {
         "Link Type": "Jump",
         "Parameters": {
             0: {
-                "Type": "int-jump",
+                "Type": "int-subscript",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
