@@ -13,7 +13,7 @@ inst_defaults = {
                 "Default": None
             },
             1: {
-                "Type": "int",
+                "Type": "int-jump",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
@@ -51,7 +51,7 @@ inst_defaults = {
                 "Default": None
             },
             1: {
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -63,7 +63,7 @@ inst_defaults = {
                 "Default": None
             },
             3: {
-                "Type": "int",
+                "Type": "int-jump",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -161,7 +161,7 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int-jump",
                 "Mask": 0xfffffffc,
                 "Signed": True,
                 "Default": None
@@ -176,7 +176,7 @@ inst_defaults = {
         "Link Type": "Jump",
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int-jump",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
@@ -306,7 +306,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int-footer",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
@@ -322,7 +322,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int-footer",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
@@ -344,7 +344,7 @@ inst_defaults = {
                 "Default": None
             },
             1: {
-                "Type": "int",
+                "Type": "int-footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -582,7 +582,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -647,7 +647,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -724,7 +724,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -1010,7 +1010,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -1033,7 +1033,7 @@ inst_defaults = {
         "Warning": "This instruction will exit the current script and load a new one",
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int-footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -1406,7 +1406,7 @@ inst_defaults = {
                 "Default": None
             },
             1: {
-                "Type": "int",
+                "Type": "int-footer",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
@@ -1639,7 +1639,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int-footer",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
@@ -2333,7 +2333,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -2361,7 +2361,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -2389,7 +2389,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -2418,7 +2418,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -2447,7 +2447,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -2527,7 +2527,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -2779,7 +2779,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -2801,7 +2801,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -3007,7 +3007,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -3137,7 +3137,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int-footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -3203,7 +3203,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int-footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -3330,7 +3330,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -3365,7 +3365,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -3439,7 +3439,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -3583,7 +3583,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -3606,7 +3606,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -3676,7 +3676,7 @@ inst_defaults = {
                 "Default": None
             },
             1: {
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -3699,7 +3699,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -3758,7 +3758,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Mask": 0x0000ffff,
                 "Signed": False,
                 "Default": None
@@ -3799,7 +3799,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Mask": 0x0000ffff,
                 "Signed": False,
                 "Default": None
@@ -3858,7 +3858,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -3991,7 +3991,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -4073,7 +4073,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -4205,7 +4205,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int-string",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
@@ -4324,7 +4324,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -4443,7 +4443,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -4471,7 +4471,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -4525,7 +4525,7 @@ inst_defaults = {
                 "Default": None
             },
             1: {
-                "Type": "int",
+                "Type": "int-string",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
@@ -4581,7 +4581,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -4703,7 +4703,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -5748,7 +5748,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int-footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -5916,7 +5916,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int-footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -5937,7 +5937,7 @@ inst_defaults = {
                 "Default": None
             },
             1: {
-                "Type": "int",
+                "Type": "int-footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -6955,7 +6955,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -6977,7 +6977,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -7006,7 +7006,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -7041,7 +7041,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int-footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -7142,7 +7142,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int-footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -7158,7 +7158,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -7247,7 +7247,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int",
+                "Type": "int-iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -7331,7 +7331,7 @@ inst_defaults = {
                 "Default": None
             },
             1: {
-                "Type": "int",
+                "Type": "int-string",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
