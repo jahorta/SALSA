@@ -4,7 +4,8 @@ from SALSA.BaseInstructions.bi_container import BaseParam
 from SALSA.Common.constants import sep
 from SALSA.Common.are_same_checker import are_same
 from SALSA.Project.project_container import SCTParameter
-from SALSA.GUI.ParamEditorPopups.param_editor_popup import ParamEditPopup, SCPTEditWidget
+from SALSA.GUI.ParamEditorPopups.param_editor_popup import ParamEditPopup, SCPTEditWidget, IntEditWidget, \
+    SubscriptWidget, FooterEditWidget
 
 
 class ParamEditController:
@@ -30,6 +31,10 @@ class ParamEditController:
                                'has_changes': self.scpt_has_changed,
                                'save': self.scpt_save,
                                'close': self.close_view}
+
+        self.int_callbacks = {'save': self.int_save, 'close': self.close_view}
+
+        self.int_field: Union[None, IntEditWidget, SubscriptWidget, FooterEditWidget] = None
 
     # ------------------------------------- #
     # Param Editor Show and Close functions #
@@ -201,9 +206,31 @@ class ParamEditController:
             cur_list.append(param_value)
         return cur_list
 
-    # ---------------------------- #
-    # Other parameter type methods #
-    # ---------------------------- #
+    # -------------------------- #
+    # Int parameter type methods #
+    # -------------------------- #
 
     def setup_int_view(self):
-        pass
+        self.view.set_callbacks(self.int_callbacks)
+        if 'subscript' in self.base_param.type:
+            self.int_field = SubscriptWidget(self.view.main_frame, name=self.base_param.name,
+                                             subscripts=self.callbacks['get_subscript_list']())
+            value = self.param.link.target_trace[0]
+        elif 'footer' in self.base_param.type:
+            self.int_field = FooterEditWidget(self.view.main_frame, name=self.base_param.name)
+            value = self.param.link_result
+        else:
+            self.int_field = IntEditWidget(self.view.main_frame, name=self.base_param.name)
+            value = self.param.value
+        self.int_field.grid(row=0, column=0)
+        self.int_field.set_value(value)
+
+    def int_save(self):
+        value = self.int_field.get_value()
+        if 'subscript' in self.base_param.type:
+            inst_id = self.callbacks['get_first_inst'](value)
+            self.param.link.target_trace = [value, inst_id]
+        elif 'footer' in self.base_param.type:
+            self.param.link_result = value
+        else:
+            self.param.value = value

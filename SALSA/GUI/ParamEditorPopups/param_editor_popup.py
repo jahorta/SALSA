@@ -1,5 +1,5 @@
 import tkinter as tk
-from typing import Union, Dict
+from typing import Union, Dict, List
 
 import SALSA.GUI.widgets as w
 from Common.constants import sep
@@ -186,6 +186,87 @@ class SCPTEditWidget(tk.Frame):
             return f'decimal: {self.input_vars["decimal"][0].get()}+{self.input_vars["decimal"][1].get()}/256'
         else:
             return float(self.input_vars['float'].get())
+
+
+# -------------------------- #
+# Widgets for int parameters #
+# -------------------------- #
+
+# base int widget
+class IntEditWidget(tk.Frame):
+
+    def __init__(self, parent, name, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+
+        label = tk.Label(self, text=f'{name}: ')
+        label.grid(row=0, column=0, sticky=tk.W)
+
+        self.entry_variable = tk.IntVar(self)
+        entry_field = w.RequiredIntEntry(self, textvariable=self.entry_variable, width=15)
+        entry_field.grid(row=0, column=1, sticky=tk.W)
+
+    def set_value(self, value):
+        self.entry_variable.set(value)
+
+    def get_value(self):
+        return self.entry_variable.get()
+
+
+class FooterEditWidget(tk.Frame):
+
+    def __init__(self, parent, name, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+
+        label = tk.Label(self, text=f'{name}: ')
+        label.grid(row=0, column=0, sticky=tk.W)
+
+        self.entry_variable = tk.StringVar(self)
+        entry_field = tk.Entry(self, textvariable=self.entry_variable, width=25)
+        entry_field.grid(row=0, column=1, sticky=tk.W)
+
+    def set_value(self, value):
+        self.entry_variable.set(value)
+
+    def get_value(self):
+        return self.entry_variable.get()
+
+
+class SubscriptWidget(tk.Frame):
+
+    def __init__(self, parent, name, subscripts: List[str], *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+
+        label = tk.Label(self, text=f'{name}: ')
+        label.grid(row=0, column=0, sticky=tk.W)
+
+        self.entry_variable = tk.StringVar(self)
+        option_field = tk.OptionMenu(self, self.entry_variable, *subscripts)
+        option_field.grid(row=0, column=1, sticky=tk.W)
+
+    def set_value(self, value):
+        self.entry_variable.set(value)
+
+    def get_value(self):
+        return self.entry_variable.get()
+
+
+class StringWidget(tk.Frame):
+
+    def __init__(self, parent, name, subscripts: List[str], *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+
+        label = tk.Label(self, text=f'{name}: ')
+        label.grid(row=0, column=0, sticky=tk.W)
+
+        self.entry_variable = tk.StringVar(self)
+        entry_field = tk.OptionMenu(self, self.entry_variable, *subscripts)
+        entry_field.grid(row=0, column=1, sticky=tk.W)
+
+    def set_value(self, value):
+        self.entry_variable.set(value)
+
+    def get_value(self):
+        return self.entry_variable.get()
 
 
 # --------------------------- #
