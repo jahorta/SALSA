@@ -145,6 +145,8 @@ class GUIController:
     # ---------------------- #
 
     def show_status_popup(self, title, msg):
+        if self.status_popup is not None:
+            self.stop_status_popup()
         height = 50
         width = 300
         self.status_popup = tk.Toplevel(self.scpt_view)
