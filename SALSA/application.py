@@ -153,9 +153,21 @@ class Application(tk.Tk):
         script_paths = filedialog.askopenfilenames(**kwargs)
         if script_paths == '' or script_paths is None:
             return
-        for script in script_paths:
-            name, script = self.sct_model.load_sct(self.base_insts, file=script)
-            self.project.add_script_to_project(name, script)
+
+        self._notify_add_script(list(script_paths))
+
+    def _notify_add_script(self, script_paths):
+        filepath = script_paths.pop(0)
+        self.gui.show_status_popup(title='Decoding Script', msg=f'Decoding Script ({os.path.basename(filepath)})')
+        self.after(10, self._continue_add_script, filepath, script_paths)
+
+    def _continue_add_script(self, filepath, script_paths):
+        name, script = self.sct_model.load_sct(self.base_insts, file=filepath)
+        self.project.add_script_to_project(name, script)
+        if len(script_paths) > 0:
+            self._notify_add_script(script_paths)
+        else:
+            self.gui.stop_status_popup()
 
     def set_script_dir(self):
         script_dir = filedialog.askdirectory()
