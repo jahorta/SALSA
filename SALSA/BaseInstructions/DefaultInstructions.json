@@ -74,7 +74,7 @@
   },
   "7": {
     "Name": "Set Float",
-    "Description": "Writes <Value> as a float into: *add[0x8030e514,*mul[<Offset>,4]*",
+    "Description": "Writes <Value> as a float into: *add[0x8030e514,*mul[<Offset>,4]*]*\n",
     "Notes": "No dependancy on param1\nFunctional at all times",
     "Parameters": {
       "0": {
