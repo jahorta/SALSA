@@ -6,6 +6,11 @@ from Common.constants import sep
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 
 
+# --------------------------- #
+# Widgets for SCPT parameters #
+# --------------------------- #
+
+# SCPT decimal input widget
 class DecimalWidget(tk.Frame):
 
     def __init__(self, parent, textvariables, *args, **kwargs):
@@ -26,6 +31,7 @@ class DecimalWidget(tk.Frame):
         right_label.grid(row=0, column=3)
 
 
+# SCPT variable input widget
 class SCPTVarWidget(tk.Frame):
 
     def __init__(self, parent, textvariable, callbacks, *args, **kwargs):
@@ -49,6 +55,7 @@ class SCPTVarWidget(tk.Frame):
         self.alias_label.config(text=alias)
 
 
+# Single row widget of SCPT parameter
 class SCPTEditWidget(tk.Frame):
 
     def __init__(self, parent, callbacks, key: str, *args, prefix='', **kwargs):
