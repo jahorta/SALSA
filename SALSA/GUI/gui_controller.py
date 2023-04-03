@@ -3,18 +3,18 @@ import tkinter as tk
 from typing import Union, TypedDict, Literal
 import webbrowser
 
-from GUI.AnalysisPopup.analysis_controller import AnalysisController
-from GUI.InstructionEditor.instruction_editor_controller import InstructionEditorController
-from GUI.other_popups import AboutView
-from BaseInstructions.bi_facade import BaseInstLibFacade
+from SALSA.GUI.AnalysisPopup.analysis_controller import AnalysisController
+from SALSA.GUI.InstructionEditor.instruction_editor_controller import InstructionEditorController
+from SALSA.GUI.other_popups import AboutView
+from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.GUI.AnalysisPopup.analysis_view import AnalysisView
 from SALSA.GUI.InstructionEditor.instruction_editor_view import InstructionEditorView
 from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
-from GUI.SCTExport.sct_export_popup import SCTExportPopup
-from GUI.VariableEditor.variable_editor_popup import VariablePopup
-from GUI.StringEditor.string_editor_popup import StringPopup
-from Project.project_facade import SCTProjectFacade
-from Common.containers import Vector2
+from SALSA.GUI.SCTExport.sct_export_popup import SCTExportPopup
+from SALSA.GUI.VariableEditor.variable_editor_popup import VariablePopup
+from SALSA.GUI.StringEditor.string_editor_popup import StringPopup
+from SALSA.Project.project_facade import SCTProjectFacade
+from SALSA.Common.containers import Vector2
 
 
 class PopupTypes(TypedDict):

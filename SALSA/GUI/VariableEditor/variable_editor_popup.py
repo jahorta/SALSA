@@ -3,7 +3,7 @@ from math import floor
 from tkinter import filedialog, ttk
 from typing import Tuple, List
 
-from Common.setting_class import settings
+from SALSA.Common.setting_class import settings
 from SALSA.GUI import widgets as w
 
 

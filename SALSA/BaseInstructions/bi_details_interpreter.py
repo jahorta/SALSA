@@ -1,5 +1,5 @@
 from SALSA.BaseInstructions.bi_container import BaseInst
-from Project.project_container import SCTInstruction
+from SALSA.Project.project_container import SCTInstruction
 from SALSA.Common.byte_array_utils import getTypeFromString, toFloat, asStringOfType, toInt
 
 

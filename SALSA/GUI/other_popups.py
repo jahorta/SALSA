@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from Common.containers import Vector2, Dimension
+from SALSA.Common.containers import Vector2, Dimension
 
 
 class HelpPopupView(tk.Toplevel):

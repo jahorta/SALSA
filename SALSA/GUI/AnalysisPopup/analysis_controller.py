@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from GUI.AnalysisPopup.analysis_view import AnalysisView
+from SALSA.GUI.AnalysisPopup.analysis_view import AnalysisView
 
 
 class AnalysisController:

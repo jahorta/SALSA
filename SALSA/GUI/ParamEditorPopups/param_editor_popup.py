@@ -2,7 +2,7 @@ import tkinter as tk
 from typing import Union, Dict, List
 
 import SALSA.GUI.widgets as w
-from Common.constants import sep
+from SALSA.Common.constants import sep
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 
 

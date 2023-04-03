@@ -64,7 +64,6 @@ class HelpStrings:
 
     def get_all(self):
         return {
-            'Instructions': self.instruction_features,
             'Scripts': self.script_notes,
             'Other': self.other_notes
         }

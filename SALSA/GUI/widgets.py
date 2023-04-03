@@ -8,7 +8,7 @@ from typing import Dict, List, Union
 # ------ #
 # Mixins #
 # ------ #
-from Common.containers import Dimension, Vector2
+from SALSA.Common.containers import Dimension, Vector2
 
 
 class ValidatedMixin:

@@ -2,7 +2,7 @@ import json
 import os.path
 import pickle
 
-from Common.setting_class import settings
+from SALSA.Common.setting_class import settings
 
 
 class ProjectModel:
