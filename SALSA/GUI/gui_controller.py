@@ -1,13 +1,13 @@
+import os.path
 import tkinter as tk
 from typing import Union, TypedDict, Literal
+import webbrowser
 
 from GUI.AnalysisPopup.analysis_controller import AnalysisController
-from GUI.HelpPopup.help_controller import HelpController
 from GUI.InstructionEditor.instruction_editor_controller import InstructionEditorController
 from GUI.other_popups import AboutView
 from BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.GUI.AnalysisPopup.analysis_view import AnalysisView
-from SALSA.GUI.HelpPopup.help_view import HelpView
 from SALSA.GUI.InstructionEditor.instruction_editor_view import InstructionEditorView
 from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
 from GUI.SCTExport.sct_export_popup import SCTExportPopup
@@ -20,7 +20,6 @@ from Common.containers import Vector2
 class PopupTypes(TypedDict):
     inst: Union[None, InstructionEditorController]
     analysis: Union[None, AnalysisController]
-    help: Union[None, HelpController]
     about: Union[None, AboutView]
     variable: Union[None, VariablePopup]
     string: Union[None, StringPopup]
@@ -34,12 +33,13 @@ class GUIController:
     def __init__(self, parent, scpt_editor_view: ProjectEditorView, project_facade: SCTProjectFacade,
                  inst_lib_facade: BaseInstLibFacade):
 
+        self.help_path = os.path.abspath('./SALSA/Help/Skies of Arcadia Legends Script Assistant.html')
         self.parent = parent
         self.scpt_view = scpt_editor_view
         self.project = project_facade
         self.base_lib = inst_lib_facade
 
-        self.popups: PopupTypes = {'inst': None, 'analysis': None, 'help': None, 'about': None,
+        self.popups: PopupTypes = {'inst': None, 'analysis': None, 'about': None,
                                    'variable': None, 'string': None, 'export': None}
 
         self.callbacks = {}
@@ -97,9 +97,7 @@ class GUIController:
         self.popups['about'] = AboutView(parent=self.parent, position=position, callback=self.close_popup)
 
     def show_help(self):
-        pass
-        # self.help_view = HelpView(self.parent, callbacks={'close': self.close_popup}, )
-        # self.help_controller = HelpController(self.help_view)
+        webbrowser.open(url='file://' + self.help_path)
 
     def show_settings(self):
         pass
@@ -134,8 +132,8 @@ class GUIController:
     # Popup cleanup functions #
     # ----------------------- #
 
-    def close_popup(self, name: Literal['inst', 'analysis', 'help', 'about', 'variable', 'string', 'export'],
-                    popup: Union[InstructionEditorView, AnalysisView, HelpView, AboutView, SCTExportPopup, VariablePopup, StringPopup]):
+    def close_popup(self, name: Literal['inst', 'analysis', 'about', 'variable', 'string', 'export'],
+                    popup: Union[InstructionEditorView, AnalysisView, AboutView, SCTExportPopup, VariablePopup, StringPopup]):
         popup.destroy()
         self.popups[name] = None
 
