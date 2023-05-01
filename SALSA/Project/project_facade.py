@@ -55,17 +55,21 @@ class SCTProjectFacade:
 
         return tree_list
 
-    def _create_tree(self, group, key_list, headers, base=None, base_key=None, key_only=False):
+    def _create_tree(self, group, key_list, headers, base=None, base_key=None, key_only=False, prev_key=None):
         tree_list = []
         for key in key_list:
             if isinstance(key, dict):
                 for ele_key, ele_value in key.items():
                     if sep not in ele_key:
                         tree_list.extend(self._create_tree(group=group, key_list=[ele_key], headers=headers, base=base, base_key=base_key, key_only=True))
-                        tree_list[-1]['group_type'] = 'element'
+                        if prev_key == 'switch':
+                            cur_group_type = 'case'
+                        else:
+                            cur_group_type = 'element'
+                        tree_list[-1]['group_type'] = cur_group_type
                     else:
                         ele_key = ele_key.split(sep)
-                        tree_list.extend(self._create_tree(group=group, key_list=[ele_key[0]], headers=headers, base=base, base_key=base_key))
+                        tree_list.extend(self._create_tree(group=group, key_list=[ele_key[0]], headers=headers, base=base, base_key=base_key, prev_key=key))
                         tree_list[-1]['group_type'] = ele_key[1]
                     tree_list.append('group')
                     ele_value = [ele_value] if not isinstance(ele_value, list) else ele_value
@@ -96,8 +100,13 @@ class SCTProjectFacade:
                     if header_key not in element_dict:
                         if base is None or base_key is None:
                             raise KeyError(f'PrjFacade: {header_key} not in {element}, no base_element_group or base_key given')
+
                         base_inst_key = element_dict[base_key]
-                        base_dict = base[base_inst_key].__dict__
+                        if base_inst_key is None:
+                            base_dict = {header_key: '---'}
+                        else:
+                            base_dict = base[base_inst_key].__dict__
+
                         if header_key not in base_dict:
                             raise KeyError(f'PrjFacade: {header_key} not in {element} or {base[base_key]}')
                         value_dict = base_dict
