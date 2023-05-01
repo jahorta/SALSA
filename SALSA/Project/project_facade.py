@@ -2,7 +2,7 @@ import copy
 from typing import Union, Tuple
 
 from SALSA.Project.description_formatting import format_description
-from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter
+from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter, SCTInstruction, SCTLink
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
 from SALSA.Common.constants import sep
@@ -307,3 +307,125 @@ class SCTProjectFacade:
 
     def get_section_list(self, script):
         return list(self.project.scripts[script].sections.keys())
+
+    def add_inst(self, script, section, ref_inst, direction='below'):
+        new_inst = SCTInstruction()
+        inst_sect = self.project.scripts[script].sections[section]
+        inst_sect.instructions[new_inst.ID] = new_inst
+
+        insert_pos = inst_sect.instruction_ids_ungrouped.index(ref_inst)
+        if direction == 'below':
+            insert_pos += 1
+        inst_sect.instruction_ids_ungrouped.insert(insert_pos, new_inst.ID)
+
+        inst_parents, insert_loc_in_parents = self.get_inst_grouped_parents_and_index(ref_inst, inst_sect.instructions_ids_grouped)
+
+        cur_group = inst_sect.instructions_ids_grouped
+        for key in inst_parents:
+            cur_group = cur_group[key]
+
+        if direction == 'below':
+            insert_loc_in_parents += 1
+
+        cur_group.insert(insert_loc_in_parents, new_inst.ID)
+
+        return new_inst.ID
+
+    def get_inst_grouped_parents_and_index(self, inst, grouped_region, parents=None):
+        if parents is None:
+            parents = []
+
+        if inst in grouped_region:
+            return parents, grouped_region.index(inst)
+
+        for i, entry in enumerate(grouped_region):
+            if not isinstance(entry, dict):
+                continue
+
+            for key, value in entry.items():
+                if inst in key:
+                    return parents, i
+
+                out_parents, index = self.get_inst_grouped_parents_and_index(inst, value, parents=parents + [i] + [key])
+                if out_parents is not None:
+                    return out_parents, index
+
+        return None, None
+
+    def change_inst_id(self, script, section, inst, new_id):
+        # Check that the instruction requires an inst_id change
+        cur_section = self.project.scripts[script].sections[section]
+        cur_inst = cur_section.instructions[inst]
+        if cur_inst.instruction_id == new_id:
+            return
+
+        change_type = None
+        if cur_inst.instruction_id in self.base_insts.group_inst_list:
+            change_type = self.callbacks['check_remove_inst_group'](cur_inst.instruction_id, int(new_id))
+            if change_type == 'cancel':
+                return
+            # TODO - If change_type == 'delete' confirm delete for N instructions
+            # TODO - If change_type == 'pop below' move instructions out of group
+            # TODO - if 'insert group' in change type save instructions for later, and add them to new group
+            # TODO - else delete grouped instructions
+
+        parent_list, index = self.get_inst_grouped_parents_and_index(inst, cur_section.instructions_ids_grouped)
+
+        # Change inst id
+        cur_inst.set_inst_id(new_id)
+
+        # Remove any current parameters and loop parameters
+        self.remove_inst_parameters(script, section, inst)
+
+        # Add in default parameter values with no loops
+        base_inst = self.base_insts.get_inst(int(new_id))
+
+        for i in [*base_inst.params_before, *base_inst.params_after]:
+            base_param = base_inst.parameters[i]
+            new_param = SCTParameter(base_param.param_ID, base_param.type)
+            if 'iterations' in base_param.type:
+                new_param.set_value(0)
+            cur_inst.parameters[i] = new_param
+
+        if int(new_id) in self.base_insts.group_inst_list:
+            self.setup_group_type_inst(script, section, inst, cur_inst, parent_list, index)
+            # TODO - if 'insert group' in change_type, insert instructions in group, resolve ungrouped, etc.
+
+    def remove_inst_parameters(self, script, section, inst, loop=True):
+        cur_inst = self.project.scripts[script].sections[section].instructions[inst]
+        cur_inst.parameters = {}
+        if not loop:
+            return
+        cur_inst.loop_parameters = []
+
+    def setup_group_type_inst(self, script, section, inst_id, inst, parent_list, index):
+        print('here')
+        inst_sect = self.project.scripts[script].sections[section]
+
+        cur_group = inst_sect.instructions_ids_grouped
+        for key in parent_list:
+            cur_group = cur_group[key]
+
+        if inst.instruction_id == 0:
+            goto_inst = SCTInstruction()
+            goto_inst.set_inst_id(10)
+            goto_param = SCTParameter(0, 'int-jump')
+            target_inst_UUID_index = inst_sect.instruction_ids_ungrouped.index(inst_id)+1
+            target_inst_UUID = inst_sect.instruction_ids_ungrouped[target_inst_UUID_index]
+            goto_link = SCTLink(origin=-1, origin_trace=[script, section, goto_inst.ID, 0], type='Jump',
+                                target=-1, target_trace=[script, section, target_inst_UUID])
+            goto_param.link = goto_link
+            inst_sect.instructions[target_inst_UUID].links_in.append(goto_link)
+            goto_inst.links_out.append(goto_link)
+            goto_inst.add_parameter(0, goto_param)
+            inst_sect.instructions[goto_inst.ID] = goto_inst
+            inst_sect.instruction_ids_ungrouped.insert(target_inst_UUID_index, goto_inst.ID)
+            grouped_insertion = {f'{inst_id}{sep}if': [goto_inst.ID]}
+        elif inst.instruction_id == 3:
+            grouped_insertion = {f'{inst_id}{sep}switch': {}}
+        else:
+            print(f'{self.log_key}: Setup Group Type Inst: Unknown group type inst ({inst.instruction_id}). Group not made.')
+            grouped_insertion = inst_id
+
+        cur_group.pop(index)
+        cur_group.insert(index, grouped_insertion)
