@@ -8,7 +8,7 @@ from SALSA.Common.constants import sep, alt_sep
 
 @dataclass
 class SCTLink:
-    type: str
+    type: str  # Available types: Jump, Switch, String
     origin: int
     origin_trace: List[Union[int, str]]
     target: int
