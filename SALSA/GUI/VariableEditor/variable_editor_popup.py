@@ -93,8 +93,8 @@ class VariablePopup(tk.Toplevel):
     def _populate_script_tree(self):
         all_scripts = self.callbacks['get_scripts']()
         for script in all_scripts:
-            self.script_tree.insert_entry(parent='', text=script['Name'], values=[], index='end',
-                                          row_data=script['Name'])
+            self.script_tree.insert_entry(parent='', text=script['name'], values=[], index='end',
+                                          row_data=script['name'])
 
     def script_select(self, tree, script_name):
         self.cur_script = script_name
