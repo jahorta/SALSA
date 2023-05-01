@@ -74,6 +74,7 @@ class SCTDecoder:
         self._jmp_if_falses = {}
         self._switches = {}
         self._variables = {}
+        self._instruction_groups = {}
 
     def _decode_sct(self, script_name: str, sct: bytearray, inst_lib: BaseInstLibFacade) -> SCTScript:
         print(f'{self.log_key}: Decoding {script_name}')
@@ -1273,11 +1274,14 @@ class SCTDecoder:
                     print(f'SCPT Decoder: Decode Jumps: No goto inst found: {sect_name}{sep}{jmp_id}')
                     continue
 
+                if sect_name not in self._instruction_groups:
+                    self._instruction_groups[sect_name] = {}
+
                 # Check for a loop and add to loops if true
                 if prev_inst.parameters[0].value < 0:
                     group_key = f'{jmp_id}{sep}while'
-                    decoded_sct.sections[sect_name].instructions_ids_grouped[group_key] = (f'{sect_name}{sep}{jmp_id}',
-                                                                                           f'{prev_sect_name}{sep}{prev_to_id}')
+                    self._instruction_groups[sect_name][group_key] = (f'{sect_name}{sep}{jmp_id}',
+                                                                        f'{prev_sect_name}{sep}{prev_to_id}')
                     decoded_sct.sections[sect_name].jump_loops.append(group_key)
                     continue
 
@@ -1286,15 +1290,14 @@ class SCTDecoder:
                 jmp_end_id = prev_inst.links_out[0].target_trace[1]
 
                 group_key = f'{jmp_id}{sep}if'
-                decoded_sct.sections[sect_name].instructions_ids_grouped[group_key] = (f'{sect_name}{sep}{jmp_id}',
-                                                                                       f'{prev_sect_name}{sep}{prev_to_id}')
+                self._instruction_groups[sect_name][group_key] = (f'{sect_name}{sep}{jmp_id}',
+                                                                    f'{prev_sect_name}{sep}{prev_to_id}')
 
                 if jmp_to_id == jmp_end_id or jmp_to_sect_name != jmp_end_sect:
                     continue
                 group_key = f'{jmp_id}{sep}else'
-                decoded_sct.sections[sect_name].instructions_ids_grouped[group_key] = (
-                f'{jmp_to_sect_name}{sep}{jmp_to_id}',
-                f'{jmp_end_sect}{sep}{jmp_end_id-1}')
+                self._instruction_groups[sect_name][group_key] = (
+                    f'{jmp_to_sect_name}{sep}{jmp_to_id}', f'{jmp_end_sect}{sep}{jmp_end_id-1}')
 
     def _group_switches(self, decoded_sct):
 
@@ -1342,6 +1345,8 @@ class SCTDecoder:
                 # For all entries except the last one, create instruction groups for switch entries
                 # Then if the goto at the end of an entry is negative, it should be a loop, so add that entry to loops
                 # If at least one is positive, record the goto, and the max goto should be the end of the last one
+                if sect_name not in self._instruction_groups:
+                    self._instruction_groups[sect_name] = {}
                 prev_start = None
                 prev_case = None
                 prev_start_sect = None
@@ -1353,7 +1358,8 @@ class SCTDecoder:
                         end_sect = self._find_sect_in_group(group_starts, inst_start - 1)
                         s = prev_start - group_starts[prev_start_sect]
                         e = inst_start - group_starts[end_sect] - 1
-                        decoded_sct.sections[sect_name].instructions_ids_grouped[group_key] = (
+
+                        self._instruction_groups[sect_name][group_key] = (
                             f'{prev_start_sect}{sep}{s}', f'{end_sect}{sep}{e}')
                         if section_insts[inst_start - 1].parameters[0].value < 0:
                             decoded_sct.sections[sect_name].jump_loops.append(group_key)
@@ -1376,7 +1382,7 @@ class SCTDecoder:
                 # if an end for the last section was found previously, set it
                 if goto_jmp is not None:
                     group_key = f'{s_id}{sep}{last_case}'
-                    decoded_sct.sections[sect_name].instructions_ids_grouped[group_key] = (
+                    self._instruction_groups[sect_name][group_key] = (
                         f'{prev_start_sect}{sep}{last_start}', f'{end_sect}{sep}{cur_id}')
                     continue
 
@@ -1391,7 +1397,7 @@ class SCTDecoder:
                             jmp_groups -= 1
                         else:
                             group_key = f'{s_id}{sep}{last_case}'
-                            decoded_sct.sections[sect_name].instructions_ids_grouped[group_key] = (
+                            self._instruction_groups[sect_name][group_key] = (
                                 f'{prev_start_sect}{sep}{last_start}', f'{end_sect}{sep}{cur_id}')
                             break
                     if cur_id == len(section_insts):
@@ -1433,7 +1439,9 @@ class SCTDecoder:
 
         # Create grouped instruction heirarchies
         for section in decoded_sct.sections.values():
-            inst_groups = section.instructions_ids_grouped
+            if section.name not in self._instruction_groups:
+                continue
+            inst_groups = self._instruction_groups[section.name]
 
             inst_groups = {k: [*range(int(v[0].split(sep)[1]), int(v[1].split(sep)[1]) + 1)]
                            for k, v in inst_groups.items()}
