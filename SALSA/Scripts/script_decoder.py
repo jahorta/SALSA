@@ -169,7 +169,9 @@ class SCTDecoder:
 
         sct_start_pos = bounds[0]
         length = bounds[1] - bounds[0]
-        section = SCTSection(name=sect_name, length=length, pos=sct_start_pos)
+        section = SCTSection()
+        section.set_name(sect_name)
+        section.set_details(length, sct_start_pos)
         self._cursor = int(sct_start_pos / 4)
 
         if length == 16:
@@ -229,11 +231,11 @@ class SCTDecoder:
                 # Test for the dunder code to delay execution of an instruction
                 delay_inst = None
                 if currWord_int == 129:
-                    delay_inst = self._decode_instruction(currWord_int, inst_pos, sct_start_pos, [sect_name, inst_list_id])
+                    delay_inst = self._decode_instruction(currWord_int, inst_pos, [sect_name, inst_list_id])
                     delay_inst.length = self._cursor * 4 - inst_pos
                     currWord_int = self.getInt(self._cursor * 4)
 
-                instResult = self._decode_instruction(currWord_int, inst_pos, sct_start_pos, [sect_name, inst_list_id])
+                instResult = self._decode_instruction(currWord_int, inst_pos, [sect_name, inst_list_id])
 
                 if try_no_refresh:
                     instResult.skip_refresh = True
@@ -394,8 +396,10 @@ class SCTDecoder:
 
         return section
 
-    def _decode_instruction(self, inst_id, inst_pos, sct_start_pos, trace):
-        cur_inst = SCTInstruction(script_pos=sct_start_pos, inst_pos=inst_pos, inst_id=inst_id)
+    def _decode_instruction(self, inst_id, inst_pos, trace):
+        cur_inst = SCTInstruction()
+        cur_inst.set_inst_id(inst_id)
+        cur_inst.set_pos(inst_pos)
         base_inst = self._inst_lib.get_inst(inst_id=inst_id)
         self._cursor += 1
 
@@ -1025,7 +1029,7 @@ class SCTDecoder:
             link.origin_trace[1] = section.internal_sections_inst[old_sect_name] + old_inst_pos
 
     def _setup_scpt_links(self, decoded_sct):
-        blank_section = SCTSection('', 0, 0)
+        blank_section = SCTSection()
         sect_keys = list(decoded_sct.sections.keys())
         self.successful_scpt_links = []
         for link in self._scpt_links:
@@ -1189,7 +1193,10 @@ class SCTDecoder:
                         cur_group = []
                     cur_group_name = f'Untitled({i})'
                     new_section_order.append(cur_group_name)
-                    new_sections[cur_group_name] = (SCTSection(cur_group_name, 0, section.start_offset))
+                    new_section = SCTSection()
+                    new_section.set_name(cur_group_name)
+                    new_section.set_details(0, section.start_offset)
+                    new_sections[cur_group_name] = new_section
                     new_sections[cur_group_name].set_type('Label')
                     has_header = True
                     i += 1
