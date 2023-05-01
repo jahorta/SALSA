@@ -99,6 +99,7 @@ class SCTInstruction:
 
     errors: List[Tuple[str, Union[int, str, bytearray]]]
     links_out: List[SCTLink]
+    links_in: List[SCTLink]
     parameters: Dict[int, SCTParameter]
     loop_parameters: List[Dict[int, SCTParameter]]
 
