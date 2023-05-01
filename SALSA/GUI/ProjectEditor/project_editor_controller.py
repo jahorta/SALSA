@@ -1,6 +1,7 @@
 from typing import Union, Dict
 import tkinter as tk
 
+from SALSA.GUI.ProjectEditor.instruction_selector import InstructionSelectorWidget
 from SALSA.GUI.ParamEditorPopups.param_editor_controller import ParamEditController
 from SALSA.Common.setting_class import settings
 from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
@@ -33,11 +34,13 @@ class ProjectEditorController:
         view_callbacks = {
             'update_field': self.update_field,
             'edit_param': self.on_edit_parameter,
-            'show_header_selection_menu': self.show_header_selection_menu
+            'show_header_selection_menu': self.show_header_selection_menu,
+            'show_inst_menu': self.show_instruction_menu
         }
         self.view.add_and_bind_callbacks(view_callbacks)
 
         self.project: SCTProjectFacade = facade
+        self.project.set_callback('check_remove_inst_group', self.confirm_remove_inst_group)
         self.callbacks = callbacks
 
         pe_callbacks = {'get_var_alias': self.get_var_alias,
@@ -243,6 +246,12 @@ class ProjectEditorController:
     def on_set_inst_start(self, start, newID):
         pass
 
+    # ----------------- #
+    # Right Click Menus #
+    # ----------------- #
+
+    # # Header Selection # #
+
     def show_header_selection_menu(self, e):
         if e.widget.identify('region', e.x, e.y) != 'heading':
             return
@@ -277,6 +286,72 @@ class ProjectEditorController:
         display_columns = self.view.visible_headers[tree][1:]
         cur_tree['displaycolumns'] = display_columns
         self.view.fit_headers(cur_tree)
+
+    # # Instruction Options # #
+
+    def show_instruction_menu(self, e):
+        if e.widget.identify('region', e.x, e.y) == 'heading':
+            return
+        if self.current['section'] is None:
+            return
+        # TODO - if rightclicked row is not selected, select it
+        m = tk.Menu(self.view, tearoff=0)
+        m.add_command(label='Add Instruction Above', command=lambda: self.rcm_add_inst('above'))
+        m.add_command(label='Add Instruction Below', command=lambda: self.rcm_add_inst('below'))
+        # TODO - if rightclicked row is group, add option for "Add Instruction in group"
+        # TODO - if rightclicked row is is switch, add option for "Add Switch Case"
+        m.add_command(label='Remove Instruction', command=self.rcm_remove_inst)
+        m.add_command(label='Change Instruction', command=self.rcm_change_inst)
+        m.bind('<Leave>', m.destroy)
+        try:
+            m.tk_popup(e.x_root, e.y_root)
+        finally:
+            m.grab_release()
+
+    def rcm_add_inst(self, direction):
+        sel_iid = self.trees['instruction'].focus()
+        pre_rowdata = self.trees['instruction'].row_data[sel_iid]
+        inst_uuid = self.project.add_inst(self.current['script'], self.current['section'], pre_rowdata, direction=direction)
+        inst_trace = [self.current['script'], self.current['section'], inst_uuid]
+        self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'),
+                                                              self.current['script'], self.current['section']))
+        sel_iid = str(int(sel_iid) + 1) if direction == 'below' else sel_iid
+        self.view.after(10, self.show_inst_selector, inst_trace, sel_iid)
+
+    def show_inst_selector(self, inst_trace, sel_iid):
+        callbacks = {
+            'set_inst_id': self.project.change_inst_id,
+            'get_relevant': self.project.base_insts.get_relevant,
+            'update_tree': lambda: self.update_tree('instruction', self.project.get_tree(
+                self.view.get_headers('instruction'), self.current['script'], self.current['section']))
+        }
+        cell_bbox = self.trees['instruction'].bbox(sel_iid, 'name')
+        x_mod = self.trees['instruction'].winfo_x()
+        y_mod = self.trees['instruction'].winfo_y()
+        w = InstructionSelectorWidget(self.view.inst_tree_frame, callbacks, inst_trace,
+                                      x=cell_bbox[0]+x_mod, y=cell_bbox[1]+y_mod+cell_bbox[3])
+        w.bind('Escape', w.destroy)
+        w.place(x=cell_bbox[0]+x_mod, y=cell_bbox[1]+y_mod, w=cell_bbox[2], h=cell_bbox[3])
+
+    def rcm_remove_inst(self):
+        # TODO - Messagebox to confirm remove instruction (checkbox to choose to never see this message again)
+        # TODO - call function from project to remove instruction
+        pass
+
+    def rcm_change_inst(self):
+        sel_iid = self.trees['instruction'].focus()
+        row_data = self.trees['instruction'].row_data[sel_iid]
+        inst_trace = [self.current['script'], self.current['section'], row_data]
+        self.show_inst_selector(inst_trace, sel_iid)
+
+    # ------------------------------------- #
+    # Instruction Confirmation Messageboxes #
+    # ------------------------------------- #
+
+    def confirm_remove_inst_group(self, old_id, new_id):
+        # TODO - create message to confirm change of instruction (separate method)
+        # TODO - create message to decide how to handle group entries
+        pass
 
     # ------------------------ #
     # Parameter editor methods #
