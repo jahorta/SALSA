@@ -102,12 +102,10 @@ class SCTInstruction:
     parameters: Dict[int, SCTParameter]
     loop_parameters: List[Dict[int, SCTParameter]]
 
-    def __init__(self, script_pos: int, inst_pos: int, inst_id: int):
+    def __init__(self):
         self.ID: str = str(uuid.uuid4()).replace(sep, alt_sep)
-        self.instruction_id = inst_id
-        self.absolute_offset = inst_pos
-        self.script_pos = script_pos
-        self.relative_offset = self.absolute_offset - script_pos
+        self.instruction_id = None
+        self.absolute_offset = None
         self.skip_refresh = False
         self.frame_delay_param = None
         self.errors = []
@@ -118,6 +116,12 @@ class SCTInstruction:
         self.condition = ''
         self.synopsis = ''
         self.ungrouped_position: int = -1
+
+    def set_inst_id(self, inst_id):
+        self.instruction_id = inst_id
+
+    def set_pos(self, inst_pos: int):
+        self.absolute_offset = inst_pos
 
     def add_error(self, value: Tuple[str, Union[int, str, bytearray]]):
         self.errors.append(value)
@@ -151,11 +155,11 @@ class SCTSection:
     instructions_used: Dict[int, int]
     garbage: Dict[str, bytearray]
 
-    def __init__(self, name, length, pos):
+    def __init__(self):
         self.instruction_ids_ungrouped = []
-        self.name = name
-        self.length = length
-        self.start_offset = pos
+        self.name = None
+        self.length = None
+        self.start_offset = None
         self.instructions: Dict[str, SCTInstruction] = {}
         self.instructions_ids_grouped = {}
         self.inst_errors = []
@@ -167,6 +171,13 @@ class SCTSection:
         self.jump_loops = []
         self.internal_sections_inst = {}
         self.internal_sections_curs = {}
+
+    def set_name(self, name):
+        self.name = name
+
+    def set_details(self, length, pos):
+        self.length = length
+        self.start_offset = pos
 
     def add_string(self, pos: int, string: str):
         self.strings[pos] = string
