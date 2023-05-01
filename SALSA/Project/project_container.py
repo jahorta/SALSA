@@ -69,9 +69,6 @@ class SCTParameter:
     def set_param_log(self, log):
         self.analyze_log = log
 
-    def get_param_as_tree(self):
-        pass
-
     def _unpack_result_dict(self, cur_dict, level):
         returnValue = ''
         for key, value in cur_dict.items():
