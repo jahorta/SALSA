@@ -141,17 +141,17 @@ class ProjectEditorView(tk.Frame):
         section_tree_scrollbar.grid(row=1, column=1, sticky=tk.N+tk.S)
         self.sections_tree.config(yscrollcommand=section_tree_scrollbar.set)
 
-        inst_tree_frame = tk.Frame(self.pane_frame, highlightthickness=1, highlightbackground='#DEDEDE', width=400)
-        inst_tree_frame.grid(row=0, column=0, sticky='NSEW')
-        inst_tree_frame.rowconfigure(1, weight=1)
-        inst_tree_frame.columnconfigure(0, weight=1)
+        self.inst_tree_frame = tk.Frame(self.pane_frame, highlightthickness=1, highlightbackground='#DEDEDE', width=400)
+        self.inst_tree_frame.grid(row=0, column=0, sticky='NSEW')
+        self.inst_tree_frame.rowconfigure(1, weight=1)
+        self.inst_tree_frame.columnconfigure(0, weight=1)
 
-        inst_tree_label = tk.Label(inst_tree_frame, text='Instructions')
+        inst_tree_label = tk.Label(self.inst_tree_frame, text='Instructions')
         inst_tree_label.grid(row=0, column=0, sticky=tk.W)
-        self.pane_frame.add(inst_tree_frame, weight=1)
+        self.pane_frame.add(self.inst_tree_frame, weight=1)
 
         columns = list(header_settings['instruction'].keys())[1:]
-        self.insts_tree = w.DataTreeview(inst_tree_frame, name='instruction', columns=columns)
+        self.insts_tree = w.DataTreeview(self.inst_tree_frame, name='instruction', columns=columns)
         self.insts_tree.grid(row=1, column=0, sticky='NSEW')
         first = True
         for name, d in header_settings['instruction'].items():
@@ -166,7 +166,7 @@ class ProjectEditorView(tk.Frame):
             self.insts_tree.heading(name, text=label, anchor=anchor)
             self.insts_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
         self.insts_tree['displaycolumns'] = self.visible_headers['instruction'][1:]
-        inst_tree_scrollbar = tk.Scrollbar(inst_tree_frame, orient='vertical', command=self.insts_tree.yview)
+        inst_tree_scrollbar = tk.Scrollbar(self.inst_tree_frame, orient='vertical', command=self.insts_tree.yview)
         inst_tree_scrollbar.grid(row=1, column=1, sticky=tk.N+tk.S)
         self.insts_tree.config(yscrollcommand=inst_tree_scrollbar.set)
 
@@ -280,6 +280,7 @@ class ProjectEditorView(tk.Frame):
         self.scripts_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
         self.sections_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
         self.insts_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
+        self.insts_tree.bind('<Button-3>', self.callbacks['show_inst_menu'], add='+')
         self.param_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
 
     def on_param_double_click(self, param, e):
