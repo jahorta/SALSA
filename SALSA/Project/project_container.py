@@ -148,7 +148,7 @@ class SCTInstruction:
 class SCTSection:
 
     instructions: List[SCTInstruction]
-    instructions_ids_grouped: Dict[str, Tuple[str, str]]
+    instructions_ids_grouped: List[Union[str, Dict[str, Union[list, dict, str]]]]
     type: str
     inst_errors: List[int]
     errors: List[str]
@@ -162,7 +162,7 @@ class SCTSection:
         self.length = None
         self.start_offset = None
         self.instructions: Dict[str, SCTInstruction] = {}
-        self.instructions_ids_grouped = {}
+        self.instructions_ids_grouped = []
         self.inst_errors = []
         self.errors = []
         self.strings = {}
