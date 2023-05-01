@@ -96,7 +96,6 @@ class SCTParameter:
 
 
 class SCTInstruction:
-    desc_codes = ['add', 'sub', 'mul']
 
     errors: List[Tuple[str, Union[int, str, bytearray]]]
     links_out: List[SCTLink]
