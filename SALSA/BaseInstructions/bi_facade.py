@@ -106,6 +106,16 @@ class BaseInstLibFacade:
     def get_user_type(self):
         return self.user_identifier
 
+    def get_relevant(self, search):
+        relevant = []
+        if search == '':
+            return relevant
+        for inst in self.lib.insts:
+            inst: BaseInst
+            if search in str(inst.instruction_id) or search.lower() in inst.name.lower():
+                relevant.append(f'{inst.instruction_id} - {inst.name}')
+        return relevant
+
 
 if __name__ == '__main__':
 
