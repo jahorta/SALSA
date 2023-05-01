@@ -11,6 +11,7 @@ from SALSA.Common.constants import LOCK
 class BaseInstLibFacade:
 
     def __init__(self):
+        self.group_inst_list = [0, 3]
         self.inst_model = InstructionModel()
         self.default_inst_details = self.inst_model.load_instructions('default')
         self.user_identifier = 'default'
