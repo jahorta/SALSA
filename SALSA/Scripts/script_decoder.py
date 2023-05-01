@@ -140,7 +140,7 @@ class SCTDecoder:
             # Create or add to a logical section group if needed
             if not in_sect_group:
                 if new_section.type == 'Script':
-                    if new_section.get_instruction_by_index().instruction_id != 12:
+                    if new_section.get_instruction_by_index(-1).instruction_id != 12:
                         in_sect_group = True
                         sect_group_key = f'logical{sep}{sect_name}'
                         decoded_sct.section_groups[sect_group_key] = [sect_name]
@@ -149,7 +149,7 @@ class SCTDecoder:
                 if new_section.type == 'Script':
                     decoded_sct.section_groups[sect_group_key].append(sect_name)
                     decoded_sct.section_group_keys[sect_name] = sect_group_key
-                    last_inst = new_section.get_instruction_by_index()
+                    last_inst = new_section.get_instruction_by_index(-1)
                     if last_inst.instruction_id == 12:
                         in_sect_group = False
                         sect_group_key = None

@@ -187,7 +187,7 @@ class SCTSection:
     def get_inst_list(self, style):
         return self.instructions_ids_grouped if style == 'grouped' else self.instruction_ids_ungrouped
 
-    def get_instruction_by_index(self, pos=-1):
+    def get_instruction_by_index(self, pos):
         return self.instructions[self.instruction_ids_ungrouped[pos]]
 
 
