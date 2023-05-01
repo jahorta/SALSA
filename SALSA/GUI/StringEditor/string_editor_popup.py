@@ -2,7 +2,7 @@ import tkinter as tk
 
 
 class StringPopup(tk.Toplevel):
-    t = 'Variable Editor'
+    t = 'SALSA - String Editor'
     log_key = 'VarEditPopup'
     w = 250
     h = 400
