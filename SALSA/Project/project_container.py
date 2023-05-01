@@ -22,6 +22,17 @@ class SCTLink:
         return f'Link: {self.ID} - {self.origin_trace[0]}:{self.origin_trace[1]}:{self.origin_trace[2]}' \
                f'\n\torigin: {self.origin}, target: {self.target}'
 
+    def __eq__(self, other_link):
+        if self.type != other_link.type:
+            return False
+        for i, element in enumerate(self.target_trace):
+            if element != other_link.target_trace[i]:
+                return False
+        for i, element in enumerate(self.origin_trace):
+            if element != other_link.origin_trace[i]:
+                return False
+        return True
+
 
 class SCTParameter:
 
