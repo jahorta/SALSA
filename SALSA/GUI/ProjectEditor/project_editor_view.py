@@ -37,8 +37,7 @@ header_settings = {
         'frame_delay_param': {'label': 'Delay', 'width': 50, 'stretch': False},
         'skip_refresh': {'label': 'SR', 'width': 50, 'stretch': False},
         'synopsis': {'label': 'Synopsis', 'width': 50, 'stretch': True},
-        'absolute_offset': {'label': 'Offset', 'width': 50, 'stretch': True},
-        'relative_offset': {'label': 'Relative Offset', 'width': 50, 'stretch': True}
+        'absolute_offset': {'label': 'Offset', 'width': 50, 'stretch': True}
     },
     'parameter': {
         'ID': {'label': 'ID', 'width': 50, 'stretch': False},
