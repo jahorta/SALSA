@@ -172,20 +172,6 @@ class SCTProjectFacade:
         instruction_details['description'] = format_description(inst=instruction, base_inst=base_inst)
         return instruction_details
 
-    def get_parameter_details(self, script, section, instruction, parameter):
-        parameter = str(parameter)
-        try:
-            if sep in parameter:
-                loop = int(parameter.split(sep)[0])
-                param = int(parameter.split(sep)[1])
-                parameter = self.project.scripts[script].sections[section].instructions[instruction].loop_parameters[loop][param]
-            else:
-                parameter = self.project.scripts[script].sections[section].instructions[instruction].parameters[int(parameter)]
-
-        except KeyError as e:
-            print(self.log_key, e)
-            return None
-
     def get_link_details(self, link):
         pass
 
