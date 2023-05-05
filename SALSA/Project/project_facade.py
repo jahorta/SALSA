@@ -55,25 +55,26 @@ class SCTProjectFacade:
 
         return tree_list
 
-    def _create_tree(self, group, key_list, headers, base=None, base_key=None, key_only=False, prev_key=None):
+    def _create_tree(self, group, key_list, headers, base=None, base_key=None, key_only=False, prev_group_type=None):
         tree_list = []
         for key in key_list:
             if isinstance(key, dict):
                 for ele_key, ele_value in key.items():
                     if sep not in ele_key:
                         tree_list.extend(self._create_tree(group=group, key_list=[ele_key], headers=headers, base=base, base_key=base_key, key_only=True))
-                        if prev_key == 'switch':
+                        if prev_group_type == 'switch':
                             cur_group_type = 'case'
                         else:
                             cur_group_type = 'element'
                         tree_list[-1]['group_type'] = cur_group_type
                     else:
                         ele_key = ele_key.split(sep)
-                        tree_list.extend(self._create_tree(group=group, key_list=[ele_key[0]], headers=headers, base=base, base_key=base_key, prev_key=key))
+                        tree_list.extend(self._create_tree(group=group, key_list=[ele_key[0]], headers=headers, base=base, base_key=base_key, prev_group_type=ele_key[1]))
                         tree_list[-1]['group_type'] = ele_key[1]
                     tree_list.append('group')
                     ele_value = [ele_value] if not isinstance(ele_value, list) else ele_value
-                    tree_list.extend(self._create_tree(group=group, key_list=ele_value, headers=headers, base=base, base_key=base_key))
+                    cur_group_type = ele_key[1] if len(ele_key) > 1 else ''
+                    tree_list.extend(self._create_tree(group=group, key_list=ele_value, headers=headers, base=base, base_key=base_key, prev_group_type=cur_group_type))
                     tree_list.append('ungroup')
                 continue
 
