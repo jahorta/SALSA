@@ -1385,6 +1385,7 @@ class SCTDecoder:
                                 goto_jmp = section_insts[inst_start - 1].parameters[0].link.target
                             else:
                                 goto_jmp = max(goto_jmp, section_insts[inst_start - 1].parameters[0].link.target)
+
                     prev_start = inst_start
                     prev_case = case
                     prev_start_sect = start_sect_names[inst_start]
@@ -1392,8 +1393,6 @@ class SCTDecoder:
                 # Find end of last swtich entry
                 last_start = list(switch_entry_start_ids.keys())[-1]
                 last_case = switch_entry_start_ids[last_start]
-                jmp_groups = 0
-                cur_id = last_start
 
                 # if an end for the last section was found previously, set it
                 if goto_jmp is not None:
@@ -1406,6 +1405,8 @@ class SCTDecoder:
                     goto_inst.my_master_uuids.append(switch_inst.ID)
                     continue
 
+                jmp_groups = 0
+                cur_id = last_start
                 # else search for a goto that matches with the switch.
                 # May be error prone if there are random gotos inside a switch entry
                 while cur_id < len(section_insts):
