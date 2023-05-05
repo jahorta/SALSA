@@ -1482,9 +1482,40 @@ class SCTDecoder:
                     insert_index = new_groups[key].index(new_groups[group_name][0])
                 for entry in group:
                     new_groups[key].remove(entry)
-                new_groups[key].insert(insert_index, {group_name: group})
-            if len(insert_keys) > 0:
-                new_groups.pop(group_name)
+                new_groups[key].insert(insert_index, group_name)
+
+        done = False
+        all_group_keys = list(new_groups.keys())
+        cur_group_ind = 0
+        while not done:
+            cur_group_key = all_group_keys[cur_group_ind]
+            new_groups = self._replace_group_name_with_group(new_groups, cur_group_key)
+
+            # goto next key
+            cur_group_ind += 1
+            if cur_group_ind >= len(all_group_keys):
+                break
+
+            # if next key is not in new groups, find next key which is present
+            while all_group_keys[cur_group_ind] not in new_groups.keys():
+                cur_group_ind += 1
+                if cur_group_ind >= len(all_group_keys):
+                    done = True
+                    break
+
+        return new_groups
+
+    def _replace_group_name_with_group(self, all_groups, cur_group_key):
+        cur_group = all_groups[cur_group_key]
+        new_groups = copy.deepcopy(all_groups)
+        for i, entry in enumerate(cur_group):
+            if entry == cur_group_key:
+                continue
+            if isinstance(entry, str) and entry in new_groups.keys():
+                new_groups = self._replace_group_name_with_group(new_groups, entry)
+                new_groups[cur_group_key].insert(i, {entry: new_groups[entry]})
+                new_groups[cur_group_key].pop(i+1)
+                new_groups.pop(entry)
 
         return new_groups
 
