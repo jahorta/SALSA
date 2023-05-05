@@ -67,7 +67,7 @@ class ReservedVars:
 sep = '|'
 
 
-alt_sep = '-'
+alt_sep = ':'
 
 
 LOCK = '🔒'
