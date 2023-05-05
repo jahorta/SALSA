@@ -534,7 +534,8 @@ class SCTDecoder:
                         elif 'byte' in param_type:
                             arithmetic_result = applyHexMask(arithmetic_result, '0xff')[2:]
 
-                        arithmetic_result = int.from_bytes(bytes=bytearray.fromhex(arithmetic_result), byteorder='big', signed=signed)
+                        arithmetic_result = int.from_bytes(bytes=bytearray.fromhex(arithmetic_result), byteorder='big',
+                                                           signed=signed)
                 cur_param.arithmetic_value = arithmetic_result
 
         elif 'int' in param_type:
@@ -1162,7 +1163,7 @@ class SCTDecoder:
             origin_inst = decoded_sct.sections[link.origin_trace[0]].get_instruction_by_index(link.origin_trace[1])
             param: SCTParameter = origin_inst.parameters[int(link.origin_trace[2])]
             param.link_result = foot_str
-            param.link_value = ('Footer', )
+            param.link_value = ('Footer',)
 
     @staticmethod
     def _create_string_groups(decoded_sct):
@@ -1288,8 +1289,9 @@ class SCTDecoder:
                 if prev_inst.parameters[0].value < 0:
                     group_key = f'{jmp_id}{sep}while'
                     self._instruction_groups[sect_name][group_key] = (f'{sect_name}{sep}{jmp_id}',
-                                                                        f'{prev_sect_name}{sep}{prev_to_id}')
+                                                                      f'{prev_sect_name}{sep}{prev_to_id}')
                     decoded_sct.sections[sect_name].jump_loops.append(group_key)
+
                     continue
 
                 # else, get the end of the false option
@@ -1298,13 +1300,13 @@ class SCTDecoder:
 
                 group_key = f'{jmp_id}{sep}if'
                 self._instruction_groups[sect_name][group_key] = (f'{sect_name}{sep}{jmp_id}',
-                                                                    f'{prev_sect_name}{sep}{prev_to_id}')
+                                                                  f'{prev_sect_name}{sep}{prev_to_id}')
 
                 if jmp_to_id == jmp_end_id or jmp_to_sect_name != jmp_end_sect:
                     continue
                 group_key = f'{jmp_id}{sep}else'
                 self._instruction_groups[sect_name][group_key] = (
-                    f'{jmp_to_sect_name}{sep}{jmp_to_id}', f'{jmp_end_sect}{sep}{jmp_end_id-1}')
+                    f'{jmp_to_sect_name}{sep}{jmp_to_id}', f'{jmp_end_sect}{sep}{jmp_end_id - 1}')
 
     def _group_switches(self, decoded_sct):
 
@@ -1318,7 +1320,7 @@ class SCTDecoder:
                     sect_group.append(s_name)
             else:
                 sect_group.append(sect_name)
-            section_insts = []
+            section_insts: List[SCTInstruction] = []
             group_starts = {}
             for s in sect_group:
                 insts = [decoded_sct.sections[s].instructions[i] for i in
@@ -1329,15 +1331,15 @@ class SCTDecoder:
             # Go through each switch in each section
             for s_id in switch_ids:
                 # print(f'SCPT Decoder: Switch Groups: Grouping Switch: {sect_name}:{s_id}')
-                switch = section_insts[s_id]
+                switch_inst: SCTInstruction = section_insts[s_id]
 
                 # Get all switch start positions
-                num_entries = switch.parameters[1].value
+                num_entries = switch_inst.parameters[1].value
                 switch_entry_target_poses = []
                 switch_entry_cases = []
                 for entry_id in range(num_entries):
-                    switch_entry_target_poses.append(switch.loop_parameters[entry_id][3].link.target)
-                    switch_entry_cases.append(switch.loop_parameters[entry_id][2].value)
+                    switch_entry_target_poses.append(switch_inst.loop_parameters[entry_id][3].link.target)
+                    switch_entry_cases.append(switch_inst.loop_parameters[entry_id][2].value)
 
                 # Create a dicitonary with index for first instructions for each case
                 switch_entry_start_ids: Dict[int, str] = {}
@@ -1465,6 +1467,7 @@ class SCTDecoder:
         for group_name, group in groups.items():
             group = new_groups[group_name]
             insert_keys = []
+
             for n_group_name, n_group in new_groups.items():
                 if group_name == n_group_name:
                     continue
@@ -1475,6 +1478,7 @@ class SCTDecoder:
                         break
                 if all_present:
                     insert_keys.append(n_group_name)
+
             for key in insert_keys:
                 if is_sections:
                     insert_index = new_groups[key].index(group_name)
@@ -1658,23 +1662,23 @@ class SCTDecoder:
         return inst_list
 
     @staticmethod
-    def _get_inst_by_pos(inst_list, start_id, target_pos, origin_sect_name, origin_element_id):
-        cur_id = start_id
-        while cur_id < len(inst_list):
-            cur_inst = inst_list[cur_id]
-            if cur_id == len(inst_list):
+    def _get_inst_by_pos(inst_list, start_ind, target_pos, origin_sect_name, origin_element_id):
+        cur_ind = start_ind
+        while cur_ind < len(inst_list):
+            cur_inst = inst_list[cur_ind]
+            if cur_ind == len(inst_list):
                 print(
                     f'SCPT Decoder: Find Inst: Entry not found: {origin_sect_name}:{origin_element_id} - {target_pos}')
                 return
             if cur_inst.absolute_offset == target_pos:
                 break
-            if cur_inst.absolute_offset < target_pos < inst_list[cur_id + 1].absolute_offset:
+            if cur_inst.absolute_offset < target_pos < inst_list[cur_ind + 1].absolute_offset:
                 print(
                     f'SCPT Decoder: Find Inst: Target pos in middle of entry {origin_sect_name}:{origin_element_id} - {target_pos}')
                 break
-            cur_id += 1
+            cur_ind += 1
 
-        return cur_id
+        return cur_ind
 
     def _replace_pos_with_ids(self, group, instruction_ids_ungrouped):
         if isinstance(group, dict):
