@@ -294,14 +294,39 @@ class ProjectEditorController:
             return
         if self.current['section'] is None:
             return
-        # TODO - if rightclicked row is not selected, select it
+        sel_iid = self.trees['instruction'].identify_row(e.y)
+        self.trees['instruction'].selection_set(sel_iid)
+        self.trees['instruction'].focus(sel_iid)
+        inst_uuid = self.trees['instruction'].row_data[sel_iid]
+        self.current['instruction'] = inst_uuid
+        inst_label = self.trees['instruction'].item(sel_iid)['values'][0]
+        group_type = ''
+        if '(' in inst_label and ')' in inst_label:
+            group_type = inst_label.split('(')[1].split(')')[0]
         m = tk.Menu(self.view, tearoff=0)
-        m.add_command(label='Add Instruction Above', command=lambda: self.rcm_add_inst('above'))
-        m.add_command(label='Add Instruction Below', command=lambda: self.rcm_add_inst('below'))
-        # TODO - if rightclicked row is group, add option for "Add Instruction in group"
-        # TODO - if rightclicked row is is switch, add option for "Add Switch Case"
-        m.add_command(label='Remove Instruction', command=self.rcm_remove_inst)
-        m.add_command(label='Change Instruction', command=self.rcm_change_inst)
+
+        # if rightclicked row is a switch or case, add option for "Add Switch Case"
+        if group_type in ('case', 'switch'):
+            m.add_command(label='Add Switch Case', command=self.rcm_switch_case)
+
+        # if rightclicked row is group, add option for "Add Instruction in group"
+        if group_type in ('if', 'else', 'while', 'case'):
+            m.add_command(label='Add Instruction Inside Group', command=lambda: self.rcm_add_inst('inside'))
+
+        # if rightclicked row is a case, add option for delete case
+        if group_type != 'case':
+            if group_type != 'else':
+                m.add_command(label='Add Instruction Above', command=lambda: self.rcm_add_inst('above'))
+
+            if group_type == 'if':
+                next_sel_iid = self.trees['instruction'].next(sel_iid)
+                if next_sel_iid != '' and 'else' not in self.trees['instruction'].item(next_sel_iid)['values'][0]:
+                    m.add_command(label='Add Instruction Below', command=lambda: self.rcm_add_inst('below'))
+            m.add_command(label='Remove Instruction', command=self.rcm_remove_inst)
+            m.add_command(label='Change Instruction', command=self.rcm_change_inst)
+        else:
+            m.add_command(label='Delete Case', command=self.rcm_remove_inst)
+
         m.bind('<Leave>', m.destroy)
         try:
             m.tk_popup(e.x_root, e.y_root)
