@@ -72,6 +72,10 @@ class InstructionSelectorWidget(tk.Frame):
         self.result_dropdown.configure(show='tree')
         self.result_dropdown.configure(height=1)
 
+        self.search.focus_set()
+
+        self.search.bind('<KeyPress-Escape>', self.cancel)
+
     def update_search(self, current):
         self.update_menu(self.callbacks['get_relevant'](current))
 
@@ -86,7 +90,13 @@ class InstructionSelectorWidget(tk.Frame):
         self.result_dropdown.configure(height=rows)
 
     def select_inst(self, name, new_ID):
-        self.callbacks['set_inst_id'](*self.inst_trace, new_ID)
-        self.destroy()
-        self.result_dropdown.destroy()
+        done = self.callbacks['set_inst_id'](*self.inst_trace, new_ID)
+        if not done:
+            self.search.focus_set()
+            return
+        self.cancel()
         self.callbacks['update_tree']()
+
+    def cancel(self, e):
+        self.result_dropdown.destroy()
+        self.destroy()
