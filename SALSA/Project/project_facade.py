@@ -162,6 +162,8 @@ class SCTProjectFacade:
         except KeyError as e:
             print(self.log_key, e)
             return None
+        if instruction.instruction_id is None:
+            return None
         base_inst = self.base_insts.get_inst(instruction.instruction_id)
         instruction_details = copy.deepcopy(base_inst.__dict__)
         instruction_details['base_parameters'] = instruction_details['parameters']
