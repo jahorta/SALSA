@@ -344,6 +344,26 @@ class SCTProjectFacade:
 
         return None, None
 
+    def get_inst_group(self, script, section, inst_uuid):
+        cur_sect = self.project.scripts[script].sections[section]
+        parents, index = self.get_inst_grouped_parents_and_index(inst_uuid, cur_sect.instructions_ids_grouped)
+
+        cur_level = cur_sect.instructions_ids_grouped
+        for parent in parents:
+            cur_level = cur_level[parent]
+
+        group = cur_level[index]
+
+        if not isinstance(group, dict):
+            return None
+
+        next_element = cur_level[index+1]
+        if isinstance(next_element, dict):
+            if inst_uuid in list(next_element.keys())[0]:
+                group = [group, next_element]
+
+        return group
+
     def change_inst_id(self, script, section, inst, new_id):
         # Check that the instruction requires an inst_id change
         cur_section = self.project.scripts[script].sections[section]
