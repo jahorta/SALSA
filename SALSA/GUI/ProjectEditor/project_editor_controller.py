@@ -118,6 +118,7 @@ class ProjectEditorController:
     def on_select_instruction(self, instructID):
         self.current['instruction'] = instructID
         self.current['parameter'] = None
+        self.view.param_tree.clear_all_entries()
         details = self.project.get_instruction_details(**self.current)
         if details is None:
             return
@@ -125,14 +126,10 @@ class ProjectEditorController:
                                                                     **self.current)
         self.set_instruction_details(details)
 
-    def clear_tree(self, tree: str):
-        if tree in self.trees.keys():
-            self.trees[tree].clear_all_entries()
-
     def update_tree(self, tree, tree_dict: Union[dict, None]):
         if tree is None:
             for tree in self.trees.keys():
-                self.clear_tree(tree)
+                self.trees[tree].clear_all_entries()
             return
 
         # Clear the current tree and all child trees to prevent desync
@@ -141,8 +138,10 @@ class ProjectEditorController:
         while cur_tree != '':
             trees_to_clear.append(tree_children[cur_tree])
             cur_tree = tree_children[cur_tree]
+
         for t in trees_to_clear:
-            self.clear_tree(t)
+            if t != '':
+                self.trees[t].clear_all_entries()
 
         if tree_dict is None:
             return
