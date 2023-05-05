@@ -369,7 +369,7 @@ class SCTProjectFacade:
         cur_section = self.project.scripts[script].sections[section]
         cur_inst = cur_section.instructions[inst]
         if cur_inst.instruction_id == new_id:
-            return
+            return True
 
         change_type = None
         if cur_inst.instruction_id in self.base_insts.group_inst_list:
@@ -402,6 +402,8 @@ class SCTProjectFacade:
         if int(new_id) in self.base_insts.group_inst_list:
             self.setup_group_type_inst(script, section, inst, cur_inst, parent_list, index)
             # TODO - if 'insert group' in change_type, insert instructions in group, resolve ungrouped, etc.
+
+        return True
 
     def remove_inst_parameters(self, script, section, inst, loop=True):
         cur_inst = self.project.scripts[script].sections[section].instructions[inst]
