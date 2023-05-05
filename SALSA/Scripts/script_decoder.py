@@ -1382,8 +1382,7 @@ class SCTDecoder:
                             decoded_sct.sections[sect_name].jump_loops.append(group_key)
                         else:
                             if goto_jmp is None:
-                                if section_insts[inst_start - 1].instruction_id == 10:
-                                    goto_jmp = section_insts[inst_start - 1].parameters[0].link.target
+                                goto_jmp = section_insts[inst_start - 1].parameters[0].link.target
                             else:
                                 goto_jmp = max(goto_jmp, section_insts[inst_start - 1].parameters[0].link.target)
                     prev_start = inst_start
