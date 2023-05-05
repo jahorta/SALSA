@@ -1,5 +1,6 @@
 from typing import Union, Dict
 import tkinter as tk
+from tkinter import messagebox
 
 from SALSA.GUI.ProjectEditor.instruction_selector import InstructionSelectorWidget
 from SALSA.GUI.ParamEditorPopups.param_editor_controller import ParamEditController
@@ -40,7 +41,7 @@ class ProjectEditorController:
         self.view.add_and_bind_callbacks(view_callbacks)
 
         self.project: SCTProjectFacade = facade
-        self.project.set_callback('check_remove_inst_group', self.confirm_remove_inst_group)
+        self.project.set_callback('confirm_remove_inst_group', self.confirm_remove_inst_group)
         self.callbacks = callbacks
 
         pe_callbacks = {'get_var_alias': self.get_var_alias,
@@ -348,10 +349,20 @@ class ProjectEditorController:
     # Instruction Confirmation Messageboxes #
     # ------------------------------------- #
 
-    def confirm_remove_inst_group(self, old_id, new_id):
-        # TODO - create message to confirm change of instruction (separate method)
-        # TODO - create message to decide how to handle group entries
-        pass
+    def confirm_remove_inst_group(self, new_id, children):
+        # Create message to confirm change of instruction (separate method)
+        cur_inst_id = self.project.get_inst_id(**self.current)
+        message = f'Are you sure you want to change this instruction from {self.project.get_inst_id_name(cur_inst_id)} to {self.project.get_inst_id_name(new_id)}?'
+        if new_id not in self.project.base_insts.group_inst_list:
+            message += '\nThis will remove the instruction group.'
+        else:
+            message += '\nThis will change the instruction group type.'
+        cancel = not tk.messagebox.askokcancel(title='Confirm Instruction Group Removal', message=message)
+        if cancel:
+            return 'cancel'
+        return self.view.inst_group_handling(cur_inst_id, new_id, children)
+
+
 
     # ------------------------ #
     # Parameter editor methods #
