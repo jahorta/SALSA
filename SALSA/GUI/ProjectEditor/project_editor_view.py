@@ -1,9 +1,11 @@
 import tkinter as tk
+from tkinter import simpledialog
 import tkinter.ttk as ttk
 import json
 from typing import List, Dict
 
 import SALSA.GUI.widgets as w
+from Common.constants import sep, alt_sep
 from SALSA.Common.setting_class import settings
 
 default_headers = {
@@ -317,3 +319,68 @@ class ProjectEditorView(tk.Frame):
 
         for k, v in width_ratios.items():
             cur_tree.column(k, width=int(v*widget_width))
+
+    def inst_group_handling(self, cur_inst_id, new_id, children):
+        # create message to decide how to handle group entries
+        if cur_inst_id == 0:
+            if isinstance(children, dict):
+                children = [children]
+            labels = ['Group']
+        elif cur_inst_id == 3:
+            children = [{k, children[k]} for k in children.keys()]
+            labels = ['Switch Case']
+        else:
+            return ''
+
+        labels += ['Delete', 'Move Above', 'Move Below']
+        if new_id == 0:
+            labels += ['Insert in If', 'Insert in Else']
+        elif new_id == 3:
+            labels += ['Insert in Switch Case']
+
+        radio_vars = []
+        entry_vars = []
+        row_labels = []
+
+        for child in children:
+            radio_vars.append(tk.IntVar(self, 1))
+            if new_id == 3:
+                entry_vars.append(tk.IntVar(self))
+            if cur_inst_id == 3:
+                row_labels.append(list(child.keys())[0])
+            if cur_inst_id == 0:
+                row_labels.append(list(child.keys())[0].split(sep)[1])
+
+        class InstGroupHandlerDialog(tk.simpledialog.Dialog):
+
+            def body(self, master):
+
+                cur_col = 0
+                for label in labels:
+                    tk.Label(master, text=label).grid(row=0, column=cur_col)
+                    cur_col += 1
+
+                for i, row_label in enumerate(row_labels):
+                    cur_col = 0
+                    tk.Label(master, text=row_label).grid(row=i+1, column=cur_col)
+                    cur_col += 1
+                    for label in labels[1:]:
+                        tk.Radiobutton(master, text='', variable=radio_vars[i], value=cur_col).grid(row=i+1, column=cur_col)
+                        cur_col += 1
+                    if new_id == 3:
+                        tk.Entry(master, textvariable=entry_vars[i]).grid(row=i+1, column=cur_col)
+
+        cancel = not InstGroupHandlerDialog(self, title='Group Handling')
+        if cancel:
+            return 'cancel'
+
+        response = ''
+        for i, row_label in enumerate(row_labels):
+            if i > 0:
+                response += f'{sep}'
+            choice = labels[radio_vars[i].get()]
+            response += f'{row_label}{alt_sep}{choice}'
+            if new_id == 3 and choice == 'Insert in Switch Case':
+                response += f'{alt_sep}{entry_vars[i].get()}'
+
+        return response
