@@ -252,6 +252,9 @@ class SCTProjectFacade:
     def get_inst_id(self, script, section, instruction, **kwargs):
         return self.project.scripts[script].sections[section].instructions[instruction].instruction_id
 
+    def get_inst_id_name(self, inst_id):
+        return self.base_insts.get_inst(inst_id).name
+
     def get_base_parameter(self, inst_id, param_str):
         if param_str == 'delay':
             return self.base_insts.get_inst(129).parameters[0]
