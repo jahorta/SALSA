@@ -1397,9 +1397,13 @@ class SCTDecoder:
 
                 # if an end for the last section was found previously, set it
                 if goto_jmp is not None:
+                    goto_tgt_ind = self._get_inst_by_pos(section_insts, last_start, goto_jmp, sect_name, switch_inst.ID)
                     group_key = f'{s_id}{sep}{last_case}'
                     self._instruction_groups[sect_name][group_key] = (
-                        f'{prev_start_sect}{sep}{last_start}', f'{end_sect}{sep}{cur_id}')
+                        f'{prev_start_sect}{sep}{last_start}', f'{end_sect}{sep}{goto_tgt_ind-1}')
+                    goto_inst = section_insts[goto_tgt_ind - 1]
+                    switch_inst.my_goto_uuids.append(goto_inst.ID)
+                    goto_inst.my_master_uuids.append(switch_inst.ID)
                     continue
 
                 # else search for a goto that matches with the switch.
@@ -1412,13 +1416,17 @@ class SCTDecoder:
                         if jmp_groups > 0:
                             jmp_groups -= 1
                         else:
-                            group_key = f'{s_id}{sep}{last_case}'
-                            self._instruction_groups[sect_name][group_key] = (
-                                f'{prev_start_sect}{sep}{last_start}', f'{end_sect}{sep}{cur_id}')
                             break
                     if cur_id == len(section_insts):
                         print(f'SCPT Decoder: Switch Groups: End of final switch entry not found: {sect_name}:{s_id}')
                     cur_id += 1
+
+                group_key = f'{s_id}{sep}{last_case}'
+                self._instruction_groups[sect_name][group_key] = (
+                    f'{prev_start_sect}{sep}{last_start}', f'{end_sect}{sep}{cur_id}')
+                goto_inst = section_insts[cur_id]
+                switch_inst.my_goto_uuids.append(goto_inst.ID)
+                goto_inst.my_master_uuids.append(switch_inst.ID)
 
     @staticmethod
     def _group_subscripts(decoded_sct):
