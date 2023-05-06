@@ -1402,17 +1402,22 @@ class SCTDecoder:
                     goto_inst.my_master_uuids.append(switch_inst.ID)
                     continue
 
-                jmp_groups = 0
+                gotos_ignored = 0
                 cur_id = last_start
                 # else search for a goto that matches with the switch.
                 # May be error prone if there are random gotos inside a switch entry
                 while cur_id < len(section_insts):
                     cur_inst = section_insts[cur_id]
                     if cur_inst.instruction_id == 0:
-                        jmp_groups += 1
+                        cur_id = cur_inst.links_out[0].target_trace[1] - 1
+                    elif cur_inst.instruction_id == 3:
+                        new_last_case_target = cur_inst.loop_parameters[-1][3].link.target
+                        new_last_case_start = self._get_inst_by_pos(section_insts, cur_id, new_last_case_target, sect_name, switch_inst.ID)
+                        cur_id = new_last_case_start
+                        gotos_ignored += 1
                     elif cur_inst.instruction_id == 10:
-                        if jmp_groups > 0:
-                            jmp_groups -= 1
+                        if gotos_ignored > 0:
+                            gotos_ignored -= 1
                         else:
                             break
                     if cur_id == len(section_insts):
