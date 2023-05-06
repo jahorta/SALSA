@@ -365,6 +365,3 @@ class ParamEditPopup(tk.Toplevel):
 
     def on_close(self):
         self.callbacks['close']()
-
-    def suggest_save(self):
-        pass
