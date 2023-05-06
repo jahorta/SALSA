@@ -6,6 +6,7 @@ from SALSA.Common.are_same_checker import are_same
 from SALSA.Project.project_container import SCTParameter
 from SALSA.GUI.ParamEditorPopups.param_editor_popup import ParamEditPopup, SCPTEditWidget, IntEditWidget, \
     SubscriptWidget, FooterEditWidget
+from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 
 
 class ParamEditController:
@@ -21,6 +22,7 @@ class ParamEditController:
         }
         self.param: Union[None, SCTParameter] = None
         self.base_param: Union[None, BaseParam] = None
+        self.scpt_codes = SCPTParamCodes()
 
         self.scpt_rows: Dict[str, int] = {}
         self.scpt_fields: Dict[str, SCPTEditWidget] = {}
@@ -65,11 +67,14 @@ class ParamEditController:
         self.scpt_fields['0'] = SCPTEditWidget(self.view.main_frame, self.scpt_callbacks, '0')
         self.scpt_fields['0'].grid(row=0, column=0, sticky='W')
 
-        if self.param.value is not None:
+        if self.param.override is not None:
+            self.setup_scpt_from_value(value=self.param.value, override=True, cur_id='0')
+
+        elif self.param.value is not None:
             self.setup_scpt_from_value(value=self.param.value, cur_id='0')
 
     # Load scpt value into scpt widgets
-    def setup_scpt_from_value(self, value, cur_id):
+    def setup_scpt_from_value(self, value, cur_id, override=False):
         if isinstance(value, dict):
             for key, parts in value.items():
                 self.scpt_fields[cur_id].set_widget_values(key)
@@ -77,7 +82,7 @@ class ParamEditController:
                 for i, value in enumerate(parts.values()):
                     self.setup_scpt_from_value(value=value, cur_id=new_keys[i])
         else:
-            self.scpt_fields[cur_id].set_widget_values(value=value)
+            self.scpt_fields[cur_id].set_widget_values(value=value, override=override)
 
     # ------------------------------------------- #
     # SCPT parameter editor functionality methods #
@@ -151,7 +156,12 @@ class ParamEditController:
         var_changes = self.get_var_changes(self.param.value, new_scpt_value)
         if var_changes is not None:
             self.callbacks['update_variables'](var_changes)
-        self.param.set_value(new_scpt_value)
+        if new_scpt_value == 'override':
+            param_type = self.base_param.type.split('-')[1]
+            value, override_value = self.scpt_codes.overrides[param_type]
+            self.param.set_value(value=value, override_value=override_value)
+        else:
+            self.param.set_value(new_scpt_value)
         self.callbacks['refresh_inst']()
 
     def scpt_has_changed(self, new_scpt_value=None):

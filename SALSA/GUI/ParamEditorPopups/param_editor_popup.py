@@ -55,6 +55,45 @@ class SCPTVarWidget(tk.Frame):
         self.alias_label.config(text=alias)
 
 
+class SCPTFloatWidget(tk.Frame):
+
+    def __init__(self, parent, callbacks, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+
+        self.callbacks = callbacks
+        self.scpt_codes = SCPTParamCodes(is_decoder=False)
+
+        self.float_variable = tk.StringVar(self)
+        self.float = w.RequiredFloatEntry(self, textvariable=self.float_variable, width=11)
+        self.float.grid(row=0, column=0)
+
+        self.override_value = tk.IntVar(self, 0)
+        override = tk.Checkbutton(self, text='Override Parameter', variable=self.override_value, command=self.override_clicked)
+        override.grid(row=0, column=1)
+
+    def override_clicked(self):
+        if self.override_value.get() == 1:
+            self.set_override()
+        else:
+            self.clear_override()
+
+    def set_override(self, init=False):
+        self.float.configure(state='disabled')
+        if init:
+            self.override_value.set(1)
+
+    def clear_override(self):
+        self.float.configure(state='normal')
+
+    def get_value(self):
+        if self.override_value.get() == 1:
+            return 'override'
+        return self.float_variable.get()
+
+    def set_value(self, value):
+        if value == 'override':
+            self.set_override(init=True)
+
 # Single row widget of SCPT parameter
 class SCPTEditWidget(tk.Frame):
 
@@ -80,13 +119,12 @@ class SCPTEditWidget(tk.Frame):
 
         self.input_vars = {
             'var': tk.IntVar(self),
-            'float': tk.StringVar(self),
             'decimal': [tk.IntVar(self), tk.IntVar(self)]
         }
 
-        self.input_widgets: Dict[str, Union[SCPTVarWidget, w.RequiredFloatEntry, DecimalWidget]] = {
+        self.input_widgets: Dict[str, Union[SCPTVarWidget, SCPTFloatWidget, DecimalWidget]] = {
             'var': SCPTVarWidget(self, textvariable=self.input_vars['var'], callbacks={'get_alias': self.get_var_alias}),
-            'float': w.RequiredFloatEntry(self, textvariable=self.input_vars['float'], width=10),
+            'float': SCPTFloatWidget(self, callbacks={}),
             'decimal': DecimalWidget(self, textvariables=self.input_vars['decimal'])
         }
 
@@ -126,7 +164,7 @@ class SCPTEditWidget(tk.Frame):
         self.active_widget = widget_key
         self.input_widgets[widget_key].grid(row=0, column=3, sticky=tk.W)
 
-    def set_widget_values(self, value):
+    def set_widget_values(self, value, override):
         self.option_option.configure(state='normal')
         # Value is a compare type scpt code
         if value in self.scpt_codes.compare:
@@ -180,7 +218,10 @@ class SCPTEditWidget(tk.Frame):
             self.update_options(None)
             self.option_selection.set('float: ')
             self.set_active_input_widget('float')
-            self.input_vars['float'].set(value)
+            if override:
+                value = 'override'
+            self.input_widgets['float'].set_value(value)
+
 
     def get_var_alias(self):
         var_type = self.option_selection.get().split(': ')[0]
@@ -192,7 +233,7 @@ class SCPTEditWidget(tk.Frame):
         elif self.active_widget == 'decimal':
             return f'decimal: {self.input_vars["decimal"][0].get()}+{self.input_vars["decimal"][1].get()}/256'
         else:
-            return float(self.input_vars['float'].get())
+            return self.input_widgets['float'].get_value()
 
 
 # -------------------------- #
