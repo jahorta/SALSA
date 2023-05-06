@@ -483,9 +483,6 @@ class SCTDecoder:
             elif 'byte' in param_type:
                 overrideResult = 0xff
 
-            if base_param.default_value is not None:
-                overrideResult = base_param.default_value
-
             scriptCompare = self.getInt(self._cursor * 4)
             if scriptCompare in overrideCompare:
                 cur_param.set_value(overrideResult)
