@@ -56,7 +56,8 @@ class SCTParameter:
         self.override = None
         self.arithmetic_value = None
 
-    def set_value(self, value: Union[int, float, str, dict, bytearray]):
+    def set_value(self, value: Union[int, float, str, dict, bytearray], override_value=None):
+        self.override = override_value
         self.value = value
         self.formatted_value = self._unpack_result_dict(value, 0) if isinstance(value, dict) else str(value)
 
