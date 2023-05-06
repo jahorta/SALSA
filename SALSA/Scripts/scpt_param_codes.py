@@ -67,6 +67,13 @@ secondary = [
 
 stop_code = 0x0000001d
 
+overrides = {
+    'float': (0x7f7fffff, bytearray(b'\x7f\x7f\xff\xff')),
+    'int': (0x7fffffff, bytearray(b'\x7f\xff\xff\xff')),
+    'short': (0xffff, bytearray(b'\x7f\x7f\xff\xff')),
+    'byte': (0xff, bytearray(b'\x7f\x7f\xff\xff')),
+}
+
 
 class SCPTParamCodes:
 
@@ -87,4 +94,6 @@ class SCPTParamCodes:
         self.primary_keys = [*list(self.compare.keys()), *list(self.arithmetic.keys())]
         self.stop_code = stop_code
         self.classes = SCPT_CLASSES
+
+        self.overrides = overrides
 
