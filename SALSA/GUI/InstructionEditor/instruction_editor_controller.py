@@ -21,7 +21,8 @@ class InstructionEditorController:
             'set_change': self.add_change,
             'on_close': self.on_close,
             'check_locked': self.check_item_is_locked,
-            'user_type': self.get_user_type
+            'user_type': self.get_user_type,
+            'show_param_editor': self.show_param_editor
         }
         self.view = InstructionEditorView(parent=parent, callbacks=view_callbacks)
         self.callbacks = callbacks
@@ -29,6 +30,8 @@ class InstructionEditorController:
         self.cur_inst = None
         self.param_details = None
         self.changed_values = {}
+
+        self.param_editor = ParamEditController(self.view, callbacks={})
 
         self.populate_instruction_tree()
 
@@ -185,3 +188,5 @@ class InstructionEditorController:
     def get_user_type(self):
         return self.inst_lib.get_user_type()
 
+    def show_param_editor(self):
+        pass
