@@ -85,7 +85,9 @@ class BaseInstLibFacade:
 
             # Locks every parameter field except name
             for key in entry:
-                if LOCK not in entry[key] and key != 'name' and key != id_key:
+                if key in ('name', 'default_value'):
+                    continue
+                if LOCK not in entry[key] and key != id_key:
                     entry[key] = f'{LOCK} {entry[key]}'
 
             tree.append(entry)
