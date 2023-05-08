@@ -9,7 +9,7 @@ from SALSA.Common.constants import sep
 
 default_headers = {
     'instruction': ['inst_ID', 'name'],
-    'parameter': ['param_ID', 'name', 'type', 'mask', 'is_signed']
+    'parameter': ['param_ID', 'name', 'type', 'mask', 'is_signed', 'default_value']
 }
 
 header_settings = {
@@ -29,6 +29,7 @@ header_settings = {
 
 param_edit_fields = {
     'name': {'widget': tk.Entry, 'args': {}, 'kwargs': {}},
+    'default_value': {'widget': 'param_edit', 'args': {}, 'kwargs': {}}
 }
 
 default_tree_width = 100
@@ -260,7 +261,6 @@ class InstructionEditorView(tk.Toplevel):
         return list(header_settings[tree_key].keys())
 
     def on_select_instruction(self, e):
-        print(self.details_desc_text.winfo_width())
         if self.inst_list_tree.identify_region(e.x, e.y) == 'heading':
             return
         selected_iid = self.inst_list_tree.focus()
@@ -319,6 +319,9 @@ class InstructionEditorView(tk.Toplevel):
             return
 
         widget_details = param_edit_fields[column_name]
+        if widget_details['widget'] == 'param_edit':
+            self.callbacks['show_param_editor'](param_id)
+            return
 
         # get cell bounding box
         cell_bbox = self.param_list_tree.bbox(selected_iid, column)
