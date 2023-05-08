@@ -94,7 +94,11 @@ class Application(tk.Tk):
         self.project_edit_controller.update_tree(None, None)
 
     def on_save_as_project(self):
-        filepath = filedialog.asksaveasfilename(filetypes=(('Project File', '*.prj'),), title='Save a project file')
+        kwargs = {'filetypes': (('Project File', '*.prj'),), 'title': 'Save a project file'}
+        start_dir = self.proj_model.get_project_directory()
+        if start_dir != '' and start_dir is not None:
+            kwargs['initialdir'] = start_dir
+        filepath = filedialog.asksaveasfilename(**kwargs)
         if filepath == '' or filepath is None:
             return
         if filepath[-4:] != '.prj':
