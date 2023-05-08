@@ -196,10 +196,14 @@ class RequiredIntEntry(RequiredEntry):
     def _key_validate(self, char, index, current, proposed, action, **kwargs):
         valid = super()._key_validate(char=char, index=index, current=current, proposed=proposed, action=action, **kwargs)
 
-        if char not in '1234567890':
+        if char not in '-1234567890':
             return False
 
-        if proposed == '':
+        if '-' in proposed:
+            if not re.search('^-', proposed):
+                return False
+
+        if proposed in ('', '-'):
             return True
 
         if int(proposed) < self.min or int(proposed) > self.max:
