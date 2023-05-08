@@ -159,7 +159,7 @@ class Application(tk.Tk):
         script_paths = filedialog.askopenfilenames(**kwargs)
         if script_paths == '' or script_paths is None:
             return
-
+        self.sct_model.set_default_directory(os.path.dirname(script_paths[0]))
         self._notify_add_script(list(script_paths))
 
     def _notify_add_script(self, script_paths):
