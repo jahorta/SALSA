@@ -2,6 +2,7 @@ import copy
 import tkinter as tk
 from tkinter import messagebox as msg
 
+from GUI.ParamEditorPopups.param_editor_controller import ParamEditController
 from SALSA.GUI.InstructionEditor.instruction_editor_view import InstructionEditorView
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.constants import sep, LOCK
@@ -31,7 +32,7 @@ class InstructionEditorController:
         self.param_details = None
         self.changed_values = {}
 
-        self.param_editor = ParamEditController(self.view, callbacks={})
+        self.param_editor = ParamEditController(self.view, callbacks={'refresh_inst': self.refresh_param_tree})
 
         self.populate_instruction_tree()
 
@@ -193,5 +194,5 @@ class InstructionEditorController:
     def get_user_type(self):
         return self.inst_lib.get_user_type()
 
-    def show_param_editor(self):
-        pass
+    def show_param_editor(self, param_id):
+        self.param_editor.show_param_editor(None, self.inst_lib.get_inst(self.cur_inst).parameters[int(param_id)])
