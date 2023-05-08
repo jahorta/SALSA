@@ -2,8 +2,9 @@ import json
 import os
 import threading
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 
+from SALSA.Common.setting_class import settings
 from SALSA.FileModels.project_model import ProjectModel
 from SALSA.FileModels.sct_model import SCTModel
 from SALSA.GUI.ProjectEditor.project_editor_controller import ProjectEditorController
