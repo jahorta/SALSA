@@ -95,6 +95,7 @@ class SCPTFloatWidget(tk.Frame):
         if value == 'override':
             self.set_override(init=True)
 
+
 # Single row widget of SCPT parameter
 class SCPTEditWidget(tk.Frame):
 
@@ -166,8 +167,9 @@ class SCPTEditWidget(tk.Frame):
         self.active_widget = widget_key
         self.input_widgets[widget_key].grid(row=0, column=3, sticky=tk.W)
 
-    def set_widget_values(self, value, override):
+    def set_widget_values(self, value, override=None):
         self.option_option.configure(state='normal')
+
         # Value is a compare type scpt code
         if value in self.scpt_codes.compare:
             self.class_selection.set('compare')
@@ -224,7 +226,6 @@ class SCPTEditWidget(tk.Frame):
                 value = 'override'
             self.input_widgets['float'].set_value(value)
 
-
     def get_var_alias(self):
         var_type = self.option_selection.get().split(': ')[0]
         return self.callbacks['get_var_alias'](var_type, self.input_vars['var'].get())
@@ -251,15 +252,24 @@ class IntEditWidget(tk.Frame):
         label = tk.Label(self, text=f'{name}: ')
         label.grid(row=0, column=0, sticky=tk.W)
 
-        self.entry_variable = tk.IntVar(self)
-        entry_field = w.RequiredIntEntry(self, textvariable=self.entry_variable, width=15)
-        entry_field.grid(row=0, column=1, sticky=tk.W)
+        self.entry_field = w.RequiredIntEntry(self, width=15)
+        self.entry_field.grid(row=0, column=1, sticky=tk.W)
+
+        self.remove_value()
+
+    def remove_value(self):
+        self.set_value(None)
 
     def set_value(self, value):
-        self.entry_variable.set(value)
+        self.entry_field.delete(0, tk.END)
+        if value is None:
+            value = 'None'
+        self.entry_field.insert(0, value)
 
     def get_value(self):
-        return self.entry_variable.get()
+        if self.entry_field.get() == 'None':
+            return None
+        return self.entry_field.get()
 
 
 class FooterEditWidget(tk.Frame):
@@ -274,6 +284,9 @@ class FooterEditWidget(tk.Frame):
         entry_field = tk.Entry(self, textvariable=self.entry_variable, width=25)
         entry_field.grid(row=0, column=1, sticky=tk.W)
 
+    def remove_value(self):
+        self.set_value('')
+
     def set_value(self, value):
         self.entry_variable.set(value)
 
@@ -281,36 +294,20 @@ class FooterEditWidget(tk.Frame):
         return self.entry_variable.get()
 
 
-class SubscriptWidget(tk.Frame):
+class ObjectSelectionWidget(tk.Frame):
 
-    def __init__(self, parent, name, subscripts: List[str], *args, **kwargs):
+    def __init__(self, parent, name, selection_list: List[str], *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         label = tk.Label(self, text=f'{name}: ')
         label.grid(row=0, column=0, sticky=tk.W)
 
         self.entry_variable = tk.StringVar(self)
-        option_field = tk.OptionMenu(self, self.entry_variable, *subscripts)
+        option_field = tk.OptionMenu(self, self.entry_variable, *selection_list)
         option_field.grid(row=0, column=1, sticky=tk.W)
 
-    def set_value(self, value):
-        self.entry_variable.set(value)
-
-    def get_value(self):
-        return self.entry_variable.get()
-
-
-class StringWidget(tk.Frame):
-
-    def __init__(self, parent, name, subscripts: List[str], *args, **kwargs):
-        super().__init__(parent, *args, **kwargs)
-
-        label = tk.Label(self, text=f'{name}: ')
-        label.grid(row=0, column=0, sticky=tk.W)
-
-        self.entry_variable = tk.StringVar(self)
-        entry_field = tk.OptionMenu(self, self.entry_variable, *subscripts)
-        entry_field.grid(row=0, column=1, sticky=tk.W)
+    def remove_value(self):
+        self.set_value('')
 
     def set_value(self, value):
         self.entry_variable.set(value)
@@ -352,14 +349,19 @@ class ParamEditPopup(tk.Toplevel):
         button_frame = tk.Frame(self)
         button_frame.grid(row=1, column=0, sticky=tk.E)
 
+        clear_button = tk.Button(button_frame, text='Clear Value', command=self.on_clear)
+        clear_button.grid(row=0, column=0)
         ok_button = tk.Button(button_frame, text='Ok', command=self.on_ok)
-        ok_button.grid(row=0, column=0, padx=20)
+        ok_button.grid(row=0, column=1, padx=10)
         cancel_button = tk.Button(button_frame, text='Cancel', command=self.on_close)
-        cancel_button.grid(row=0, column=1)
+        cancel_button.grid(row=0, column=2)
         self.protocol('WM_DELETE_WINDOW', self.on_close)
 
     def set_callbacks(self, callbacks):
         self.callbacks = callbacks
+
+    def on_clear(self):
+        self.callbacks['clear_value']()
 
     def on_ok(self):
         self.callbacks['save']()
