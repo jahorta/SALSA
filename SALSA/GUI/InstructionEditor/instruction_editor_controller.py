@@ -107,8 +107,13 @@ class InstructionEditorController:
         else:
             raise KeyError(f'{self.log_name}: Unknown user type: {user_type}')
 
+        self.refresh_param_tree(ID=newID)
+
+    def refresh_param_tree(self, ID=None):
+        if ID is None:
+            ID = self.cur_inst
         headers = self.view.get_headers('parameter')
-        entries = self.inst_lib.get_tree_entries(headers=self.view.get_headers('parameter'), inst_id=newID)
+        entries = self.inst_lib.get_tree_entries(headers=self.view.get_headers('parameter'), inst_id=ID)
         self.populate_tree(self.view.param_list_tree, headers, entries)
 
     def replace_changed_values(self, details):
