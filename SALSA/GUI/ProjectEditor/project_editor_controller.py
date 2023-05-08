@@ -36,7 +36,8 @@ class ProjectEditorController:
             'update_field': self.update_field,
             'edit_param': self.on_edit_parameter,
             'show_header_selection_menu': self.show_header_selection_menu,
-            'show_inst_menu': self.show_instruction_menu
+            'show_inst_menu': self.show_instruction_menu,
+            'save_project': self.save_project
         }
         self.view.add_and_bind_callbacks(view_callbacks)
 
@@ -47,7 +48,8 @@ class ProjectEditorController:
         pe_callbacks = {'get_var_alias': self.get_var_alias,
                         'refresh_inst': self.on_refresh_inst,
                         'update_variables': self.update_var_usage,
-                        'get_subscript_list': lambda: self.project.get_section_list(self.current['script'])}
+                        'get_subscript_list': lambda: self.project.get_section_list(self.current['script']),
+                        'set_change': self.set_change}
         self.param_editor = ParamEditController(self.view, callbacks=pe_callbacks)
 
         if self.log_name not in settings:
@@ -79,6 +81,17 @@ class ProjectEditorController:
         self.trees['script'].add_callback('select', self.on_select_tree_entry)
         self.trees['section'].add_callback('select', self.on_select_tree_entry)
         self.trees['instruction'].add_callback('select', self.on_select_tree_entry)
+
+        self.has_changes = False
+
+    def set_change(self):
+        self.has_changes = True
+        self.view.save_button.configure(state='normal')
+
+    def save_project(self):
+        self.callbacks['save_project']()
+        self.has_changes = False
+        self.view.save_button.configure(state='disabled')
 
     def load_project(self):
         for key in list(self.current.keys()):

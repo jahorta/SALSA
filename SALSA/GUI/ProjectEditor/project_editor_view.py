@@ -78,7 +78,7 @@ class ProjectEditorView(tk.Frame):
 
         button_frame = tk.Frame(self)
         button_frame.grid(row=0, column=0, sticky=tk.W)
-        self.save_button = tk.Button(button_frame, text='Save', command=None)
+        self.save_button = tk.Button(button_frame, text='Save', command=self.on_save_button)
         self.save_button.grid(row=0, column=0)
 
         self.pane_frame = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
@@ -263,6 +263,9 @@ class ProjectEditorView(tk.Frame):
         self.link_in = w.ScrollLabelFrame(link_frame, has_label=False, size={'width': 100, 'height': 50})
         self.link_in.grid(row=4, column=0, sticky=tk.W+tk.E)
         self.link_in.columnconfigure(0, weight=1)
+
+    def on_save_button(self):
+        self.callbacks['save_project']()
 
     def get_headers(self, tree_key=None, get_all=False):
         if tree_key is None:
