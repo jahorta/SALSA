@@ -34,7 +34,7 @@ class DecimalWidget(tk.Frame):
 # SCPT variable input widget
 class SCPTVarWidget(tk.Frame):
 
-    def __init__(self, parent, textvariable, callbacks, *args, **kwargs):
+    def __init__(self, parent, textvariable, callbacks, is_base, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.callbacks = callbacks
@@ -42,8 +42,9 @@ class SCPTVarWidget(tk.Frame):
         self.var_variable = textvariable
         self.var_entry = w.RequiredIntEntry(self, width=10, textvariable=self.var_variable)
         self.var_entry.grid(row=0, column=0, sticky=tk.W)
-        self.var_entry.bind('<FocusOut>', self.load_alias)
-        self.var_entry.bind('<Return>', self.load_alias)
+        if not is_base:
+            self.var_entry.bind('<FocusOut>', self.load_alias)
+            self.var_entry.bind('<Return>', self.load_alias)
 
         self.alias_label = tk.Label(self, text='No Alias')
         self.alias_label.grid(row=0, column=1, sticky=tk.W)
