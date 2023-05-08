@@ -11,6 +11,8 @@ from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 
 class ParamEditController:
 
+    log_code = 'ParamEditCtrlr'
+
     def __init__(self, parent, callbacks):
         self.parent = parent
         self.callbacks = callbacks
@@ -59,23 +61,36 @@ class ParamEditController:
         self.param = None
         self.base_param = None
 
+    def clear_value(self, param_base_type):
+        if param_base_type == 'scpt':
+            self.clear_scpt()
+        elif param_base_type == 'int':
+            self.clear_int()
+        else:
+            print(f'{self.log_code}: Unrecognized reset value option: {param_base_type}')
+
     # ------------------------------------------- #
     # SCPT parameter editor initial setup methods #
     # ------------------------------------------- #
 
     # Initial SCPT Parameter View Setup
-    def setup_scpt_view(self):
+    def setup_scpt_view(self, cleared=False):
         self.view.set_callbacks(self.scpt_callbacks)
         self.scpt_rows['0'] = 0
         self.scpt_fields['0'] = SCPTEditWidget(parent=self.view.main_frame, callbacks=self.scpt_callbacks, key='0',
                                                is_base=self.param is None)
         self.scpt_fields['0'].grid(row=0, column=0, sticky='W')
+        if cleared:
+            return
+        value = self.param.value if self.param is not None else self.base_param.default_value
+        if value is None:
+            return
+        kwargs = {'value': value, 'cur_id': '0'}
+        if self.param is not None:
+            if self.param.override is not None:
+                kwargs |= {'override': True}
 
-        if self.param.override is not None:
-            self.setup_scpt_from_value(value=self.param.value, override=True, cur_id='0')
-
-        elif self.param.value is not None:
-            self.setup_scpt_from_value(value=self.param.value, cur_id='0')
+        self.setup_scpt_from_value(value=value, cur_id='0')
 
     # Load scpt value into scpt widgets
     def setup_scpt_from_value(self, value, cur_id, override=False):
@@ -87,6 +102,15 @@ class ParamEditController:
                     self.setup_scpt_from_value(value=value, cur_id=new_keys[i])
         else:
             self.scpt_fields[cur_id].set_widget_values(value=value, override=override)
+
+    # Clear SCPT value
+    def clear_scpt(self):
+        for field in self.scpt_fields.values():
+            field.destroy()
+        self.scpt_fields = {}
+        self.scpt_rows = {}
+        self.old_scpt_fields = {}
+        self.setup_scpt_view(cleared=True)
 
     # ------------------------------------------- #
     # SCPT parameter editor functionality methods #
