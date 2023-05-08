@@ -42,6 +42,8 @@ class SCTExportPopup(tk.Toplevel):
         directory_frame.columnconfigure(0, weight=1)
 
         self.directory_var = tk.StringVar()
+        if 'script export dir' in settings[self.log_key]:
+            self.directory_var.set(settings[self.log_key]['script export dir'])
         directory_entry = tk.Entry(directory_frame, textvariable=self.directory_var, width=30)
         directory_entry.grid(row=0, column=0, sticky='NSEW')
 
@@ -113,6 +115,7 @@ class SCTExportPopup(tk.Toplevel):
         if new_dir == '':
             return
         self.directory_var.set(new_dir)
+        settings.set_single(self.log_key, 'script export dir', new_dir)
         self.tkraise()
 
     def change_setting(self, setting):
