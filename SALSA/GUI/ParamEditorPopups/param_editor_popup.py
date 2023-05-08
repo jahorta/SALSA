@@ -98,12 +98,13 @@ class SCPTFloatWidget(tk.Frame):
 # Single row widget of SCPT parameter
 class SCPTEditWidget(tk.Frame):
 
-    def __init__(self, parent, callbacks, key: str, *args, prefix='', **kwargs):
+    def __init__(self, parent, callbacks, key: str, is_base, *args, prefix='', **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.callbacks = callbacks
         self.scpt_codes = SCPTParamCodes(is_decoder=False)
         self.key = key
+        self.is_base = is_base
 
         indent = '\t'*key.count(sep)
         self.prefix_label = tk.Label(self, text=f'{indent} {prefix}')
@@ -124,7 +125,7 @@ class SCPTEditWidget(tk.Frame):
         }
 
         self.input_widgets: Dict[str, Union[SCPTVarWidget, SCPTFloatWidget, DecimalWidget]] = {
-            'var': SCPTVarWidget(self, textvariable=self.input_vars['var'], callbacks={'get_alias': self.get_var_alias}),
+            'var': SCPTVarWidget(self, textvariable=self.input_vars['var'], callbacks={'get_alias': self.get_var_alias}, is_base=self.is_base),
             'float': SCPTFloatWidget(self, callbacks={}),
             'decimal': DecimalWidget(self, textvariables=self.input_vars['decimal'])
         }
