@@ -5,7 +5,7 @@ from SALSA.Common.constants import sep
 from SALSA.Common.are_same_checker import are_same
 from SALSA.Project.project_container import SCTParameter
 from SALSA.GUI.ParamEditorPopups.param_editor_popup import ParamEditPopup, SCPTEditWidget, IntEditWidget, \
-    SubscriptWidget, FooterEditWidget
+    FooterEditWidget, ObjectSelectionWidget
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 
 
@@ -29,12 +29,12 @@ class ParamEditController:
         self.old_scpt_fields: Dict[str, SCPTEditWidget] = {}
         self.scpt_callbacks = {'add_child_scpt_rows': self.add_scpt_rows,
                                'remove_child_scpt_rows': self.remove_scpt_rows,
-                               'get_var_alias': self.callbacks['get_var_alias'],
                                'has_changes': self.scpt_has_changed,
-                               'save': self.scpt_save,
-                               'close': self.close_view}
+                               'save': self.scpt_save, 'close': self.close_view,
+                               'clear_value': lambda: self.clear_value('scpt')}
 
-        self.int_callbacks = {'save': self.int_save, 'close': self.close_view}
+        self.int_callbacks = {'save': self.int_save, 'close': self.close_view,
+                              'clear_value': lambda: self.clear_value('int')}
 
         self.int_field: Union[None, IntEditWidget, SubscriptWidget, FooterEditWidget] = None
 
@@ -42,10 +42,13 @@ class ParamEditController:
     # Param Editor Show and Close functions #
     # ------------------------------------- #
 
-    def show_param_editor(self, param: SCTParameter, base_param: BaseParam):
+    def show_param_editor(self, param: Union[SCTParameter, None], base_param: BaseParam):
         self.view = ParamEditPopup(self.parent)
         self.view.main_frame_label.config(text=base_param.type)
         self.param = param
+        if self.param is not None:
+            self.scpt_callbacks |= {'get_var_alias': self.callbacks['get_var_alias']}
+            self.int_callbacks |= {'get_string_from_name': self.callbacks['get_string_from_name']}
         self.base_param = base_param
         base_type = base_param.type.split('-')[0]
         self.setup_view_fxns[base_type]()
@@ -64,7 +67,8 @@ class ParamEditController:
     def setup_scpt_view(self):
         self.view.set_callbacks(self.scpt_callbacks)
         self.scpt_rows['0'] = 0
-        self.scpt_fields['0'] = SCPTEditWidget(self.view.main_frame, self.scpt_callbacks, '0')
+        self.scpt_fields['0'] = SCPTEditWidget(parent=self.view.main_frame, callbacks=self.scpt_callbacks, key='0',
+                                               is_base=self.param is None)
         self.scpt_fields['0'].grid(row=0, column=0, sticky='W')
 
         if self.param.override is not None:
@@ -153,6 +157,12 @@ class ParamEditController:
         new_scpt_value = self.convert_scpt_widgets_to_value()
         if not self.scpt_has_changed(new_scpt_value):
             return
+
+        # If editing a base parameter
+        if self.param is None:
+            self.base_param.default_value = new_scpt_value
+            return
+
         var_changes = self.get_var_changes(self.param.value, new_scpt_value)
         if var_changes is not None:
             self.callbacks['update_variables'](var_changes)
@@ -222,9 +232,13 @@ class ParamEditController:
 
     def setup_int_view(self):
         self.view.set_callbacks(self.int_callbacks)
-        if 'subscript' in self.base_param.type:
-            self.int_field = SubscriptWidget(self.view.main_frame, name=self.base_param.name,
-                                             subscripts=self.callbacks['get_subscript_list']())
+
+        if self.param is None:
+            self.int_field = IntEditWidget(self.view.main_frame, name=self.base_param.name)
+            value = self.base_param.default_value
+        elif 'subscript' in self.base_param.type:
+            self.int_field = ObjectSelectionWidget(self.view.main_frame, name=self.base_param.name,
+                                                   selection_list=self.callbacks['get_subscript_list']())
             value = self.param.link.target_trace[0]
         elif 'footer' in self.base_param.type:
             self.int_field = FooterEditWidget(self.view.main_frame, name=self.base_param.name)
@@ -237,6 +251,18 @@ class ParamEditController:
 
     def int_save(self):
         value = self.int_field.get_value()
+        if self.param is None:
+            if value == 'None':
+                value = None
+            if value == self.base_param.default_value:
+                return
+            self.base_param.default_value = value
+            self.callbacks['set_change']()
+            return
+
+        if value == self.param.value:
+            return
+
         if 'subscript' in self.base_param.type:
             inst_id = self.callbacks['get_first_inst'](value)
             self.param.link.target_trace = [value, inst_id]
