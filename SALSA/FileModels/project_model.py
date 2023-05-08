@@ -36,6 +36,7 @@ class ProjectModel:
             print('No file path for saving')
             return
 
+        settings.set_single(self.log_key, 'directory', os.path.dirname(filepath))
         with open(filepath, 'wb') as file:
             pickle.dump(proj, file)
 
