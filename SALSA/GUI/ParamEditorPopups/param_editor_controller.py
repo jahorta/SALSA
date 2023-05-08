@@ -56,6 +56,7 @@ class ParamEditController:
         self.setup_view_fxns[base_type]()
 
     def close_view(self):
+
         self.view.destroy()
         self.view = None
         self.param = None
@@ -197,6 +198,7 @@ class ParamEditController:
         else:
             self.param.set_value(new_scpt_value)
         self.callbacks['refresh_inst']()
+        self.callbacks['set_change']()
 
     def scpt_has_changed(self, new_scpt_value=None):
         if new_scpt_value is None:
@@ -307,3 +309,9 @@ class ParamEditController:
             self.param.link_result = value
         else:
             self.param.value = value
+
+        self.callbacks['refresh_inst']()
+        self.callbacks['set_change']()
+
+    def clear_int(self):
+        self.int_field.remove_value()
