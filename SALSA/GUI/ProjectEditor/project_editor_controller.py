@@ -30,8 +30,9 @@ class ProjectEditorController:
 
     def __init__(self, parent: tk.Tk, view: ProjectEditorView, facade: SCTProjectFacade, callbacks):
         self.parent: tk.Tk = parent
-        self.view: ProjectEditorView = view
+        self.callbacks = callbacks
 
+        self.view: ProjectEditorView = view
         view_callbacks = {
             'update_field': self.update_field,
             'edit_param': self.on_edit_parameter,
@@ -43,7 +44,6 @@ class ProjectEditorController:
 
         self.project: SCTProjectFacade = facade
         self.project.set_callback('confirm_remove_inst_group', self.confirm_remove_inst_group)
-        self.callbacks = callbacks
 
         pe_callbacks = {'get_var_alias': self.get_var_alias,
                         'refresh_inst': self.on_refresh_inst,
@@ -398,8 +398,6 @@ class ProjectEditorController:
         if cancel:
             return 'cancel'
         return self.view.inst_group_handling(cur_inst_id, new_id, children)
-
-
 
     # ------------------------ #
     # Parameter editor methods #
