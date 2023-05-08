@@ -298,7 +298,7 @@ class SCTEncoder:
             if link_value[0] == 'Footer':
                 self.footer_links[len(self.sct_body)] = param.link_result
             elif link_value[0] == 'String':
-                self.string_links[len(self.sct_body)] = link_value[1]
+                self.string_links[len(self.sct_body)] = self.script.strings[param.link_result]
             elif link_value[0] == 'SCT':
                 self.sct_links[len(self.sct_body)] = param.link.target_trace
             else:
