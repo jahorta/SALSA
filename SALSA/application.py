@@ -175,14 +175,14 @@ class Application(tk.Tk):
         else:
             self.gui.stop_status_popup()
 
-    def set_script_dir(self):
-        script_dir = filedialog.askdirectory()
-        if script_dir == '':
-            return
-        self.settings.set_script_dir(script_dir)
-
     def on_quit(self):
-        pass
+        if not self.project_edit_controller.has_changes:
+            return
+
+        # dialog to save changes or not
+        save = tk.messagebox.askyesno(title='Unsaved Changes', message='There are unsaved changes remaining.\nWould you like to save them?')
+        if save:
+            self.on_save_project()
 
     def on_export_scts(self, directory, scripts, options):
         compress = options['compress_aklz']
