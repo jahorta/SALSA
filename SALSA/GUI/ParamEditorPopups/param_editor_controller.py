@@ -38,7 +38,7 @@ class ParamEditController:
         self.int_callbacks = {'save': self.int_save, 'close': self.close_view,
                               'clear_value': lambda: self.clear_value('int')}
 
-        self.int_field: Union[None, IntEditWidget, SubscriptWidget, FooterEditWidget] = None
+        self.int_field: Union[None, IntEditWidget, ObjectSelectionWidget, FooterEditWidget] = None
 
     # ------------------------------------- #
     # Param Editor Show and Close functions #
@@ -135,7 +135,7 @@ class ParamEditController:
                 self.scpt_fields[key] = self.old_scpt_fields.pop(key)
                 self.scpt_rows[key] = p_row + i + 1
             else:
-                self.scpt_fields[key] = SCPTEditWidget(self.view.main_frame, self.scpt_callbacks, key, prefix=i+1)
+                self.scpt_fields[key] = SCPTEditWidget(self.view.main_frame, self.scpt_callbacks, key, prefix=i + 1)
                 self.scpt_rows[key] = p_row + i + 1
 
         self.regrid_scpt_rows(changed_keys)
@@ -264,8 +264,16 @@ class ParamEditController:
             self.int_field = ObjectSelectionWidget(self.view.main_frame, name=self.base_param.name,
                                                    selection_list=self.callbacks['get_subscript_list']())
             value = self.param.link.target_trace[0]
+        elif 'jump' in self.base_param.type:
+            self.int_field = ObjectSelectionWidget(self.view.main_frame, name=self.base_param.name,
+                                                   selection_list=self.callbacks['get_instruction_list']())
+            value = self.callbacks['get_inst_identifier'](self.param.link.target_trace[0])
         elif 'footer' in self.base_param.type:
             self.int_field = FooterEditWidget(self.view.main_frame, name=self.base_param.name)
+            value = self.param.link_result
+        elif 'string' in self.base_param.type:
+            self.int_field = ObjectSelectionWidget(self.view.main_frame, name=self.base_param.name,
+                                                   selection_list=self.callbacks['get_string_list']())
             value = self.param.link_result
         else:
             self.int_field = IntEditWidget(self.view.main_frame, name=self.base_param.name)
@@ -290,7 +298,12 @@ class ParamEditController:
         if 'subscript' in self.base_param.type:
             inst_id = self.callbacks['get_first_inst'](value)
             self.param.link.target_trace = [value, inst_id]
+        elif 'jump' in self.base_param.type:
+            inst_id = self.callbacks['get_inst_by_pos'](value)
+            self.param.link.target_trace[1] = inst_id
         elif 'footer' in self.base_param.type:
+            self.param.link_result = value
+        elif 'string' in self.base_param.type:
             self.param.link_result = value
         else:
             self.param.value = value
