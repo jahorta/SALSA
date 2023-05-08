@@ -18,11 +18,13 @@ class Application(tk.Tk):
     """Controls the links between the data models and views"""
     test = True
     title_text = "Skies of Arcadia Legends Script Assistant"
-    default_sct_file = 'me002a.sct'
-    export_thread: threading.Thread
+    log_key = 'app'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        if self.log_key not in settings:
+            settings[self.log_key] = {}
 
         # Load base instructions
         self.base_insts = BaseInstLibFacade()
