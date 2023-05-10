@@ -1457,12 +1457,13 @@ class SCTDecoder:
         # Create grouped section heirarchy
         groups = decoded_sct.section_groups
 
-        # sort groups by size with smallest first
-        groups = {k: groups[k] for k in sorted(groups.keys(), key=lambda k: len(groups[k]))}
+        if len(groups) > 0:
+            # sort groups by size with smallest first
+            groups = {k: groups[k] for k in sorted(groups.keys(), key=lambda k: len(groups[k]))}
 
-        new_groups = self._nest_groups(groups)
-        new_groups = self._complete_heirarchy_sections(list(decoded_sct.sections.keys()), new_groups)
-        decoded_sct.sections_grouped = new_groups
+            new_groups = self._nest_groups(groups)
+            new_groups = self._complete_heirarchy_sections(list(decoded_sct.sections.keys()), new_groups)
+            decoded_sct.sections_grouped = new_groups
 
         # Create grouped instruction heirarchies
         for section in decoded_sct.sections.values():
