@@ -349,7 +349,17 @@ class ProjectEditorController:
     def rcm_add_inst(self, direction):
         sel_iid = self.trees['instruction'].focus()
         pre_rowdata = self.trees['instruction'].row_data[sel_iid]
-        inst_uuid = self.project.add_inst(self.current['script'], self.current['section'], pre_rowdata, direction=direction)
+
+        # if switch case selected
+        case = None
+        if pre_rowdata is None:
+            parent_sel_iid = self.trees['instruction'].parent(sel_iid)
+            parent_rowdata = self.trees['instruction'].row_data[parent_sel_iid]
+            pre_rowdata = parent_rowdata
+
+            case = self.trees['instruction'].item(sel_iid)['values'][0]
+
+        inst_uuid = self.project.add_inst(self.current['script'], self.current['section'], pre_rowdata, case=case, direction=direction)
         inst_trace = [self.current['script'], self.current['section'], inst_uuid]
         self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'),
                                                               self.current['script'], self.current['section']))
