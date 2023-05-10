@@ -300,26 +300,72 @@ class SCTProjectFacade:
     def get_section_list(self, script):
         return list(self.project.scripts[script].sections.keys())
 
-    def add_inst(self, script, section, ref_inst, direction='below'):
+    def add_inst(self, script, section, ref_inst_uuid, case=None, direction='below'):
         new_inst = SCTInstruction()
         inst_sect = self.project.scripts[script].sections[section]
         inst_sect.instructions[new_inst.ID] = new_inst
 
-        insert_pos = inst_sect.instruction_ids_ungrouped.index(ref_inst)
-        if direction == 'below':
-            insert_pos += 1
-        inst_sect.instruction_ids_ungrouped.insert(insert_pos, new_inst.ID)
-
-        inst_parents, insert_loc_in_parents = self.get_inst_grouped_parents_and_index(ref_inst, inst_sect.instructions_ids_grouped)
+        inst_parents, index = self.get_inst_grouped_parents_and_index(ref_inst_uuid, inst_sect.instructions_ids_grouped)
 
         cur_group = inst_sect.instructions_ids_grouped
         for key in inst_parents:
             cur_group = cur_group[key]
 
-        if direction == 'below':
-            insert_loc_in_parents += 1
+        clicked_inst_group_key = cur_group[index]
+        if isinstance(clicked_inst_group_key, dict):
+            clicked_inst_group_key = list(clicked_inst_group_key.keys())[0]
 
-        cur_group.insert(insert_loc_in_parents, new_inst.ID)
+        grouped_insert_loc = index
+
+        if direction == 'below':
+            grouped_insert_loc += 1
+
+        if direction == 'inside':
+            grouped_insert_loc = 0
+            cur_group = cur_group[index][list(cur_group.keys())[0]]
+            if case is not None:
+                cur_group = cur_group[case]
+
+        cur_group.insert(grouped_insert_loc, new_inst.ID)
+
+        ungroup_ref_inst_uuid = ref_inst_uuid
+
+        if direction == 'below' and isinstance(cur_group[index], dict):
+            cur_group = cur_group[index][list(cur_group.keys())[0]]
+
+            # If its a switch, there will be one more dict level for cases
+            if isinstance(cur_group, dict):
+                cur_group = cur_group[list(cur_group.keys())[-1]]
+
+            # The ref inst for below is the last instruction of the group this should almost always be a goto
+            ungroup_ref_inst_uuid = cur_group[-1]
+
+        insert_pos = inst_sect.instruction_ids_ungrouped.index(ungroup_ref_inst_uuid)
+        if direction in ('inside', 'below'):
+            insert_pos += 1
+        inst_sect.instruction_ids_ungrouped.insert(insert_pos, new_inst.ID)
+
+        # if new inst is inside, and clicked is a switch case, change target of link of case to new inst
+        if case is not None:
+            switch = inst_sect.instructions[ref_inst_uuid]
+            for loop in switch.loop_parameters:
+                if loop[2].value == int(case):
+                    loop[3].link.target_trace[1] = new_inst.ID
+                    break
+
+        # if new inst is below, and clicked is a switch, change targets of all links which contain the prev_below inst to cur_below inst for the switch
+        if direction == 'below' and inst_sect.instructions[ref_inst_uuid].instruction_id == 3:
+            switch = inst_sect.instructions[ref_inst_uuid]
+            old_target = inst_sect.instruction_ids_ungrouped[insert_pos+1]
+            for loop in switch.loop_parameters:
+                if loop[3].link.target_trace[1] == old_target:
+                    loop[3].link.target_trace[1] = new_inst.ID
+
+        # if new inst is below, and clicked is if, change target of goto to new inst
+        if direction == 'below' and inst_sect.instructions[ref_inst_uuid].instruction_id == 0:
+            if_inst = inst_sect.instructions[ref_inst_uuid]
+            goto_inst = inst_sect.instructions[if_inst.my_goto_uuids[0]]
+            goto_inst.parameters[0].link.target_trace[1] = new_inst.ID
 
         return new_inst.ID
 
