@@ -363,7 +363,13 @@ class ProjectEditorController:
         inst_trace = [self.current['script'], self.current['section'], inst_uuid]
         self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'),
                                                               self.current['script'], self.current['section']))
-        sel_iid = str(int(sel_iid) + 1) if direction == 'below' else sel_iid
+
+        sel_iid = str(int(sel_iid) + 1) if direction == 'inside' else sel_iid
+
+        sel_iid = self.trees['instruction'].next(sel_iid) if direction == 'below' else sel_iid
+
+        self.trees['instruction'].see(sel_iid)
+
         self.view.after(10, self.show_inst_selector, inst_trace, sel_iid)
 
     def show_inst_selector(self, inst_trace, sel_iid):
