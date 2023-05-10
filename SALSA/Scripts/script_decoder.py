@@ -1685,10 +1685,10 @@ class SCTDecoder:
         cur_ind = start_ind
         while cur_ind < len(inst_list):
             cur_inst = inst_list[cur_ind]
-            if cur_ind == len(inst_list):
+            if cur_ind == len(inst_list) - 1:
                 print(
                     f'SCPT Decoder: Find Inst: Entry not found: {origin_sect_name}:{origin_element_id} - {target_pos}')
-                return
+                return None
             if cur_inst.absolute_offset == target_pos:
                 break
             if cur_inst.absolute_offset < target_pos < inst_list[cur_ind + 1].absolute_offset:
