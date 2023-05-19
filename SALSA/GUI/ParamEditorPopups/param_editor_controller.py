@@ -222,10 +222,12 @@ class ParamEditController:
             }}
         elif scpt_class == 'secondary':
             value = scpt_widget.option_selection.get()
-        else:
+        elif scpt_class in ('decimal', 'float'):
             value = scpt_widget.get_input()
             if 'float' not in self.base_param.type and cur_id == '0' and value != 'override':
                 value = int(value)
+        else:
+            value = None
         return value
 
     def get_var_changes(self, old_param, new_param):
@@ -291,10 +293,14 @@ class ParamEditController:
 
     def int_save(self):
         value = self.int_field.get_value()
-        if self.param is None:
-            if value == 'None':
-                value = None
-            if value == self.base_param.default_value:
+
+        cur_value = self.param.value if self.param is not None else self.base_param.default_value
+
+        if value == 'None':
+            value = None
+
+        if value is None or cur_value is None:
+            if value is None and cur_value is None:
                 return
 
         elif value == cur_value:
