@@ -128,18 +128,6 @@ class BaseInst:
 
         self.warning = inst_values.get('Warning', None)
 
-    def get_all(self):
-        all_fields = {'Name': self.name, 'Description': self.description, 'Notes': self.notes}
-        param = {}
-        currParam = 0
-        for key, value in self.parameters.items():
-            param[key] = value.get_fields()
-            currParam += 1
-
-        all_fields['Parameters'] = param
-
-        return all_fields
-
     def set_inst_details(self, updated_details, user_id):
         if 'Name' not in self.locked_fields:
             self.name = updated_details.get('Name', self.name)
