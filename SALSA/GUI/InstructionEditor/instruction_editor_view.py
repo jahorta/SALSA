@@ -353,7 +353,7 @@ class InstructionEditorView(tk.Toplevel):
         column_name = e.widget.editing_column_name
 
         current_values = self.param_list_tree.item(selected_iid).get('values')
-        current_values[column_index] = new_text
+        current_values[column_index - 1] = new_text
 
         self.param_list_tree.item(selected_iid, values=current_values)
 
