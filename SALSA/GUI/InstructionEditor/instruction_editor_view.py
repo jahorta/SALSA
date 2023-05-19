@@ -358,7 +358,7 @@ class InstructionEditorView(tk.Toplevel):
         self.param_list_tree.item(selected_iid, values=current_values)
 
         param_id = self.param_list_tree.item(selected_iid).get('text')
-        self.callbacks['set_change'](f'{param_id}{sep}{column_name}')
+        self.callbacks['set_change'](f'{param_id}{sep}{column_name}', new_text)
 
         e.widget.destroy()
 
