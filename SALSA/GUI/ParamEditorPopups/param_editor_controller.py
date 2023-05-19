@@ -209,7 +209,7 @@ class ParamEditController:
     def scpt_has_changed(self, new_scpt_value=None):
         if new_scpt_value is None:
             new_scpt_value = self.convert_scpt_widgets_to_value()
-        old_scpt_value = self.param.value
+        old_scpt_value = self.param.value if self.param is not None else self.base_param.default_value
         return not are_same(old_scpt_value, new_scpt_value)
 
     def convert_scpt_widgets_to_value(self, cur_id='0'):
