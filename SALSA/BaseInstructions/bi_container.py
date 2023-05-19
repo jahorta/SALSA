@@ -77,9 +77,7 @@ class BaseParam:
 
     def set_parameter_detail(self, field, value):
         if locked_conversions['parameter'][field] not in self.locked_fields:
-            temp_dict = self.__dict__
-            temp_dict[field] = value
-            self.__dict__ = temp_dict
+            self.__setattr__(field, value)
 
     def get_differences(self, other_param):
         return {'Name': self.name} if self.name != other_param.name else {}
@@ -164,9 +162,7 @@ class BaseInst:
         if param_id is not None:
             return self.parameters[int(param_id)].set_parameter_detail(field, value)
         if locked_conversions['instruction'][field] not in self.locked_fields:
-            temp_dict = self.__dict__
-            temp_dict[field] = value
-            self.__dict__ = temp_dict
+            self.__setattr__(field, value)
 
     def get_default_inst_details(self):
         fields = {}
