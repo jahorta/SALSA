@@ -55,7 +55,8 @@
         "Name": "Offset"
       },
       "1": {
-        "Name": "Value"
+        "Name": "Value",
+        "Default": 0
       }
     }
   },
@@ -68,7 +69,8 @@
         "Name": "Offset"
       },
       "1": {
-        "Name": "Value"
+        "Name": "Value",
+        "Default": 0
       }
     }
   },
@@ -81,7 +83,8 @@
         "Name": "Offset"
       },
       "1": {
-        "Name": "Value"
+        "Name": "Value",
+        "Default": "0"
       }
     }
   },
@@ -96,7 +99,8 @@
     "Notes": "No dependancy on param1\nFunctional at all times",
     "Parameters": {
       "0": {
-        "Name": "No Function?"
+        "Name": "No Function?",
+        "Default": 1
       }
     }
   },
@@ -2392,14 +2396,15 @@
   },
   "144": {
     "Name": "Display Message",
-    "Description": "Displays a string based on the Offset parameter\n*lnk[Offset,<Offset>]*\n\nAlso calls an SCPT parameter:\nunknown1: <unknown1>",
-    "Notes": "",
+    "Description": "Displays a string based on the Offset parameter\n*lnk[Offset,<Offset>]*\n\nThe text box will not fade out if the Fadeout parameter is overridden (0x7FFFFFFF).\n\n",
+    "Notes": "The value of the Fadeout parameter (param 1) doesn't seem to make a difference in terms of timing, so the value itself may not matter.\n",
     "Parameters": {
       "0": {
         "Name": "Offset"
       },
       "1": {
-        "Name": "unknown1"
+        "Name": "Fadeout",
+        "Default": "override"
       }
     }
   },
