@@ -384,7 +384,7 @@ class ProjectEditorController:
         y_mod = self.trees['instruction'].winfo_y()
         w = InstructionSelectorWidget(self.view.inst_tree_frame, callbacks, inst_trace,
                                       x=cell_bbox[0]+x_mod, y=cell_bbox[1]+y_mod+cell_bbox[3])
-        w.bind('Escape', w.destroy)
+        w.bind('<Escape>', w.destroy)
         w.place(x=cell_bbox[0]+x_mod, y=cell_bbox[1]+y_mod, w=cell_bbox[2], h=cell_bbox[3])
 
     def rcm_remove_inst(self):
