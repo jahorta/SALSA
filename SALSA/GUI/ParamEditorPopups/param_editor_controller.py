@@ -14,6 +14,8 @@ class ParamEditController:
     log_code = 'ParamEditCtrlr'
 
     def __init__(self, parent, callbacks):
+        self.column_id = None
+        self.param_id = None
         self.parent = parent
         self.callbacks = callbacks
         self.view: Union[None, ParamEditPopup] = None
@@ -44,23 +46,27 @@ class ParamEditController:
     # Param Editor Show and Close functions #
     # ------------------------------------- #
 
-    def show_param_editor(self, param: Union[SCTParameter, None], base_param: BaseParam):
+    def show_param_editor(self, param: Union[SCTParameter, None], base_param: BaseParam, param_id=None, column_id=None):
         self.view = ParamEditPopup(self.parent)
         self.view.main_frame_label.config(text=base_param.type)
         self.param = param
         if self.param is not None:
             self.scpt_callbacks |= {'get_var_alias': self.callbacks['get_var_alias']}
             self.int_callbacks |= {'get_string_from_name': self.callbacks['get_string_from_name']}
+        else:
+            self.param_id = param_id
+            self.column_id = column_id
         self.base_param = base_param
         base_type = base_param.type.split('-')[0]
         self.setup_view_fxns[base_type]()
 
     def close_view(self):
-
         self.view.destroy()
         self.view = None
         self.param = None
         self.base_param = None
+        self.param_id = None
+        self.column_id = None
 
     def clear_value(self, param_base_type):
         if param_base_type == 'scpt':
@@ -185,7 +191,7 @@ class ParamEditController:
 
         # If editing a base parameter
         if self.param is None:
-            self.base_param.default_value = new_scpt_value
+            self.callbacks['set_change'](self.param_id, self.column_id, new_scpt_value)
             return
 
         var_changes = self.get_var_changes(self.param.value, new_scpt_value)
@@ -290,11 +296,12 @@ class ParamEditController:
                 value = None
             if value == self.base_param.default_value:
                 return
-            self.base_param.default_value = value
-            self.callbacks['set_change']()
+
+        elif value == cur_value:
             return
 
-        if value == self.param.value:
+        if self.param is None:
+            self.callbacks['set_change'](self.param_id, self.column_name, value)
             return
 
         if 'subscript' in self.base_param.type:

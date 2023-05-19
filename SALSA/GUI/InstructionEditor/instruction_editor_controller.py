@@ -32,7 +32,7 @@ class InstructionEditorController:
         self.param_details = None
         self.changed_values = {}
 
-        self.param_editor = ParamEditController(self.view, callbacks={'refresh_inst': self.refresh_param_tree})
+        self.param_editor = ParamEditController(self.view, callbacks={'set_change': self.add_param_editor_change})
 
         self.populate_instruction_tree()
 
@@ -194,5 +194,10 @@ class InstructionEditorController:
     def get_user_type(self):
         return self.inst_lib.get_user_type()
 
-    def show_param_editor(self, param_id):
-        self.param_editor.show_param_editor(None, self.inst_lib.get_inst(self.cur_inst).parameters[int(param_id)])
+    def show_param_editor(self, param_id, column_id):
+        self.param_editor.show_param_editor(None, self.inst_lib.get_inst(self.cur_inst).parameters[int(param_id)], param_id, column_id)
+
+    def add_param_editor_change(self, param_id, column_id, value):
+        self.view.set_value(param_id, column_id, value)
+        column_name = self.view.get_headers('parameter')[column_id]
+        self.add_change(key=f'{param_id}{sep}{column_name}', value=value)

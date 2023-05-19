@@ -320,7 +320,7 @@ class InstructionEditorView(tk.Toplevel):
 
         widget_details = param_edit_fields[column_name]
         if widget_details['widget'] == 'param_edit':
-            self.callbacks['show_param_editor'](param_id)
+            self.callbacks['show_param_editor'](param_id, column_id)
             return
 
         # get cell bounding box
@@ -368,3 +368,10 @@ class InstructionEditorView(tk.Toplevel):
     def on_save(self):
         self.callbacks['save']()
         self.save['state'] = 'disabled'
+
+    def set_value(self, param_id, column_id, value):
+        sel_iid = self.param_list_tree.get_children('')[int(param_id)]
+        values = self.param_list_tree.item(sel_iid).get('values')
+        values[column_id - 1] = value
+        self.param_list_tree.item(sel_iid, values=values)
+
