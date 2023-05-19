@@ -343,7 +343,7 @@ class InstructionEditorView(tk.Toplevel):
         edit_widget.bind('<FocusOut>', self.on_param_change)
         edit_widget.bind('<Return>', self.on_param_change)
 
-    def on_param_enter_pressed(self, e):
+    def on_param_change(self, e):
         new_text = e.widget.get()
         if new_text == e.widget.default_text:
             return
