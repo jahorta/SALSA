@@ -32,7 +32,7 @@ header_settings = {
         'start_offset': {'label': 'Start Offset', 'width': 50, 'stretch': True}
     },
     'instruction': {
-        'ungrouped_position': {'label': 'Pos', 'width': 40, 'stretch': True},
+        'ungrouped_position': {'label': 'Pos', 'width': 180, 'stretch': True},
         'name': {'label': 'Name', 'width': 270, 'stretch': True},
         'condition': {'label': 'Condition', 'width': 300, 'stretch': True},
         'instruction_id': {'label': 'ID', 'width': 40, 'stretch': False},
