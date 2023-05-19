@@ -345,7 +345,7 @@ class InstructionEditorView(tk.Toplevel):
 
     def on_param_change(self, e):
         new_text = e.widget.get()
-        if new_text == e.widget.default_text:
+        if new_text == e.widget.default_value:
             return
 
         selected_iid = e.widget.editing_item_iid
