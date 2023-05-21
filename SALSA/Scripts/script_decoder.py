@@ -1368,13 +1368,16 @@ class SCTDecoder:
                         s = prev_start - group_starts[prev_start_sect]
                         e = inst_start - group_starts[end_sect] - 1
 
-                        prev_inst: SCTInstruction = section_insts[inst_start - 1]
-                        if prev_inst.instruction_id == 10:
-                            switch_inst.my_goto_uuids.append(prev_inst.ID)
-                            prev_inst.my_master_uuids.append(switch_inst.ID)
-
                         self._instruction_groups[sect_name][group_key] = (
                             f'{prev_start_sect}{sep}{s}', f'{end_sect}{sep}{e}')
+
+                        prev_inst: SCTInstruction = section_insts[inst_start - 1]
+                        if prev_inst.ID != 10:
+                            continue
+
+                        switch_inst.my_goto_uuids.append(prev_inst.ID)
+                        prev_inst.my_master_uuids.append(switch_inst.ID)
+
                         if section_insts[inst_start - 1].parameters[0].value < 0:
                             decoded_sct.sections[sect_name].jump_loops.append(group_key)
                         else:
