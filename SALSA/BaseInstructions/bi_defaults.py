@@ -81,7 +81,7 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int|var|byte",
                 "Mask": 0x0000ffff,
                 "Signed": False,
                 "Default": None
@@ -99,11 +99,10 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int|var|int",
                 "Mask": 0x0000ffff,
                 "Signed": False,
                 "Default": None
-
             },
             1: {
                 "Type": "scpt|int",
@@ -118,7 +117,7 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Type": "int",
+                "Type": "int|var|float",
                 "Mask": 0x0000ffff,
                 "Signed": False,
                 "Default": None

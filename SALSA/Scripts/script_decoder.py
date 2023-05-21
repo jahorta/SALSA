@@ -540,7 +540,7 @@ class SCTDecoder:
             if self._cur_endian == 'little':
                 currWord = bytearray(reversed(currWord))
 
-            if 'code' in param_type:
+            if 'var' in param_type:
                 param_value = self._resolve_SCPT_code_only()
                 cur_param.set_value(param_value)
             else:

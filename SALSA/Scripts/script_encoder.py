@@ -326,7 +326,7 @@ class SCTEncoder:
                         self._check_additions(trace, value)
                     value.extend(self._make_word(self.param_code.stop_code))
         else:
-            if 'code' in base_param.type:
+            if 'var' in base_param.type:
                 value = self._encode_scpt_param(param.value)
             else:
                 value = self._make_word(param.value, signed=base_param.is_signed)
