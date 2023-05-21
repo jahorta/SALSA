@@ -7,13 +7,13 @@ inst_defaults = {
         "Link Type": "Jump",
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
             },
             1: {
-                "Type": "int-jump",
+                "Type": "int|jump",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
@@ -45,13 +45,13 @@ inst_defaults = {
         "Switch Entry": [2, 3],
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
             },
             1: {
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -62,7 +62,7 @@ inst_defaults = {
                 "Mask": None
             },
             3: {
-                "Type": "int-jump",
+                "Type": "int|jump",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -87,7 +87,7 @@ inst_defaults = {
                 "Default": None
             },
             1: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             }
@@ -106,7 +106,7 @@ inst_defaults = {
 
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -124,7 +124,7 @@ inst_defaults = {
                 "Default": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -143,7 +143,7 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Type": "scpt-skip",
+                "Type": "scpt|skip",
                 "Signed": False,
                 "Mask": None
             }
@@ -157,7 +157,7 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Type": "int-jump",
+                "Type": "int|jump",
                 "Mask": 0xfffffffc,
                 "Signed": True,
                 "Default": None
@@ -172,7 +172,7 @@ inst_defaults = {
         "Link Type": "Jump",
         "Parameters": {
             0: {
-                "Type": "int-subscript",
+                "Type": "int|subscript",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
@@ -213,7 +213,7 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -225,7 +225,7 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -238,7 +238,7 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -252,7 +252,7 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -265,7 +265,7 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -277,7 +277,7 @@ inst_defaults = {
         "Hard parameter two": 0x00000000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -299,7 +299,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int-footer",
+                "Type": "int|footer",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
@@ -315,7 +315,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int-footer",
+                "Type": "int|footer",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
@@ -331,12 +331,12 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "int-footer",
+                "Type": "int|footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -349,7 +349,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -361,7 +361,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -373,22 +373,22 @@ inst_defaults = {
         "Hard parameter two": 0x00020000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -401,22 +401,22 @@ inst_defaults = {
         "Hard parameter two": 0x00020000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -429,12 +429,12 @@ inst_defaults = {
         "Hard parameter two": 0x0002000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -447,42 +447,42 @@ inst_defaults = {
         "Hard parameter two": 0x00050000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -495,42 +495,42 @@ inst_defaults = {
         "Hard parameter two": 0x00050000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -546,43 +546,43 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
@@ -597,59 +597,59 @@ inst_defaults = {
         "Loop Iterations": 1,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             10: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -664,59 +664,59 @@ inst_defaults = {
         "Loop Iterations": 1,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             10: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -729,42 +729,42 @@ inst_defaults = {
         "Hard parameter two": 0x00050000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -777,42 +777,42 @@ inst_defaults = {
         "Hard parameter two": 0x00050000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -826,27 +826,27 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -859,12 +859,12 @@ inst_defaults = {
         "Hard parameter two": 0x00020000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -877,17 +877,17 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -899,7 +899,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -913,19 +913,19 @@ inst_defaults = {
         "Loop Iterations": 1,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             2: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -941,7 +941,7 @@ inst_defaults = {
         "Warning": "This instruction will exit the current script and load a new one",
         "Parameters": {
             0: {
-                "Type": "int-footer",
+                "Type": "int|footer",
                 "Signed": False,
                 "Mask": None
             }
@@ -968,22 +968,22 @@ inst_defaults = {
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -996,22 +996,22 @@ inst_defaults = {
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1025,7 +1025,7 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1038,7 +1038,7 @@ inst_defaults = {
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None,
             }
@@ -1050,32 +1050,32 @@ inst_defaults = {
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -1087,22 +1087,22 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -1114,32 +1114,32 @@ inst_defaults = {
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -1151,102 +1151,102 @@ inst_defaults = {
         "Hard parameter two": 0x00050000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             10: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             11: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             12: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             13: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             14: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             15: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             16: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             17: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             18: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             19: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1261,12 +1261,12 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "int-footer",
+                "Type": "int|footer",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
@@ -1279,17 +1279,17 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1301,7 +1301,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -1328,7 +1328,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1341,7 +1341,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1354,17 +1354,17 @@ inst_defaults = {
         "Hard parameter two": 0x00040000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1377,12 +1377,12 @@ inst_defaults = {
         "Hard parameter two": 0x00040000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1395,12 +1395,12 @@ inst_defaults = {
         "Hard parameter two": 0x00040000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1413,7 +1413,7 @@ inst_defaults = {
         "Hard parameter two": 0x00040000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1426,7 +1426,7 @@ inst_defaults = {
         "Hard parameter two": 0x00040000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1440,17 +1440,17 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             }
@@ -1481,7 +1481,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int-footer",
+                "Type": "int|footer",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
@@ -1495,22 +1495,22 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1523,22 +1523,22 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1551,47 +1551,47 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1604,52 +1604,52 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -1662,37 +1662,37 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1705,62 +1705,62 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             10: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             11: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1774,7 +1774,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1787,27 +1787,27 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -1820,22 +1820,22 @@ inst_defaults = {
         "Hard parameter two": 0x00020000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -1847,37 +1847,37 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -1895,47 +1895,47 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -1947,22 +1947,22 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -1974,37 +1974,37 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -2016,52 +2016,52 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -2075,18 +2075,18 @@ inst_defaults = {
         "Loop Iterations": 1,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -2100,19 +2100,19 @@ inst_defaults = {
         "Loop Iterations": 1,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             2: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -2126,19 +2126,19 @@ inst_defaults = {
         "Loop Iterations": 1,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             2: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -2153,19 +2153,19 @@ inst_defaults = {
         "Loop Iterations": 1,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             2: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -2180,59 +2180,59 @@ inst_defaults = {
         "Loop Iterations": 1,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             10: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2247,62 +2247,62 @@ inst_defaults = {
         "Loop Iterations": 1,
         "Implement": True,
         "Parameter num": 13,
-        "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-short\n2: int\n\nloop ((2)) iterations):\n\n3: scpt-float\n4: scpt-float\n5: scpt-float\n6: scpt-float\n7: scpt-int\n8: scpt-int\n9: scpt-float\n10: scpt-int\n11: scpt-int",
+        "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt|short\n2: int\n\nloop ((2)) iterations):\n\n3: scpt|float\n4: scpt|float\n5: scpt|float\n6: scpt|float\n7: scpt|int\n8: scpt|int\n9: scpt|float\n10: scpt|int\n11: scpt|int",
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             10: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2314,12 +2314,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2331,7 +2331,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2343,7 +2343,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2355,7 +2355,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2368,37 +2368,37 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2410,37 +2410,37 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2452,17 +2452,17 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2477,13 +2477,13 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -2498,13 +2498,13 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -2518,17 +2518,17 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -2540,7 +2540,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2553,7 +2553,7 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2571,17 +2571,17 @@ inst_defaults = {
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2593,7 +2593,7 @@ inst_defaults = {
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2605,47 +2605,47 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -2657,12 +2657,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -2676,59 +2676,59 @@ inst_defaults = {
         "Loop Iterations": 1,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             10: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2740,47 +2740,47 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -2794,7 +2794,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int-footer",
+                "Type": "int|footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -2807,12 +2807,12 @@ inst_defaults = {
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2824,22 +2824,22 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2854,7 +2854,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int-footer",
+                "Type": "int|footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -2868,12 +2868,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -2894,37 +2894,37 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -2937,12 +2937,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -2963,19 +2963,19 @@ inst_defaults = {
         },
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             2: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -2996,19 +2996,19 @@ inst_defaults = {
         },
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             2: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -3022,37 +3022,37 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3068,43 +3068,43 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
@@ -3117,27 +3117,27 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3150,12 +3150,12 @@ inst_defaults = {
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3168,12 +3168,12 @@ inst_defaults = {
         "Hard parameter two": 0xfffe0000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None,
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3196,13 +3196,13 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3218,13 +3218,13 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3237,32 +3237,32 @@ inst_defaults = {
         "Hard parameter two": 0x00020000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3275,12 +3275,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None
             }
@@ -3295,49 +3295,49 @@ inst_defaults = {
         "Loop Iterations": 1,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -3353,28 +3353,28 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Mask": 0x0000ffff,
                 "Signed": False,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3390,43 +3390,43 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Mask": 0x0000ffff,
                 "Signed": False,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3442,58 +3442,58 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             10: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3506,37 +3506,37 @@ inst_defaults = {
         "Hard parameter two": 0x00020000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3551,19 +3551,19 @@ inst_defaults = {
         "Loop Iterations": 1,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             2: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -3576,27 +3576,27 @@ inst_defaults = {
         "Hard parameter two": 0x00050000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3609,7 +3609,7 @@ inst_defaults = {
         "Hard parameter two": 0x00050000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3632,43 +3632,43 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3681,7 +3681,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3694,7 +3694,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3707,27 +3707,27 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3750,13 +3750,13 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int-string",
+                "Type": "int|string",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3769,7 +3769,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3782,7 +3782,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3795,52 +3795,52 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3856,53 +3856,53 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3915,7 +3915,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3928,7 +3928,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3941,12 +3941,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3962,13 +3962,13 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -3989,23 +3989,23 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -4018,7 +4018,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4033,17 +4033,17 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "int-string",
+                "Type": "int|string",
                 "Signed": True,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4062,7 +4062,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4074,7 +4074,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4090,48 +4090,48 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             }
@@ -4144,37 +4144,37 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -4190,59 +4190,59 @@ inst_defaults = {
         "Loop Iterations": 1,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             10: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
@@ -4254,7 +4254,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4266,47 +4266,47 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4318,12 +4318,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4335,97 +4335,97 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             10: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             11: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             12: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             13: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             14: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             15: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             16: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             17: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             18: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4437,12 +4437,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4460,7 +4460,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4472,22 +4472,22 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -4511,7 +4511,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4523,7 +4523,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4535,7 +4535,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4549,12 +4549,12 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -4567,32 +4567,32 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4605,67 +4605,67 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             10: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             11: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             12: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -4677,42 +4677,42 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4724,22 +4724,22 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4752,7 +4752,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4765,7 +4765,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4785,7 +4785,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -4797,12 +4797,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4814,7 +4814,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4826,7 +4826,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4839,7 +4839,7 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4852,7 +4852,7 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4872,17 +4872,17 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -4894,7 +4894,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4907,7 +4907,7 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4920,7 +4920,7 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4933,12 +4933,12 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4951,12 +4951,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4974,12 +4974,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -4991,12 +4991,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -5008,7 +5008,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -5041,7 +5041,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5054,12 +5054,12 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5072,7 +5072,7 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5091,17 +5091,17 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -5127,7 +5127,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int-footer",
+                "Type": "int|footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -5146,27 +5146,27 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5178,87 +5178,87 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             10: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             11: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             12: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             13: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             14: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             15: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             16: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             }
@@ -5273,7 +5273,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int-footer",
+                "Type": "int|footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -5288,12 +5288,12 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "int-footer",
+                "Type": "int|footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -5306,7 +5306,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5318,7 +5318,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5330,7 +5330,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5342,7 +5342,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5354,47 +5354,47 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -5407,12 +5407,12 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5424,7 +5424,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5436,127 +5436,127 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             10: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             11: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             12: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             13: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             14: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             15: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             16: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             17: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             18: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             19: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             20: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             21: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             22: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             23: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             24: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5568,127 +5568,127 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             10: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             11: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             12: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             13: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             14: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             15: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             16: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             17: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             18: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             19: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             20: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             21: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             22: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             23: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             24: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -5700,37 +5700,37 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5742,12 +5742,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5759,7 +5759,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5783,37 +5783,37 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5826,7 +5826,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5838,72 +5838,72 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             10: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             11: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             12: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             13: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5916,12 +5916,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5941,7 +5941,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5954,32 +5954,32 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -5999,17 +5999,17 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -6022,7 +6022,7 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -6034,32 +6034,32 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -6077,17 +6077,17 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -6100,52 +6100,52 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             8: {
-                "Type": "scpt-byte",
+                "Type": "scpt|byte",
                 "Signed": False,
                 "Mask": None
             },
             9: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -6159,12 +6159,12 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -6179,13 +6179,13 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -6200,13 +6200,13 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             }
@@ -6228,7 +6228,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int-footer",
+                "Type": "int|footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -6241,12 +6241,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -6261,7 +6261,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int-footer",
+                "Type": "int|footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -6275,12 +6275,12 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -6292,12 +6292,12 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -6310,12 +6310,12 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -6341,7 +6341,7 @@ inst_defaults = {
         "Warning": "Instruction not used in the game, may be buggy",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -6355,7 +6355,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int-footer",
+                "Type": "int|footer",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
@@ -6371,13 +6371,13 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -6390,7 +6390,7 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -6417,27 +6417,27 @@ inst_defaults = {
         "Hard parameter two": 0x00010000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -6453,13 +6453,13 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int-iterations",
+                "Type": "int|iterations",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             }
@@ -6472,42 +6472,42 @@ inst_defaults = {
         "Hard parameter two": 0x00050000,
         "Parameters": {
             0: {
-                "Type": "scpt-short",
+                "Type": "scpt|short",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             2: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             3: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             4: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             5: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             6: {
-                "Type": "scpt-float",
+                "Type": "scpt|float",
                 "Signed": False,
                 "Mask": None
             },
             7: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             }
@@ -6522,12 +6522,12 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "scpt-int",
+                "Type": "scpt|int",
                 "Signed": False,
                 "Mask": None
             },
             1: {
-                "Type": "int-string",
+                "Type": "int|string",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
