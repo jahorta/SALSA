@@ -1409,6 +1409,7 @@ class SCTDecoder:
 
                 gotos_ignored = 0
                 cur_id = last_start
+                goto_found = False
                 # else search for a goto that matches with the switch.
                 # May be error prone if there are random gotos inside a switch entry
                 while cur_id < len(section_insts):
@@ -1424,17 +1425,22 @@ class SCTDecoder:
                         if gotos_ignored > 0:
                             gotos_ignored -= 1
                         else:
+                            goto_found = True
                             break
+                    cur_id += 1
                     if cur_id == len(section_insts):
                         print(f'SCPT Decoder: Switch Groups: End of final switch entry not found: {sect_name}:{s_id}')
-                    cur_id += 1
+
+                if not goto_found:
+                    cur_id -= 1
 
                 group_key = f'{s_id}{sep}{last_case}'
                 self._instruction_groups[sect_name][group_key] = (
                     f'{prev_start_sect}{sep}{last_start}', f'{end_sect}{sep}{cur_id}')
-                goto_inst = section_insts[cur_id]
-                switch_inst.my_goto_uuids.append(goto_inst.ID)
-                goto_inst.my_master_uuids.append(switch_inst.ID)
+                if goto_found:
+                    goto_inst = section_insts[cur_id]
+                    switch_inst.my_goto_uuids.append(goto_inst.ID)
+                    goto_inst.my_master_uuids.append(switch_inst.ID)
 
     @staticmethod
     def _group_subscripts(decoded_sct):
