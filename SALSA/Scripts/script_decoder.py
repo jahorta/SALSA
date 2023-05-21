@@ -1328,6 +1328,8 @@ class SCTDecoder:
                 group_starts[s] = len(section_insts)
                 section_insts = [*section_insts, *insts]
 
+            last_inst_pos = section_insts[-1].absolute_offset
+
             # Go through each switch in each section
             for s_id in switch_ids:
                 # print(f'SCPT Decoder: Switch Groups: Grouping Switch: {sect_name}:{s_id}')
@@ -1380,7 +1382,7 @@ class SCTDecoder:
 
                         if section_insts[inst_start - 1].parameters[0].value < 0:
                             decoded_sct.sections[sect_name].jump_loops.append(group_key)
-                        else:
+                        elif section_insts[inst_start - 1].parameters[0].link.target <= last_inst_pos:
                             if goto_jmp is None:
                                 goto_jmp = section_insts[inst_start - 1].parameters[0].link.target
                             else:
