@@ -70,4 +70,7 @@ sep = '|'
 alt_sep = ':'
 
 
+alt_alt_sep = ';'
+
+
 LOCK = '🔒'
