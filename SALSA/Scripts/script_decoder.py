@@ -1694,19 +1694,22 @@ class SCTDecoder:
     @staticmethod
     def _get_inst_by_pos(inst_list, start_ind, target_pos, origin_sect_name, origin_element_id):
         cur_ind = start_ind
+        found = False
         while cur_ind < len(inst_list):
             cur_inst = inst_list[cur_ind]
-            if cur_ind == len(inst_list) - 1:
-                print(
-                    f'SCPT Decoder: Find Inst: Entry not found: {origin_sect_name}:{origin_element_id} - {target_pos}')
-                return None
             if cur_inst.absolute_offset == target_pos:
+                found = True
                 break
             if cur_inst.absolute_offset < target_pos < inst_list[cur_ind + 1].absolute_offset:
                 print(
                     f'SCPT Decoder: Find Inst: Target pos in middle of entry {origin_sect_name}:{origin_element_id} - {target_pos}')
                 break
             cur_ind += 1
+
+        if not found:
+            print(
+                f'SCPT Decoder: Find Inst: Entry not found: {origin_sect_name}:{origin_element_id} - {target_pos}')
+            return None
 
         return cur_ind
 
