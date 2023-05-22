@@ -1,3 +1,5 @@
+from Common.constants import sep
+
 SCPT_CLASSES = [
     'compare',
     'arithmetic',
@@ -97,3 +99,11 @@ class SCPTParamCodes:
 
         self.overrides = overrides
 
+
+def get_scpt_override(base_type: str):
+    parts = base_type.split(sep)
+    if parts[0] != 'scpt':
+        return None
+    if parts[1] not in overrides.keys():
+        return None
+    return overrides[parts[1]][0]
