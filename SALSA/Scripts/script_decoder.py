@@ -1279,8 +1279,8 @@ class SCTDecoder:
                     print(f'SCPT Decoder: Decode Jumps: No goto inst found: {sect_name}{sep}{jmp_id}')
                     continue
 
-                jmp_inst.my_goto_uuids.append(prev_to_id)
-                prev_inst.my_master_uuids.append(jmp_inst)
+                jmp_inst.my_goto_uuids.append(prev_inst.ID)
+                prev_inst.my_master_uuids.append(jmp_inst.ID)
 
                 if sect_name not in self._instruction_groups:
                     self._instruction_groups[sect_name] = {}
