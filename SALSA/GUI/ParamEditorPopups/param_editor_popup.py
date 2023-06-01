@@ -1,3 +1,4 @@
+import math
 import tkinter as tk
 from typing import Union, Dict, List
 
@@ -246,13 +247,13 @@ class SCPTEditWidget(tk.Frame):
 # base int widget
 class IntEditWidget(tk.Frame):
 
-    def __init__(self, parent, name, *args, **kwargs):
+    def __init__(self, parent, name, signed=True, b_min=-math.inf, b_max=math.inf, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         label = tk.Label(self, text=f'{name}: ')
         label.grid(row=0, column=0, sticky=tk.W)
 
-        self.entry_field = w.RequiredIntEntry(self, width=15)
+        self.entry_field = w.RequiredIntEntry(self, width=15, signed=signed, b_min=b_min, b_max=b_max)
         self.entry_field.grid(row=0, column=1, sticky=tk.W)
 
         self.remove_value()
@@ -270,6 +271,30 @@ class IntEditWidget(tk.Frame):
         if self.entry_field.get() == 'None':
             return None
         return self.entry_field.get()
+
+
+class VarSelectionWidget(IntEditWidget):
+    def __init__(self, parent, callback, var_type, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+
+        self.var_alias_label = tk.Label(self, text='')
+        self.var_alias_label.grid(row=0, column=1)
+
+        self.get_alias_callback = callback
+        self.var_type = var_type
+
+    def set_value(self, value):
+        super().set_value(value)
+        alias = self.get_alias_callback(self.var_type, value)
+        alias_str = 'No alias'
+        if alias is not None:
+            alias_str = alias
+        self.var_alias_label.configure(text=alias_str)
+
+    def get_value(self):
+        value = super().get_value()
+
+        return f'{self.var_type}: {value}'
 
 
 class FooterEditWidget(tk.Frame):
