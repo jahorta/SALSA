@@ -150,8 +150,7 @@ class SCTInstruction:
 
 class SCTSection:
 
-    instructions: List[SCTInstruction]
-    instructions_ids_grouped: List[Union[str, Dict[str, Union[list, dict, str]]]]
+    instruction_ids_grouped: List[Union[str, Dict[str, Union[list, dict, str]]]]
     type: str
     inst_errors: List[int]
     errors: List[str]
@@ -165,7 +164,7 @@ class SCTSection:
         self.length = None
         self.start_offset = None
         self.instructions: Dict[str, SCTInstruction] = {}
-        self.instructions_ids_grouped = []
+        self.instruction_ids_grouped = []
         self.inst_errors = []
         self.errors = []
         self.strings = {}
@@ -207,7 +206,7 @@ class SCTSection:
         self.jump_loops.append(loop_id)
 
     def get_inst_list(self, style):
-        return self.instructions_ids_grouped if style == 'grouped' else self.instruction_ids_ungrouped
+        return self.instruction_ids_grouped if style == 'grouped' else self.instruction_ids_ungrouped
 
     def get_instruction_by_index(self, pos):
         return self.instructions[self.instruction_ids_ungrouped[pos]]

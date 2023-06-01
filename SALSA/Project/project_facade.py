@@ -307,9 +307,9 @@ class SCTProjectFacade:
         inst_sect = self.project.scripts[script].sections[section]
         inst_sect.instructions[new_inst.ID] = new_inst
 
-        inst_parents, index = self.get_inst_grouped_parents_and_index(ref_inst_uuid, inst_sect.instructions_ids_grouped)
+        inst_parents, index = self.get_inst_grouped_parents_and_index(ref_inst_uuid, inst_sect.instruction_ids_grouped)
 
-        cur_group = inst_sect.instructions_ids_grouped
+        cur_group = inst_sect.instruction_ids_grouped
         for key in inst_parents:
             cur_group = cur_group[key]
 
@@ -394,9 +394,9 @@ class SCTProjectFacade:
 
     def get_inst_group(self, script, section, inst_uuid):
         cur_sect = self.project.scripts[script].sections[section]
-        parents, index = self.get_inst_grouped_parents_and_index(inst_uuid, cur_sect.instructions_ids_grouped)
+        parents, index = self.get_inst_grouped_parents_and_index(inst_uuid, cur_sect.instruction_ids_grouped)
 
-        cur_level = cur_sect.instructions_ids_grouped
+        cur_level = cur_sect.instruction_ids_grouped
         for parent in parents:
             cur_level = cur_level[parent]
 

@@ -1489,7 +1489,7 @@ class SCTDecoder:
             new_groups = self._remove_duplicate_inst_locations(new_groups)
             new_groups = self._resolve_switches(new_groups)
             new_groups = self._replace_pos_with_ids(new_groups, section.instruction_ids_ungrouped)
-            section.instructions_ids_grouped = new_groups
+            section.instruction_ids_grouped = new_groups
 
     def _nest_groups(self, groups, is_sections=True):
         # replace entries in parent groups with child groups
