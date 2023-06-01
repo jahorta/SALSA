@@ -5,11 +5,11 @@ from SALSA.Project.description_formatting import format_description
 from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter, SCTInstruction, SCTLink
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
-from SALSA.Common.constants import sep
+from SALSA.Common.constants import sep, alt_sep, alt_alt_sep
+from SALSA.Scripts.scpt_param_codes import get_scpt_override
 
 
 class SCTProjectFacade:
-
     project: Union[SCTProject, None]
     log_key = 'PrjFacade'
 
@@ -51,7 +51,8 @@ class SCTProjectFacade:
             self._refresh_inst_positions(script=script, section=section)
             inst_list = self.project.scripts[script].sections[section].get_inst_list(style)
             instructions = self.project.scripts[script].sections[section].instructions
-            tree_list = self._create_tree(group=instructions, key_list=inst_list, headers=headers, base=self.base_insts.get_all_insts(), base_key='instruction_id')
+            tree_list = self._create_tree(group=instructions, key_list=inst_list, headers=headers,
+                                          base=self.base_insts.get_all_insts(), base_key='instruction_id')
 
         return tree_list
 
@@ -61,7 +62,8 @@ class SCTProjectFacade:
             if isinstance(key, dict):
                 for ele_key, ele_value in key.items():
                     if sep not in ele_key:
-                        tree_list.extend(self._create_tree(group=group, key_list=[ele_key], headers=headers, base=base, base_key=base_key, key_only=True))
+                        tree_list.extend(self._create_tree(group=group, key_list=[ele_key], headers=headers, base=base,
+                                                           base_key=base_key, key_only=True))
                         if prev_group_type == 'switch':
                             cur_group_type = 'case'
                         else:
@@ -69,12 +71,15 @@ class SCTProjectFacade:
                         tree_list[-1]['group_type'] = cur_group_type
                     else:
                         ele_key = ele_key.split(sep)
-                        tree_list.extend(self._create_tree(group=group, key_list=[ele_key[0]], headers=headers, base=base, base_key=base_key, prev_group_type=ele_key[1]))
+                        tree_list.extend(
+                            self._create_tree(group=group, key_list=[ele_key[0]], headers=headers, base=base,
+                                              base_key=base_key, prev_group_type=ele_key[1]))
                         tree_list[-1]['group_type'] = ele_key[1]
                     tree_list.append('group')
                     ele_value = [ele_value] if not isinstance(ele_value, list) else ele_value
                     cur_group_type = ele_key[1] if len(ele_key) > 1 else ''
-                    tree_list.extend(self._create_tree(group=group, key_list=ele_value, headers=headers, base=base, base_key=base_key, prev_group_type=cur_group_type))
+                    tree_list.extend(self._create_tree(group=group, key_list=ele_value, headers=headers, base=base,
+                                                       base_key=base_key, prev_group_type=cur_group_type))
                     tree_list.append('ungroup')
                 continue
 
@@ -100,7 +105,8 @@ class SCTProjectFacade:
                     value_dict = element_dict
                     if header_key not in element_dict:
                         if base is None or base_key is None:
-                            raise KeyError(f'PrjFacade: {header_key} not in {element}, no base_element_group or base_key given')
+                            raise KeyError(
+                                f'PrjFacade: {header_key} not in {element}, no base_element_group or base_key given')
 
                         base_inst_key = element_dict[base_key]
                         if base_inst_key is None:
@@ -111,7 +117,8 @@ class SCTProjectFacade:
                         if header_key not in base_dict:
                             raise KeyError(f'PrjFacade: {header_key} not in {element} or {base[base_key]}')
                         value_dict = base_dict
-                    values[header_key] = value_dict[header_key] if isinstance(value_dict[header_key], str) else str(value_dict[header_key])
+                    values[header_key] = value_dict[header_key] if isinstance(value_dict[header_key], str) else str(
+                        value_dict[header_key])
                 tree_list.append(values)
         return tree_list
 
@@ -119,7 +126,8 @@ class SCTProjectFacade:
         inst = self.project.scripts[script].sections[section].instructions[instruction]
         base_inst = self.base_insts.get_inst(inst.instruction_id)
 
-        tree = self._create_tree(inst.parameters, base_inst.params_before, headings, base=base_inst.parameters, base_key='ID')
+        tree = self._create_tree(inst.parameters, base_inst.params_before, headings, base=base_inst.parameters,
+                                 base_key='ID')
 
         for param in base_inst.params_before:
             if inst.parameters[param].link is None:
@@ -131,8 +139,10 @@ class SCTProjectFacade:
             elif link_type == 'SCT':
                 tree[param]['type'] = 'Jump'
                 sect = inst.parameters[param].link_value[1].split(f'{sep}')[0]
-                target_inst = self.project.scripts[script].sections[sect].instructions[inst.parameters[param].link_value[1].split(f'{sep}')[1]]
-                tree[param]['value'] = f'{sect} - {target_inst.ungrouped_position} {self.base_insts.get_inst(target_inst.instruction_id).name}'
+                target_inst = self.project.scripts[script].sections[sect].instructions[
+                    inst.parameters[param].link_value[1].split(f'{sep}')[1]]
+                tree[param]['value'] = f'{sect} - {target_inst.ungrouped_position} ' \
+                                       f'{self.base_insts.get_inst(target_inst.instruction_id).name}'
             elif link_type == 'String':
                 tree[param]['type'] = 'String'
                 tree[param]['value'] = inst.parameters[param].link_result
@@ -152,7 +162,8 @@ class SCTProjectFacade:
             temp_tree += ['ungroup']
             tree += temp_tree
 
-        tree += self._create_tree(inst.parameters, base_inst.params_after, headings, base=base_inst.parameters, base_key='ID')
+        tree += self._create_tree(inst.parameters, base_inst.params_after, headings, base=base_inst.parameters,
+                                  base_key='ID')
 
         return tree
 
@@ -171,7 +182,6 @@ class SCTProjectFacade:
             instruction_details[key] = value
         instruction_details['description'] = format_description(inst=instruction, base_inst=base_inst)
         return instruction_details
-
 
     def remove_element_from_group(self, script, element, group, section=None):
         if section is None:
@@ -204,7 +214,7 @@ class SCTProjectFacade:
 
     def get_project_script_by_index(self, index):
         if index >= len(self.project.scripts.keys()):
-            print(f'{self.log_key}: Script index out of range: {index} : {len(self.project.scripts.keys())-1}')
+            print(f'{self.log_key}: Script index out of range: {index} : {len(self.project.scripts.keys()) - 1}')
             return None
         name = list(self.project.scripts.keys())[index]
         return name, self.project.scripts[name]
@@ -331,7 +341,7 @@ class SCTProjectFacade:
         if direction == 'below' and isinstance(cur_group[index], dict):
             cur_group = cur_group[index][list(cur_group.keys())[0]]
 
-            # If its a switch, there will be one more dict level for cases
+            # If it is a switch, there will be one more dict level for cases
             if isinstance(cur_group, dict):
                 cur_group = cur_group[list(cur_group.keys())[-1]]
 
@@ -354,7 +364,7 @@ class SCTProjectFacade:
         # if new inst is below, and clicked is a switch, change targets of all links which contain the prev_below inst to cur_below inst for the switch
         if direction == 'below' and inst_sect.instructions[ref_inst_uuid].instruction_id == 3:
             switch = inst_sect.instructions[ref_inst_uuid]
-            old_target = inst_sect.instruction_ids_ungrouped[insert_pos+1]
+            old_target = inst_sect.instruction_ids_ungrouped[insert_pos + 1]
             for loop in switch.loop_parameters:
                 if loop[3].link.target_trace[1] == old_target:
                     loop[3].link.target_trace[1] = new_inst.ID
@@ -367,7 +377,7 @@ class SCTProjectFacade:
 
         return new_inst.ID
 
-    def get_inst_grouped_parents_and_index(self, inst, grouped_region, parents=None):
+    def get_inst_grouped_parents_and_index(self, inst, grouped_region, parents=None) -> (list, int):
         if parents is None:
             parents = []
 
