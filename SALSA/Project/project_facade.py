@@ -340,10 +340,6 @@ class SCTProjectFacade:
         for key in inst_parents:
             cur_group = cur_group[key]
 
-        clicked_inst_group_key = cur_group[index]
-        if isinstance(clicked_inst_group_key, dict):
-            clicked_inst_group_key = list(clicked_inst_group_key.keys())[0]
-
         grouped_insert_loc = index
 
         if direction == 'below':
