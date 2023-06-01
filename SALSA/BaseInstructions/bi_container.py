@@ -35,8 +35,8 @@ class BaseParam:
 
         self.locked_fields = [k for k in param_dict.keys()]
         self.param_ID = param_id
-        self.name = param_dict.get('Name', default_name)
-        self.type = param_dict['Type']
+        self.name: str = param_dict.get('Name', default_name)
+        self.type: str = param_dict['Type']
         self.default_value = param_dict.get('Default', None)
         self.mask = param_dict.get('Mask', None)
         self.is_signed = param_dict.get('Signed', None)
