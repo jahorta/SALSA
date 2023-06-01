@@ -5,7 +5,7 @@ from SALSA.Common.constants import sep
 from SALSA.Common.are_same_checker import are_same
 from SALSA.Project.project_container import SCTParameter
 from SALSA.GUI.ParamEditorPopups.param_editor_popup import ParamEditPopup, SCPTEditWidget, IntEditWidget, \
-    FooterEditWidget, ObjectSelectionWidget
+    FooterEditWidget, ObjectSelectionWidget, VarSelectionWidget
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 
 
@@ -284,6 +284,12 @@ class ParamEditController:
             self.int_field = ObjectSelectionWidget(self.view.main_frame, name=self.base_param.name,
                                                    selection_list=self.callbacks['get_string_list']())
             value = self.param.link_result
+
+        elif 'var' in self.base_param.type:
+            var_type = f'{self.base_param.type.split(sep)[-1].capitalize()}Var: '
+            self.int_field = VarSelectionWidget(self.view.main_frame, name=f'{self.base_param.name} - {var_type}',
+                                                var_type=var_type, signed=False, b_min=0)
+            value = self.param.value
         else:
             self.int_field = IntEditWidget(self.view.main_frame, name=self.base_param.name)
             value = self.param.value
