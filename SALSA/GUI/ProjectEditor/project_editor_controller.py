@@ -389,7 +389,9 @@ class ProjectEditorController:
         w.place(x=cell_bbox[0]+x_mod, y=cell_bbox[1]+y_mod, w=cell_bbox[2], h=cell_bbox[3])
 
     def rcm_remove_inst(self):
-        # TODO - Messagebox to confirm remove instruction (checkbox to choose to never see this message again)
+        sel_iid = self.trees['instruction'].focus()
+        cur_inst_uuid = self.trees['instruction'].row_data[sel_iid]
+        self.project.remove_inst(self.current['script'], self.current['section'], cur_inst_uuid)
         # TODO - call function from project to remove instruction
         pass
 
@@ -408,14 +410,25 @@ class ProjectEditorController:
     # Instruction Confirmation Messageboxes #
     # ------------------------------------- #
 
-    def confirm_remove_inst_group(self, new_id, children):
+    def confirm_change_inst_group(self, children, new_id=None):
         # Create message to confirm change of instruction (separate method)
         cur_inst_id = self.project.get_inst_id(**self.current)
-        message = f'Are you sure you want to change this instruction from {self.project.get_inst_id_name(cur_inst_id)} to {self.project.get_inst_id_name(new_id)}?'
-        if new_id not in self.project.base_insts.group_inst_list:
-            message += '\nThis will remove the instruction group.'
+
+        message = f'Are you sure you want to'
+
+        if new_id is not None:
+            message += ' change '
         else:
-            message += '\nThis will change the instruction group type.'
+            message += ' remove '
+        message += f'this instruction: {self.project.get_inst_id_name(cur_inst_id)}'
+        if new_id is not None:
+            message += f' to {self.project.get_inst_id_name(new_id)}?'
+
+            if new_id not in self.project.base_insts.group_inst_list:
+                message += '\nThis will remove the instruction group.'
+            else:
+                message += '\nThis will change the instruction group type.'
+
         cancel = not tk.messagebox.askokcancel(title='Confirm Instruction Group Removal', message=message)
         if cancel:
             return 'cancel'

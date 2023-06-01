@@ -428,34 +428,73 @@ class SCTProjectFacade:
         if not isinstance(group, dict):
             return None
 
-        next_element = cur_level[index+1]
+        group = [group]
+
+        next_element = cur_level[index + 1]
         if isinstance(next_element, dict):
             if inst_uuid in list(next_element.keys())[0]:
-                group = [group, next_element]
+                group.append(next_element)
 
         return group
 
-    def change_inst_id(self, script, section, inst, new_id):
-        # Check that the instruction requires an inst_id change
+    def change_inst_id(self, script, section, inst, new_id=None):
+        # not entering a new_id will remove the instruction
         cur_section = self.project.scripts[script].sections[section]
         cur_inst = cur_section.instructions[inst]
-        if cur_inst.instruction_id == new_id:
-            return True
+        if new_id is not None:
+            if cur_inst.instruction_id == new_id:
+                return True
 
-        change_type = None
+        saved_children = {}
+        changes = []
         if cur_inst.instruction_id in self.base_insts.group_inst_list:
-            change_type = self.callbacks['check_remove_inst_group'](cur_inst.instruction_id, int(new_id))
-            if change_type == 'cancel':
-                return
-            # TODO - If change_type == 'delete' confirm delete for N instructions
-            # TODO - If change_type == 'pop below' move instructions out of group
-            # TODO - if 'insert group' in change type save instructions for later, and add them to new group
-            # TODO - else delete grouped instructions
+            inst_group = self.get_inst_group(script, section, inst)
+            if cur_inst.instruction_id == 3:
+                inst_group = inst_group[0][f'{inst}{sep}switch']
+            change_type = self.callbacks['confirm_remove_inst_group'](new_id=int(new_id), children=inst_group)
+            if 'cancel' in change_type:
+                return False
+            changes: list = change_type.split(alt_alt_sep)
+            changes.reverse()
 
-        parent_list, index = self.get_inst_grouped_parents_and_index(inst, cur_section.instructions_ids_grouped)
+            finished_change_indexes = []
+            for i, change in enumerate(changes):
+                change_parts = change.split(alt_sep)
+                cur_group = None
+                for key, group in inst_group.items():
+                    if key == change_parts[0]:
+                        cur_group = group
+                        break
+                if cur_group is None:
+                    print(f'{self.log_key}: Unable to find group to save for later insertion: {change_parts[0]}')
+
+                if 'Move' in change or 'Delete' in change:
+                    self.perform_group_change(script, section, inst, cur_group, change)
+                    finished_change_indexes.append(i)
+                elif 'Insert' in change:
+                    self.perform_group_change(script, section, inst, cur_group, change)
+                    saved_children[change_parts[0]] = cur_group
+                else:
+                    print(f'{self.log_key}: Unknown group change instruction: {change}')
+
+            for i in reversed(finished_change_indexes):
+                changes.pop(i)
+
+        parent_list, index = self.get_inst_grouped_parents_and_index(inst, cur_section.instruction_ids_grouped)
+
+        cur_group = cur_section.instruction_ids_grouped
+        for parent in parent_list:
+            cur_group = cur_group[parent]
+
+        if new_id is None:
+            cur_group.pop(index)
+            return
+
+        if cur_inst.instruction_id in self.base_insts.group_inst_list:
+            cur_group[index] = inst
 
         # Change inst id
-        cur_inst.set_inst_id(new_id)
+        cur_inst.set_inst_id(int(new_id))
 
         # Remove any current parameters and loop parameters
         self.remove_inst_parameters(script, section, inst)
@@ -466,13 +505,70 @@ class SCTProjectFacade:
         for i in [*base_inst.params_before, *base_inst.params_after]:
             base_param = base_inst.parameters[i]
             new_param = SCTParameter(base_param.param_ID, base_param.type)
-            if 'iterations' in base_param.type:
-                new_param.set_value(0)
+            if base_param.default_value == 'override':
+                new_param.set_value('override', get_scpt_override(base_param.type))
+            else:
+                new_param.set_value(base_param.default_value)
             cur_inst.parameters[i] = new_param
 
         if int(new_id) in self.base_insts.group_inst_list:
             self.setup_group_type_inst(script, section, inst, cur_inst, parent_list, index)
-            # TODO - if 'insert group' in change_type, insert instructions in group, resolve ungrouped, etc.
+
+            # add necessary groups to insert insts into
+            for change in changes:
+                if 'If' in change:
+                    continue
+                sub_group = change.split(' ')[-1].lower()
+                self.add_inst_sub_group(script, section, inst, parent_list, index, sub_group)
+
+            # Insert insts into groups
+            for change in changes:
+                # insert inst list into appropriate place in ungrouped
+                temp_cur_group = cur_group
+                if 'If' in change:
+                    ungrouped_index = cur_section.instruction_ids_ungrouped.index(inst) + 1
+                    temp_cur_group = temp_cur_group[index][f'{inst}{sep}if']
+                elif 'Else' in change:
+                    goto_inst = cur_section.instructions[cur_inst.my_goto_uuids[0]]
+                    ungrouped_index = cur_section.instruction_ids_ungrouped.index(goto_inst.ID) + 1
+                    temp_cur_group = temp_cur_group[index + 1][f'{inst}{sep}else']
+                else:
+                    sub_group = change.split(' ')[-1]
+                    temp_cur_group = temp_cur_group[index][f'{inst}{sep}switch'][sub_group]
+                    first_uuid, _ = self.get_inst_group_bounds(cur_group)
+                    ungrouped_index = cur_section.instruction_ids_ungrouped.index(first_uuid)
+
+                inst_list = self.extract_inst_uuids_from_group(saved_children[change.split(alt_sep)[0]])
+                for uuid in reversed(inst_list):
+                    cur_section.instruction_ids_ungrouped.insert(ungrouped_index, uuid)
+
+                # insert saved_group into appropriate place in grouped
+                for item in reversed(saved_children[change.split(alt_sep)[0]]):
+                    temp_cur_group.insert(0, item)
+
+                # Adjust if or switch for new linked inst values
+                if 'If' in change:
+                    pass
+                elif 'Else' in change:
+                    prev_tgt_uuid = cur_inst.parameters[0].link.target_trace[2]
+                    prev_tgt_inst = cur_section.instructions[prev_tgt_uuid]
+                    prev_tgt_inst.links_in.remove(cur_inst.parameters[0].link)
+                    cur_inst.parameters[0].link.target_trace[2] = inst_list[0]
+                    new_tgt_inst = cur_section.instructions[inst_list[0]]
+                    new_tgt_inst.links_in.append(cur_inst.parameters[0].link)
+                else:
+                    case_param = None
+                    for loop in cur_inst.loop_parameters:
+                        if loop[0].value == int(sub_group):
+                            case_param = loop[1]
+                            break
+                    if case_param is None:
+                        print(f'{self.log_key}: Unable to find switch case for link change')
+                    prev_tgt_inst = cur_section.instructions[case_param.link.target_trace[1]]
+                    prev_tgt_inst.links_in.remove(case_param.link)
+                    case_param.link.target_trace[1] = inst_list[0]
+                    new_tgt_inst = cur_section.instructions[inst_list[0]]
+                    new_tgt_inst.links_in.append(cur_inst.parameters[0].link)
 
         return True
 
@@ -484,33 +580,211 @@ class SCTProjectFacade:
         cur_inst.loop_parameters = []
 
     def setup_group_type_inst(self, script, section, inst_id, inst, parent_list, index):
-        print('here')
+
         inst_sect = self.project.scripts[script].sections[section]
 
-        cur_group = inst_sect.instructions_ids_grouped
+        cur_group = inst_sect.instruction_ids_grouped
         for key in parent_list:
             cur_group = cur_group[key]
 
         if inst.instruction_id == 0:
+            target_inst_UUID_index = inst_sect.instruction_ids_ungrouped.index(inst_id) + 1
+            target_inst_UUID = inst_sect.instruction_ids_ungrouped[target_inst_UUID_index]
+
+            inst_link = SCTLink(origin=-1, origin_trace=[script, section, inst.ID, 0], type='Jump',
+                                target=-1, target_trace=[script, section, target_inst_UUID])
+            inst.parameters[0].link = inst_link
+            inst.links_out.append(inst_link)
+            inst_sect.instructions[target_inst_UUID].links_in.append(inst_link)
+
             goto_inst = SCTInstruction()
             goto_inst.set_inst_id(10)
-            goto_param = SCTParameter(0, 'int-jump')
-            target_inst_UUID_index = inst_sect.instruction_ids_ungrouped.index(inst_id)+1
-            target_inst_UUID = inst_sect.instruction_ids_ungrouped[target_inst_UUID_index]
+            goto_param = SCTParameter(0, 'int|jump')
+            goto_inst.add_parameter(0, goto_param)
             goto_link = SCTLink(origin=-1, origin_trace=[script, section, goto_inst.ID, 0], type='Jump',
                                 target=-1, target_trace=[script, section, target_inst_UUID])
             goto_param.link = goto_link
             inst_sect.instructions[target_inst_UUID].links_in.append(goto_link)
             goto_inst.links_out.append(goto_link)
-            goto_inst.add_parameter(0, goto_param)
+
+            inst.my_goto_uuids = [goto_inst.ID]
+            goto_inst.my_master_uuids = [inst.ID]
+
             inst_sect.instructions[goto_inst.ID] = goto_inst
+
             inst_sect.instruction_ids_ungrouped.insert(target_inst_UUID_index, goto_inst.ID)
+
             grouped_insertion = {f'{inst_id}{sep}if': [goto_inst.ID]}
+
         elif inst.instruction_id == 3:
             grouped_insertion = {f'{inst_id}{sep}switch': {}}
+            inst.my_goto_uuids = []
         else:
-            print(f'{self.log_key}: Setup Group Type Inst: Unknown group type inst ({inst.instruction_id}). Group not made.')
+            print(
+                f'{self.log_key}: Setup Group Type Inst: Unknown group type inst ({inst.instruction_id}). Group not made.')
             grouped_insertion = inst_id
 
         cur_group.pop(index)
         cur_group.insert(index, grouped_insertion)
+
+    def perform_group_change(self, script, section, inst, cur_group, change):
+        # Handles Move Above, Move Below, Delete
+        cur_sect = self.project.scripts[script].sections[section]
+
+        start_inst_key, end_inst_key = self.get_inst_group_bounds(cur_group)
+
+        # Remove Instructions from current place in ungrouped in new temp ungrouped
+        start_inst_uuid = start_inst_key if sep not in start_inst_key else start_inst_key.split(sep)[0]
+        end_inst_uuid = end_inst_key if sep not in end_inst_key else end_inst_key.split(sep)[0]
+        start_ind = cur_sect.instruction_ids_ungrouped.index(start_inst_uuid)
+        end_ind = cur_sect.instruction_ids_ungrouped.index(end_inst_uuid)
+        group_insts = cur_sect.instruction_ids_ungrouped[start_ind: end_ind + 1]
+        temp_ungrouped = []
+        temp_ungrouped += cur_sect.instruction_ids_ungrouped[:start_ind] if start_ind > 0 else []
+        temp_ungrouped += cur_sect.instruction_ids_ungrouped[end_ind + 1:] if end_ind < len(
+            cur_sect.instruction_ids_ungrouped) - 1 else []
+
+        # Remove instructions from current place in grouped in new temp grouped
+        parents, grouped_ind = self.get_inst_grouped_parents_and_index(inst, cur_sect.instruction_ids_grouped)
+
+        temp_grouped = cur_sect.instruction_ids_grouped
+        cur_temp_group = temp_grouped
+        for parent in parents:
+            cur_temp_group = cur_temp_group[parent]
+
+        if "Delete" in change:
+            new_insts = {k: cur_sect.instructions[k] for k in cur_sect.instructions if k not in group_insts}
+            cur_sect.instructions = new_insts
+            new_ungrouped = temp_ungrouped
+
+        elif 'Move' in change:
+            grouped_insert_loc = grouped_ind
+            ungroup_ref_inst_uuid = inst
+
+            if 'Below' in change:
+                temp_cur_group = cur_temp_group[grouped_ind]
+                temp_cur_group = temp_cur_group[list(temp_cur_group.keys())[0]]
+
+                # If it is a switch, there will be one more dict level for cases, get the last case
+                if isinstance(temp_cur_group, dict):
+                    temp_cur_group = temp_cur_group[list(temp_cur_group.keys())[-1]]
+
+                ungroup_ref_inst_uuid = temp_cur_group[-1]
+
+            ungrouped_insert_ind = temp_ungrouped.index(ungroup_ref_inst_uuid)
+
+            if 'Below' in change:
+                ungrouped_insert_ind += 1
+                grouped_insert_loc += 1
+
+            ungrouped_before = temp_ungrouped[:ungrouped_insert_ind]
+            ungrouped_after = temp_ungrouped[ungrouped_insert_ind:]
+
+            new_ungrouped = ungrouped_before + group_insts + ungrouped_after
+            for entry in reversed(cur_group):
+                cur_temp_group.insert(grouped_insert_loc, entry)
+
+        elif 'Insert' in change:
+            new_ungrouped = temp_ungrouped
+
+        else:
+            print(f'{self.log_key}: Unknown change request: {change}')
+            return
+
+        cur_sect.instruction_ids_ungrouped = new_ungrouped
+
+    def get_inst_group_bounds(self, cur_group) -> (str, str):
+        first = cur_group[0]
+        if isinstance(first, dict):
+            first = list(first.keys())[0]
+        last = cur_group[-1]
+        if isinstance(last, dict):
+            last = list(last.keys())[0]
+        return first, last
+
+    def add_inst_sub_group(self, script, section, inst, parent_list, index, sub_group):
+        cur_sect = self.project.scripts[script].sections[section]
+        cur_group = cur_sect.instruction_ids_grouped
+        cur_inst = cur_sect.instructions[inst]
+        for parent in parent_list:
+            cur_group = cur_group[parent]
+
+        test_group = cur_group
+        if cur_inst.instruction_id == 3:
+            test_group = test_group[index]
+            test_group = test_group[list(test_group.keys())[0]]
+
+        if cur_inst.instruction_id == 0:
+            sub_group = f'{inst}{sep}{sub_group}'
+
+        if self._inst_sub_group_present(test_group, sub_group):
+            return
+
+        if 'else' in sub_group:
+            cur_group.insert(index + 1, {sub_group: []})
+            return
+
+        goto_target_ind = cur_sect.instruction_ids_ungrouped.index(inst) + 1
+        goto_target_uuid = cur_sect.instruction_ids_ungrouped[goto_target_ind]
+        loop_param_num = len(cur_inst.loop_parameters)
+        if loop_param_num > 0:
+            for uuid in cur_inst.my_goto_uuids:
+                cur_tgt_uuid = cur_sect.instructions[uuid].parameters[0].link.target_trace[1]
+                cur_tgt_ind = cur_sect.instruction_ids_ungrouped.index(cur_tgt_uuid)
+                if cur_tgt_ind > goto_target_ind:
+                    goto_target_ind = cur_tgt_uuid
+                    goto_target_uuid = cur_tgt_uuid
+
+        case_goto = SCTInstruction()
+        case_goto.set_inst_id(10)
+        case_goto.parameters[0] = SCTParameter(0, 'int|jump')
+        case_goto.parameters[0].link = SCTLink('Jump', origin=-1, origin_trace=[section, case_goto.ID, 0],
+                                               target=-1, target_trace=[section, goto_target_uuid])
+
+        switch_loop_params = {2: SCTParameter(2, 'int'), 3: SCTParameter(3, 'int|jump')}
+        switch_loop_params[2].value = int(sub_group)
+        switch_loop_params[3].link = SCTLink('Jump', origin=-1, origin_trace=[section, inst, f'{loop_param_num}{sep}3'],
+                                             target=-1, target_trace=[section, case_goto.ID])
+        cur_inst.loop_parameters.append(switch_loop_params)
+
+        cur_inst.links_out.append(switch_loop_params[3].link)
+        case_goto.links_in.append(switch_loop_params[3].link)
+        case_goto.links_out.append(case_goto.parameters[0].link)
+        cur_sect.instructions[goto_target_uuid].links_in.append(case_goto.parameters[0].link)
+
+        cur_sect.instruction_ids_ungrouped.insert(goto_target_ind, case_goto.ID)
+        test_group[sub_group] = [case_goto.ID]
+
+    def _inst_sub_group_present(self, cur_group: Union[list, dict], sub_group: str):
+        if 'else' in sub_group:
+            for item in cur_group:
+                if not isinstance(item, dict):
+                    continue
+                if list(item.keys())[0] == sub_group:
+                    return True
+        else:
+            if sub_group in cur_group:
+                return True
+        return False
+
+    def extract_inst_uuids_from_group(self, cur_group, uuids: Union[list, None] = None):
+        if uuids is None:
+            uuids = []
+
+        for item in cur_group:
+            if not isinstance(item, dict):
+                uuids.append(item)
+                continue
+
+            item_key = list(item.keys())[0]
+            item_uuid = item_key.split(sep)[0]
+            if item_uuid not in uuids:
+                uuids.append(item_uuid)
+            next_group = item[item_key]
+            if isinstance(next_group, dict):
+                for value in next_group.values():
+                    uuids = self.extract_inst_uuids_from_group(value, uuids)
+            else:
+                uuids = self.extract_inst_uuids_from_group(next_group, uuids)
+
+        return uuids

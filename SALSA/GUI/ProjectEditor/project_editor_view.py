@@ -5,7 +5,7 @@ import json
 from typing import List, Dict
 
 import SALSA.GUI.widgets as w
-from Common.constants import sep, alt_sep
+from Common.constants import sep, alt_sep, alt_alt_sep
 from SALSA.Common.setting_class import settings
 
 default_headers = {
@@ -326,11 +326,9 @@ class ProjectEditorView(tk.Frame):
     def inst_group_handling(self, cur_inst_id, new_id, children):
         # create message to decide how to handle group entries
         if cur_inst_id == 0:
-            if isinstance(children, dict):
-                children = [children]
             labels = ['Group']
         elif cur_inst_id == 3:
-            children = [{k, children[k]} for k in children.keys()]
+            children = [{k: children[k]} for k in children.keys()]
             labels = ['Switch Case']
         else:
             return ''
@@ -347,12 +345,9 @@ class ProjectEditorView(tk.Frame):
 
         for child in children:
             radio_vars.append(tk.IntVar(self, 1))
+            row_labels.append(list(child.keys())[0])
             if new_id == 3:
                 entry_vars.append(tk.IntVar(self))
-            if cur_inst_id == 3:
-                row_labels.append(list(child.keys())[0])
-            if cur_inst_id == 0:
-                row_labels.append(list(child.keys())[0].split(sep)[1])
 
         class InstGroupHandlerDialog(tk.simpledialog.Dialog):
 
@@ -365,6 +360,8 @@ class ProjectEditorView(tk.Frame):
 
                 for i, row_label in enumerate(row_labels):
                     cur_col = 0
+                    if cur_inst_id == 0:
+                        row_label = row_label.split(sep)[1]
                     tk.Label(master, text=row_label).grid(row=i+1, column=cur_col)
                     cur_col += 1
                     for label in labels[1:]:
@@ -380,7 +377,7 @@ class ProjectEditorView(tk.Frame):
         response = ''
         for i, row_label in enumerate(row_labels):
             if i > 0:
-                response += f'{sep}'
+                response += f'{alt_alt_sep}'
             choice = labels[radio_vars[i].get()]
             response += f'{row_label}{alt_sep}{choice}'
             if new_id == 3 and choice == 'Insert in Switch Case':
