@@ -94,7 +94,7 @@ class InstructionSelectorWidget(tk.Frame):
         if not done:
             self.search.focus_set()
             return
-        self.cancel()
+        self.cancel(None)
         self.callbacks['update_tree']()
 
     def cancel(self, e):
