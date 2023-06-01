@@ -302,6 +302,33 @@ class SCTProjectFacade:
     def get_section_list(self, script):
         return list(self.project.scripts[script].sections.keys())
 
+    def get_inst_list(self, script, section, goto_uuid=None):
+        cur_sect = self.project.scripts[script].sections[section]
+        inst_list = cur_sect.instruction_ids_ungrouped
+        if goto_uuid is not None:
+            first_blocked = 0
+            master_uuid = None
+            if len(cur_sect.instructions[goto_uuid].my_master_uuids) < 0:
+                master_uuid = cur_sect.instructions[goto_uuid].my_master_uuids[0]
+                first_blocked = inst_list.index(master_uuid)
+            last_blocked = cur_sect.instruction_ids_ungrouped.index(goto_uuid)
+            if master_uuid is not None:
+                if cur_sect.instructions[master_uuid].instruction_id == 3:
+                    last_blocked = max(*[cur_sect.instruction_ids_ungrouped.index(i) for i in
+                                         cur_sect.instructions[master_uuid].my_goto_uuids], last_blocked)
+            inst_list = cur_sect.instruction_ids_ungrouped[:first_blocked] + cur_sect.instruction_ids_ungrouped[
+                                                                             last_blocked + 1:]
+
+        return [f'{cur_sect.instructions[i].ungrouped_position}: '
+                f'{self.base_insts.get_inst(cur_sect.instructions[i].instruction_id).name}'
+                f'{sep}{cur_sect.instructions[i].ID}' for i in inst_list]
+
+    def remove_inst(self, script, section, inst):
+        # This will handle inst group children and remove the inst from the grouped representation of insts
+        self.change_inst_id(script, section, inst)
+        self.project.scripts[script].sections[section].instructions.pop(inst)
+        self.project.scripts[script].sections[section].instruction_ids_ungrouped.remove(inst)
+
     def add_inst(self, script, section, ref_inst_uuid, case=None, direction='below'):
         new_inst = SCTInstruction()
         inst_sect = self.project.scripts[script].sections[section]
