@@ -56,7 +56,7 @@ class ParamEditController:
             self.param_id = param_id
             self.column_id = column_id
         self.base_param = base_param
-        base_type = base_param.type.split('-')[0]
+        base_type = base_param.type.split(sep)[0]
         self.setup_view_fxns[base_type]()
 
     def close_view(self):
@@ -197,7 +197,7 @@ class ParamEditController:
         if var_changes is not None:
             self.callbacks['update_variables'](var_changes)
         if new_scpt_value == 'override':
-            param_type = self.base_param.type.split('-')[1]
+            param_type = self.base_param.type.split(sep)[1]
             value, override_value = self.scpt_codes.overrides[param_type]
             self.param.set_value(value=value, override_value=override_value)
         else:
