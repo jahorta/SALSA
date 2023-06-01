@@ -195,12 +195,6 @@ class SCTProjectFacade:
         else:
             pass
 
-    def rearrange_list(self, script, order_list, section=None):
-        if section is None:
-            pass
-        else:
-            pass
-
     def add_script_to_project(self, script_name, script):
         self.project.scripts[script_name] = script
         script_keys = sorted(list(self.project.scripts.keys()), key=str.casefold)
