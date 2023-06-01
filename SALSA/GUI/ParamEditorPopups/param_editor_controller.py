@@ -52,7 +52,6 @@ class ParamEditController:
         self.param = param
         if self.param is not None:
             self.scpt_callbacks |= {'get_var_alias': self.callbacks['get_var_alias']}
-            self.int_callbacks |= {'get_string_from_name': self.callbacks['get_string_from_name']}
         else:
             self.param_id = param_id
             self.column_id = column_id
