@@ -276,7 +276,7 @@ class ParamEditController:
         elif 'jump' in self.base_param.type:
             self.int_field = ObjectSelectionWidget(self.view.main_frame, name=self.base_param.name,
                                                    selection_list=self.callbacks['get_instruction_list']())
-            value = self.callbacks['get_inst_identifier'](self.param.link.target_trace[0])
+            value = self.callbacks['get_inst_identifier'](self.param.link.target_trace)
         elif 'footer' in self.base_param.type:
             self.int_field = FooterEditWidget(self.view.main_frame, name=self.base_param.name)
             value = self.param.link_result
