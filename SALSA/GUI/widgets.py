@@ -178,12 +178,14 @@ class RequiredAddrEntry(RequiredHexEntry):
 
 
 class RequiredIntEntry(RequiredEntry):
-    def __init__(self, parent, b_min=-math.inf, b_max=math.inf, *a, **kw):
+    def __init__(self, parent, signed=True, b_min=-math.inf, b_max=math.inf, *a, **kw):
 
         super().__init__(parent, *a, **kw)
 
         self.max = b_max
         self.min = b_min
+
+        self.signed = signed
 
     def _focusout_validate(self, **kwargs):
         valid = super()._focusout_validate(**kwargs)
@@ -196,7 +198,11 @@ class RequiredIntEntry(RequiredEntry):
     def _key_validate(self, char, index, current, proposed, action, **kwargs):
         valid = super()._key_validate(char=char, index=index, current=current, proposed=proposed, action=action, **kwargs)
 
-        if char not in '-1234567890':
+        chars = '-1234567890'
+        if self.signed:
+            chars += '-'
+
+        if char not in chars:
             return False
 
         if '-' in proposed:
