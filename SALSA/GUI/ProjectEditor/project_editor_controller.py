@@ -49,7 +49,8 @@ class ProjectEditorController:
                         'refresh_inst': self.on_refresh_inst,
                         'update_variables': self.update_var_usage,
                         'get_subscript_list': lambda: self.project.get_section_list(self.current['script']),
-                        'set_change': self.set_change}
+                        'set_change': self.set_change,
+                        'get_instruction_list': lambda: self.project.get_inst_list(self.current['script'], self.current['section'], self.current['instruction'])}
         self.param_editor = ParamEditController(self.view, callbacks=pe_callbacks)
 
         if self.log_name not in settings:
