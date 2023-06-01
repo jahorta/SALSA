@@ -43,7 +43,7 @@ class ProjectEditorController:
         self.view.add_and_bind_callbacks(view_callbacks)
 
         self.project: SCTProjectFacade = facade
-        self.project.set_callback('confirm_remove_inst_group', self.confirm_remove_inst_group)
+        self.project.set_callback('confirm_remove_inst_group', self.confirm_change_inst_group)
 
         pe_callbacks = {'get_var_alias': self.get_var_alias,
                         'refresh_inst': self.on_refresh_inst,
@@ -321,7 +321,7 @@ class ProjectEditorController:
 
         # if rightclicked row is a switch or case, add option for "Add Switch Case"
         if group_type in ('case', 'switch'):
-            m.add_command(label='Add Switch Case', command=self.rcm_switch_case)
+            m.add_command(label='Add Switch Case', command=self.rcm_add_switch_case)
 
         # if rightclicked row is group, add option for "Add Instruction in group"
         if group_type in ('if', 'else', 'while', 'case'):
@@ -398,6 +398,11 @@ class ProjectEditorController:
         row_data = self.trees['instruction'].row_data[sel_iid]
         inst_trace = [self.current['script'], self.current['section'], row_data]
         self.show_inst_selector(inst_trace, sel_iid)
+
+    def rcm_add_switch_case(self):
+        sel_iid = self.trees['instruction'].focus()
+        row_data = self.trees['instruction'].row_data[sel_iid]
+        # TODO - implement adding a switch case
 
     # ------------------------------------- #
     # Instruction Confirmation Messageboxes #
