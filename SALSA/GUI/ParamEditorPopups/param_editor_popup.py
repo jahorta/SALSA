@@ -293,7 +293,6 @@ class VarSelectionWidget(IntEditWidget):
 
     def get_value(self):
         value = super().get_value()
-
         return f'{self.var_type}: {value}'
 
 
