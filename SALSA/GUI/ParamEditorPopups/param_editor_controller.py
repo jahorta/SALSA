@@ -284,11 +284,11 @@ class ParamEditController:
             self.int_field = ObjectSelectionWidget(self.view.main_frame, name=self.base_param.name,
                                                    selection_list=self.callbacks['get_string_list']())
             value = self.param.link_result
-
         elif 'var' in self.base_param.type:
             var_type = f'{self.base_param.type.split(sep)[-1].capitalize()}Var: '
             self.int_field = VarSelectionWidget(self.view.main_frame, name=f'{self.base_param.name} - {var_type}',
-                                                var_type=var_type, signed=False, b_min=0)
+                                                b_min=0, var_type=var_type, signed=False,
+                                                callback=self.callbacks['get_var_alias'])
             value = self.param.value
         else:
             self.int_field = IntEditWidget(self.view.main_frame, name=self.base_param.name)
