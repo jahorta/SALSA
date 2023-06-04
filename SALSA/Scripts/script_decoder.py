@@ -1479,6 +1479,7 @@ class SCTDecoder:
         # Create grouped instruction heirarchies
         for section in decoded_sct.sections.values():
             if section.name not in self._instruction_groups:
+                section.instruction_ids_grouped = copy.deepcopy(section.instruction_ids_ungrouped)
                 continue
             inst_groups = self._instruction_groups[section.name]
 
