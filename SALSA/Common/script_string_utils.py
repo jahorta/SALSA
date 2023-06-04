@@ -21,10 +21,10 @@ def visible_to_SAstr(string):
     return string
 
 
-def SAstr_to_head_and_tail(string):
+def SAstr_to_head_and_body(string):
     head_start = string.find('《') + 1
     head_end = string.find('》')
-    head = string[head_start:head_end]
+    head = SAstr_to_visible(string[head_start:head_end])
     body_start = string.find(')') + 1
     body = SAstr_to_visible(string[body_start:])
     return head, body

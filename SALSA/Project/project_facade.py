@@ -1,6 +1,7 @@
 import copy
 from typing import Union, Tuple
 
+from Common.script_string_utils import SAstr_to_head_and_body
 from SALSA.Project.description_formatting import format_description
 from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter, SCTInstruction, SCTLink
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
@@ -182,6 +183,29 @@ class SCTProjectFacade:
             instruction_details[key] = value
         instruction_details['description'] = format_description(inst=instruction, base_inst=base_inst)
         return instruction_details
+
+    def get_string_tree(self, script, headers):
+        string_groups = self.project.scripts[script].string_groups
+        strings = self.project.scripts[script].strings
+        string_tree = []
+        for key, group in string_groups.items():
+            string_tree.append({headers[0]: key, headers[1]: '', 'row_data': None})
+            string_tree.append('group')
+            for string_id in group:
+                str_head, str_body = SAstr_to_head_and_body(strings[string_id])
+                if '\n' in str_body:
+                    str_body = str_body.split('\n')[0]
+                    str_body += '...'
+                string_tree.append({headers[0]: string_id, headers[1]: f'{str_head}: {str_body}', 'row_data': string_id})
+            string_tree.append('ungroup')
+
+        return string_tree
+
+    def get_string_to_edit(self, script, string_id):
+        return SAstr_to_head_and_body(self.project.scripts[script].strings[string_id])
+
+    def edit_strings(self, change_dict):
+        pass
 
     def remove_element_from_group(self, script, element, group, section=None):
         if section is None:
