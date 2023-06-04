@@ -88,7 +88,6 @@ class SCTExportPopup(tk.Toplevel):
 
         self.title(self.t)
         self.resizable(width=False, height=False)
-        self.geometry()
 
         posX = self.parent.winfo_x() + (self.parent.winfo_width() - self.w)//2
         posY = self.parent.winfo_y() + (self.parent.winfo_height() - self.h)//2
