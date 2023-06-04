@@ -2397,7 +2397,7 @@
   "144": {
     "Name": "Display Message",
     "Description": "Displays a string based on the Offset parameter\n*lnk[Offset,<Offset>]*\n\nThe text box will not fade out if the Fadeout parameter is overridden (0x7FFFFFFF).\n\n",
-    "Notes": "The value of the Fadeout parameter (param 1) doesn't seem to make a difference in terms of timing, so the value itself may not matter.\n\nSetting param1 causes the first character of the string (usually \\h) to be changed to \\c. This prefix is what leads to the fadeout effect for the message box.\n",
+    "Notes": "The value of the Fadeout parameter (param 1) doesn't seem to make a difference in terms of timing, so the value itself may not matter.\n\nSetting param1 causes the last two characters of the string (usually \\e) to be changed to \\c. This prefix is what leads to the fadeout effect for the message box.\n\n",
     "Parameters": {
       "0": {
         "Name": "Offset"
