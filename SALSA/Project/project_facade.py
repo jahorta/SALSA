@@ -214,16 +214,13 @@ class SCTProjectFacade:
         if 'update_scripts' not in self.callbacks:
             return
         self.callbacks['update_scripts']()
-
-    def set_callback(self, key, callback):
-        self.callbacks[key] = callback
-
-    def get_project_script_by_index(self, index):
-        if index >= len(self.project.scripts.keys()):
-            print(f'{self.log_key}: Script index out of range: {index} : {len(self.project.scripts.keys()) - 1}')
-            return None
-        name = list(self.project.scripts.keys())[index]
-        return name, self.project.scripts[name]
+    #
+    # def get_project_script_by_index(self, index):
+    #     if index >= len(self.project.scripts.keys()):
+    #         print(f'{self.log_key}: Script index out of range: {index} : {len(self.project.scripts.keys()) - 1}')
+    #         return None
+    #     name = list(self.project.scripts.keys())[index]
+    #     return name, self.project.scripts[name]
 
     def get_project_script_by_name(self, name):
         if name not in self.project.scripts.keys():
