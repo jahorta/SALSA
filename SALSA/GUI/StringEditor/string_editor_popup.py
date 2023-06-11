@@ -116,8 +116,7 @@ class StringPopup(tk.Toplevel):
 
         body_label = tk.Label(lower_frame, text='Textbox Body')
         body_label.grid(row=2, column=0, sticky=tk.W)
-        self.body_entry = tk.Text(lower_frame)
-        self.body_entry['state'] = 'disabled'
+        self.body_entry = tk.Text(lower_frame, wrap=tk.WORD)
         self.body_entry.grid(row=3, column=0, sticky=tk.W + tk.E)
         self.body_entry.bind('<FocusIn>', self.on_text_focus_in)
         self.body_entry.bind('<FocusOut>', lambda e, k='body': self.on_text_focus_out(k, e))
@@ -191,9 +190,8 @@ class StringPopup(tk.Toplevel):
         self.head_entry.configure(state='normal')
         self.head_entry.delete(0, tk.END)
         self.head_entry.insert(0, head)
-        self.head_entry.configure(state='normal')
         self.body_entry.delete(1.0, tk.END)
-        self.body_entry.insert(1.0, body)
+        self.body_entry.insert(tk.INSERT, body)
 
     def on_entry_focus_in(self, e):
         e.widget.cur_value = e.widget.get()
