@@ -33,6 +33,7 @@ class VariablePopup(tk.Toplevel):
 
         script_frame = tk.LabelFrame(self, text='Scripts')
         script_frame.grid(row=0, column=0, sticky='NSEW')
+        script_frame.rowconfigure(0, weight=1)
 
         tree_callbacks = {'select': self.script_select}
 
