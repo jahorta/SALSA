@@ -337,7 +337,7 @@ class SCTProjectFacade:
 
     def remove_inst(self, script, section, inst):
         # This will handle inst group children and remove the inst from the grouped representation of insts
-        self.change_inst_id(script, section, inst)
+        self.change_inst(script, section, inst)
         self.project.scripts[script].sections[section].instructions.pop(inst)
         self.project.scripts[script].sections[section].instruction_ids_ungrouped.remove(inst)
 
@@ -449,7 +449,7 @@ class SCTProjectFacade:
 
         return group
 
-    def change_inst_id(self, script, section, inst, new_id=None):
+    def change_inst(self, script, section, inst, new_id=None):
         # not entering a new_id will remove the instruction
         cur_section = self.project.scripts[script].sections[section]
         cur_inst = cur_section.instructions[inst]

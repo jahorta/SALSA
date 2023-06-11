@@ -375,7 +375,7 @@ class ProjectEditorController:
 
     def show_inst_selector(self, inst_trace, sel_iid):
         callbacks = {
-            'set_inst_id': self.project.change_inst_id,
+            'set_inst_id': self.project.change_inst,
             'get_relevant': self.project.base_insts.get_relevant,
             'update_tree': lambda: self.update_tree('instruction', self.project.get_tree(
                 self.view.get_headers('instruction'), self.current['script'], self.current['section']))
