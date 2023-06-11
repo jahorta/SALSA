@@ -207,18 +207,6 @@ class SCTProjectFacade:
     def edit_strings(self, change_dict):
         pass
 
-    def remove_element_from_group(self, script, element, group, section=None):
-        if section is None:
-            pass
-        else:
-            pass
-
-    def add_element_to_group(self, script, element, group, section=None):
-        if section is None:
-            pass
-        else:
-            pass
-
     def add_script_to_project(self, script_name, script):
         self.project.scripts[script_name] = script
         script_keys = sorted(list(self.project.scripts.keys()), key=str.casefold)
