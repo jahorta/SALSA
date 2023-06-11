@@ -10,8 +10,8 @@ from SALSA.GUI import widgets as w
 class VariablePopup(tk.Toplevel):
     t = 'Variable Editor'
     log_key = 'VarEditPopup'
-    w = 250
-    h = 400
+    w = 400
+    h = 600
 
     option_settings = {}
     canvas_names = ['Bit', 'Byte', 'Int', 'Float']
