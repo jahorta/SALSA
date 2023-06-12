@@ -392,14 +392,14 @@ class ProjectEditorController:
         sel_iid = self.trees['instruction'].focus()
         cur_inst_uuid = self.trees['instruction'].row_data[sel_iid]
         self.project.remove_inst(self.current['script'], self.current['section'], cur_inst_uuid)
-        # TODO - call function from project to remove instruction
-        pass
+        self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'), **self.current))
 
     def rcm_change_inst(self):
         sel_iid = self.trees['instruction'].focus()
         row_data = self.trees['instruction'].row_data[sel_iid]
         inst_trace = [self.current['script'], self.current['section'], row_data]
         self.show_inst_selector(inst_trace, sel_iid)
+        self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'), **self.current))
 
     def rcm_add_switch_case(self):
         sel_iid = self.trees['instruction'].focus()
