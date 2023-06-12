@@ -369,7 +369,7 @@ class SCTProjectFacade:
     def remove_inst(self, script, section, inst):
         # This will handle inst group children and remove the inst from the grouped representation of insts
         self.change_inst(script, section, inst)
-        self.remove_links(script, section, inst)
+        self.remove_inst_links(script, section, inst)
         cur_sect = self.project.scripts[script].sections[section]
         if len(cur_sect.instructions[inst].my_goto_uuids) > 0:
             for uuid in cur_sect.instructions[inst].my_goto_uuids:
@@ -853,4 +853,21 @@ class SCTProjectFacade:
     # ----------------- #
 
     def remove_inst_links(self, script, section, inst):
-        pass
+        cur_sect = self.project.scripts[script].sections[section]
+        cur_inst = cur_sect.instructions[inst]
+        parents, index = self.get_inst_grouped_parents_and_index(inst, cur_sect.instruction_ids_grouped)
+        tgt_index = index - 1 if index != 0 else index + 1
+        cur_group = cur_sect.instruction_ids_grouped
+        for parent in parents:
+            cur_group = cur_group[parent]
+        new_tgt_inst = self.get_inst_uuid_from_group_entry(cur_group, tgt_index)
+        for link in cur_inst.links_in:
+            ori_sect = link.target_trace[0]
+            ori_inst_uuid = link.target_trace[1]
+            ori_inst = self.project.scripts[script].sections[ori_sect].instructions[ori_inst_uuid]
+            link_ind = ori_inst.links_out.index(link)
+            ori_inst.links_out[link_ind].target_trace[1] = new_tgt_inst
+        for link in cur_inst.links_out:
+            tgt_inst_uuid = link.target_trace[1]
+            self.project.scripts[script].sections[section].instructions[tgt_inst_uuid].links_in.remove(link)
+
