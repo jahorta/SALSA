@@ -868,13 +868,14 @@ class SCTProjectFacade:
         cur_group = cur_sect.instruction_ids_grouped
         for parent in parents:
             cur_group = cur_group[parent]
-        new_tgt_inst = self.get_inst_uuid_from_group_entry(cur_group, tgt_index)
+        new_tgt_inst_uuid = self.get_inst_uuid_from_group_entry(cur_group, tgt_index)
         for link in cur_inst.links_in:
-            ori_sect = link.target_trace[0]
-            ori_inst_uuid = link.target_trace[1]
+            ori_sect = link.origin_trace[0]
+            ori_inst_uuid = link.origin_trace[1]
             ori_inst = self.project.scripts[script].sections[ori_sect].instructions[ori_inst_uuid]
             link_ind = ori_inst.links_out.index(link)
-            ori_inst.links_out[link_ind].target_trace[1] = new_tgt_inst
+            ori_inst.links_out[link_ind].target_trace[1] = new_tgt_inst_uuid
+            cur_sect.instructions[new_tgt_inst_uuid].links_in.append(link)
         for link in cur_inst.links_out:
             tgt_inst_uuid = link.target_trace[1]
             self.project.scripts[script].sections[section].instructions[tgt_inst_uuid].links_in.remove(link)
