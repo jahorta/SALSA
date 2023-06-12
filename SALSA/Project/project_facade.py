@@ -47,7 +47,7 @@ class SCTProjectFacade:
 
     # Tree methods
 
-    def get_tree(self, headers: Tuple[str], script=None, section=None, style='grouped'):
+    def get_tree(self, headers: Tuple[str], script=None, section=None, style='grouped', **kwargs):
         if self.project is None:
             return
         if script is None:
