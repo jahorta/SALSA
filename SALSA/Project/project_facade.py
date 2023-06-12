@@ -38,6 +38,15 @@ class SCTProjectFacade:
     def get_filepath(self):
         return self.project.filepath
 
+    # ---------------------- #
+    # Project Editor Methods #
+    # ---------------------- #
+
+    def set_callback(self, key, callback):
+        self.callbacks[key] = callback
+
+    # Tree methods
+
     def get_tree(self, headers: Tuple[str], script=None, section=None, style='grouped'):
         if self.project is None:
             return
@@ -184,29 +193,6 @@ class SCTProjectFacade:
         instruction_details['description'] = format_description(inst=instruction, base_inst=base_inst)
         return instruction_details
 
-    def get_string_tree(self, script, headers):
-        string_groups = self.project.scripts[script].string_groups
-        strings = self.project.scripts[script].strings
-        string_tree = []
-        for key, group in string_groups.items():
-            string_tree.append({headers[0]: key, headers[1]: '', 'row_data': None})
-            string_tree.append('group')
-            for string_id in group:
-                str_head, str_body = SAstr_to_head_and_body(strings[string_id])
-                if '\n' in str_body:
-                    str_body = str_body.split('\n')[0]
-                    str_body += '...'
-                string_tree.append({headers[0]: string_id, headers[1]: f'{str_head}: {str_body}', 'row_data': string_id})
-            string_tree.append('ungroup')
-
-        return string_tree
-
-    def get_string_to_edit(self, script, string_id):
-        return SAstr_to_head_and_body(self.project.scripts[script].strings[string_id])
-
-    def edit_strings(self, change_dict):
-        pass
-
     def add_script_to_project(self, script_name, script):
         self.project.scripts[script_name] = script
         script_keys = sorted(list(self.project.scripts.keys()), key=str.casefold)
@@ -214,7 +200,22 @@ class SCTProjectFacade:
         if 'update_scripts' not in self.callbacks:
             return
         self.callbacks['update_scripts']()
-    #
+
+    def get_project_script_by_name(self, name):
+        if name not in self.project.scripts.keys():
+            print(f'{self.log_key}: No script loaded with the name: {name}')
+            return None
+        return self.project.scripts[name]
+
+    def add_delay_parameter(self, script, section, instruction, **kwargs):
+        param = SCTParameter(_id=-1, _type='scpt-int')
+        self.project.scripts[script].sections[section].instructions[instruction].frame_delay_param = param
+        return param
+
+    def update_inst_field(self, field, value, script, section, instruction, **kwargs):
+        inst = self.project.scripts[script].sections[section].instructions[instruction]
+        inst.__setattr__(field, value)
+
     # def get_project_script_by_index(self, index):
     #     if index >= len(self.project.scripts.keys()):
     #         print(f'{self.log_key}: Script index out of range: {index} : {len(self.project.scripts.keys()) - 1}')
@@ -222,11 +223,21 @@ class SCTProjectFacade:
     #     name = list(self.project.scripts.keys())[index]
     #     return name, self.project.scripts[name]
 
-    def get_project_script_by_name(self, name):
-        if name not in self.project.scripts.keys():
-            print(f'{self.log_key}: No script loaded with the name: {name}')
-            return None
-        return self.project.scripts[name]
+    # ---------------------------- #
+    # Instruction position methods #
+    # ---------------------------- #
+
+    def get_inst_ind(self, script, section, inst):
+        return self.project.scripts[script].sections[section].instruction_ids_ungrouped.index(inst)
+
+    def _refresh_inst_positions(self, script, section):
+        section = self.project.scripts[script].sections[section]
+        for i, inst_id in enumerate(section.instruction_ids_ungrouped):
+            section.instructions[inst_id].ungrouped_position = i
+
+    # ----------------------- #
+    # Script variable methods #
+    # ----------------------- #
 
     def get_script_variables_with_aliases(self, script):
         var_dict = {}
@@ -237,51 +248,16 @@ class SCTProjectFacade:
                 var_dict[var_type][key] = var_list[key]['alias']
         return var_dict
 
+    def get_var_alias(self, script, var_type, var_id):
+        if var_id not in self.project.scripts[script].variables[var_type]:
+            return 'No Alias'
+        return self.project.scripts[script].variables[var_type][var_id]['alias']
+
     def set_variable_alias(self, script, var_type, var_id, alias):
         self.project.scripts[script].variables[var_type][var_id]['alias'] = alias
 
     def get_variable_usages(self, script, var_type, var_id):
         return self.project.scripts[script].variables[var_type][var_id]['usage']
-
-    def get_inst_ind(self, script, section, inst):
-        return self.project.scripts[script].sections[section].instruction_ids_ungrouped.index(inst)
-
-    def _refresh_inst_positions(self, script, section):
-        section = self.project.scripts[script].sections[section]
-        for i, inst_id in enumerate(section.instruction_ids_ungrouped):
-            section.instructions[inst_id].ungrouped_position = i
-
-    def get_parameter(self, script, section, instruction, parameter):
-        instruction = self.project.scripts[script].sections[section].instructions[instruction]
-        if parameter == 'delay':
-            return instruction.frame_delay_param
-        if sep in parameter:
-            param_parts = parameter.split(sep)
-            return instruction.loop_parameters[int(param_parts[0])][int(param_parts[1])]
-        return instruction.parameters[int(parameter)]
-
-    def get_inst_id(self, script, section, instruction, **kwargs):
-        return self.project.scripts[script].sections[section].instructions[instruction].instruction_id
-
-    def get_inst_id_name(self, inst_id):
-        return self.base_insts.get_inst(inst_id).name
-
-    def get_base_parameter(self, inst_id, param_str):
-        if param_str == 'delay':
-            return self.base_insts.get_inst(129).parameters[0]
-        param_parts = param_str.split(sep)
-        b_param_id = param_parts[-1]
-        return self.base_insts.get_inst(inst_id).parameters[int(b_param_id)]
-
-    def add_delay_parameter(self, script, section, instruction, **kwargs):
-        param = SCTParameter(_id=-1, _type='scpt-int')
-        self.project.scripts[script].sections[section].instructions[instruction].frame_delay_param = param
-        return param
-
-    def get_var_alias(self, script, var_type, var_id):
-        if var_id not in self.project.scripts[script].variables[var_type]:
-            return 'No Alias'
-        return self.project.scripts[script].variables[var_type][var_id]['alias']
 
     def update_var_usage(self, changes, script, section, instruction, parameter):
         trace = (section, instruction, parameter)
@@ -304,9 +280,37 @@ class SCTProjectFacade:
                 continue
             self.project.scripts[script].variables[var_type][var_key]['usage'].remove(trace)
 
-    def update_inst_field(self, field, value, script, section, instruction, **kwargs):
-        inst = self.project.scripts[script].sections[section].instructions[instruction]
-        inst.__setattr__(field, value)
+    # ------------------------------ #
+    # String Editor Callback Methods #
+    # ------------------------------ #
+
+    def get_string_tree(self, script, headers):
+        string_groups = self.project.scripts[script].string_groups
+        strings = self.project.scripts[script].strings
+        string_tree = []
+        for key, group in string_groups.items():
+            string_tree.append({headers[0]: key, headers[1]: '', 'row_data': None})
+            string_tree.append('group')
+            for string_id in group:
+                str_head, str_body = SAstr_to_head_and_body(strings[string_id])
+                if '\n' in str_body:
+                    str_body = str_body.split('\n')[0]
+                    str_body += '...'
+                string_tree.append({headers[0]: string_id, headers[1]: f'{str_head}: {str_body}', 'row_data': string_id})
+            string_tree.append('ungroup')
+
+        return string_tree
+
+    def get_string_to_edit(self, script, string_id):
+        return SAstr_to_head_and_body(self.project.scripts[script].strings[string_id])
+
+    def edit_strings(self, change_dict):
+        # TODO - implement changing strings based on the change dict
+        pass
+
+    # ----------------------------- #
+    # Param Editor Callback Methods #
+    # ----------------------------- #
 
     def get_section_list(self, script):
         return list(self.project.scripts[script].sections.keys())
@@ -332,11 +336,47 @@ class SCTProjectFacade:
                 f'{self.base_insts.get_inst(cur_sect.instructions[i].instruction_id).name}'
                 f'{sep}{cur_sect.instructions[i].ID}' for i in inst_list]
 
+    # ------------------------------------------ #
+    # Instruction and parameter analysis methods #
+    # ------------------------------------------ #
+
+    def get_parameter(self, script, section, instruction, parameter):
+        instruction = self.project.scripts[script].sections[section].instructions[instruction]
+        if parameter == 'delay':
+            return instruction.frame_delay_param
+        if sep in parameter:
+            param_parts = parameter.split(sep)
+            return instruction.loop_parameters[int(param_parts[0])][int(param_parts[1])]
+        return instruction.parameters[int(parameter)]
+
+    def get_inst_id(self, script, section, instruction, **kwargs):
+        return self.project.scripts[script].sections[section].instructions[instruction].instruction_id
+
+    def get_inst_id_name(self, inst_id):
+        return self.base_insts.get_inst(inst_id).name
+
+    def get_base_parameter(self, inst_id, param_str):
+        if param_str == 'delay':
+            return self.base_insts.get_inst(129).parameters[0]
+        param_parts = param_str.split(sep)
+        b_param_id = param_parts[-1]
+        return self.base_insts.get_inst(inst_id).parameters[int(b_param_id)]
+
+    # ---------------------------------------------- #
+    # Instruction and parameter manipulation methods #
+    # ---------------------------------------------- #
+
     def remove_inst(self, script, section, inst):
         # This will handle inst group children and remove the inst from the grouped representation of insts
         self.change_inst(script, section, inst)
-        self.project.scripts[script].sections[section].instructions.pop(inst)
-        self.project.scripts[script].sections[section].instruction_ids_ungrouped.remove(inst)
+        self.remove_links(script, section, inst)
+        cur_sect = self.project.scripts[script].sections[section]
+        if len(cur_sect.instructions[inst].my_goto_uuids) > 0:
+            for uuid in cur_sect.instructions[inst].my_goto_uuids:
+                cur_sect.instructions.pop(uuid)
+                cur_sect.instruction_ids_ungrouped.remove(uuid)
+        cur_sect.instructions.pop(inst)
+        cur_sect.instruction_ids_ungrouped.remove(inst)
 
     def add_inst(self, script, section, ref_inst_uuid, case=None, direction='below'):
         new_inst = SCTInstruction()
@@ -402,49 +442,6 @@ class SCTProjectFacade:
             goto_inst.parameters[0].link.target_trace[1] = new_inst.ID
 
         return new_inst.ID
-
-    def get_inst_grouped_parents_and_index(self, inst, grouped_region, parents=None) -> (list, int):
-        if parents is None:
-            parents = []
-
-        if inst in grouped_region:
-            return parents, grouped_region.index(inst)
-
-        for i, entry in enumerate(grouped_region):
-            if not isinstance(entry, dict):
-                continue
-
-            for key, value in entry.items():
-                if inst in key:
-                    return parents, i
-
-                out_parents, index = self.get_inst_grouped_parents_and_index(inst, value, parents=parents + [i] + [key])
-                if out_parents is not None:
-                    return out_parents, index
-
-        return None, None
-
-    def get_inst_group(self, script, section, inst_uuid):
-        cur_sect = self.project.scripts[script].sections[section]
-        parents, index = self.get_inst_grouped_parents_and_index(inst_uuid, cur_sect.instruction_ids_grouped)
-
-        cur_level = cur_sect.instruction_ids_grouped
-        for parent in parents:
-            cur_level = cur_level[parent]
-
-        group = cur_level[index]
-
-        if not isinstance(group, dict):
-            return None
-
-        group = [group]
-
-        next_element = cur_level[index + 1]
-        if isinstance(next_element, dict):
-            if inst_uuid in list(next_element.keys())[0]:
-                group.append(next_element)
-
-        return group
 
     def change_inst(self, script, section, inst, new_id=None):
         # not entering a new_id will remove the instruction
@@ -588,6 +585,10 @@ class SCTProjectFacade:
             return
         cur_inst.loop_parameters = []
 
+    # ------------------------------- #
+    # Inst group manipulation methods #
+    # ------------------------------- #
+
     def setup_group_type_inst(self, script, section, inst_id, inst, parent_list, index):
 
         inst_sect = self.project.scripts[script].sections[section]
@@ -702,15 +703,6 @@ class SCTProjectFacade:
 
         cur_sect.instruction_ids_ungrouped = new_ungrouped
 
-    def get_inst_group_bounds(self, cur_group) -> (str, str):
-        first = cur_group[0]
-        if isinstance(first, dict):
-            first = list(first.keys())[0]
-        last = cur_group[-1]
-        if isinstance(last, dict):
-            last = list(last.keys())[0]
-        return first, last
-
     def add_inst_sub_group(self, script, section, inst, parent_list, index, sub_group):
         cur_sect = self.project.scripts[script].sections[section]
         cur_group = cur_sect.instruction_ids_grouped
@@ -764,7 +756,65 @@ class SCTProjectFacade:
         cur_sect.instruction_ids_ungrouped.insert(goto_target_ind, case_goto.ID)
         test_group[sub_group] = [case_goto.ID]
 
-    def _inst_sub_group_present(self, cur_group: Union[list, dict], sub_group: str):
+    # --------------------------- #
+    # Inst group analysis methods #
+    # --------------------------- #
+
+    def get_inst_group(self, script, section, inst_uuid):
+        cur_sect = self.project.scripts[script].sections[section]
+        parents, index = self.get_inst_grouped_parents_and_index(inst_uuid, cur_sect.instruction_ids_grouped)
+
+        cur_level = cur_sect.instruction_ids_grouped
+        for parent in parents:
+            cur_level = cur_level[parent]
+
+        group = cur_level[index]
+
+        if not isinstance(group, dict):
+            return None
+
+        group = [group]
+
+        next_element = cur_level[index + 1]
+        if isinstance(next_element, dict):
+            if inst_uuid in list(next_element.keys())[0]:
+                group.append(next_element)
+
+        return group
+
+    def get_inst_grouped_parents_and_index(self, inst, grouped_region, parents=None) -> (list, int):
+        if parents is None:
+            parents = []
+
+        if inst in grouped_region:
+            return parents, grouped_region.index(inst)
+
+        for i, entry in enumerate(grouped_region):
+            if not isinstance(entry, dict):
+                continue
+
+            for key, value in entry.items():
+                if inst in key:
+                    return parents, i
+
+                out_parents, index = self.get_inst_grouped_parents_and_index(inst, value, parents=parents + [i] + [key])
+                if out_parents is not None:
+                    return out_parents, index
+
+        return None, None
+
+    @staticmethod
+    def get_inst_group_bounds(cur_group) -> (str, str):
+        first = cur_group[0]
+        if isinstance(first, dict):
+            first = list(first.keys())[0]
+        last = cur_group[-1]
+        if isinstance(last, dict):
+            last = list(last.keys())[0]
+        return first, last
+
+    @staticmethod
+    def _inst_sub_group_present(cur_group: Union[list, dict], sub_group: str):
         if 'else' in sub_group:
             for item in cur_group:
                 if not isinstance(item, dict):
@@ -797,3 +847,10 @@ class SCTProjectFacade:
                 uuids = self.extract_inst_uuids_from_group(next_group, uuids)
 
         return uuids
+
+    # ----------------- #
+    # Inst link methods #
+    # ----------------- #
+
+    def remove_inst_links(self, script, section, inst):
+        pass
