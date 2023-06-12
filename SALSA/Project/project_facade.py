@@ -305,7 +305,6 @@ class SCTProjectFacade:
         return SAstr_to_head_and_body(self.project.scripts[script].strings[string_id])
 
     def edit_strings(self, change_dict):
-        # TODO - implement changing strings based on the change dict
         pass
 
     # ----------------------------- #
@@ -831,14 +830,14 @@ class SCTProjectFacade:
             uuids = []
 
         for item in cur_group:
+            item_uuid = self.get_inst_uuid_from_group_entry(cur_group, item)
             if not isinstance(item, dict):
-                uuids.append(item)
                 continue
 
-            item_key = list(item.keys())[0]
-            item_uuid = item_key.split(sep)[0]
             if item_uuid not in uuids:
                 uuids.append(item_uuid)
+
+            item_key = list(item.keys())[0]
             next_group = item[item_key]
             if isinstance(next_group, dict):
                 for value in next_group.values():
@@ -847,6 +846,15 @@ class SCTProjectFacade:
                 uuids = self.extract_inst_uuids_from_group(next_group, uuids)
 
         return uuids
+
+    @staticmethod
+    def get_inst_uuid_from_group_entry(group, index):
+        item = group[index]
+        if not isinstance(item, dict):
+            return item
+        item_key = list(item.keys())[0]
+        item_uuid = item_key.split(sep)[0]
+        return item_uuid
 
     # ----------------- #
     # Inst link methods #
