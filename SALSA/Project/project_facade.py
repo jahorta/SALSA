@@ -148,11 +148,11 @@ class SCTProjectFacade:
                 tree[param]['value'] = inst.parameters[param].linked_string
             elif link_type == 'SCT':
                 tree[param]['type'] = 'Jump'
-                sect = inst.parameters[param].link_value[1].split(f'{sep}')[0]
-                target_inst = self.project.scripts[script].sections[sect].instructions[
-                    inst.parameters[param].link_value[1].split(f'{sep}')[1]]
-                tree[param]['value'] = f'{sect} - {target_inst.ungrouped_position} ' \
-                                       f'{self.base_insts.get_inst(target_inst.instruction_id).name}'
+                tgt_sect = inst.parameters[param].link.target_trace[0]
+                tgt_inst = inst.parameters[param].link.target_trace[1]
+                target_inst = self.project.scripts[script].sections[tgt_sect].instructions[tgt_inst]
+                tgt_name = self.base_insts.get_inst(target_inst.instruction_id).name
+                tree[param]['value'] = f'{tgt_sect} - {target_inst.ungrouped_position} {tgt_name}'
             elif link_type == 'String':
                 tree[param]['type'] = 'String'
                 tree[param]['value'] = inst.parameters[param].linked_string
