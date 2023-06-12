@@ -366,9 +366,9 @@ class SCTProjectFacade:
     # ---------------------------------------------- #
 
     def remove_inst(self, script, section, inst):
+        self.remove_inst_links(script, section, inst)
         # This will handle inst group children and remove the inst from the grouped representation of insts
         self.change_inst(script, section, inst)
-        self.remove_inst_links(script, section, inst)
         cur_sect = self.project.scripts[script].sections[section]
         if len(cur_sect.instructions[inst].my_goto_uuids) > 0:
             for uuid in cur_sect.instructions[inst].my_goto_uuids:
