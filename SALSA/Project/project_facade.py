@@ -863,6 +863,8 @@ class SCTProjectFacade:
     def remove_inst_links(self, script, section, inst):
         cur_sect = self.project.scripts[script].sections[section]
         cur_inst = cur_sect.instructions[inst]
+        if len(cur_inst.links_in) == 0 and len(cur_inst.links_out) == 0:
+            return
         parents, index = self.get_inst_grouped_parents_and_index(inst, cur_sect.instruction_ids_grouped)
         tgt_index = index - 1 if index != 0 else index + 1
         cur_group = cur_sect.instruction_ids_grouped
