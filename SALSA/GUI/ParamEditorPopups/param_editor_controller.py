@@ -279,11 +279,11 @@ class ParamEditController:
             value = self.callbacks['get_inst_identifier'](self.param.link.target_trace)
         elif 'footer' in self.base_param.type:
             self.int_field = FooterEditWidget(self.view.main_frame, name=self.base_param.name)
-            value = self.param.link_result
+            value = self.param.linked_string
         elif 'string' in self.base_param.type:
             self.int_field = ObjectSelectionWidget(self.view.main_frame, name=self.base_param.name,
                                                    selection_list=self.callbacks['get_string_list']())
-            value = self.param.link_result
+            value = self.param.linked_string
         elif 'var' in self.base_param.type:
             var_type = f'{self.base_param.type.split(sep)[-1].capitalize()}Var: '
             self.int_field = VarSelectionWidget(self.view.main_frame, name=f'{self.base_param.name} - {var_type}',
@@ -321,10 +321,8 @@ class ParamEditController:
         elif 'jump' in self.base_param.type:
             inst_id = self.callbacks['get_inst_by_pos'](value)
             self.param.link.target_trace[1] = inst_id
-        elif 'footer' in self.base_param.type:
-            self.param.link_result = value
-        elif 'string' in self.base_param.type:
-            self.param.link_result = value
+        elif 'footer' in self.base_param.type or 'string' in self.base_param.type:
+            self.param.linked_string = value
         else:
             self.param.value = value
 

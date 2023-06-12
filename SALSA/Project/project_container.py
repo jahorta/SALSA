@@ -52,7 +52,7 @@ class SCTParameter:
         self.value = None
         self.formatted_value = ''
         self.raw_bytes = bytearray(b'')
-        self.link_result = ('',)
+        self.linked_string = ('',)
         self.override = None
         self.arithmetic_value = None
 

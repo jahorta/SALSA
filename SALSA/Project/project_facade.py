@@ -145,7 +145,7 @@ class SCTProjectFacade:
             link_type = inst.parameters[param].link_value[0]
             if link_type == 'Footer':
                 tree[param]['type'] = 'Footer Entry'
-                tree[param]['value'] = inst.parameters[param].link_result
+                tree[param]['value'] = inst.parameters[param].linked_string
             elif link_type == 'SCT':
                 tree[param]['type'] = 'Jump'
                 sect = inst.parameters[param].link_value[1].split(f'{sep}')[0]
@@ -155,7 +155,7 @@ class SCTProjectFacade:
                                        f'{self.base_insts.get_inst(target_inst.instruction_id).name}'
             elif link_type == 'String':
                 tree[param]['type'] = 'String'
-                tree[param]['value'] = inst.parameters[param].link_result
+                tree[param]['value'] = inst.parameters[param].linked_string
 
         if base_inst.loop is None:
             return tree
