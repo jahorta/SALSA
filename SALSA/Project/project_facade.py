@@ -472,7 +472,7 @@ class SCTProjectFacade:
                         cur_group = group
                         break
                 if cur_group is None:
-                    print(f'{self.log_key}: Unable to find group to save for later insertion: {change_parts[0]}')
+                    print(f'{self.log_key}: Unable to find group for processing: {change_parts[0]}')
 
                 if 'Move' in change or 'Delete' in change:
                     self.perform_group_change(script, section, inst, cur_group, change)
