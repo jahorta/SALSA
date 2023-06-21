@@ -775,7 +775,7 @@ class SCTProjectFacade:
     # Inst group analysis methods #
     # --------------------------- #
 
-    def get_inst_group(self, script, section, inst_uuid):
+    def get_inst_group(self, script, section, inst_uuid) -> Union[None, dict]:
         cur_sect = self.project.scripts[script].sections[section]
         parents, index = self.get_inst_grouped_parents_and_index(inst_uuid, cur_sect.instruction_ids_grouped)
 
@@ -788,12 +788,10 @@ class SCTProjectFacade:
         if not isinstance(group, dict):
             return None
 
-        group = [group]
-
         next_element = cur_level[index + 1]
         if isinstance(next_element, dict):
             if inst_uuid in list(next_element.keys())[0]:
-                group.append(next_element)
+                group |= next_element
 
         return group
 
