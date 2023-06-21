@@ -325,10 +325,10 @@ class ProjectEditorView(tk.Frame):
 
     def inst_group_handling(self, cur_inst_id, new_id, children):
         # create message to decide how to handle group entries
+        children = [{k: children[k]} for k in children.keys()]
         if cur_inst_id == 0:
             labels = ['Group']
         elif cur_inst_id == 3:
-            children = [{k: children[k]} for k in children.keys()]
             labels = ['Switch Case']
         else:
             return ''
