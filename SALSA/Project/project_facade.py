@@ -6,7 +6,7 @@ from SALSA.Project.description_formatting import format_description
 from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter, SCTInstruction, SCTLink
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
-from SALSA.Common.constants import sep, alt_sep, alt_alt_sep
+from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep
 from SALSA.Scripts.scpt_param_codes import get_scpt_override
 
 
@@ -881,4 +881,42 @@ class SCTProjectFacade:
         for link in cur_inst.links_out:
             tgt_inst_uuid = link.target_trace[1]
             self.project.scripts[script].sections[section].instructions[tgt_inst_uuid].links_in.remove(link)
+
+    def get_next_grouped_uuid(self, script, section, inst):
+        cur_sect = self.project.scripts[script].sections[section]
+        cur_inst = cur_sect.instructions[inst]
+        parents, index = self.get_inst_grouped_parents_and_index(inst, cur_sect.instruction_ids_grouped)
+        cur_group = cur_sect.instruction_ids_grouped
+        for parent in parents:
+            cur_group = cur_group[parent]
+
+        if index + 1 != len(cur_group):
+            # if cur_inst is an if/else/while
+            if cur_inst.instruction_id == 0:
+                new_tgt_inst_uuid = cur_sect.instructions[cur_inst.my_goto_uuids[0]].links_out[0].target_trace[1]
+            # if cur_inst is a switch
+            elif cur_inst.instruction_id == 3:
+                max_goto_tgt_uuid = ''
+                max_goto_tgt_pos = 0
+                for goto in cur_inst.my_goto_uuids:
+                    cur_goto_tgt_uuid = cur_sect.instructions[goto].links_out[0].target_trace[1]
+                    cur_goto_tgt_pos = cur_sect.instruction_ids_ungrouped.index(cur_goto_tgt_uuid)
+                    if cur_goto_tgt_pos > max_goto_tgt_pos:
+                        max_goto_tgt_pos = cur_goto_tgt_pos
+                        max_goto_tgt_uuid = cur_goto_tgt_uuid
+                new_tgt_inst_uuid = max_goto_tgt_uuid
+            else:
+                new_tgt_inst_uuid = cur_sect.instructions[cur_group[index + 1]]
+        else:
+            if len(parents) == 0:
+                return None
+            next_inst = parents[-1]
+            if uuid_sep not in next_inst:
+                if len(parents) == 1:
+                    return None
+                next_inst = parents[-2]
+            next_inst = next_inst.split(sep)[0]
+            new_tgt_inst_uuid = self.get_next_grouped_uuid(script, section, next_inst)
+
+        return new_tgt_inst_uuid
 
