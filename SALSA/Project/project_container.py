@@ -3,7 +3,7 @@ from itertools import count
 from dataclasses import dataclass, field as dc_field
 from typing import List, Union, Dict, Tuple
 
-from SALSA.Common.constants import sep, alt_sep
+from SALSA.Common.constants import sep, uuid_sep
 
 
 @dataclass
@@ -105,7 +105,7 @@ class SCTInstruction:
     loop_parameters: List[Dict[int, SCTParameter]]
 
     def __init__(self):
-        self.ID: str = str(uuid.uuid4()).replace(sep, alt_sep)
+        self.ID: str = str(uuid.uuid4()).replace('-', uuid_sep)
         self.instruction_id = None
         self.absolute_offset = None
         self.skip_refresh = False
