@@ -73,4 +73,7 @@ alt_sep = ':'
 alt_alt_sep = ';'
 
 
+uuid_sep = ','
+
+
 LOCK = '🔒'
