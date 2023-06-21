@@ -662,6 +662,17 @@ class SCTProjectFacade:
             cur_temp_group = cur_temp_group[parent]
 
         if "Delete" in change:
+            for del_inst in reversed(temp_ungrouped):
+                links_removed = False
+                if len(cur_sect.instructions[del_inst].links_in) > 0:
+                    for link in cur_sect.instructions[del_inst].links_in:
+                        if link.origin_trace[1] not in temp_ungrouped:
+                            links_removed = True
+                            self.remove_inst_links(script, section, del_inst)
+                if not links_removed and len(cur_sect.instructions[del_inst].links_out) > 0:
+                    for link in cur_sect.instructions[del_inst].links_out:
+                        if link.target_trace[1] not in temp_ungrouped:
+                            self.remove_inst_links(script, section, del_inst)
             new_insts = {k: cur_sect.instructions[k] for k in cur_sect.instructions if k not in group_insts}
             cur_sect.instructions = new_insts
             new_ungrouped = temp_ungrouped
