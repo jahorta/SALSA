@@ -934,8 +934,9 @@ class SCTProjectFacade:
                 ori_inst.links_out[link_ind].target_trace[1] = new_tgt_inst_uuid
                 cur_sect.instructions[new_tgt_inst_uuid].links_in.append(link)
         for link in cur_inst.links_out:
+            tgt_sect = link.target_trace[0]
             tgt_inst_uuid = link.target_trace[1]
-            self.project.scripts[script].sections[section].instructions[tgt_inst_uuid].links_in.remove(link)
+            self.project.scripts[script].sections[tgt_sect].instructions[tgt_inst_uuid].links_in.remove(link)
 
 
 
