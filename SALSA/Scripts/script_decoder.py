@@ -1374,7 +1374,7 @@ class SCTDecoder:
                             f'{prev_start_sect}{sep}{s}', f'{end_sect}{sep}{e}')
 
                         prev_inst: SCTInstruction = section_insts[inst_start - 1]
-                        if prev_inst.ID != 10:
+                        if prev_inst.instruction_id != 10:
                             continue
 
                         switch_inst.my_goto_uuids.append(prev_inst.ID)
