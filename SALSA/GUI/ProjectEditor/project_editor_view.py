@@ -296,6 +296,8 @@ class ProjectEditorView(tk.Frame):
             # get item id and values associated with the item
             selected_iid = self.param_tree.focus()
             param = self.param_tree.row_data[selected_iid]
+            if param is None:
+                return
         self.callbacks['edit_param'](param)
 
     def sort_visible_headers(self, tree):
