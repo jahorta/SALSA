@@ -308,6 +308,7 @@ class ProjectEditorController:
         self.trees['instruction'].focus(sel_iid)
         inst_uuid = self.trees['instruction'].row_data[sel_iid]
         self.current['instruction'] = inst_uuid
+        is_removable = self.project.get_inst_is_removable(**self.current)
         inst_label = self.trees['instruction'].item(sel_iid)['values'][0]
         group_type = ''
         if '(' in inst_label and ')' in inst_label:
@@ -331,7 +332,11 @@ class ProjectEditorController:
                 next_sel_iid = self.trees['instruction'].next(sel_iid)
                 if next_sel_iid != '' and 'else' not in self.trees['instruction'].item(next_sel_iid)['values'][0]:
                     m.add_command(label='Add Instruction Below', command=lambda: self.rcm_add_inst('below'))
+
             m.add_command(label='Remove Instruction', command=self.rcm_remove_inst)
+            if not is_removable:
+                m.entryconfig('Remove Instruction', state='disabled')
+
             m.add_command(label='Change Instruction', command=self.rcm_change_inst)
         else:
             m.add_command(label='Delete Case', command=self.rcm_remove_inst)
