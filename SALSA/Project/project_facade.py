@@ -863,11 +863,10 @@ class SCTProjectFacade:
         return uuids
 
     @staticmethod
-    def get_inst_uuid_from_group_entry(group, index):
-        item = group[index]
-        if not isinstance(item, dict):
-            return item
-        item_key = list(item.keys())[0]
+    def get_inst_uuid_from_group_entry(entry):
+        if not isinstance(entry, dict):
+            return entry
+        item_key = list(entry.keys())[0]
         item_uuid = item_key.split(sep)[0]
         return item_uuid
 
