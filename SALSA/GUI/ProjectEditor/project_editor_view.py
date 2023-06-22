@@ -248,21 +248,24 @@ class ProjectEditorView(tk.Frame):
         link_frame = tk.LabelFrame(inst_frame, text='Links')
         link_frame.grid(row=4, column=0, sticky='NSEW')
         link_frame.columnconfigure(0, weight=1)
-
-        link_out_label = tk.Label(link_frame, text='Outgoing Links')
-        link_out_label.grid(row=0, column=0, sticky=tk.W)
-        self.link_out = w.ScrollLabelFrame(link_frame, has_label=False, size={'width': 100, 'height': 50})
-        self.link_out.grid(row=1, column=0, sticky=tk.W+tk.E)
-        self.link_out.columnconfigure(0, weight=1)
-
-        link_sep = ttk.Separator(link_frame, orient='horizontal')
-        link_sep.grid(row=2, column=0, sticky=tk.W+tk.E)
+        link_frame.columnconfigure(2, weight=1)
 
         link_in_label = tk.Label(link_frame, text='Incoming Links')
-        link_in_label.grid(row=3, column=0, sticky=tk.W)
+        link_in_label.grid(row=0, column=0, sticky=tk.W)
         self.link_in = w.ScrollLabelFrame(link_frame, has_label=False, size={'width': 100, 'height': 50})
-        self.link_in.grid(row=4, column=0, sticky=tk.W+tk.E)
+        self.link_in.grid(row=1, column=0, sticky=tk.W+tk.E)
         self.link_in.columnconfigure(0, weight=1)
+        self.link_in.rowconfigure(0, weight=1)
+
+        link_sep = ttk.Separator(link_frame, orient='vertical')
+        link_sep.grid(row=0, column=1, rowspan=2, sticky=tk.N+tk.S)
+
+        link_out_label = tk.Label(link_frame, text='Outgoing Links')
+        link_out_label.grid(row=0, column=2, sticky=tk.W)
+        self.link_out = w.ScrollLabelFrame(link_frame, has_label=False, size={'width': 100, 'height': 50})
+        self.link_out.grid(row=1, column=2, sticky=tk.W+tk.E)
+        self.link_out.columnconfigure(0, weight=1)
+        self.link_out.rowconfigure(0, weight=1)
 
     def on_save_button(self):
         self.callbacks['save_project']()
