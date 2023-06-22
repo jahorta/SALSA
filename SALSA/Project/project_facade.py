@@ -452,7 +452,7 @@ class SCTProjectFacade:
         if cur_inst.instruction_id in self.base_insts.group_inst_list:
             inst_group = self.get_inst_group(script, section, inst)
             if cur_inst.instruction_id == 3:
-                inst_group = inst_group[0][f'{inst}{sep}switch']
+                inst_group = inst_group[f'{inst}{sep}switch']
             new_id = None if new_id is None else int(new_id)
             change_type = self.callbacks['confirm_remove_inst_group'](new_id=new_id, children=inst_group)
             if 'cancel' in change_type:
