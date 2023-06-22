@@ -367,7 +367,8 @@ class SCTProjectFacade:
 
     def remove_inst(self, script, section, inst):
         self.remove_inst_links(script, section, inst)
-        # This will handle inst group children and remove the inst from the grouped representation of insts
+        # This will handle inst group children, remove any inst links in the group
+        # and remove the inst from the grouped representation of insts
         self.change_inst(script, section, inst)
         cur_sect = self.project.scripts[script].sections[section]
         cur_sect.instructions.pop(inst)
