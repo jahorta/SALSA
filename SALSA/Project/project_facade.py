@@ -660,7 +660,7 @@ class SCTProjectFacade:
             cur_temp_group = cur_temp_group[parent]
 
         if "Delete" in change:
-            for del_inst in reversed(temp_ungrouped):
+            for del_inst in reversed(group_insts):
                 links_removed = False
                 if len(cur_sect.instructions[del_inst].links_in) > 0:
                     for link in cur_sect.instructions[del_inst].links_in:
