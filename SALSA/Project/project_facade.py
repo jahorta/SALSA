@@ -841,7 +841,11 @@ class SCTProjectFacade:
             uuids = []
 
         for item in cur_group:
-            item_uuid = self.get_inst_uuid_from_group_entry(cur_group, item)
+            item_uuid = self.get_inst_uuid_from_group_entry(item)
+            if isinstance(item_uuid, str):
+                if item_uuid not in uuids:
+                    uuids.append(item_uuid)
+
             if not isinstance(item, dict):
                 continue
 
