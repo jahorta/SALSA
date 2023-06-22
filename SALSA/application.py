@@ -31,6 +31,7 @@ class Application(tk.Tk):
         # Setup window parameters
         self.title(self.title_text)
         self.resizable(width=True, height=True)
+        self.protocol('WM_DELETE_WINDOW', self.on_quit)
 
         # Setup project details
         self.project = SCTProjectFacade(self.base_insts)
@@ -175,13 +176,13 @@ class Application(tk.Tk):
             self.gui.stop_status_popup()
 
     def on_quit(self):
-        if not self.project_edit_controller.has_changes:
-            return
-
-        # dialog to save changes or not
-        save = tk.messagebox.askyesno(title='Unsaved Changes', message='There are unsaved changes remaining.\nWould you like to save them?')
-        if save:
-            self.on_save_project()
+        if self.project_edit_controller.has_changes:
+            # dialog to save changes or not
+            save = tk.messagebox.askyesno(title='Unsaved Changes',
+                                          message='There are unsaved changes remaining.\nWould you like to save them?')
+            if save:
+                self.on_save_project()
+        self.destroy()
 
     def on_export_scts(self, directory, scripts, options):
         compress = options['compress_aklz']
