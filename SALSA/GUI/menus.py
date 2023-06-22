@@ -30,7 +30,7 @@ class MainMenu(tk.Menu):
         self.add_cascade(label='File', menu=self.file_menu)
 
         self.project_menu = tk.Menu(self, tearoff=False)
-        self.project_menu.add_command(label='Add SCT file(s)', command=callbacks['prj->add_script'])
+        self.project_menu.add_command(label='Import SCT file(s)', command=callbacks['prj->add_script'])
         self.project_menu.add_command(label='Export SCT file(s)', command=callbacks['prj->export_script'])
         self.project_menu.add_separator()
         self.project_menu.add_command(label='Variable editor', command=callbacks['prj->variable'])
@@ -54,14 +54,14 @@ class MainMenu(tk.Menu):
     def disable_script_commands(self):
         self.project_menu.entryconfig('Variable editor', state='disabled')
         self.project_menu.entryconfig('String editor', state='disabled')
-        self.project_menu.entryconfig('Add SCT file(s)', state='disabled')
+        self.project_menu.entryconfig('Import SCT file(s)', state='disabled')
         self.project_menu.entryconfig('Export SCT file(s)', state='disabled')
         self.file_menu.entryconfig('Save Project', state='disabled')
 
     def enable_script_commands(self):
         self.project_menu.entryconfig('Variable editor', state='normal')
         self.project_menu.entryconfig('String editor', state='normal')
-        self.project_menu.entryconfig('Add SCT file(s)', state='normal')
+        self.project_menu.entryconfig('Import SCT file(s)', state='normal')
         self.project_menu.entryconfig('Export SCT file(s)', state='normal')
         self.file_menu.entryconfig('Save Project', state='normal')
 
