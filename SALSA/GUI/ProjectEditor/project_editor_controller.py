@@ -37,7 +37,7 @@ class ProjectEditorController:
             'update_field': self.update_field,
             'edit_param': self.on_edit_parameter,
             'show_header_selection_menu': self.show_header_selection_menu,
-            'show_inst_menu': self.show_instruction_menu,
+            'show_inst_menu': self.show_instruction_right_click_menu,
             'save_project': self.save_project
         }
         self.view.add_and_bind_callbacks(view_callbacks)
@@ -303,7 +303,7 @@ class ProjectEditorController:
 
     # # Instruction Options # #
 
-    def show_instruction_menu(self, e):
+    def show_instruction_right_click_menu(self, e):
         if e.widget.identify('region', e.x, e.y) == 'heading':
             return
         if self.current['section'] is None:
