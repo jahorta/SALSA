@@ -252,12 +252,6 @@ class ProjectEditorController:
         for child in self.view.link_in.scroll_frame.winfo_children():
             child.destroy()
 
-    def on_script_display_change(self, mode):
-        pass
-
-    def on_instruction_display_change(self, scriptID, mode):
-        pass
-
     def on_set_inst_start(self, start, newID):
         pass
 
