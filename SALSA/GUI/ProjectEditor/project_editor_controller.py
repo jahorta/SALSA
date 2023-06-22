@@ -315,13 +315,13 @@ class ProjectEditorController:
             group_type = inst_label.split('(')[1].split(')')[0]
         m = tk.Menu(self.view, tearoff=0)
 
-        # if rightclicked row is a switch or case, add option for "Add Switch Case"
-        if group_type in ('case', 'switch'):
-            m.add_command(label='Add Switch Case', command=self.rcm_add_switch_case)
-
         # if rightclicked row is group, add option for "Add Instruction in group"
         if group_type in ('if', 'else', 'while', 'case'):
             m.add_command(label='Add Instruction Inside Group', command=lambda: self.rcm_add_inst('inside'))
+
+        # if rightclicked row is a switch or case, add option for "Add Switch Case"
+        if group_type in ('case', 'switch'):
+            m.add_command(label='Add Switch Case', command=self.rcm_add_switch_case)
 
         # if rightclicked row is a case, add option for delete case
         if group_type != 'case':
