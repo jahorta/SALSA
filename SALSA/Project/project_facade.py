@@ -142,11 +142,11 @@ class SCTProjectFacade:
         for param in base_inst.params_before:
             if inst.parameters[param].link is None:
                 continue
-            link_type = inst.parameters[param].link_value[0]
+            link_type = inst.parameters[param].link.type
             if link_type == 'Footer':
                 tree[param]['type'] = 'Footer Entry'
                 tree[param]['value'] = inst.parameters[param].linked_string
-            elif link_type == 'SCT':
+            elif link_type in ('Jump', 'Subscript'):
                 tree[param]['type'] = 'Jump'
                 tgt_sect = inst.parameters[param].link.target_trace[0]
                 tgt_inst = inst.parameters[param].link.target_trace[1]
