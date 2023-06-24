@@ -361,20 +361,19 @@ class SCTProjectFacade:
         b_param_id = param_parts[-1]
         return self.base_insts.get_inst(inst_id).parameters[int(b_param_id)]
 
-    def get_inst_is_removable(self, script, section, inst, **kwargs):
+    def get_inst_is_removable(self, script, section, instruction, **kwargs):
         cur_sect = self.project.scripts[script].sections[section]
-        inst_ind = cur_sect.instruction_ids_ungrouped.index(inst)
+        inst_ind = cur_sect.instruction_ids_ungrouped.index(instruction)
 
         # Checks for initial label and return of a function
         if inst_ind == 0 or inst_ind + 1 == len(cur_sect.instruction_ids_ungrouped):
             return False
 
         # Checks if the instruction is a goto with a master
-        if len(cur_sect.instructions[inst].my_master_uuids) > 0:
+        if len(cur_sect.instructions[instruction].my_master_uuids) > 0:
             return False
 
         return True
-
 
     # ---------------------------------------------- #
     # Instruction and parameter manipulation methods #
