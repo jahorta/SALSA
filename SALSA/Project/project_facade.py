@@ -21,6 +21,11 @@ class SCTProjectFacade:
         if self.log_key not in settings.keys():
             settings[self.log_key] = {}
 
+        self.desc_callbacks = {
+            'get_str': self.get_string_to_edit
+        }
+        self.cur_script = None
+
     def load_project(self, prj: SCTProject):
         new_project = SCTProject()
         if prj.version == new_project.version:
@@ -54,10 +59,12 @@ class SCTProjectFacade:
             scripts = self.project.scripts
             tree_list = self._create_tree(group=scripts, key_list=list(scripts.keys()), headers=headers)
         elif section is None:
+            self.cur_script = script
             section_list = self.project.scripts[script].get_sect_list(style)
             sections = self.project.scripts[script].sections
             tree_list = self._create_tree(group=sections, key_list=section_list, headers=headers)
         else:
+            self.cur_script = script
             self._refresh_inst_positions(script=script, section=section)
             inst_list = self.project.scripts[script].sections[section].get_inst_list(style)
             instructions = self.project.scripts[script].sections[section].instructions
@@ -190,7 +197,7 @@ class SCTProjectFacade:
         instruction_details['base_parameters'] = instruction_details['parameters']
         for key, value in instruction.__dict__.items():
             instruction_details[key] = value
-        instruction_details['description'] = format_description(inst=instruction, base_inst=base_inst)
+        instruction_details['description'] = format_description(inst=instruction, base_inst=base_inst, callbacks=self.desc_callbacks)
         return instruction_details
 
     def add_script_to_project(self, script_name, script):
@@ -301,7 +308,8 @@ class SCTProjectFacade:
 
         return string_tree
 
-    def get_string_to_edit(self, script, string_id):
+    def get_string_to_edit(self, string_id, script=None):
+        script = self.cur_script if script is None else script
         return SAstr_to_head_and_body(self.project.scripts[script].strings[string_id])
 
     def edit_strings(self, change_dict):
