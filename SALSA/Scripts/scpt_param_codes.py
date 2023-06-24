@@ -1,4 +1,4 @@
-from Common.constants import sep
+from SALSA.Common.constants import sep
 
 SCPT_CLASSES = [
     'compare',

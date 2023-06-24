@@ -3,8 +3,8 @@ from typing import List, Dict
 
 from SALSA.Analysis.script_performer import ScriptPerformer
 from SALSA.Common.constants import FieldTypes as FT, KnownMemAddresses as KA
-from SALSA.BaseInstructions.instruction_class import Instruct
-from Project.project_container import SCTScript
+from SALSA.BaseInstructions.bi_container import BaseInst
+from SALSA.Project.project_container import SCTScript
 
 
 class SCTAnalyzer:
@@ -22,7 +22,7 @@ class SCTAnalyzer:
         self.verbose_out = verbose
         self.dir = loc
         self.script_list: List[SCTScript] = []
-        self.instruction_list: Dict[str, Instruct] = {}
+        self.instruction_list: Dict[str, BaseInst] = {}
         self.export_type = ''
         self.export_args = {}
 

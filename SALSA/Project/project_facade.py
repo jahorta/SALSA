@@ -1,7 +1,7 @@
 import copy
 from typing import Union, Tuple
 
-from Common.script_string_utils import SAstr_to_head_and_body
+from SALSA.Common.script_string_utils import SAstr_to_head_and_body
 from SALSA.Project.description_formatting import format_description
 from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter, SCTInstruction, SCTLink
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade

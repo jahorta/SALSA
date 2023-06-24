@@ -2,7 +2,7 @@ import copy
 import tkinter as tk
 from tkinter import messagebox as msg
 
-from GUI.ParamEditorPopups.param_editor_controller import ParamEditController
+from SALSA.GUI.ParamEditorPopups.param_editor_controller import ParamEditController
 from SALSA.GUI.InstructionEditor.instruction_editor_view import InstructionEditorView
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.constants import sep, LOCK

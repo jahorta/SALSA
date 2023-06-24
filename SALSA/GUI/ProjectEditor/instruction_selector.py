@@ -3,7 +3,7 @@ import tkinter as tk
 
 
 import SALSA.GUI.widgets as w
-from Common.setting_class import settings
+from SALSA.Common.setting_class import settings
 
 
 class SearchWidget(w.ValidatedMixin, tk.Entry):

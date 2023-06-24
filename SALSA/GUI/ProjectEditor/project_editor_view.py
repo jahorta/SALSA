@@ -5,7 +5,7 @@ import json
 from typing import List, Dict
 
 import SALSA.GUI.widgets as w
-from Common.constants import sep, alt_sep, alt_alt_sep
+from SALSA.Common.constants import sep, alt_sep, alt_alt_sep
 from SALSA.Common.setting_class import settings
 
 default_headers = {
