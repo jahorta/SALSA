@@ -379,8 +379,8 @@ class SCTProjectFacade:
     # Instruction and parameter manipulation methods #
     # ---------------------------------------------- #
 
-    def remove_inst(self, script, section, inst):
-        self.remove_inst_links(script, section, inst)
+    def remove_inst(self, script, section, inst, custom_link_tgt=None):
+        self.remove_inst_links(script, section, inst, custom_tgt=custom_link_tgt)
         # This will handle inst group children, remove any inst links in the group
         # and remove the inst from the grouped representation of insts
         self.change_inst(script, section, inst)
