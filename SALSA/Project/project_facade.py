@@ -580,10 +580,10 @@ class SCTProjectFacade:
                 if 'If' in change:
                     pass
                 elif 'Else' in change:
-                    prev_tgt_uuid = cur_inst.parameters[0].link.target_trace[2]
+                    prev_tgt_uuid = cur_inst.parameters[0].link.target_trace[1]
                     prev_tgt_inst = cur_section.instructions[prev_tgt_uuid]
                     prev_tgt_inst.links_in.remove(cur_inst.parameters[0].link)
-                    cur_inst.parameters[0].link.target_trace[2] = inst_list[0]
+                    cur_inst.parameters[0].link.target_trace[1] = inst_list[0]
                     new_tgt_inst = cur_section.instructions[inst_list[0]]
                     new_tgt_inst.links_in.append(cur_inst.parameters[0].link)
                 else:
