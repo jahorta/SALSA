@@ -816,17 +816,23 @@ class SCTProjectFacade:
         if inst in grouped_region:
             return parents, grouped_region.index(inst)
 
-        for i, entry in enumerate(grouped_region):
-            if not isinstance(entry, dict):
-                continue
-
-            for key, value in entry.items():
-                if inst in key:
-                    return parents, i
-
-                out_parents, index = self.get_inst_grouped_parents_and_index(inst, value, parents=parents + [i] + [key])
+        if isinstance(grouped_region, dict):
+            for key, value in grouped_region.items():
+                out_parents, index = self.get_inst_grouped_parents_and_index(inst, value, parents=parents + [key])
                 if out_parents is not None:
                     return out_parents, index
+        else:
+            for i, entry in enumerate(grouped_region):
+                if not isinstance(entry, dict):
+                    continue
+
+                for key, value in entry.items():
+                    if inst in key:
+                        return parents, i
+
+                    out_parents, index = self.get_inst_grouped_parents_and_index(inst, value, parents=parents + [i] + [key])
+                    if out_parents is not None:
+                        return out_parents, index
 
         return None, None
 
