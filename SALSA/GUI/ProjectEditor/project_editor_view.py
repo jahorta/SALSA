@@ -18,7 +18,7 @@ default_headers = {
 default_header_order = {
     'script': ['name', 'section_num'],
     'section': ['name', 'start_offset'],
-    'instruction': ['ungrouped_position', 'name', 'condition', 'instruction_id', 'frame_delay_param', 'skip_refresh', 'synopsis', 'absolute_offset', 'relative_offset'],
+    'instruction': ['ungrouped_position', 'name', 'condition', 'instruction_id', 'frame_delay_param', 'skip_refresh', 'synopsis', 'absolute_offset'],
     'parameter': ['name', 'section_num'],
 }
 
