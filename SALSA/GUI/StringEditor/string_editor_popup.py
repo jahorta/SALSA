@@ -181,7 +181,7 @@ class StringPopup(tk.Toplevel):
     def edit_string(self, name, string_id):
         self.cur_string_id = string_id
 
-        head, body = self.callbacks['get_string_to_edit'](self.cur_script, string_id)
+        head, body = self.callbacks['get_string_to_edit'](string_id, self.cur_script)
         if string_id not in self.string_defaults:
             self.string_defaults[string_id] = {}
         self.string_defaults[string_id]['head'] = head
