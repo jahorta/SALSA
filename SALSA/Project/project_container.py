@@ -146,6 +146,11 @@ class SCTInstruction:
         return self.links_out if len(self.links_out) > 0 else None
 
     def generate_condition(self):
+        # Only generate conditions for ifs and switches
+        if self.instruction_id not in (0, 3):
+            self.condition = ''
+            return
+
         # if the instruction is a switch, just put the value of the choice address
         if self.instruction_id == 3:
             if self.parameters[0].value is None:
@@ -157,6 +162,7 @@ class SCTInstruction:
         # if the instruction is a jmpif, work out a shorthand of the condition
         if self.parameters[0].value is None:
             self.condition = '???'
+            return
         condition, cond_type = self._get_subconditions(self.parameters[0].value)
         self.condition = condition
 
