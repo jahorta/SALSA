@@ -505,6 +505,8 @@ class SCTProjectFacade:
             for i in reversed(finished_change_indexes):
                 changes.pop(i)
 
+            self.remove_inst_links(script, section, inst, custom_tgt=custom_link_tgt)
+
         parent_list, index = self.get_inst_grouped_parents_and_index(inst, cur_section.instruction_ids_grouped)
 
         cur_group = cur_section.instruction_ids_grouped
