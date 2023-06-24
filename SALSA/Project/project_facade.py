@@ -683,8 +683,7 @@ class SCTProjectFacade:
         # Remove instructions from current place in grouped in new temp grouped
         parents, grouped_ind = self.get_inst_grouped_parents_and_index(inst, cur_sect.instruction_ids_grouped)
 
-        temp_grouped = cur_sect.instruction_ids_grouped
-        cur_temp_group = temp_grouped
+        cur_temp_group = cur_sect.instruction_ids_grouped
         for parent in parents:
             cur_temp_group = cur_temp_group[parent]
 
