@@ -836,14 +836,9 @@ class SCTProjectFacade:
 
         return None, None
 
-    @staticmethod
-    def get_inst_group_bounds(cur_group) -> (str, str):
-        first = cur_group[0]
-        if isinstance(first, dict):
-            first = list(first.keys())[0]
-        last = cur_group[-1]
-        if isinstance(last, dict):
-            last = list(last.keys())[0]
+    def get_inst_group_bounds(self, cur_group) -> (str, str):
+        first = self.get_inst_uuid_from_group_entry(cur_group[0])
+        last = self.get_inst_uuid_from_group_entry(cur_group[-1], last=True)
         return first, last
 
     @staticmethod
