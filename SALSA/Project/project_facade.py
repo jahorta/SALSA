@@ -386,7 +386,9 @@ class SCTProjectFacade:
         self.change_inst(script, section, inst)
         cur_sect = self.project.scripts[script].sections[section]
         cur_sect.instructions.pop(inst)
-        cur_sect.instruction_ids_ungrouped.remove(inst)
+        if inst in cur_sect.instruction_ids_ungrouped:
+            cur_sect.instruction_ids_ungrouped.remove(inst)
+            self._refresh_inst_positions(script, section)
 
     def add_inst(self, script, section, ref_inst_uuid, case=None, direction='below'):
         new_inst = SCTInstruction()
