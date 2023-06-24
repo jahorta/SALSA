@@ -709,23 +709,12 @@ class SCTProjectFacade:
 
         elif 'Move' in change:
             grouped_insert_loc = grouped_ind
-            ungroup_ref_inst_uuid = inst
 
             if 'Below' in change:
-                temp_cur_group = cur_temp_group[grouped_ind]
-                temp_cur_group = temp_cur_group[list(temp_cur_group.keys())[0]]
-
-                # If it is a switch, there will be one more dict level for cases, get the last case
-                if isinstance(temp_cur_group, dict):
-                    temp_cur_group = temp_cur_group[list(temp_cur_group.keys())[-1]]
-
-                ungroup_ref_inst_uuid = temp_cur_group[-1]
-
-            ungrouped_insert_ind = temp_ungrouped.index(ungroup_ref_inst_uuid)
-
-            if 'Below' in change:
-                ungrouped_insert_ind += 1
                 grouped_insert_loc += 1
+
+            ungroup_ref_inst_uuid = self.get_inst_uuid_from_group_entry(cur_temp_group[grouped_insert_loc])
+            ungrouped_insert_ind = temp_ungrouped.index(ungroup_ref_inst_uuid)
 
             ungrouped_before = temp_ungrouped[:ungrouped_insert_ind]
             ungrouped_after = temp_ungrouped[ungrouped_insert_ind:]
