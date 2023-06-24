@@ -6,9 +6,9 @@ from SALSA.Common.byte_array_utils import getTypeFromString, toInt, asStringOfTy
 from SALSA.Project.project_container import SCTInstruction, SCTParameter
 
 
-def format_description(inst: SCTInstruction, base_inst: BaseInst):
+def format_description(inst: SCTInstruction, base_inst: BaseInst, callbacks):
     desc = description_insert_param_values(inst, base_inst)
-    return resolveDescriptionFuncs(desc)
+    return resolveDescriptionFuncs(desc, inst, base_inst, callbacks)
 
 
 def description_insert_param_values(inst: SCTInstruction, base_inst: BaseInst):
@@ -38,13 +38,13 @@ def get_loop_desc(inst, base_inst):
     return result
 
 
-def resolveDescriptionFuncs(desc):
+def resolveDescriptionFuncs(desc, inst, base_inst, callbacks):
     new_desc = ''
     char_ind = 0
     while char_ind < len(desc):
         next_char = desc[char_ind]
         if next_char == '*':
-            result, char_ind = parse_desc_func(desc, char_ind)
+            result, char_ind = parse_desc_func(desc, char_ind, inst, base_inst, callbacks)
             if result is not None:
                 next_char = result
         new_desc += next_char
@@ -53,7 +53,7 @@ def resolveDescriptionFuncs(desc):
     return new_desc
 
 
-def parse_desc_func(desc, char_ind):
+def parse_desc_func(desc, char_ind, inst, base_inst, callbacks):
     cur_pos = char_ind
     cur_pos += 1
     command = desc[cur_pos: cur_pos + 3]
@@ -78,11 +78,11 @@ def parse_desc_func(desc, char_ind):
             params.append(cur_param)
             if not len(params) in desc_code_param_nums[command]:
                 return None, char_ind
-            result = desc_code_funcs[command](*params)
+            result = desc_code_funcs[command](*params, inst=inst, base_inst=base_inst, callbacks=callbacks)
             cur_pos += 2
             break
         elif next_char == '*':
-            result, cur_pos = parse_desc_func(desc, cur_pos)
+            result, cur_pos = parse_desc_func(desc, cur_pos, inst, base_inst, callbacks)
             if result is None:
                 return result, cur_pos
             cur_param = result
@@ -103,9 +103,7 @@ def check_params_are_numeric(paramlist: List[str]):
     for param in paramlist:
         if not param.lstrip('-').isnumeric():
             numeric = False
-            result += f'(not numeric){param},'
-        else:
-            result += f'{param}'
+        result += f'{param},'
 
     if numeric:
         return None
@@ -116,7 +114,7 @@ def check_params_are_numeric(paramlist: List[str]):
 # Arithmetic functions #
 # -------------------- #
 
-def add_desc_params(param1: str, param2: str):
+def add_desc_params(param1: str, param2: str, **kwargs):
     result = check_params_are_numeric([param1, param2])
     if result is not None:
         return result
@@ -127,7 +125,7 @@ def add_desc_params(param1: str, param2: str):
     return result
 
 
-def subtract_desc_params(param1: str, param2: str):
+def subtract_desc_params(param1: str, param2: str, **kwargs):
     result = check_params_are_numeric([param1, param2])
     if result is not None:
         return result
@@ -138,7 +136,7 @@ def subtract_desc_params(param1: str, param2: str):
     return result
 
 
-def multiply_desc_params(param1: str, param2: str):
+def multiply_desc_params(param1: str, param2: str, **kwargs):
     result = check_params_are_numeric([param1, param2])
     if result is not None:
         return result
@@ -153,7 +151,7 @@ def multiply_desc_params(param1: str, param2: str):
 # Hex conversion function #
 # ----------------------- #
 
-def hex_desc_params(param1: str, form='>'):
+def hex_desc_params(param1: str, form='>', **kwargs):
     result = check_params_are_numeric([param1])
     if result is not None:
         return result
@@ -184,7 +182,7 @@ var_sizes = {
 }
 
 
-def replace_vars_with_locs(param1: str):
+def replace_vars_with_locs(param1: str, **kwargs):
     var_pieces = param1.split('Var: ')
     if len(var_pieces) == 1:
         return param1
@@ -216,6 +214,19 @@ def replace_vars_with_locs(param1: str):
             result += f' {var_loc_str}'
 
 
+# ----------------------- #
+# String display function #
+# ----------------------- #
+
+def get_parameter_string(param_name, inst: SCTInstruction, base_inst: BaseInst, callbacks):
+    string_id = None
+    for param in inst.parameters.values():
+        if base_inst.parameters[param.ID].name == param_name:
+            string_id = param.linked_string
+    if string_id is None:
+        return f'No string found for parameter {param_name}'
+    return '\n'.join(callbacks['get_str'](string_id))
+
 # ------------------------------------------------------------------ #
 # Dicts for description code functions and allowed parameter numbers #
 # ------------------------------------------------------------------ #
@@ -225,7 +236,8 @@ desc_code_funcs = {
     'sub': subtract_desc_params,
     'mul': multiply_desc_params,
     'hex': hex_desc_params,
-    'loc': replace_vars_with_locs
+    'loc': replace_vars_with_locs,
+    'str': get_parameter_string
 }
 
 desc_code_param_nums = {
@@ -233,5 +245,6 @@ desc_code_param_nums = {
     'sub': [2],
     'mul': [2],
     'hex': [1, 2],
-    'loc': [1]
+    'loc': [1],
+    'str': [1]
 }
