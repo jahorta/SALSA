@@ -923,8 +923,9 @@ class SCTProjectFacade:
             else:
                 new_tgt_inst_uuid = self.get_inst_uuid_from_group_entry(cur_group[index + 1])
         else:
+            # if no parents, and targets last inst, then it is probably the return inst which is valid
             if len(parents) == 0:
-                return None
+                return cur_group[-1]
             next_inst = parents[-1]
             if uuid_sep not in next_inst:
                 if len(parents) == 1:
