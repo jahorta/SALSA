@@ -600,6 +600,8 @@ class SCTProjectFacade:
                     new_tgt_inst = cur_section.instructions[inst_list[0]]
                     new_tgt_inst.links_in.append(cur_inst.parameters[0].link)
 
+        self._refresh_inst_positions(script, section)
+
         return True
 
     def remove_inst_parameters(self, script, section, inst, loop=True):
