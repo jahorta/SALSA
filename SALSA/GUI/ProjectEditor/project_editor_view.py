@@ -210,7 +210,7 @@ class ProjectEditorView(tk.Frame):
         self.delay_label.grid(row=0, column=0, sticky='NSEW')
         self.delay_label.bind('<Double-1>', lambda e: self.on_param_double_click('delay', e))
 
-        self.inst_desc_frame = w.ScrollLabelFrame(inst_frame, text='Description', size={'width': 100, 'height': 100})
+        self.inst_desc_frame = w.ScrollLabelFrame(inst_frame, text='Description', size={'width': 100, 'height': 200})
         self.inst_desc_frame.grid(row=2, column=0, sticky='NSEW')
         self.inst_desc_frame.columnconfigure(0, weight=1)
         self.inst_desc_frame.rowconfigure(0, weight=1)
@@ -252,7 +252,7 @@ class ProjectEditorView(tk.Frame):
 
         link_in_label = tk.Label(link_frame, text='Incoming Links')
         link_in_label.grid(row=0, column=0, sticky=tk.W)
-        self.link_in = w.ScrollLabelFrame(link_frame, has_label=False, size={'width': 100, 'height': 50})
+        self.link_in = w.ScrollLabelFrame(link_frame, has_label=False, size={'width': 100, 'height': 100})
         self.link_in.grid(row=1, column=0, sticky=tk.W+tk.E)
         self.link_in.columnconfigure(0, weight=1)
         self.link_in.rowconfigure(0, weight=1)
@@ -262,7 +262,7 @@ class ProjectEditorView(tk.Frame):
 
         link_out_label = tk.Label(link_frame, text='Outgoing Links')
         link_out_label.grid(row=0, column=2, sticky=tk.W)
-        self.link_out = w.ScrollLabelFrame(link_frame, has_label=False, size={'width': 100, 'height': 50})
+        self.link_out = w.ScrollLabelFrame(link_frame, has_label=False, size={'width': 100, 'height': 100})
         self.link_out.grid(row=1, column=2, sticky=tk.W+tk.E)
         self.link_out.columnconfigure(0, weight=1)
         self.link_out.rowconfigure(0, weight=1)
