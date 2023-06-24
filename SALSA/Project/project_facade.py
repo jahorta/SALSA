@@ -509,6 +509,9 @@ class SCTProjectFacade:
 
         parent_list, index = self.get_inst_grouped_parents_and_index(inst, cur_section.instruction_ids_grouped)
 
+        if index is None:
+            return
+
         cur_group = cur_section.instruction_ids_grouped
         for parent in parent_list:
             cur_group = cur_group[parent]
