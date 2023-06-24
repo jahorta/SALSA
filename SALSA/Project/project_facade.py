@@ -775,6 +775,7 @@ class SCTProjectFacade:
                     goto_target_uuid = cur_tgt_uuid
 
         case_goto = SCTInstruction()
+        cur_sect.instructions[case_goto.ID] = case_goto
         case_goto.set_inst_id(10)
         case_goto.parameters[0] = SCTParameter(0, 'int|jump')
         case_goto.parameters[0].link = SCTLink('Jump', origin=-1, origin_trace=[section, case_goto.ID, 0],
