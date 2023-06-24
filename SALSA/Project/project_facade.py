@@ -627,9 +627,9 @@ class SCTProjectFacade:
             target_inst_UUID_index = inst_sect.instruction_ids_ungrouped.index(inst_id) + 1
             target_inst_UUID = inst_sect.instruction_ids_ungrouped[target_inst_UUID_index]
 
-            inst_link = SCTLink(origin=-1, origin_trace=[script, section, inst.ID, 0], type='Jump',
-                                target=-1, target_trace=[script, section, target_inst_UUID])
-            inst.parameters[0].link = inst_link
+            inst_link = SCTLink(origin=-1, origin_trace=[section, inst.ID, 1], type='Jump',
+                                target=-1, target_trace=[section, target_inst_UUID])
+            inst.parameters[1].link = inst_link
             inst.links_out.append(inst_link)
             inst_sect.instructions[target_inst_UUID].links_in.append(inst_link)
 
@@ -637,8 +637,8 @@ class SCTProjectFacade:
             goto_inst.set_inst_id(10)
             goto_param = SCTParameter(0, 'int|jump')
             goto_inst.add_parameter(0, goto_param)
-            goto_link = SCTLink(origin=-1, origin_trace=[script, section, goto_inst.ID, 0], type='Jump',
-                                target=-1, target_trace=[script, section, target_inst_UUID])
+            goto_link = SCTLink(origin=-1, origin_trace=[section, goto_inst.ID, 0], type='Jump',
+                                target=-1, target_trace=[section, target_inst_UUID])
             goto_param.link = goto_link
             inst_sect.instructions[target_inst_UUID].links_in.append(goto_link)
             goto_inst.links_out.append(goto_link)
