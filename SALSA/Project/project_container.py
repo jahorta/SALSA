@@ -4,6 +4,7 @@ from dataclasses import dataclass, field as dc_field
 from typing import List, Union, Dict, Tuple
 
 from SALSA.Common.constants import sep, uuid_sep
+from SALSA.Scripts import scpt_condition_changes as cond_changes
 
 
 @dataclass
@@ -143,6 +144,41 @@ class SCTInstruction:
 
     def get_links(self):
         return self.links_out if len(self.links_out) > 0 else None
+
+    def generate_condition(self):
+        # if the instruction is a switch, just put the value of the choice address
+        if self.instruction_id == 3:
+            if self.parameters[0].value is None:
+                self.condition = '???'
+            cond = self.parameters[0].value
+            self.condition = cond if isinstance(cond, str) else str(cond)
+            return
+
+        # if the instruction is a jmpif, work out a shorthand of the condition
+        if self.parameters[0].value is None:
+            self.condition = '???'
+        condition, cond_type = self._get_subconditions(self.parameters[0].value)
+        self.condition = condition
+
+    def _get_subconditions(self, cond_dict):
+        result_str = ''
+        result_type = 'float'
+        if not isinstance(cond_dict, dict):
+            return cond_dict if isinstance(cond_dict, str) else str(cond_dict), result_type
+
+        for key, value in cond_dict.items():
+            if key in cond_changes.scpt_types.keys():
+                result_type = cond_changes.scpt_types[key]
+            result_1, result_type_1 = self._get_subconditions(value['1'])
+            result_2, result_type_2 = self._get_subconditions(value['2'])
+            if key in cond_changes.scpt_log_changes.keys():
+                param_key = f'{result_type_1}{sep}{result_type_2}'
+                if param_key in cond_changes.scpt_log_changes[key]:
+                    key = cond_changes.scpt_log_changes[key][param_key]
+            temp_result = key.replace('(1)', result_1)
+            result_str = temp_result.replace('(2)', result_2)
+
+        return result_str, result_type
 
     def __repr__(self):
         return f'{self.instruction_id}'
