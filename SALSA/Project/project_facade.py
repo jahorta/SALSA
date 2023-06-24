@@ -473,6 +473,12 @@ class SCTProjectFacade:
             change_type = self.callbacks['confirm_remove_inst_group'](new_id=new_id, children=inst_group)
             if 'cancel' in change_type:
                 return False
+
+            custom_link_tgt = self.get_next_grouped_uuid(script, section, inst)
+            for goto in cur_inst.my_goto_uuids:
+                if goto in cur_section.instructions:
+                    self.remove_inst(script, section, goto, custom_link_tgt=custom_link_tgt)
+
             changes: list = change_type.split(alt_alt_sep)
             changes.reverse()
 
@@ -492,7 +498,7 @@ class SCTProjectFacade:
                     finished_change_indexes.append(i)
                 elif 'Insert' in change:
                     self.perform_group_change(script, section, inst, cur_group, change)
-                    saved_children[change_parts[0]] = cur_group
+                    saved_children[change_parts[0]] = cur_group[:-1]
                 else:
                     print(f'{self.log_key}: Unknown group change instruction: {change}')
 
