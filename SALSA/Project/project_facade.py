@@ -940,17 +940,18 @@ class SCTProjectFacade:
     # Inst link methods #
     # ----------------- #
 
-    def remove_inst_links(self, script, section, inst):
+    def remove_inst_links(self, script, section, inst, custom_tgt=None):
         cur_sect = self.project.scripts[script].sections[section]
         cur_inst = cur_sect.instructions[inst]
         if len(cur_inst.links_in) == 0 and len(cur_inst.links_out) == 0:
             return
+
         parents, index = self.get_inst_grouped_parents_and_index(inst, cur_sect.instruction_ids_grouped)
         cur_group = cur_sect.instruction_ids_grouped
         for parent in parents:
             cur_group = cur_group[parent]
 
-        new_tgt_inst_uuid = self.get_next_grouped_uuid(script, section, inst)
+        new_tgt_inst_uuid = self.get_next_grouped_uuid(script, section, inst) if custom_tgt is None else custom_tgt
         for link in cur_inst.links_in:
             ori_sect = link.origin_trace[0]
             ori_inst_uuid = link.origin_trace[1]
