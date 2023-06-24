@@ -386,6 +386,6 @@ class ProjectEditorView(tk.Frame):
             choice = labels[radio_vars[i].get()]
             response += f'{row_label}{alt_sep}{choice}'
             if new_id == 3 and choice == 'Insert in Switch Case':
-                response += f'{alt_sep}{entry_vars[i].get()}'
+                response += f'{alt_sep} {entry_vars[i].get()}'
 
         return response
