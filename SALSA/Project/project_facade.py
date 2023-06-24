@@ -921,7 +921,7 @@ class SCTProjectFacade:
                         max_goto_tgt_uuid = cur_goto_tgt_uuid
                 new_tgt_inst_uuid = max_goto_tgt_uuid
             else:
-                new_tgt_inst_uuid = cur_sect.instructions[cur_group[index + 1]].ID
+                new_tgt_inst_uuid = self.get_inst_uuid_from_group_entry(cur_group[index + 1])
         else:
             if len(parents) == 0:
                 return None
