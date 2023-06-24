@@ -880,12 +880,21 @@ class SCTProjectFacade:
 
         return uuids
 
-    @staticmethod
-    def get_inst_uuid_from_group_entry(entry):
-        if not isinstance(entry, dict):
+    def get_inst_uuid_from_group_entry(self, entry, last=False):
+        if isinstance(entry, dict):
+            if not last:
+                item_key = list(entry.keys())[0]
+                item_uuid = item_key.split(sep)[0]
+            else:
+                item_key = list(entry.keys())[-1]
+                item_uuid = self.get_inst_uuid_from_group_entry(entry[item_key], last)
+        elif isinstance(entry, list):
+            if last:
+                item_uuid = self.get_inst_uuid_from_group_entry(entry[-1], last)
+            else:
+                item_uuid = self.get_inst_uuid_from_group_entry(entry[0], last)
+        else:
             return entry
-        item_key = list(entry.keys())[0]
-        item_uuid = item_key.split(sep)[0]
         return item_uuid
 
     def get_next_grouped_uuid(self, script, section, inst):
