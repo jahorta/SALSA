@@ -580,17 +580,17 @@ class SCTProjectFacade:
                 if 'If' in change:
                     pass
                 elif 'Else' in change:
-                    prev_tgt_uuid = cur_inst.parameters[0].link.target_trace[1]
+                    prev_tgt_uuid = cur_inst.parameters[1].link.target_trace[1]
                     prev_tgt_inst = cur_section.instructions[prev_tgt_uuid]
-                    prev_tgt_inst.links_in.remove(cur_inst.parameters[0].link)
-                    cur_inst.parameters[0].link.target_trace[1] = inst_list[0]
+                    prev_tgt_inst.links_in.remove(cur_inst.parameters[1].link)
+                    cur_inst.parameters[1].link.target_trace[1] = inst_list[0]
                     new_tgt_inst = cur_section.instructions[inst_list[0]]
-                    new_tgt_inst.links_in.append(cur_inst.parameters[0].link)
+                    new_tgt_inst.links_in.append(cur_inst.parameters[1].link)
                 else:
                     case_param = None
                     for loop in cur_inst.loop_parameters:
-                        if loop[0].value == int(sub_group):
-                            case_param = loop[1]
+                        if loop[2].value == int(sub_group):
+                            case_param = loop[3]
                             break
                     if case_param is None:
                         print(f'{self.log_key}: Unable to find switch case for link change')
