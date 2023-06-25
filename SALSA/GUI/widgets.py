@@ -118,7 +118,7 @@ class HexEntry(ValidatedMixin, tk.Entry):
         self.prefix = "^"
         self.min_len = hex_min_length
         min_str = '0' * self.min_len
-        self.set(min_str)
+        self.insert(0, min_str)
         self.max_len = hex_max_length
         self.suffix = '{' + str(self.min_len) + ',' + str(self.max_len) + '}$'
         self._set_pattern()
@@ -129,7 +129,7 @@ class HexEntry(ValidatedMixin, tk.Entry):
     def _key_validate(self, char, index, current, proposed, action, **kwargs):
         valid = True
 
-        if not re.search(proposed, self.get()):
+        if not re.search(self.pattern, proposed):
             valid = False
             error = ''
             if not self.min_len < len(proposed) < self.max_len:
