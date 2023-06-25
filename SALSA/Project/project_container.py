@@ -360,6 +360,7 @@ class SCTProject:
         self.scripts = {}
         self.file_name = 'Untitled.prj'
         self.filepath = None
+        self.global_variables = {'BitVar': {}, 'IntVar': {}, 'ByteVar': {}, 'FloatVar': {}}
 
     def add_script(self, filename: str, script: SCTScript):
         self.scripts[filename] = script
