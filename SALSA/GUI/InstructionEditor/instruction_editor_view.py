@@ -165,7 +165,7 @@ class InstructionEditorView(tk.Toplevel):
         name_frame.grid(row=5, column=0, columnspan=2, sticky=tk.W+tk.E)
         name_label_label = tk.Label(name_frame, text='Name:')
         name_label_label.grid(row=0, column=0)
-        self.details_name_entry = tk.Entry(name_frame, text='')
+        self.details_name_entry = tk.Entry(name_frame)
         self.details_name_entry.grid(row=0, column=1, sticky='nsew')
         self.details_name_entry.bind('<FocusIn>', self.on_entry_focus_in)
         self.details_name_entry.bind('<FocusOut>', lambda e, k='name': self.on_entry_focus_out(k, e))
