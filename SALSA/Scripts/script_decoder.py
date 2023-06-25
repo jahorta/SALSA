@@ -674,7 +674,7 @@ class SCTDecoder:
                     elif not (isinstance(v, dict) or isinstance(v, bytearray)):
                         inputs.append(v)
                 if len(inputs) == 2:
-                    result = self._scpt_arithmetic_fxns[self._p_codes.arithmetic[currentWord][3]](inputs[0], inputs[1])
+                    result = self._scpt_arithmetic_fxns[self._p_codes.arithmetic[currentWord][4]](inputs[0], inputs[1])
                     param.set_arithmetic_result(result)
                 result_stack[stack_index + nones] = cur_result
                 stack_index -= 1
