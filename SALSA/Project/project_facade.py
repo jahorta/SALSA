@@ -631,7 +631,7 @@ class SCTProjectFacade:
                     new_tgt_inst = cur_section.instructions[inst_list[0]]
                     new_tgt_inst.links_in.append(cur_inst.parameters[0].link)
 
-        cur_inst.generate_condition()
+        cur_inst.generate_condition(self.get_script_variables_with_aliases(script))
         self._refresh_inst_positions(script, section)
 
         return True

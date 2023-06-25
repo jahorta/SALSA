@@ -145,7 +145,7 @@ class SCTInstruction:
     def get_links(self):
         return self.links_out if len(self.links_out) > 0 else None
 
-    def generate_condition(self):
+    def generate_condition(self, var_aliases):
         # Only generate conditions for ifs and switches
         if self.instruction_id not in (0, 3):
             self.condition = ''
@@ -164,6 +164,7 @@ class SCTInstruction:
             self.condition = '???'
             return
         condition, cond_type = self._get_subconditions(self.parameters[0].value)
+        condition = self.replace_vars_with_aliases(condition, var_aliases)
         self.condition = condition
 
     def _get_subconditions(self, cond_dict):
@@ -185,6 +186,32 @@ class SCTInstruction:
             result_str = temp_result.replace('(2)', result_2)
 
         return result_str, result_type
+
+    @staticmethod
+    def replace_vars_with_aliases(condition, aliases):
+        pieces = condition.split('Var: ')
+        if len(pieces) == 1:
+            return condition
+        prev_piece = ''
+        first = True
+        cond_out = ''
+        for piece in pieces:
+            if first:
+                first = False
+                prev_piece = piece
+                cond_out = ' '.join(prev_piece.split(' ')[:-1])
+                continue
+            cur_piece = piece
+            prev_pieces = prev_piece.split(' ')
+            cur_pieces = cur_piece.split(' ')
+            if int(cur_pieces[0]) in aliases[prev_pieces[-1]+'Var']:
+                alias = aliases[prev_pieces[-1]+'Var'][int(cur_pieces[0])]
+            else:
+                alias = ''
+            alias = alias if alias != '' else f'{prev_pieces[-1]}Var: {cur_pieces[0]}'
+            cond_out += f'{alias} {" ".join(cur_pieces[1:])}'
+            prev_piece = cur_piece
+        return cond_out
 
     def __repr__(self):
         return f'{self.instruction_id}'
