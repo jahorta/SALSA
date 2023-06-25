@@ -33,7 +33,7 @@ class MainMenu(tk.Menu):
         self.project_menu.add_command(label='Import SCT file(s)', command=callbacks['prj->add_script'])
         self.project_menu.add_command(label='Export SCT file(s)', command=callbacks['prj->export_script'])
         self.project_menu.add_separator()
-        self.project_menu.add_command(label='Variable editor', command=callbacks['prj->variable'])
+        self.project_menu.add_command(label='Variable alias editor', command=callbacks['prj->variable'])
         self.project_menu.add_command(label='String editor', command=callbacks['prj->string'])
         self.add_cascade(label='Project', menu=self.project_menu)
 
@@ -52,14 +52,14 @@ class MainMenu(tk.Menu):
         self.add_cascade(label='Help', menu=help_menu)
 
     def disable_script_commands(self):
-        self.project_menu.entryconfig('Variable editor', state='disabled')
+        self.project_menu.entryconfig('Variable alias editor', state='disabled')
         self.project_menu.entryconfig('String editor', state='disabled')
         self.project_menu.entryconfig('Import SCT file(s)', state='disabled')
         self.project_menu.entryconfig('Export SCT file(s)', state='disabled')
         self.file_menu.entryconfig('Save Project', state='disabled')
 
     def enable_script_commands(self):
-        self.project_menu.entryconfig('Variable editor', state='normal')
+        self.project_menu.entryconfig('Variable alias editor', state='normal')
         self.project_menu.entryconfig('String editor', state='normal')
         self.project_menu.entryconfig('Import SCT file(s)', state='normal')
         self.project_menu.entryconfig('Export SCT file(s)', state='normal')
