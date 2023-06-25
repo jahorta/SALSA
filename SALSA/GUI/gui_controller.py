@@ -110,6 +110,7 @@ class GUIController:
             'get_scripts': lambda: self.project.get_tree(self.scpt_view.get_headers('script')),
             'get_variables': self.project.get_script_variables_with_aliases,
             'set_alias': self.project.set_variable_alias,
+            'remove_global': self.project.remove_global,
             'get_var_usage': self.project.get_variable_usages,
             'close': self.close_popup
         }
