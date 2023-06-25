@@ -247,13 +247,21 @@ class SCTProjectFacade:
     # ----------------------- #
 
     def get_script_variables_with_aliases(self, script):
-        var_dict = {}
-        for var_type, var_list in self.project.scripts[script].variables.items():
-            var_dict[var_type] = {}
+        globals = self.project.global_variables
+        var_dict = None if script is None else self.project.scripts[script].variables
+        if var_dict is None:
+            var_dict = globals
+        vars = {}
+        for var_type, var_list in var_dict.items():
+            vars[var_type] = {}
             var_order = sorted(list(var_list.keys()))
             for key in var_order:
-                var_dict[var_type][key] = var_list[key]['alias']
-        return var_dict
+                vars[var_type][key] = {'alias': var_list[key]['alias']}
+                if var_dict is not globals:
+                    vars[var_type][key]['is_global'] = key in globals[var_type]
+                else:
+                    vars[var_type][key]['is_global'] = True
+        return vars
 
     def get_var_alias(self, script, var_type, var_id):
         if var_id not in self.project.scripts[script].variables[var_type]:
@@ -261,10 +269,25 @@ class SCTProjectFacade:
         return self.project.scripts[script].variables[var_type][var_id]['alias']
 
     def set_variable_alias(self, script, var_type, var_id, alias):
-        self.project.scripts[script].variables[var_type][var_id]['alias'] = alias
+        var_dict = self.project.global_variables[var_type] if script is None \
+            else self.project.scripts[script].variables[var_type]
+
+        if var_id not in var_dict:
+            var_dict[var_id] = {'alias': alias}
+        else:
+            var_dict[var_id]['alias'] = alias
+
+    def remove_global(self, var_type, var_id):
+        if var_id in self.project.global_variables[var_type]:
+            self.project.global_variables[var_type].pop(var_id)
 
     def get_variable_usages(self, script, var_type, var_id):
-        return self.project.scripts[script].variables[var_type][var_id]['usage']
+        if script is not None:
+            return self.project.scripts[script].variables[var_type][var_id]['usage']
+        usage = []
+        for name, cur_script in self.project.scripts.values():
+            if var_id in cur_script.variables[var_type]:
+                usage.append((name, *cur_script.variables[var_type][var_id]['usage']))
 
     def update_var_usage(self, changes, script, section, instruction, parameter):
         trace = (section, instruction, parameter)
