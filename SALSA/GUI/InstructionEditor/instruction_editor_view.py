@@ -339,7 +339,7 @@ class InstructionEditorView(tk.Toplevel):
 
         edit_widget.focus()
 
-        edit_widget.bind('<Escape>', lambda event: event.widget.destroy())
+        edit_widget.bind('<Escape>', lambda event: edit_widget.destroy())
         edit_widget.bind('<FocusOut>', self.on_param_change)
         edit_widget.bind('<Return>', self.on_param_change)
 
