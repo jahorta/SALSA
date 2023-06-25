@@ -206,7 +206,7 @@ class SCTDecoder:
         self.end = bounds[1]
         inst_list_id = inst_list_id_start
         sect_name = section.name
-        sct_start_pos = section.start_offset
+        sct_start_pos = section.absolute_offset
 
         while (self._cursor * 4) < bounds[1]:
             self._cur_endian = 'big'
@@ -912,7 +912,7 @@ class SCTDecoder:
             for sect_name in group[1:]:
                 sect_to_add: SCTSection = decoded_sct.sections[sect_name]
                 new_section.internal_sections_inst[sect_name] = len(new_section.instructions)
-                new_section.internal_sections_curs[sect_name] = sect_to_add.start_offset - new_section.start_offset
+                new_section.internal_sections_curs[sect_name] = sect_to_add.absolute_offset - new_section.absolute_offset
                 new_section.instructions = {**new_section.instructions, **sect_to_add.instructions}
                 new_section.instruction_ids_ungrouped.extend(sect_to_add.instruction_ids_ungrouped)
                 for key, value in sect_to_add.instructions_used.items():
@@ -1005,7 +1005,7 @@ class SCTDecoder:
             target_sct_id = 0
             while target_sct_id < len(decoded_sct.sections):
                 section = decoded_sct.sections[sect_keys[target_sct_id]]
-                if section.start_offset <= link.target < section.start_offset + section.length:
+                if section.absolute_offset <= link.target < section.absolute_offset + section.length:
                     target_sct: SCTSection = section
                     break
                 target_sct_id += 1
@@ -1015,7 +1015,7 @@ class SCTDecoder:
                 if inst.absolute_offset == link.target:
                     break
                 if target_inst_id == len(target_sct.instructions) - 1:
-                    inst_end = target_sct.start_offset + target_sct.length
+                    inst_end = target_sct.absolute_offset + target_sct.length
                 else:
                     inst_end = target_sct.get_instruction_by_index(target_inst_id + 1).absolute_offset
                 if inst.absolute_offset < link.target < inst_end:
@@ -1108,14 +1108,14 @@ class SCTDecoder:
             target_sct_id = 0
             while target_sct_id < len(decoded_sct.sections):
                 section = decoded_sct.sections[sect_keys[target_sct_id]]
-                if link.target == section.start_offset:
+                if link.target == section.absolute_offset:
                     target_sct_str = section.name
                     break
                 if target_sct_id == len(decoded_sct.sections) - 1:
-                    sect_end = section.start_offset + section.length
+                    sect_end = section.absolute_offset + section.length
                 else:
-                    sect_end = decoded_sct.sections[sect_keys[target_sct_id + 1]].start_offset
-                if section.start_offset < link.target < sect_end:
+                    sect_end = decoded_sct.sections[sect_keys[target_sct_id + 1]].absolute_offset
+                if section.absolute_offset < link.target < sect_end:
                     print(f'link position is incorrect: \n\t{link}')
                     break
                 target_sct_id += 1
@@ -1163,7 +1163,7 @@ class SCTDecoder:
                     new_section_order.append(cur_group_name)
                     new_section = SCTSection()
                     new_section.set_name(cur_group_name)
-                    new_section.set_details(0, section.start_offset)
+                    new_section.set_details(0, section.absolute_offset)
                     new_sections[cur_group_name] = new_section
                     new_sections[cur_group_name].set_type('Label')
                     has_header = True

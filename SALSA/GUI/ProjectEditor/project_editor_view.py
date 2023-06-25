@@ -17,7 +17,7 @@ default_headers = {
 
 default_header_order = {
     'script': ['name', 'section_num'],
-    'section': ['name', 'start_offset'],
+    'section': ['name', 'absolute_offset'],
     'instruction': ['ungrouped_position', 'name', 'condition', 'instruction_id', 'frame_delay_param', 'skip_refresh', 'synopsis', 'absolute_offset'],
     'parameter': ['name', 'section_num'],
 }
@@ -28,18 +28,18 @@ header_settings = {
         'section_num': {'label': 'Section #', 'width': 50, 'stretch': True}
     },
     'section': {
-        'name': {'label': 'Name', 'width': 180, 'stretch': True},
-        'start_offset': {'label': 'Start Offset', 'width': 50, 'stretch': True}
+        'name': {'label': 'Name', 'width': 300, 'stretch': True},
+        'absolute_offset': {'label': 'Offset', 'width': 100, 'stretch': True}
     },
     'instruction': {
         'ungrouped_position': {'label': 'Pos', 'width': 180, 'stretch': True},
-        'name': {'label': 'Name', 'width': 270, 'stretch': True},
+        'name': {'label': 'Name', 'width': 180, 'stretch': True},
         'condition': {'label': 'Condition', 'width': 300, 'stretch': True},
         'instruction_id': {'label': 'ID', 'width': 40, 'stretch': False},
         'frame_delay_param': {'label': 'Delay', 'width': 50, 'stretch': False},
         'skip_refresh': {'label': 'SR', 'width': 50, 'stretch': False},
         'synopsis': {'label': 'Synopsis', 'width': 50, 'stretch': True},
-        'absolute_offset': {'label': 'Offset', 'width': 50, 'stretch': True}
+        'absolute_offset': {'label': 'Offset', 'width': 100, 'stretch': True}
     },
     'parameter': {
         'ID': {'label': 'ID', 'width': 50, 'stretch': False},

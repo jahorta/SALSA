@@ -204,7 +204,7 @@ class SCTSection:
         self.instruction_ids_ungrouped = []
         self.name = None
         self.length = None
-        self.start_offset = None
+        self.absolute_offset = None
         self.instructions: Dict[str, SCTInstruction] = {}
         self.instruction_ids_grouped = []
         self.inst_errors = []
@@ -222,7 +222,7 @@ class SCTSection:
 
     def set_details(self, length, pos):
         self.length = length
-        self.start_offset = pos
+        self.absolute_offset = pos
 
     def add_string(self, pos: int, string: str):
         self.strings[pos] = string
