@@ -76,10 +76,19 @@ class ProjectEditorView(tk.Frame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
 
-        button_frame = tk.Frame(self)
-        button_frame.grid(row=0, column=0, sticky=tk.W)
-        self.save_button = tk.Button(button_frame, text='Save', command=self.on_save_button)
+        header_frame = tk.Frame(self)
+        header_frame.grid(row=0, column=0, sticky=tk.W)
+        self.save_button = tk.Button(header_frame, text='Save', command=self.on_save_button)
         self.save_button.grid(row=0, column=0)
+
+        mem_offset_label = tk.Label(header_frame, text='Memory Offset: 0x')
+        mem_offset_label.grid(row=0, column=1, sticky=tk.W, padx='30 0')
+        self.mem_offset_var = tk.StringVar(header_frame, '')
+        mem_offset_entry = w.HexEntry(master=header_frame, textvariable=self.mem_offset_var, hex_max_length=8, hex_min_length=0, width=10)
+        mem_offset_entry.grid(row=0, column=2, sticky=tk.W)
+        mem_offset_button = tk.Button(header_frame, text='Set', command=self.set_mem_offset)
+        mem_offset_button.grid(row=0, column=3)
+        self.cur_mem_offset = None
 
         self.pane_frame = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
         self.pane_frame.grid(row=1, column=0, sticky='NSEW')
@@ -269,6 +278,10 @@ class ProjectEditorView(tk.Frame):
 
     def on_save_button(self):
         self.callbacks['save_project']()
+
+    def set_mem_offset(self):
+        self.callbacks['set_mem_offset']()
+
 
     def get_headers(self, tree_key=None, get_all=False):
         if tree_key is None:

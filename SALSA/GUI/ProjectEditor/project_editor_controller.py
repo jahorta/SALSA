@@ -38,7 +38,8 @@ class ProjectEditorController:
             'edit_param': self.on_edit_parameter,
             'show_header_selection_menu': self.show_header_selection_menu,
             'show_inst_menu': self.show_instruction_right_click_menu,
-            'save_project': self.save_project
+            'save_project': self.save_project,
+            'set_mem_offset': self.set_mem_offset
         }
         self.view.add_and_bind_callbacks(view_callbacks)
 
@@ -68,6 +69,8 @@ class ProjectEditorController:
             'parameter': None
         }
 
+        self.cur_mem_offset = 0
+
         self.trees: Dict[str, DataTreeview] = {
             'script': self.view.scripts_tree,
             'section': self.view.sections_tree,
@@ -89,6 +92,12 @@ class ProjectEditorController:
     def set_change_flag(self):
         self.has_changes = True
         self.view.save_button.configure(state='normal')
+
+    def set_mem_offset(self):
+        mem_offset_value = self.view.mem_offset_var.get()
+        self.cur_mem_offset = 0 if mem_offset_value is '' else int(mem_offset_value, 16)
+        if self.current['section'] is not None:
+            self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'), **self.current))
 
     def save_project(self):
         self.callbacks['save_project']()
@@ -188,6 +197,8 @@ class ProjectEditorController:
                 if col == 'name':
                     if 'group_type' in entry.keys():
                         entry[col] += f' ({entry["group_type"]})'
+                elif col == 'absolute_offset':
+                    entry[col] = hex(int(entry[col])+self.cur_mem_offset) if entry[col] != '' else ''
                 if first:
                     kwargs['text'] = entry[col]
                     first = False
