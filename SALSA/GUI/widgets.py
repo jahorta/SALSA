@@ -661,8 +661,8 @@ class CustomTree(ScrollLabelCanvas):
 
 class DataTreeview(ttk.Treeview):
 
-    def __init__(self, parent, name, callbacks=None, can_open=True, **kwargs):
-        super().__init__(parent, selectmode='browse', **kwargs)
+    def __init__(self, parent, name, callbacks=None, can_open=True, return_none=False, selectmode='browse', **kwargs):
+        super().__init__(parent, selectmode=selectmode, **kwargs)
 
         self._parent = parent
         self.name = name
@@ -671,6 +671,7 @@ class DataTreeview(ttk.Treeview):
         self.group_types = {}
         self.cur_selection = []
         self.selection_order = []
+        self.return_none = return_none
 
         self.can_open = can_open
 
@@ -688,6 +689,8 @@ class DataTreeview(ttk.Treeview):
             return
         row_data = self.row_data[widget]
         if row_data is not None:
+            self.callbacks['select'](self.name, row_data)
+        elif self.return_none:
             self.callbacks['select'](self.name, row_data)
 
     def insert_entry(self, parent, text, values, group_type=None, row_data=None, **kwargs):
