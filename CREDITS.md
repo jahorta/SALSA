@@ -5,12 +5,12 @@ Developer
 ---------
 * Jahorta
 
-Software
+Software Used
 --------
+* [Pycharm](https://www.jetbrains.com/pycharm/) - IDE
 * [Dolphin Emulator](https://dolphin-emu.org/) - Gamecube/Wii Emulator
 * [Ghidra](https://ghidra-sre.org/) - Reverse Engineering Tool
 * [HxD](https://mh-nexus.de/en/hxd/) - Hex Editor
-* [Pycharm](https://www.jetbrains.com/pycharm/) - Source Code Editor
 
 Special Thanks
 --------------

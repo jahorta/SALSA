@@ -1,25 +1,40 @@
 SALSA - Skies of Arcadia Legends Script Assistant
 ===================================================
-SALSA is a GUI-based tool to assist in parsing and decoding the script system in Skies of Arcadia Legends. Currently, SALSA features two modes, an Instruction Edit mode and a Script Parsing mode. Any instructions annotated in the Instruction Edit mode will be used to parse and annotate script files in the Script Parsing mode.
+SALSA is a GUI-based tool to assist in editing sct files in Skies of Arcadia Legends. Currently, SALSA allows for .sct file import and export and  
 
 
 Requirements
 ------------
-* [Python](https://www.python.org/) 3.8+
-* Extracted and Decrypted Skies of Arcadia Legends script files (.sct).
-  * At this time, there is no support for decrypting the script files within SALSA. Information on how to extract and decrypt the .sct files can be found on the [Skies of Arcadia community discord](https://discord.gg/wMnXkhu)
-
-
-Features
---------
-* Definable instructions
-* Parameter values can be displayed within instruction descriptions
-* Script file parsing using instructions
-* Script file addressing by setting starting memory address for script file for use with Dolphin Emulator.
+* [Python](https://www.python.org/) 3.10+
+* Skies of Arcadia Legends script files (.sct).
+  * Supports aklz compressed files
 
 Getting Started
 ---------------
-With Python 3.8+ installed, running SALSA.py should run the program. In the event that this does not start the program, and you are using Windows, try using SALSA.bat to start the program. Upon startup, Instruction Edit view will show up first. Here the tree on the left contains a list of instructions which can be annotated, while annotations can be displayed/edited on the right. In order to start parsing scripts, the script directory should be set first (File->Select Script Directory). Then, a script file can be selected to parse in the (File->Select SCT File). While encoded script files are visible in the sct file select window, an error will be produced if they are selected.
+With Python 3.10+ installed, running SALSA.py should run the program. In the event that this does not start the program, make sure it is running with Python 3.10+.
+
+Upon startup, a project should first be created or loaded. A project can contain an arbitrary number of scripts. Scripts can be imported using Project->Import Script, and exported using Project-> Export Script.
+
+Features (Completed)
+--------
+* Instructions with editable paramter names and default parameters
+* Parameter values can be displayed within instruction descriptions
+* Script file import and export
+* Script file addressing by setting starting memory address for script file for use with Dolphin Emulator. (change headers to include offset)
+* Dialog string editing (Project->String Editor)
+
+Features (In Progress)
+--------
+* Adding, removing, and changing instructions
+* Moving instructions around within a section
+* Program help
+
+Features (Planned)
+--------
+* Grouping and moving sections around within a script
+* Saving groups of sections separately
+* Saving groups of instructions separately
+
 
 Credits
 -------
@@ -27,4 +42,4 @@ See credits.md for full credits
 
 License
 -------
-Copyright (C) 2021. SALSA is licensed under the GNU General Public License, Version 3.0. See [LICENSE.md](/LICENSE.md) for full license text
+Copyright (C) 2023. SALSA is licensed under the GNU General Public License, Version 3.0. See [LICENSE.md](/LICENSE.md) for full license text
