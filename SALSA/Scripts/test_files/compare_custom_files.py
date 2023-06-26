@@ -1,3 +1,6 @@
+# This file allows for tests between two specific files in the same directory
+# Set file names and directory below
+
 first_file = 'me002a.sct'
 second_file = 'me002a.out.sct'
 directory = 'D:\\SALSA projects\\exported'

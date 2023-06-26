@@ -1,4 +1,22 @@
-import csv
+# This file tests decoding and encoding of sct files.
+
+# Requires a script directory to run
+script_dir = './../../compressed_scripts'
+
+# Determines whether compressed or decompressed scripts are checked
+check_compressed = True
+
+# All files between the first and last file names will be checked.
+# If first_file == None, starts at beginning
+# If last_file == None, goes till end
+
+first_file = None
+# first_file = 'me002a.sct'
+last_file = None
+# last_file = 'me005a.sct'
+
+# Determines whether files are exported if there is a difference
+file_out = True
 
 hex_equivalencies = {
     '00000010': '00000006',
@@ -72,15 +90,7 @@ if __name__ == '__main__':
 
     sct_model = SCTModel()
 
-    first_file = None
-    # first_file = 'me116f.sct'
-    last_file = None
-    # last_file = 'me005a.sct'
-
-    file_out = True
-    check_compressed = True
-
-    files = os.listdir('./../../scripts/')
+    files = os.listdir(script_dir)
 
     differences = {}
     skip_till = first_file if first_file is not None else 'me002a.sct'
@@ -92,7 +102,7 @@ if __name__ == '__main__':
         if skip:
             continue
 
-        file_dir = './../../compressed_scripts/' if check_compressed else './../../decompressed_scripts/'
+        file_dir = script_dir
         filepath = os.path.join(file_dir, f)
         name, original_ba = sct_model.read_sct_file(filepath=filepath)
 
