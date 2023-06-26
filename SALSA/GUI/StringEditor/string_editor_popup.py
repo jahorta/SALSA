@@ -214,14 +214,9 @@ class StringPopup(tk.Toplevel):
         self._change_editor_state('normal')
 
         self.cur_string_id = string_id
-
-        head, body = self.callbacks['get_string_to_edit'](string_id, self.cur_script)
-        if string_id not in self.string_defaults:
-            self.string_defaults[string_id] = {}
-        self.string_defaults[string_id]['head'] = head
-        self.string_defaults[string_id]['body'] = body
-
-        self.head_entry.configure(state='normal')
+        no_head, head, body = self.callbacks['get_string_to_edit'](string_id, self.cur_script)
+        no_head = 1 if no_head else 0
+        self.no_head_var.set(no_head)
         self.head_entry.delete(0, tk.END)
         self.head_entry.insert(0, head)
         self.body_entry.delete(1.0, tk.END)
