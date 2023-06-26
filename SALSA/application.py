@@ -188,11 +188,27 @@ class Application(tk.Tk):
         compress = options['compress_aklz']
         options.pop('compress_aklz')
 
+        script_paths = []
         for script in scripts:
             script_file = script
             if script_file[-4:] != '.sct':
                 script_file += '.sct'
-            script = self.project.get_project_script_by_name(script)
             filepath = os.path.join(directory, script_file)
-            self.sct_model.export_script_as_sct(filepath=filepath, script=script, base_insts=self.base_insts,
-                                                options=options, compress=compress)
+            script_paths.append(filepath)
+
+        self._notify_export_sct(script_paths, scripts, options, compress)
+
+    def _notify_export_sct(self, script_paths, script_names, options, compress):
+        filepath = script_paths[0]
+        self.gui.show_status_popup(title='Exporting Script', msg=f'Decoding Script ({os.path.basename(filepath)})')
+        self.after(10, self._continue_export_sct, script_paths, script_names, options, compress)
+
+    def _continue_export_sct(self, script_paths, script_names, options, compress):
+        script = self.project.get_project_script_by_name(script_names.pop(0))
+        filepath = script_paths.pop(0)
+        self.sct_model.export_script_as_sct(filepath=filepath, script=script, base_insts=self.base_insts,
+                                            options=options, compress=compress)
+        if len(script_paths) > 0:
+            self._notify_export_sct(script_paths, script_names, options, compress)
+        else:
+            self.gui.stop_status_popup()
