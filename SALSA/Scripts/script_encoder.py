@@ -1,5 +1,6 @@
+import copy
 import struct
-from typing import Union
+from typing import Union, Literal
 
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.byte_array_utils import float2Hex
@@ -28,7 +29,7 @@ class SCTEncoder:
 
     param_tests = {'==': is_equal, '!=': not_equal}
 
-    def __init__(self, script: SCTScript, base_insts: BaseInstLibFacade, update_inst_pos=True, endian='big'):
+    def __init__(self, script: SCTScript, base_insts: BaseInstLibFacade, update_inst_pos=True, endian: Literal['little', 'big'] = 'big'):
         self.sct_body = bytearray()
         # for decoder, encoder validation only
         if self.validation:
@@ -70,7 +71,13 @@ class SCTEncoder:
         self.script = script
         self.bi = base_insts
         self.sct = bytearray()
-        self.sct_head = self.script.header if self.script.header is not None else self._default_header_start
+        self.sct_head = copy.deepcopy(self._default_header_start)
+        if '199' in script.name:
+            self.sct_head = bytearray(b'\x07\xd0\x00\x05\x00\x01\x00\x01')
+        if '355' in script.name:
+            self.sct_head = bytearray(b'\x07\xd0\x00\x06\x00\x1b\x00\x02')
+        if '398' in script.name:
+            self.sct_head = bytearray(b'\x07\xd0\x00\x06\x00\x1b\x00\x00')
         self.sct_foot = bytearray()
         self.header_dict = {}
         self.footer_dict = {}
