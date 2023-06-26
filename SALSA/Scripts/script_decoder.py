@@ -1445,6 +1445,8 @@ class SCTDecoder:
             new_groups = self._nest_groups(groups)
             new_groups = self._complete_heirarchy_sections(list(decoded_sct.sections.keys()), new_groups)
             decoded_sct.sections_grouped = new_groups
+        else:
+            decoded_sct.sections_grouped = copy.deepcopy(decoded_sct.sections_ungrouped)
 
         # Create grouped instruction heirarchies
         for section in decoded_sct.sections.values():
