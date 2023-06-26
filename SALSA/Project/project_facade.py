@@ -344,6 +344,7 @@ class SCTProjectFacade:
         if 'body' in changes:
             body = changes['body']
         self.project.scripts[script].strings[string_id] = head_and_body_to_SAstr(no_head, head, body)
+        self.callbacks['set_change']()
 
     # ----------------------------- #
     # Param Editor Callback Methods #
