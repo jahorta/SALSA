@@ -127,7 +127,7 @@ class StringPopup(tk.Toplevel):
 
         head_label = tk.Label(head_frame, text='Textbox Header')
         head_label.grid(row=0, column=0, sticky=tk.W)
-        self.head_entry = tk.Entry(lower_frame, state='disabled')
+        self.head_entry = tk.Entry(head_frame, state='disabled')
         self.head_entry.grid(row=1, column=0, sticky=tk.W)
         self.head_entry.bind('<FocusIn>', self.on_entry_focus_in)
         self.head_entry.bind('<FocusOut>', lambda e, k='head': self.on_entry_focus_out(k, e))
