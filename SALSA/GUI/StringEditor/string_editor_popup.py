@@ -20,6 +20,7 @@ default_tree_anchor = tk.W
 default_tree_stretch = False
 default_tree_label = ''
 
+note_font = {}
 no_head_warning = 'Removing the header will allow for 5 lines of body text instead of 4.\nClicking this check box will delete the current header.'
 body_note = 'NOTES:\n"[" and "]" are used for open and close quotes respectively. Using " or \' will only give the closing version.' \
             '\n"..." will be converted to "…"'
@@ -119,7 +120,7 @@ class StringPopup(tk.Toplevel):
         self.no_head = tk.Checkbutton(no_head_frame, text='Remove Header', variable=self.no_head_var, onvalue=1, offvalue=0,
                                       command=lambda: self.set_change('no_head', self.no_head_var.get() == 1), state='disabled')
         self.no_head.grid(row=0, column=0, sticky=tk.W)
-        no_head_warning_label = tk.Label(no_head_frame, text=no_head_warning, anchor='w')
+        no_head_warning_label = tk.Label(no_head_frame, text=no_head_warning, anchor='w', justify=tk.LEFT)
         no_head_warning_label.grid(row=1, column=0)
 
         head_frame = tk.Frame(lower_frame)
@@ -140,7 +141,7 @@ class StringPopup(tk.Toplevel):
         self.body_entry.grid(row=3, column=0, sticky=tk.W + tk.E)
         self.body_entry.bind('<FocusIn>', self.on_text_focus_in)
         self.body_entry.bind('<FocusOut>', lambda e, k='body': self.on_text_focus_out(k, e))
-        body_note_label = tk.Label(lower_frame, text=body_note)
+        body_note_label = tk.Label(lower_frame, text=body_note, anchor='w', justify=tk.LEFT)
         body_note_label.grid(row=4, column=0, sticky=tk.W)
 
         self.update_scripts()
@@ -157,8 +158,10 @@ class StringPopup(tk.Toplevel):
         pos = f'{self.w}x{self.h}+{posX}+{posY}'
         self.geometry(pos)
 
-    def update_scripts(self, ):
+    def update_scripts(self):
+        self._clear_editor_fields()
         self._change_editor_state('disabled')
+        self.strings.clear_all_entries()
         script_tree = self.callbacks['get_scripts']()
         for entry in script_tree:
             self.scripts.insert_entry(parent='', index='end', text=entry['name'], values=[], row_data=entry['row_data'])
@@ -168,8 +171,14 @@ class StringPopup(tk.Toplevel):
         self.head_entry.configure(state=state)
         self.head_add_quote.configure(state=state)
 
+    def _clear_editor_fields(self):
+        self.no_head_var.set(0)
+        self.head_entry.delete(0, tk.END)
+        self.body_entry.delete(1.0, tk.END)
+
     def on_script_select(self, name, script):
         self.cur_script = script
+        self._clear_editor_fields()
         self._change_editor_state('disabled')
         self._update_string_tree(script)
 
@@ -212,14 +221,13 @@ class StringPopup(tk.Toplevel):
             self.save()
 
         self._change_editor_state('normal')
+        self._clear_editor_fields()
 
         self.cur_string_id = string_id
         no_head, head, body = self.callbacks['get_string_to_edit'](string_id, self.cur_script)
         no_head = 1 if no_head else 0
         self.no_head_var.set(no_head)
-        self.head_entry.delete(0, tk.END)
         self.head_entry.insert(0, head)
-        self.body_entry.delete(1.0, tk.END)
         self.body_entry.insert(tk.INSERT, body)
 
     def add_quotes_to_head(self):
