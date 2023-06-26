@@ -45,7 +45,7 @@ class ProjectEditorController:
 
         self.project: SCTProjectFacade = facade
         self.project.set_callback('confirm_remove_inst_group', self.confirm_change_inst_group)
-        self.project.set_callback('toggle_change', self.set_change_flag)
+        self.project.set_callback('set_change', self.set_change_flag)
 
         pe_callbacks = {'get_var_alias': self.get_var_alias,
                         'refresh_inst': self.on_refresh_inst,
