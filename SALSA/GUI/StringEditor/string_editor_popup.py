@@ -44,8 +44,8 @@ class StringPopup(tk.Toplevel):
         save_frame = tk.Frame(self)
         save_frame.grid(row=0, column=0, sticky='NSEW')
 
-        save_button = tk.Button(save_frame, text='Save', command=self.save, state='disabled')
-        save_button.grid(row=0, column=0, sticky=tk.W)
+        self.save_button = tk.Button(save_frame, text='Save', command=self.save, state='disabled')
+        self.save_button.grid(row=0, column=0, sticky=tk.W)
 
         upper_frame = tk.Frame(self)
         upper_frame.grid(row=1, column=0, sticky='NSEW')
@@ -217,7 +217,10 @@ class StringPopup(tk.Toplevel):
         self.string_changes[self.cur_string_id][key] = value
 
     def save(self):
-        self.callbacks['save']()
+        for script, strings in self.string_changes.items():
+            for string_id, string_changes in strings.items():
+                self.callbacks['save'](script, string_id, string_changes)
+        self.save_button.configure(state='disabled')
 
     def close(self):
         self.callbacks['close'](self.name, self)
