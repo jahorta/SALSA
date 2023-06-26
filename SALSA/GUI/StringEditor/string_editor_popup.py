@@ -20,6 +20,10 @@ default_tree_anchor = tk.W
 default_tree_stretch = False
 default_tree_label = ''
 
+no_head_warning = 'Removing the header will allow for 5 lines of body text instead of 4.\nClicking this check box will delete the current header.'
+body_note = 'NOTES:\n"[" and "]" are used for open and close quotes respectively. Using " or \' will only give the closing version.' \
+            '\n"..." will be converted to "…"'
+
 
 class StringPopup(tk.Toplevel):
     t = 'SALSA - String Editor'
@@ -104,10 +108,23 @@ class StringPopup(tk.Toplevel):
         self.strings.add_callback('select', self.edit_string)
 
         lower_frame = tk.Frame(self)
-        lower_frame.grid(row=2, column=0, sticky='NSEW')
+        lower_frame.grid(row=2, column=0, sticky='NSEW', padx=5)
         lower_frame.columnconfigure(0, weight=1)
 
-        head_label = tk.Label(lower_frame, text='Textbox Header')
+        no_head_frame = tk.Frame(lower_frame)
+        no_head_frame.grid(row=0, column=0, sticky=tk.W)
+
+        self.no_head_var = tk.IntVar()
+        self.no_head = tk.Checkbutton(no_head_frame, text='Remove Header', variable=self.no_head_var, onvalue=1, offvalue=0,
+                                      command=lambda: self.set_change('no_head', self.no_head_var.get() == 1), state='disabled')
+        self.no_head.grid(row=0, column=0, sticky=tk.W)
+        no_head_warning_label = tk.Label(no_head_frame, text=no_head_warning, anchor='w')
+        no_head_warning_label.grid(row=1, column=0)
+
+        head_frame = tk.Frame(lower_frame)
+        head_frame.grid(row=1, column=0, sticky=tk.W)
+
+        head_label = tk.Label(head_frame, text='Textbox Header')
         head_label.grid(row=0, column=0, sticky=tk.W)
         self.head_entry = tk.Entry(lower_frame, state='disabled')
         self.head_entry.grid(row=1, column=0, sticky=tk.W)
@@ -120,6 +137,8 @@ class StringPopup(tk.Toplevel):
         self.body_entry.grid(row=3, column=0, sticky=tk.W + tk.E)
         self.body_entry.bind('<FocusIn>', self.on_text_focus_in)
         self.body_entry.bind('<FocusOut>', lambda e, k='body': self.on_text_focus_out(k, e))
+        body_note_label = tk.Label(lower_frame, text=body_note)
+        body_note_label.grid(row=4, column=0, sticky=tk.W)
 
         self.update_scripts()
 
