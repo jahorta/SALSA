@@ -200,7 +200,7 @@ class Application(tk.Tk):
 
     def _notify_export_sct(self, script_paths, script_names, options, compress):
         filepath = script_paths[0]
-        self.gui.show_status_popup(title='Exporting Script', msg=f'Decoding Script ({os.path.basename(filepath)})')
+        self.gui.show_status_popup(title='Exporting Script', msg=f'Exporting Script ({os.path.basename(filepath)})')
         self.after(10, self._continue_export_sct, script_paths, script_names, options, compress)
 
     def _continue_export_sct(self, script_paths, script_names, options, compress):
