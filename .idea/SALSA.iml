@@ -3,7 +3,6 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/SALSA" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/SALSA/Scripts/test_files" />
       <excludeFolder url="file://$MODULE_DIR$/compressed_scripts" />
       <excludeFolder url="file://$MODULE_DIR$/decompressed_scripts" />
     </content>
