@@ -240,11 +240,7 @@ class ParamEditController:
         for var in old_var_list:
             if var not in new_var_list:
                 remove_list.append(var)
-        changes = {}
-        if len(add_list) > 0:
-            changes['add'] = add_list
-        if len(remove_list) > 0:
-            changes['remove'] = remove_list
+        changes = {'add': add_list if len(add_list) > 0 else [], 'remove': remove_list if len(remove_list) > 0 else []}
         return None if len(changes) == 0 else changes
 
     def get_vars(self, param_value, cur_list=None):
