@@ -29,7 +29,7 @@ class StringPopup(tk.Toplevel):
     t = 'SALSA - String Editor'
     log_key = 'StrEditPopup'
     w = 600
-    h = 400
+    h = 500
 
     option_settings = {}
 
@@ -44,6 +44,7 @@ class StringPopup(tk.Toplevel):
         #     settings.add_group(self.log_key)
 
         self.columnconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
 
         save_frame = tk.Frame(self)
         save_frame.grid(row=0, column=0, sticky='NSEW')
