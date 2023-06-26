@@ -13,8 +13,6 @@ if __name__ == '__main__':
     os.chdir(os.path.pardir)
     from SALSA.FileModels.sct_model import SCTModel
     from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
-    from SALSA.Scripts.script_decoder import SCTDecoder
-    from SALSA.Scripts.script_encoder import SCTEncoder
     from SALSA.Scripts.test_files.decode_encode_test import compare_files, save_diffs
     os.chdir(cur_dir)
     os.chdir(os.path.pardir)
