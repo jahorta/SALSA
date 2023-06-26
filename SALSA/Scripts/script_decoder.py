@@ -929,7 +929,7 @@ class SCTDecoder:
             keys_before = []
             keys_after = []
             hit_name = False
-            for key in decoded_sct.section_names_ungrouped:
+            for key in decoded_sct.sections_ungrouped:
                 if key in group:
                     hit_name = True
                     continue
@@ -943,7 +943,7 @@ class SCTDecoder:
             sections = {**sections, **{k: decoded_sct.sections[k] for k in keys_after}}
             decoded_sct.sections = sections
 
-            decoded_sct.section_names_ungrouped = [*keys_before, new_name, *keys_after]
+            decoded_sct.sections_ungrouped = [*keys_before, new_name, *keys_after]
 
             for s in group:
                 decoded_sct.folded_sections[s] = new_name
@@ -1140,7 +1140,7 @@ class SCTDecoder:
         i = 0
         new_section_order = []
         new_sections = {}
-        for name in decoded_sct.section_names_ungrouped:
+        for name in decoded_sct.sections_ungrouped:
 
             section = decoded_sct.sections[name]
             if section.type == 'Label':
@@ -1198,7 +1198,7 @@ class SCTDecoder:
             new_sections_dict[name] = new_sections[name]
             new_sections_ungrouped.append(name)
         decoded_sct.sections = new_sections_dict
-        decoded_sct.section_names_ungrouped = new_sections_ungrouped
+        decoded_sct.sections_ungrouped = new_sections_ungrouped
 
     @staticmethod
     def _detect_unused_sections(decoded_sct: SCTScript):

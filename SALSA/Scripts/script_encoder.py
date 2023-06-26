@@ -103,7 +103,7 @@ class SCTEncoder:
         self.add_spurious_refresh = add_spurious_refresh
 
         # encode sections in order
-        for name in self.script.section_names_ungrouped:
+        for name in self.script.sections_ungrouped:
             section = self.script.sections[name]
             self._encode_section(name=name, section=section)
 

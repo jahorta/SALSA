@@ -309,8 +309,8 @@ class SCTScript:
         self.sections = {}
         self.section_groups = {}
         self.section_group_keys = {}
-        self.sections_grouped = {}
-        self.section_names_ungrouped = []
+        self.sections_grouped = []
+        self.sections_ungrouped = []
         self.inst_locations = [[] for _ in range(266)]
         self.links = []
         self.links_to_sections = {}
@@ -328,7 +328,7 @@ class SCTScript:
     def add_section(self, section: SCTSection):
         name = section.name
         self.sections[name] = section
-        self.section_names_ungrouped.append(name)
+        self.sections_ungrouped.append(name)
         inst_list = self.sections[name].instructions_used.keys()
         for inst in inst_list:
             self.inst_locations[inst].append(name)
