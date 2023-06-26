@@ -23,6 +23,8 @@ class Settings(configparser.ConfigParser):
     def _new_settings_file(self):
         for name, group in self.defaults.items():
             self[name] = group
+        if not os.path.exists(os.path.dirname(self.filename)):
+            os.mkdir(os.path.dirname(self.filename))
         with open(self.filename, 'w') as configfile:
             self.write(configfile)
 
