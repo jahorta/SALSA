@@ -158,15 +158,22 @@ class StringPopup(tk.Toplevel):
         self.geometry(pos)
 
     def update_scripts(self, ):
+        self._change_editor_state('disabled')
         script_tree = self.callbacks['get_scripts']()
         for entry in script_tree:
             self.scripts.insert_entry(parent='', index='end', text=entry['name'], values=[], row_data=entry['row_data'])
 
+    def _change_editor_state(self, state):
+        self.no_head.configure(state=state)
+        self.head_entry.configure(state=state)
+        self.head_add_quote.configure(state=state)
+
     def on_script_select(self, name, script):
         self.cur_script = script
-        self.update_string_tree(script)
+        self._change_editor_state('disabled')
+        self._update_string_tree(script)
 
-    def update_string_tree(self, script):
+    def _update_string_tree(self, script):
         self.strings.clear_all_entries()
         headers = list(tree_settings['string'].keys())
         string_tree = self.callbacks['get_string_tree'](script, headers)
@@ -201,6 +208,11 @@ class StringPopup(tk.Toplevel):
             prev_iid = self.strings.insert_entry(**kwargs)
 
     def edit_string(self, name, string_id):
+        if len(self.string_changes) > 0:
+            self.save()
+
+        self._change_editor_state('normal')
+
         self.cur_string_id = string_id
 
         head, body = self.callbacks['get_string_to_edit'](string_id, self.cur_script)
