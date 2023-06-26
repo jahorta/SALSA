@@ -121,7 +121,7 @@ class GUIController:
             self.popups['string'].tkraise()
             return
         callbacks = {
-            'save': self.project.edit_strings, 'close': self.close_popup,
+            'save': self.project.edit_string, 'close': self.close_popup,
             'get_scripts': lambda: self.project.get_tree(self.scpt_view.get_headers('script')),
             'get_string_tree': self.project.get_string_tree, 'get_string_to_edit': self.project.get_string_to_edit
         }

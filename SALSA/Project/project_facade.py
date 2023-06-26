@@ -1,7 +1,7 @@
 import copy
 from typing import Union, Tuple
 
-from SALSA.Common.script_string_utils import SAstr_to_head_and_body
+from SALSA.Common.script_string_utils import SAstr_to_head_and_body, head_and_body_to_SAstr
 from SALSA.Project.description_formatting import format_description
 from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter, SCTInstruction, SCTLink
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
@@ -335,8 +335,16 @@ class SCTProjectFacade:
         script = self.cur_script if script is None else script
         return SAstr_to_head_and_body(self.project.scripts[script].strings[string_id])
 
-    def edit_strings(self, change_dict):
-        pass
+    def edit_string(self, script, string_id, changes):
+        print('pause here')
+        no_head, head, body = SAstr_to_head_and_body(self.project.scripts[script].strings[string_id])
+        if 'no_head' in changes:
+            no_head = changes['no_head']
+        if 'head' in changes:
+            head = changes['head']
+        if 'body' in changes:
+            body = changes['body']
+        self.project.scripts[script].strings[string_id] = head_and_body_to_SAstr(no_heaad, head, body)
 
     # ----------------------------- #
     # Param Editor Callback Methods #
