@@ -17,7 +17,7 @@ def SAstr_to_visible(string):
 
 def visible_to_SAstr(string):
     for item in string_replace_list:
-        if item[0] == '':
+        if item[1] == '':
             continue
         string = string.replace(item[1], item[0])
     return string
