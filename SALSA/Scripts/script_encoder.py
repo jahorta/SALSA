@@ -20,18 +20,18 @@ class SCTEncoder:
     _header_name_length = 0x10
     _default_header_start = bytearray(b'\x07\xd2\x00\x06\x00\x0e\x00\x00')
 
-    # These variables are for validation purposes only, validation should be false in production
-    validation: bool = True
-
     use_garbage: bool
     combine_footer_links: bool
     add_spurious_refresh: bool
 
     param_tests = {'==': is_equal, '!=': not_equal}
 
-    def __init__(self, script: SCTScript, base_insts: BaseInstLibFacade, update_inst_pos=True, endian: Literal['little', 'big'] = 'big'):
+    def __init__(self, script: SCTScript, base_insts: BaseInstLibFacade, update_inst_pos=True,
+                 endian: Literal['little', 'big'] = 'big', validation=False):
         self.sct_body = bytearray()
+
         # for decoder, encoder validation only
+        self.validation = validation
         if self.validation:
             if '099' in script.name:
                 self.sct_body = bytearray(b'\x4F\x00\x00\x00\x00\x00\x00\x04\x00\x00\x66\x43\x1D\x00\x00\x00\x00\x00\x00'
@@ -95,11 +95,11 @@ class SCTEncoder:
     @classmethod
     def encode_sct_file_from_project_script(cls, project_script: SCTScript, base_insts: BaseInstLibFacade,
                                             use_garbage=True, combine_footer_links=False, add_spurious_refresh=True,
-                                            update_inst_pos=True):
+                                            update_inst_pos=True, validation=False):
         print(f'{cls.log_key}: encoding {project_script.name}')
         encoder = cls(script=project_script, base_insts=base_insts, update_inst_pos=update_inst_pos)
         encoder.encode_sct_file(use_garbage=use_garbage, combine_footer_links=combine_footer_links,
-                                add_spurious_refresh=add_spurious_refresh)
+                                add_spurious_refresh=add_spurious_refresh, validation=validation)
         print(f'{cls.log_key}: finished encoding for {project_script.name}')
         return encoder.sct
 
