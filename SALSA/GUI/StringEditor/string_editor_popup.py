@@ -39,6 +39,7 @@ class StringPopup(tk.Toplevel):
         self.parent: tk.Tk = parent
         self.callbacks = callbacks
         self.name = name
+        self.protocol('WM_DELETE_WINDOW', self.close)
 
         # if self.log_key not in settings:
         #     settings.add_group(self.log_key)
