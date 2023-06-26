@@ -92,6 +92,7 @@ class ParamEditController:
         if value is None:
             return
         kwargs = {'value': value, 'cur_id': '0'}
+        kwargs |= {'is_base': False} if self.param is not None else {'is_base': True}
         if self.param is not None:
             if self.param.override is not None:
                 kwargs |= {'override': True}
@@ -99,13 +100,13 @@ class ParamEditController:
         self.setup_scpt_from_value(value=value, cur_id='0')
 
     # Load scpt value into scpt widgets
-    def setup_scpt_from_value(self, value, cur_id, override=False):
+    def setup_scpt_from_value(self, value, cur_id, is_base, override=False):
         if isinstance(value, dict):
             for key, parts in value.items():
                 self.scpt_fields[cur_id].set_widget_values(key)
-                new_keys = self.add_scpt_rows(cur_id)
+                new_keys = self.add_scpt_rows(cur_id, is_base=is_base)
                 for i, value in enumerate(parts.values()):
-                    self.setup_scpt_from_value(value=value, cur_id=new_keys[i])
+                    self.setup_scpt_from_value(value=value, cur_id=new_keys[i], is_base=is_base, override=override)
         else:
             self.scpt_fields[cur_id].set_widget_values(value=value, override=override)
 
@@ -122,7 +123,7 @@ class ParamEditController:
     # SCPT parameter editor functionality methods #
     # ------------------------------------------- #
 
-    def add_scpt_rows(self, p_key):
+    def add_scpt_rows(self, p_key, is_base):
         if p_key not in self.scpt_rows:
             return
 
@@ -141,7 +142,7 @@ class ParamEditController:
                 self.scpt_fields[key] = self.old_scpt_fields.pop(key)
                 self.scpt_rows[key] = p_row + i + 1
             else:
-                self.scpt_fields[key] = SCPTEditWidget(self.view.main_frame, self.scpt_callbacks, key, prefix=i + 1)
+                self.scpt_fields[key] = SCPTEditWidget(self.view.main_frame, self.scpt_callbacks, key, prefix=i + 1, is_base=is_base)
                 self.scpt_rows[key] = p_row + i + 1
 
         self.regrid_scpt_rows(changed_keys)
