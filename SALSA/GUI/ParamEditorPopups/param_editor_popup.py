@@ -237,7 +237,7 @@ class SCPTEditWidget(tk.Frame):
         elif self.active_widget == 'decimal':
             return f'decimal: {self.input_vars["decimal"][0].get()}+{self.input_vars["decimal"][1].get()}/256'
         else:
-            return self.input_widgets['float'].get_value()
+            return float(self.input_widgets['float'].get_value())
 
 
 # -------------------------- #
