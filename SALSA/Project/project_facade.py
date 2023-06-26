@@ -326,7 +326,7 @@ class SCTProjectFacade:
                 if '\n' in str_body:
                     str_body = str_body.split('\n')[0]
                     str_body += '...'
-                string_tree.append({headers[0]: string_id, headers[1]: f'{str_head}: {str_body}', 'row_data': string_id})
+                string_tree.append({headers[0]: string_id, headers[1]: f'{str_head} {str_body}', 'row_data': string_id})
             string_tree.append('ungroup')
 
         return string_tree
