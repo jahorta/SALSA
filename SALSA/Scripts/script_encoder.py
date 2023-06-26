@@ -122,14 +122,14 @@ class SCTEncoder:
         for link_offset, jmp_to in self.sct_links.items():
             jmp_to_pos = self.inst_positions[jmp_to[1]]
             jmp_offset = self._make_word(i=(jmp_to_pos - link_offset), signed=True)
-            self._sct_body_replace_hex(location=link_offset, value=jmp_offset, validation=self._placeholder)
+            self._sct_body_insert_hex(location=link_offset, value=jmp_offset, validation=self._placeholder)
 
         # Resolve string links
         for link_offset, section in self.string_links.items():
             str_pos = self.header_dict[section]
             str_offset = str_pos - link_offset
             str_offset_word = self._make_word(i=str_offset, signed=True)
-            self._sct_body_replace_hex(location=link_offset, value=str_offset_word, validation=self._placeholder)
+            self._sct_body_insert_hex(location=link_offset, value=str_offset_word, validation=self._placeholder)
 
         # Add footer entries in order by links while resolving links
         added_footer_entries = {}
@@ -141,7 +141,7 @@ class SCTEncoder:
             str_offset = str_pos - offset
             str_offset_word = self._make_word(i=str_offset)
             self.sct_foot.extend(self._encode_string(string=string, align=False))
-            self._sct_body_replace_hex(location=offset, value=str_offset_word, validation=self._placeholder)
+            self._sct_body_insert_hex(location=offset, value=str_offset_word, validation=self._placeholder)
 
         # Build header
         header_len = self._make_word(len(self.header_dict))
@@ -276,7 +276,7 @@ class SCTEncoder:
 
         if loop_iter_param_value is not None:
             if loop_iters_performed != loop_iter_param_value:
-                self._sct_body_replace_hex(location=loop_iter_param_location, value=self._make_word(loop_iters_performed))
+                self._sct_body_insert_hex(location=loop_iter_param_location, value=self._make_word(loop_iters_performed))
 
         for p_id in base_inst.params_after:
             self._encode_param(param=instruction.parameters[p_id], base_param=base_inst.parameters[p_id],
@@ -295,7 +295,7 @@ class SCTEncoder:
 
         if delay_pos is not None:
             inst_len = len(self.sct_body) - inst_pos
-            self._sct_body_replace_hex(delay_pos, bytearray(self._make_word(inst_len)))
+            self._sct_body_insert_hex(delay_pos, bytearray(self._make_word(inst_len)))
 
     def _encode_param(self, param, base_param, trace):
         # if needed, setup link and use 0x7fffffff as placeholder
@@ -426,7 +426,7 @@ class SCTEncoder:
         str_bytes.extend(extra_bytes)
         return str_bytes
 
-    def _sct_body_replace_hex(self, location: int, value: bytearray, validation: Union[None, bytearray] = None):
+    def _sct_body_insert_hex(self, location: int, value: bytearray, validation: Union[None, bytearray] = None):
         if validation is None:
             valid = True
         else:
