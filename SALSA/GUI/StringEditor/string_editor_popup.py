@@ -212,9 +212,17 @@ class StringPopup(tk.Toplevel):
         self.set_change(key=key, value=e.widget.get(1.0, tk.END))
 
     def set_change(self, key, value):
-        if self.cur_string_id not in self.string_changes:
-            self.string_changes[self.cur_string_id] = {}
-        self.string_changes[self.cur_string_id][key] = value
+        if self.cur_script not in self.string_changes:
+            self.string_changes[self.cur_script] = {self.cur_string_id: {key: value}}
+        elif self.cur_string_id not in self.string_changes[self.cur_script]:
+            self.string_changes[self.cur_script][self.cur_string_id] = {key: value}
+        elif key not in self.string_changes[self.cur_script][self.cur_string_id]:
+            self.string_changes[self.cur_script][self.cur_string_id][key] = value
+        elif self.string_changes[self.cur_script][self.cur_string_id][key] != value:
+            self.string_changes[self.cur_script][self.cur_string_id][key] = value
+        else:
+            return
+        self.save_button.configure(state='normal')
 
     def save(self):
         for script, strings in self.string_changes.items():
