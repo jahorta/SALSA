@@ -4,16 +4,16 @@
 script_dir = './../../compressed_scripts'
 
 # Determines whether compressed or decompressed scripts are checked
-check_compressed = True
+check_compressed = False
 
 # All files between the first and last file names will be checked.
 # If first_file == None, starts at beginning
 # If last_file == None, goes till end
 
-first_file = None
-# first_file = 'me002a.sct'
-last_file = None
-# last_file = 'me005a.sct'
+# first_file = None
+first_file = 'me002a.sct'
+# last_file = None
+last_file = 'me008a.sct'
 
 # Determines whether files are exported if there is a difference
 file_out = True
@@ -105,6 +105,7 @@ if __name__ == '__main__':
         file_dir = script_dir
         filepath = os.path.join(file_dir, f)
         name, original_ba = sct_model.read_sct_file(filepath=filepath)
+        name = name.split(os.sep)[-1]
 
         print(f'Starting decode for {f.split(".")[0]}')
         script = SCTDecoder.decode_sct_from_file(f.split('.')[0], sct=original_ba, inst_lib=baseinsts)
