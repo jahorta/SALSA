@@ -258,6 +258,10 @@ class StringPopup(tk.Toplevel):
             return
         self.save_button.configure(state='normal')
 
+    def save_and_close(self):
+        self.save()
+        self.callbacks['close'](self.name, self)
+
     def save(self):
         for script, strings in self.string_changes.items():
             for string_id, string_changes in strings.items():
@@ -265,6 +269,7 @@ class StringPopup(tk.Toplevel):
         self.save_button.configure(state='disabled')
 
     def close(self):
-        self.callbacks['close'](self.name, self)
+        self.focus()
+        self.after(10, self.save_and_close)
 
 
