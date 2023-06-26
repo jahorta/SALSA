@@ -1,11 +1,11 @@
 {
   "0": {
     "Name": "If",
-    "Description": "Jump test: <test>\n\nJump if False:\n*lnk[Offset,<Offset>]*",
+    "Description": "Jump test: <Condition>\n\nJump if False:\n*lnk[Offset,<Offset>]*\n",
     "Notes": "No dependancy on param1\nFunctional at all times\n\nPerforms a comparison via SCPT\nIf true:\n\tmoves to the next line\nIf false:\n\tadds Offset to the script pointer and continues.\n\ndefault test 1\n",
     "Parameters": {
       "0": {
-        "Name": "CompareResult"
+        "Name": "Condition"
       },
       "1": {
         "Name": "Offset"
