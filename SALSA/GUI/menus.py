@@ -24,7 +24,7 @@ class MainMenu(tk.Menu):
         for i, file in enumerate(self.recent_files):
             self.recent_menu.add_command(label=file, command=lambda x=i: self.callbacks['file->load_recent'](x))
         if self.no_recents:
-            self.recent_menu.entryconfig('No Recent Projects', state='disabled')
+            self.recent_menu.entryconfig(self.recent_files[0], state='disabled')
         self.file_menu.add_cascade(label='Recent Projects...', menu=self.recent_menu)
 
         self.file_menu.add_command(label='Quit', command=callbacks['file->quit'])
