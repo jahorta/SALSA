@@ -94,8 +94,7 @@ class ParamEditController:
         kwargs = {'value': value, 'cur_id': '0'}
         kwargs |= {'is_base': False} if self.param is not None else {'is_base': True}
         if self.param is not None:
-            if self.param.override is not None:
-                kwargs |= {'override': True}
+            kwargs |= {'override': True} if self.param.override is not None else {}
 
         self.setup_scpt_from_value(**kwargs)
 
