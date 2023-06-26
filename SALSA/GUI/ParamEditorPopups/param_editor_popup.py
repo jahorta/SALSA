@@ -95,6 +95,8 @@ class SCPTFloatWidget(tk.Frame):
     def set_value(self, value):
         if value == 'override':
             self.set_override(init=True)
+            return
+        self.float_variable.set(value)
 
 
 # Single row widget of SCPT parameter
