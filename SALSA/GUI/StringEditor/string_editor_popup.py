@@ -136,7 +136,7 @@ class StringPopup(tk.Toplevel):
 
         body_label = tk.Label(lower_frame, text='Textbox Body')
         body_label.grid(row=2, column=0, sticky=tk.W)
-        self.body_entry = tk.Text(lower_frame, wrap=tk.WORD)
+        self.body_entry = tk.Text(lower_frame, wrap=tk.WORD, height=5)
         self.body_entry.grid(row=3, column=0, sticky=tk.W + tk.E)
         self.body_entry.bind('<FocusIn>', self.on_text_focus_in)
         self.body_entry.bind('<FocusOut>', lambda e, k='body': self.on_text_focus_out(k, e))
