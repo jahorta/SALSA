@@ -336,7 +336,6 @@ class SCTProjectFacade:
         return SAstr_to_head_and_body(self.project.scripts[script].strings[string_id])
 
     def edit_string(self, script, string_id, changes):
-        print('pause here')
         no_head, head, body = SAstr_to_head_and_body(self.project.scripts[script].strings[string_id])
         if 'no_head' in changes:
             no_head = changes['no_head']
@@ -344,7 +343,7 @@ class SCTProjectFacade:
             head = changes['head']
         if 'body' in changes:
             body = changes['body']
-        self.project.scripts[script].strings[string_id] = head_and_body_to_SAstr(no_heaad, head, body)
+        self.project.scripts[script].strings[string_id] = head_and_body_to_SAstr(no_head, head, body)
 
     # ----------------------------- #
     # Param Editor Callback Methods #
