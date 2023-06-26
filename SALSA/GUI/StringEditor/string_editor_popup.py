@@ -131,6 +131,8 @@ class StringPopup(tk.Toplevel):
         self.head_entry.grid(row=1, column=0, sticky=tk.W)
         self.head_entry.bind('<FocusIn>', self.on_entry_focus_in)
         self.head_entry.bind('<FocusOut>', lambda e, k='head': self.on_entry_focus_out(k, e))
+        self.head_add_quote = tk.Button(head_frame, text='add《》to header', command=self.add_quotes_to_head)
+        self.head_add_quote.grid(row=1, column=1, sticky=tk.W)
 
         body_label = tk.Label(lower_frame, text='Textbox Body')
         body_label.grid(row=2, column=0, sticky=tk.W)
@@ -212,6 +214,11 @@ class StringPopup(tk.Toplevel):
         self.head_entry.insert(0, head)
         self.body_entry.delete(1.0, tk.END)
         self.body_entry.insert(tk.INSERT, body)
+
+    def add_quotes_to_head(self):
+        self.head_entry.insert(0, '《')
+        self.head_entry.insert(tk.END, '》')
+        self.set_change('head', self.head_entry.get())
 
     def on_entry_focus_in(self, e):
         e.widget.cur_value = e.widget.get()
