@@ -75,6 +75,7 @@ def save_diffs(d_dict, path):
 if __name__ == '__main__':
     import os
     cur_dir = os.path.dirname(__file__)
+    os.chdir(cur_dir)
     os.chdir(os.path.pardir)
     os.chdir(os.path.pardir)
     os.chdir(os.path.pardir)
