@@ -97,7 +97,7 @@ class ParamEditController:
             if self.param.override is not None:
                 kwargs |= {'override': True}
 
-        self.setup_scpt_from_value(value=value, cur_id='0')
+        self.setup_scpt_from_value(**kwargs)
 
     # Load scpt value into scpt widgets
     def setup_scpt_from_value(self, value, cur_id, is_base, override=False):
