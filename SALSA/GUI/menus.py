@@ -17,6 +17,7 @@ class MainMenu(tk.Menu):
         self.file_menu = tk.Menu(self, tearoff=False)
         self.file_menu.add_command(label='New Project', command=callbacks['file->new_prj'])
         self.file_menu.add_command(label='Save Project', command=callbacks['file->save_prj'])
+        self.file_menu.add_command(label='Save Project as', command=callbacks['file->save_as_prj'])
         self.file_menu.add_command(label='Load Project', command=callbacks['file->load_prj'])
 
         self.recent_menu = tk.Menu(self.file_menu, tearoff=False)
@@ -57,6 +58,7 @@ class MainMenu(tk.Menu):
         self.project_menu.entryconfig('Import SCT file(s)', state='disabled')
         self.project_menu.entryconfig('Export SCT file(s)', state='disabled')
         self.file_menu.entryconfig('Save Project', state='disabled')
+        self.file_menu.entryconfig('Save Project as', state='disabled')
 
     def enable_script_commands(self):
         self.project_menu.entryconfig('Variable alias editor', state='normal')
@@ -64,6 +66,7 @@ class MainMenu(tk.Menu):
         self.project_menu.entryconfig('Import SCT file(s)', state='normal')
         self.project_menu.entryconfig('Export SCT file(s)', state='normal')
         self.file_menu.entryconfig('Save Project', state='normal')
+        self.file_menu.entryconfig('Save Project as', state='normal')
 
     def update_recents(self, recent_files):
         self.no_recents = True if len(self.recent_files) == 0 else False
