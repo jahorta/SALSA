@@ -1,8 +1,7 @@
-# These are aliases which are directly referred to by the game as identified by Ghidra
+# These are aliases for variables which are directly referred to by the game as identified by Ghidra
 
 default_aliases = {
     'BitVar': {
-
     },
     'ByteVar': {
         0x101: 'SB: 1 during atk',
@@ -10,9 +9,7 @@ default_aliases = {
         0x106: 'SB: eHP%'
     },
     'IntVar': {
-
     },
     'FloatVar': {
-
     },
 }
