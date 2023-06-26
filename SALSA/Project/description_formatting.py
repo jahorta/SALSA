@@ -225,7 +225,9 @@ def get_parameter_string(param_name, inst: SCTInstruction, base_inst: BaseInst, 
             string_id = param.linked_string
     if string_id is None:
         return f'No string found for parameter {param_name}'
-    return '\n'.join(callbacks['get_str'](string_id))
+    no_head, head, body = callbacks['get_str'](string_id)
+    connector = '\n' if no_head else ''
+    return f'{head}{connector}{body}'
 
 # ------------------------------------------------------------------ #
 # Dicts for description code functions and allowed parameter numbers #
