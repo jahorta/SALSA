@@ -367,6 +367,8 @@ class ProjectEditorView(tk.Frame):
             if new_id == 3:
                 entry_vars.append(tk.IntVar(self))
 
+        cancel_group_change = True
+
         class InstGroupHandlerDialog(tk.simpledialog.Dialog):
 
             def body(self, master):
@@ -388,8 +390,13 @@ class ProjectEditorView(tk.Frame):
                     if new_id == 3:
                         tk.Entry(master, textvariable=entry_vars[i]).grid(row=i+1, column=cur_col)
 
-        cancel = not InstGroupHandlerDialog(self, title='Group Handling')
-        if cancel:
+            def apply(self):
+                nonlocal cancel_group_change
+                cancel_group_change = False
+
+        InstGroupHandlerDialog(self, title='Group Handling')
+
+        if cancel_group_change:
             return 'cancel'
 
         response = ''
