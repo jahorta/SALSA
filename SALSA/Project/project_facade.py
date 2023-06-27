@@ -537,7 +537,7 @@ class SCTProjectFacade:
                     finished_change_indexes.append(i)
                 elif 'Insert' in change:
                     self.perform_group_change(script, section, inst, cur_group, change)
-                    saved_children[change_parts[0]] = cur_group[:-1]
+                    saved_children[change_parts[0]] = copy.deepcopy(cur_group)
                 else:
                     print(f'{self.log_key}: Unknown group change instruction: {change}')
 
