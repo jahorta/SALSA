@@ -607,9 +607,9 @@ class SCTProjectFacade:
                     first_uuid, _ = self.get_inst_group_bounds(cur_group)
                     ungrouped_index = cur_section.instruction_ids_ungrouped.index(first_uuid)
 
+                # Insert saved group into appropriate place in ungrouped
                 inst_list = self.extract_inst_uuids_from_group(saved_children[change.split(alt_sep)[0]])
-                for uuid in reversed(inst_list):
-                    cur_section.instruction_ids_ungrouped.insert(ungrouped_index, uuid)
+                cur_section.instruction_ids_ungrouped = cur_section.instruction_ids_ungrouped[:ungrouped_index] + inst_list + cur_section.instruction_ids_ungrouped[ungrouped_index:]
 
                 # insert saved_group into appropriate place in grouped
                 for item in reversed(saved_children[change.split(alt_sep)[0]]):
@@ -617,7 +617,16 @@ class SCTProjectFacade:
 
                 # Adjust if or switch for new linked inst values
                 if 'If' in change:
-                    pass
+                    cur_goto_uuid = cur_section.instructions[inst].my_goto_uuids[0]
+                    cur_goto_ind = cur_section.instruction_ids_ungrouped.index(cur_goto_uuid)
+                    prev_inst_uuid = cur_section.instruction_ids_ungrouped[cur_goto_ind-1]
+                    prev_inst = cur_section.instructions[prev_inst_uuid]
+                    if not prev_inst.instruction_id == 10:
+                        continue
+                    if prev_inst.links_out[0].target_trace[1] == cur_goto_uuid:
+                        continue
+                    self.change_link_tgt(tgt_sect=cur_section, link=prev_inst.links_out[0], new_tgt_uuid=cur_goto_uuid)
+
                 elif 'Else' in change:
                     self.change_link_tgt(tgt_sect=cur_section, link=cur_inst.links_out[0], new_tgt_uuid=inst_list[0])
 
