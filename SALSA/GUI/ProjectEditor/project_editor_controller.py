@@ -198,7 +198,10 @@ class ProjectEditorController:
                     if 'group_type' in entry.keys():
                         entry[col] += f' ({entry["group_type"]})'
                 elif col == 'absolute_offset':
-                    entry[col] = hex(int(entry[col])+self.cur_mem_offset) if entry[col] != '' else ''
+                    if entry[col] == '' or entry[col] is None:
+                        entry[col] = ''
+                    else:
+                        entry[col] = hex(int(entry[col])+self.cur_mem_offset)
                 if first:
                     kwargs['text'] = entry[col]
                     first = False
