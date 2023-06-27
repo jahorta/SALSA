@@ -1,5 +1,5 @@
 import copy
-from typing import Union, Tuple
+from typing import Union, Tuple, Literal
 
 from SALSA.Common.script_string_utils import SAstr_to_head_and_body, head_and_body_to_SAstr
 from SALSA.Project.description_formatting import format_description
