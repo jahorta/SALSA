@@ -619,12 +619,8 @@ class SCTProjectFacade:
                 if 'If' in change:
                     pass
                 elif 'Else' in change:
-                    prev_tgt_uuid = cur_inst.parameters[1].link.target_trace[1]
-                    prev_tgt_inst = cur_section.instructions[prev_tgt_uuid]
-                    prev_tgt_inst.links_in.remove(cur_inst.parameters[1].link)
-                    cur_inst.parameters[1].link.target_trace[1] = inst_list[0]
-                    new_tgt_inst = cur_section.instructions[inst_list[0]]
-                    new_tgt_inst.links_in.append(cur_inst.parameters[1].link)
+                    self.change_link_tgt(tgt_sect=cur_section, link=cur_inst.links_out[0], new_tgt_uuid=inst_list[0])
+
                 else:
                     case_param = None
                     for loop in cur_inst.loop_parameters:
@@ -997,12 +993,11 @@ class SCTProjectFacade:
             ori_sect = link.origin_trace[0]
             ori_inst_uuid = link.origin_trace[1]
             ori_inst = self.project.scripts[script].sections[ori_sect].instructions[ori_inst_uuid]
-            link_ind = ori_inst.links_out.index(link)
             if new_tgt_inst_uuid is None:
-                ori_inst.links_out.pop(link_ind)
+                ori_inst.links_out.pop(ori_inst.links_out.index(link))
             else:
-                ori_inst.links_out[link_ind].target_trace[1] = new_tgt_inst_uuid
-                cur_sect.instructions[new_tgt_inst_uuid].links_in.append(link)
+                self.change_link_tgt(tgt_sect=cur_sect, link=link, new_tgt_uuid=new_tgt_inst_uuid)
+
         for link in cur_inst.links_out:
             tgt_sect = link.target_trace[0]
             tgt_inst_uuid = link.target_trace[1]
@@ -1011,5 +1006,9 @@ class SCTProjectFacade:
         cur_inst.links_in = []
         cur_inst.links_out = []
 
-
-
+    def change_link_tgt(self, tgt_sect: SCTSection, link: SCTLink, new_tgt_uuid: str):
+        prev_tgt_uuid = link.target_trace[1]
+        tgt_sect.instructions[prev_tgt_uuid].links_in.remove(link)
+        tgt_sect.instructions[new_tgt_uuid].links_in.append(link)
+        link.target_trace[1] = new_tgt_uuid
+        print('a place to pause ')
