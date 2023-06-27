@@ -95,7 +95,7 @@ class ProjectEditorController:
 
     def set_mem_offset(self):
         mem_offset_value = self.view.mem_offset_var.get()
-        self.cur_mem_offset = 0 if mem_offset_value is '' else int(mem_offset_value, 16)
+        self.cur_mem_offset = 0 if mem_offset_value == '' else int(mem_offset_value, 16)
         if self.current['section'] is not None:
             self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'), **self.current))
 
