@@ -108,6 +108,7 @@ class SCPTEditWidget(tk.Frame):
         self.callbacks = callbacks
         self.scpt_codes = SCPTParamCodes(is_decoder=False)
         self.key = key
+        self.is_base = is_base
 
         indent = '\t'*key.count(sep)
         self.prefix_label = tk.Label(self, text=f'{indent} {prefix}')
@@ -170,7 +171,7 @@ class SCPTEditWidget(tk.Frame):
     def update_input_entry(self):
         if self.class_selection.get() in ('compare', 'arithmetic'):
             # May need to ungrid other entry fields
-            self.callbacks['add_child_scpt_rows'](self.key)
+            self.callbacks['add_child_scpt_rows'](self.key, self.is_base)
             self.set_active_input_widget('')
             return
         self.callbacks['remove_child_scpt_rows'](self.key)
