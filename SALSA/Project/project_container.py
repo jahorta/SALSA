@@ -78,6 +78,8 @@ class SCTParameter:
         self.override = override_value
         self.value = value
         self.formatted_value = self._unpack_result_dict(value, 0) if isinstance(value, dict) else str(value)
+        if isinstance(value, int) or isinstance(value, float):
+            self.set_arithmetic_result(value)
 
     def add_raw(self, raw: bytearray):
         self.raw_bytes += raw
