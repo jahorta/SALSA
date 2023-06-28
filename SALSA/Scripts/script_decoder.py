@@ -4,10 +4,11 @@ import os
 import re
 import struct
 import difflib
-from typing import Dict, Tuple, List, Callable
+from typing import Dict, Tuple, List, Callable, Literal, Union
 
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
-from SALSA.Project.project_container import SCTScript, SCTSection, SCTLink, SCTInstruction, SCTParameter
+from SALSA.Project.project_container import SCTScript, SCTSection, SCTLink, SCTInstruction, SCTParameter, \
+    footer_str_group_name, footer_str_id_prefix
 from SALSA.BaseInstructions.bi_container import BaseInstLib, BaseParam
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 from SALSA.Scripts.default_variables import default_aliases
@@ -42,7 +43,8 @@ class SCTDecoder:
     _jmp_if_falses: Dict[str, List[int]]
     _switches: Dict[str, List[int]]
     _last_sect_pos: int
-    _cur_endian = endian['gc']
+    _cur_endian: Literal['big', 'little'] = endian['gc']
+    _footer_dialog_locs = []
 
     _scpt_arithmetic_fxns: Dict[str, Callable] = {
         '*': scpt_arithmetic.mult,
@@ -265,7 +267,11 @@ class SCTDecoder:
 
                 section.add_instruction(instResult)
 
-                if instResult.instruction_id in [0, 3]:
+                # Detect potential footer strings
+                if instResult.instruction_id in (24, 25):
+                    self._footer_dialog_locs.append((sect_name, instResult.ID))
+
+                if instResult.instruction_id in (0, 3):
                     instResult.generate_condition(default_aliases)
 
                 if instResult.instruction_id == 3:
@@ -864,6 +870,8 @@ class SCTDecoder:
         print(f'{self.log_key}: Grouping Subscripts...', end='\r')
         self._group_subscripts(decoded_sct=decoded_sct)
 
+        self._detect_and_move_footer_dialog(decoded_sct=decoded_sct)
+
         self._create_group_heirarchies(decoded_sct=decoded_sct)
 
         self._put_inst_ids_into_link_traces(decoded_sct=decoded_sct)
@@ -1130,7 +1138,7 @@ class SCTDecoder:
             origin_inst = decoded_sct.sections[link.origin_trace[0]].get_instruction_by_index(link.origin_trace[1])
             param: SCTParameter = origin_inst.parameters[int(link.origin_trace[2])]
             param.linked_string = foot_str
-            param.link_value = ('Footer',)
+            param.link_value = ('Footer', foot_str)
 
     @staticmethod
     def _create_string_groups(decoded_sct):
@@ -1815,3 +1823,28 @@ class SCTDecoder:
         for section in decoded_sct.sections.values():
             for i, key in enumerate(section.instruction_ids_ungrouped):
                 section.instructions[key].ungrouped_position = i
+
+    def _detect_and_move_footer_dialog(self, decoded_sct):
+        if len(self._footer_dialog_locs) == 0:
+            return
+
+        footer_dialog_strings = []
+        for trace in self._footer_dialog_locs:
+            inst = decoded_sct.sections[trace[0]].instructions[trace[1]]
+            string = inst.parameters[int(inst.links_out[0].origin_trace[2])].linked_string
+            if '\\e' in string or '\\c' in string:
+                footer_dialog_strings.append((trace, string))
+
+        if len(footer_dialog_strings) == 0:
+            return
+
+        decoded_sct.string_groups[footer_str_group_name] = []
+        for i, item in enumerate(footer_dialog_strings):
+            foot_id = f'{footer_str_id_prefix}{i:02d}'
+            decoded_sct.strings[foot_id] = item[1]
+            decoded_sct.string_groups[footer_str_group_name].append(foot_id)
+            decoded_sct.string_locations[foot_id] = footer_str_group_name
+            inst = decoded_sct.sections[item[0][0]].instructions[item[0][1]]
+            param = inst.parameters[int(inst.links_out[0].origin_trace[2])]
+            param.linked_string = foot_id
+            param.link_value = ('Footer', foot_id)
