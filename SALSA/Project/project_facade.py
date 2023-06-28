@@ -1006,17 +1006,6 @@ class SCTProjectFacade:
             # if cur_inst is an if/else/while
             if cur_inst.instruction_id == 0:
                 new_tgt_inst_uuid = cur_sect.instructions[cur_inst.my_goto_uuids[0]].links_out[0].target_trace[1]
-            # if cur_inst is a switch
-            elif cur_inst.instruction_id == 3:
-                max_goto_tgt_uuid = ''
-                max_goto_tgt_pos = 0
-                for goto in cur_inst.my_goto_uuids:
-                    cur_goto_tgt_uuid = cur_sect.instructions[goto].links_out[0].target_trace[1]
-                    cur_goto_tgt_pos = cur_sect.instruction_ids_ungrouped.index(cur_goto_tgt_uuid)
-                    if cur_goto_tgt_pos > max_goto_tgt_pos:
-                        max_goto_tgt_pos = cur_goto_tgt_pos
-                        max_goto_tgt_uuid = cur_goto_tgt_uuid
-                new_tgt_inst_uuid = max_goto_tgt_uuid
             else:
                 new_tgt_inst_uuid = self.get_inst_uuid_from_group_entry(cur_group[index + 1])
         else:
