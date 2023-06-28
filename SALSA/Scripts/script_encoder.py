@@ -1,11 +1,9 @@
 import copy
-import struct
 from typing import Union, Literal
 
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.byte_array_utils import float2Hex
-from SALSA.Common.constants import sep
-from SALSA.Project.project_container import SCTScript, SCTSection
+from SALSA.Project.project_container import SCTScript, SCTSection, footer_str_group_name
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 from SALSA.Scripts.scpt_compare_fxns import is_equal, not_equal
 
@@ -132,8 +130,14 @@ class SCTEncoder:
             self._sct_body_insert_hex(location=link_offset, value=str_offset_word, validation=self._placeholder)
 
         # Add footer entries in order by links while resolving links
+        has_footer_dialogue = footer_str_group_name in self.script.string_groups
         added_footer_entries = {}
         for offset, string in self.footer_links.items():
+
+            if has_footer_dialogue:
+                if string in self.script.string_groups[footer_str_group_name]:
+                    string = self.script.strings[string]
+
             if combine_footer_links and string in added_footer_entries:
                 str_pos = added_footer_entries[string]
             else:
