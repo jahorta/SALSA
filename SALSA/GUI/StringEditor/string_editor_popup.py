@@ -248,10 +248,11 @@ class StringPopup(tk.Toplevel):
         e.widget.cur_value = e.widget.get(1.0, tk.END)
 
     def on_text_focus_out(self, key, e):
-        if e.widget.get(1.0, tk.END) == e.widget.cur_value:
+        new_value: str = e.widget.get(1.0, tk.END).rstrip(' \n\t')
+        if new_value == e.widget.cur_value:
             print('same text')
             return
-        self.set_change(key=key, value=e.widget.get(1.0, tk.END))
+        self.set_change(key=key, value=new_value)
 
     def set_change(self, key, value):
         if self.cur_script not in self.string_changes:
