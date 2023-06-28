@@ -221,7 +221,7 @@
   },
   "24": {
     "Name": "??Print",
-    "Description": "\n*lnk[Offset,<Offset>]*",
+    "Description": "\n*str[Offset]*\n\n",
     "Notes": "Dependency on param1:\n\nHas Debug Messages:\n\"scptPRINT: malloc failed 1\"\n\"scptPRINT: message post timed out\"",
     "Parameters": {
       "0": {
@@ -231,11 +231,11 @@
   },
   "25": {
     "Name": "??Select",
-    "Description": "PRINT: <Print>\nlist position: *lnk[Offset,<Offset>]*",
-    "Notes": "Dependent on param1:\nbit is 1:\n1:\nRequires allocation of memory.\nFirst, gets an SCPT variable...\n\nWill need to figure out rest in game",
+    "Description": "Option num: <Num>\n\nOptions:\n*str[Offset]*\n\n",
+    "Notes": "Dependent on param1:\nbit is 1:\n1:\nRequires allocation of memory.\nFirst, gets an SCPT variable...\n\nWill need to figure out rest in game\n\nMight not support headers, so inst 24 (Print) should be used to make the header for the choices\n",
     "Parameters": {
       "0": {
-        "Name": "Print"
+        "Name": "Num"
       },
       "1": {
         "Name": "Offset"
