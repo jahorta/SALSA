@@ -265,6 +265,9 @@ class SCTDecoder:
 
                 section.add_instruction(instResult)
 
+                if instResult.instruction_id in (24, 25):
+                    self._footer_dialog_locs.append([sect_name, instResult.ID])
+
                 if instResult.instruction_id in [0, 3]:
                     instResult.generate_condition(default_aliases)
 
