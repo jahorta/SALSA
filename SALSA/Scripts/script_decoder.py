@@ -43,7 +43,6 @@ class SCTDecoder:
     _switches: Dict[str, List[int]]
     _last_sect_pos: int
     _cur_endian: Literal['big', 'little'] = endian['gc']
-    _footer_dialog_locs = []
 
     _scpt_arithmetic_fxns: Dict[str, Callable] = {
         '*': scpt_arithmetic.mult,
@@ -77,6 +76,7 @@ class SCTDecoder:
         self._switches = {}
         self._variables = {}
         self._instruction_groups = {}
+        self._footer_dialog_locs = []
 
     def _decode_sct(self, script_name: str, sct: bytearray, inst_lib: BaseInstLibFacade) -> SCTScript:
         print(f'{self.log_key}: Decoding {script_name}')
