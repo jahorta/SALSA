@@ -9,7 +9,7 @@ tree_settings = {
         'name': {'label': 'Name', 'width': 100, 'stretch': True}
     },
     'string': {
-        'location': {'label': 'Name', 'width': 120, 'stretch': True},
+        'location': {'label': 'Name', 'width': 100, 'stretch': True},
         'string': {'label': 'Name', 'width': 200, 'stretch': True}
     }
 }
