@@ -150,6 +150,7 @@ class StringPopup(tk.Toplevel):
         self.cur_string_id = ''
         self.string_defaults = {}
         self.string_changes = {}
+        self.header_invalid = False
 
         self.title(self.t)
 
@@ -225,10 +226,18 @@ class StringPopup(tk.Toplevel):
 
         self.cur_string_id = string_id
         no_head, head, body = self.callbacks['get_string_to_edit'](string_id, self.cur_script)
+        self.header_invalid = False
+        self.body_entry.insert(tk.INSERT, body)
+        if head is None:
+            self.head_entry.insert(0, 'This instruction does not support headers')
+            self._change_editor_state('disabled')
+            self.body_entry.configure(state='normal')
+            self.header_invalid = True
+            return
+
         no_head = 1 if no_head else 0
         self.no_head_var.set(no_head)
         self.head_entry.insert(0, head)
-        self.body_entry.insert(tk.INSERT, body)
 
     def add_quotes_to_head(self):
         self.head_entry.insert(0, '《')
