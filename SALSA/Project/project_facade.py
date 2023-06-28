@@ -520,6 +520,8 @@ class SCTProjectFacade:
                 if goto in cur_section.instructions:
                     self.remove_inst(script, section, goto, custom_link_tgt=custom_link_tgt)
 
+            self.remove_inst_links(script, section, inst, custom_tgt=custom_link_tgt)
+
             changes: list = change_type.split(alt_alt_sep)
             changes.reverse()
 
@@ -545,8 +547,6 @@ class SCTProjectFacade:
 
             for i in reversed(finished_change_indexes):
                 changes.pop(i)
-
-            self.remove_inst_links(script, section, inst, custom_tgt=custom_link_tgt)
 
         parent_list, index = self.get_inst_grouped_parents_and_index(inst, cur_section.instruction_ids_grouped)
 
@@ -786,6 +786,32 @@ class SCTProjectFacade:
             new_ungrouped = ungrouped_before + group_insts + ungrouped_after
             for entry in reversed(cur_group):
                 cur_temp_group.insert(grouped_insert_loc, entry)
+
+            new_tgt_uuid = inst
+            if 'Below' in change:
+                new_tgt_uuid = ungrouped_after[0]
+            prev_inst_uuid = new_ungrouped[new_ungrouped.index(new_tgt_uuid) - 1]
+            prev_inst = cur_sect.instructions[prev_inst_uuid]
+            # Skip if it is not a goto
+            if prev_inst.instruction_id == 10:
+                # Skip if the target is already correct
+                prev_tgt = prev_inst.links_out[0].target_trace[1]
+                if prev_tgt == new_tgt_uuid:
+                    pass
+                elif len(prev_inst.my_master_uuids) != 0:
+                    prev_master = cur_sect.instructions[prev_inst.my_master_uuids[0]]
+                    # Skip if If is a While
+                    if cur_sect.instruction_ids_ungrouped.index(prev_tgt) > cur_sect.instruction_ids_ungrouped.index(
+                            prev_master.ID):
+                        self.change_link_tgt(tgt_sect=cur_sect, link=prev_inst.links_out[0],
+                                             new_tgt_uuid=new_tgt_uuid)
+                    # Skip if prev has no master, master can only be If or Switch
+                    # Skip prev master is switch. prev_inst will not be a goto if an If with Else
+                    if prev_master.instruction_id != 3:
+                        self.change_link_tgt(tgt_sect=cur_sect, link=prev_master.links_out[0], new_tgt_uuid=new_tgt_uuid)
+                else:
+                    self.change_link_tgt(tgt_sect=cur_sect, link=prev_inst.links_out[0],
+                                         new_tgt_uuid=new_tgt_uuid)
 
         elif 'Insert' in change:
             new_ungrouped = temp_ungrouped
@@ -1040,4 +1066,3 @@ class SCTProjectFacade:
             tgt_sect.instructions[prev_tgt_uuid].links_in.remove(link)
         tgt_sect.instructions[new_tgt_uuid].links_in.append(link)
         link.target_trace[1] = new_tgt_uuid
-        print('a place to pause ')
