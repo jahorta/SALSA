@@ -621,7 +621,7 @@ class SCTDecoder:
 
         raw = bytearray(b'')
         # Resolve the SCPT analysis
-        result_stack = [None] * 20
+        result_stack: List[Union[None, int, float]] = [None] * 20
         flag_stack = [0] * 20
         stack_index: int = 0
         max_index = 18
@@ -656,7 +656,7 @@ class SCTDecoder:
             elif currentWord in self._p_codes.compare.keys():
                 currVals = {'1': result_stack[stack_index], '2': result_stack[stack_index + 1]}
                 cur_result = {self._p_codes.compare[currentWord]: currVals}
-                nones = 0
+                nones: int = 0
                 for v in currVals.values():
                     if v is None:
                         nones += 1
