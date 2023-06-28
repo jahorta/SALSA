@@ -131,9 +131,9 @@ class SCTExportPopup(tk.Toplevel):
             'add_spurious_refresh': self.option_vars['all_refresh'].get() == 'True',
             'compress_aklz': self.option_vars['compress_aklz'].get() == 'True'
         }
-        self.callbacks['export'](directory=directory,
-                                 scripts=[self.script_ids[int(s)] for s in self.scripts.selection()],
-                                 options=options)
+        scripts = [self.script_ids[int(s)] for s in self.scripts.selection()]
+        if len(scripts) > 0:
+            self.callbacks['export'](directory=directory, scripts=scripts, options=options)
         self.close()
 
     def close(self):
