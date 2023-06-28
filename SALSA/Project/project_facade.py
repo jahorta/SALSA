@@ -323,6 +323,8 @@ class SCTProjectFacade:
             string_tree.append('group')
             for string_id in group:
                 _, str_head, str_body = SAstr_to_head_and_body(strings[string_id])
+                if str_head is None:
+                    str_head = ''
                 if '\n' in str_body:
                     str_body = str_body.split('\n')[0]
                     str_body += '...'
