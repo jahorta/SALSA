@@ -599,6 +599,7 @@ class SCTProjectFacade:
                 if 'If' in change:
                     ungrouped_index = cur_section.instruction_ids_ungrouped.index(inst) + 1
                     temp_cur_group = temp_cur_group[index][f'{inst}{sep}if']
+                    cur_first_uuid = self.get_inst_uuid_from_group_entry(temp_cur_group[0])
                 elif 'Else' in change:
                     goto_inst = cur_section.instructions[cur_inst.my_goto_uuids[0]]
                     ungrouped_index = cur_section.instruction_ids_ungrouped.index(goto_inst.ID) + 1
@@ -619,15 +620,31 @@ class SCTProjectFacade:
 
                 # Adjust if or switch for new linked inst values
                 if 'If' in change:
-                    cur_goto_uuid = cur_section.instructions[inst].my_goto_uuids[0]
-                    cur_goto_ind = cur_section.instruction_ids_ungrouped.index(cur_goto_uuid)
-                    prev_inst_uuid = cur_section.instruction_ids_ungrouped[cur_goto_ind-1]
+                    next_inst_ind = cur_section.instruction_ids_ungrouped.index(cur_first_uuid)
+                    prev_inst_uuid = cur_section.instruction_ids_ungrouped[next_inst_ind-1]
                     prev_inst = cur_section.instructions[prev_inst_uuid]
+                    # Skip if it is not a goto
                     if not prev_inst.instruction_id == 10:
                         continue
-                    if prev_inst.links_out[0].target_trace[1] == cur_goto_uuid:
+                    # Skip if the target is already correct
+                    prev_tgt = prev_inst.links_out[0].target_trace[1]
+                    if prev_tgt == cur_first_uuid:
                         continue
-                    self.change_link_tgt(tgt_sect=cur_section, link=prev_inst.links_out[0], new_tgt_uuid=cur_goto_uuid)
+                    if len(prev_inst.my_master_uuids) != 0:
+                        prev_master = cur_section.instructions[prev_inst.my_master_uuids[0]]
+                        # Skip if If is a While
+                        if cur_section.instruction_ids_ungrouped.index(prev_tgt) > cur_section.instruction_ids_ungrouped.index(prev_master.ID):
+                            self.change_link_tgt(tgt_sect=cur_section, link=prev_inst.links_out[0],
+                                                 new_tgt_uuid=cur_first_uuid)
+                    else:
+                        self.change_link_tgt(tgt_sect=cur_section, link=prev_inst.links_out[0],
+                                             new_tgt_uuid=cur_first_uuid)
+                        continue
+                    # Skip if prev has no master, master can only be If or Switch
+                    # Skip prev master is switch. prev_inst will not be a goto if an If with Else
+                    if prev_master.instruction_id == 3:
+                        continue
+                    self.change_link_tgt(tgt_sect=cur_section, link=prev_master.links_out[0], new_tgt_uuid=cur_first_uuid)
 
                 elif 'Else' in change:
                     self.change_link_tgt(tgt_sect=cur_section, link=cur_inst.links_out[0], new_tgt_uuid=inst_list[0])
@@ -1007,7 +1024,7 @@ class SCTProjectFacade:
             if new_tgt_inst_uuid is None:
                 ori_inst.links_out.pop(ori_inst.links_out.index(link))
             else:
-                self.change_link_tgt(tgt_sect=cur_sect, link=link, new_tgt_uuid=new_tgt_inst_uuid)
+                self.change_link_tgt(tgt_sect=cur_sect, link=link, new_tgt_uuid=new_tgt_inst_uuid, remove_from_tgt=False)
 
         for link in cur_inst.links_out:
             tgt_sect = link.target_trace[0]
@@ -1017,9 +1034,10 @@ class SCTProjectFacade:
         cur_inst.links_in = []
         cur_inst.links_out = []
 
-    def change_link_tgt(self, tgt_sect: SCTSection, link: SCTLink, new_tgt_uuid: str):
+    def change_link_tgt(self, tgt_sect: SCTSection, link: SCTLink, new_tgt_uuid: str, remove_from_tgt=True):
         prev_tgt_uuid = link.target_trace[1]
-        tgt_sect.instructions[prev_tgt_uuid].links_in.remove(link)
+        if remove_from_tgt:
+            tgt_sect.instructions[prev_tgt_uuid].links_in.remove(link)
         tgt_sect.instructions[new_tgt_uuid].links_in.append(link)
         link.target_trace[1] = new_tgt_uuid
         print('a place to pause ')
