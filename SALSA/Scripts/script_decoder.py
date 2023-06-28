@@ -274,17 +274,16 @@ class SCTDecoder:
                 if instResult.instruction_id in (0, 3):
                     instResult.generate_condition(default_aliases)
 
-                if instResult.instruction_id == 3:
-                    if sect_name not in self._switches.keys():
-                        self._switches[sect_name] = []
-                    self._switches[sect_name].append(inst_list_id)
-
                 if instResult.instruction_id == 0:
                     if sect_name not in self._jmp_if_falses.keys():
                         self._jmp_if_falses[sect_name] = []
                     self._jmp_if_falses[sect_name].append(inst_list_id)
 
-                if instResult.instruction_id == 0x3:
+                if instResult.instruction_id == 3:
+                    if sect_name not in self._switches.keys():
+                        self._switches[sect_name] = []
+                    self._switches[sect_name].append(inst_list_id)
+
                     # Check for garbage before first entry
                     switch_start = (self._cursor + len(instResult.parameters))
                     min_case_start = None
