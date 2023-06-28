@@ -94,7 +94,7 @@ class SCTProjectFacade:
                         tree_list[-1]['group_type'] = ele_key[1]
                         if ele_key[1] == 'else':
                             tree_list[-1][headers[0]] = group[self.get_inst_uuid_from_group_entry(ele_value)].ungrouped_position
-                            tree_list[-1]['absolute_position'] = group[self.get_inst_uuid_from_group_entry(ele_value)].absolute_position
+                            tree_list[-1]['absolute_offset'] = group[self.get_inst_uuid_from_group_entry(ele_value)].absolute_offset
                     tree_list.append('group')
                     ele_value = [ele_value] if not isinstance(ele_value, list) else ele_value
                     cur_group_type = ele_key[1] if len(ele_key) > 1 else ''
