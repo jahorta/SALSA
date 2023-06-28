@@ -21,7 +21,7 @@ ind_entry_len = 0x14
 ind_name_offset = 0x4
 ind_name_max_len = 0x10
 
-endian = {'gc': 'big', 'dc': 'little'}
+endian: Dict[str, Literal['big', 'little']] = {'gc': 'big', 'dc': 'little'}
 
 
 class SCTDecoder:
@@ -190,7 +190,7 @@ class SCTDecoder:
             if string == '':
                 section.add_error('Length of string == 0')
             section.set_type('String')
-            section.set_string(self._cursor * 4, string)
+            section.add_string(self._cursor * 4, string)
             garbage = self._get_garbage_after_string(bounds=bounds)
             if len(garbage) > 0:
                 section.add_garbage('end', garbage)
@@ -208,7 +208,6 @@ class SCTDecoder:
         self.end = bounds[1]
         inst_list_id = inst_list_id_start
         sect_name = section.name
-        sct_start_pos = section.absolute_offset
 
         while (self._cursor * 4) < bounds[1]:
             self._cur_endian = 'big'
@@ -267,23 +266,20 @@ class SCTDecoder:
 
                 section.add_instruction(instResult)
 
-                # Detect potential footer strings
-                if instResult.instruction_id in (24, 25):
-                    self._footer_dialog_locs.append((sect_name, instResult.ID))
-
-                if instResult.instruction_id in (0, 3):
+                if instResult.instruction_id in [0, 3]:
                     instResult.generate_condition(default_aliases)
-
-                if instResult.instruction_id == 0:
-                    if sect_name not in self._jmp_if_falses.keys():
-                        self._jmp_if_falses[sect_name] = []
-                    self._jmp_if_falses[sect_name].append(inst_list_id)
 
                 if instResult.instruction_id == 3:
                     if sect_name not in self._switches.keys():
                         self._switches[sect_name] = []
                     self._switches[sect_name].append(inst_list_id)
 
+                if instResult.instruction_id == 0:
+                    if sect_name not in self._jmp_if_falses.keys():
+                        self._jmp_if_falses[sect_name] = []
+                    self._jmp_if_falses[sect_name].append(inst_list_id)
+
+                if instResult.instruction_id == 0x3:
                     # Check for garbage before first entry
                     switch_start = (self._cursor + len(instResult.parameters))
                     min_case_start = None
@@ -380,18 +376,22 @@ class SCTDecoder:
                         param += currWord
                     error_str = f'{self.log_key}: Extra SCPT parameter found:\n\tSCPT Position: {cur_pos}'
                     error_str += f'\n\tAbsolute Position: {absolute_pos}'
-                    error_str += f'\n\tPrevious Instruction: {section.get_instruction_by_index().instruction_id}'
+                    if int(inst_list_id):
+                        error_str += f'\n\tPrevious Instruction: {section.get_instruction_by_index(inst_list_id).instruction_id}'
+                    else:
+                        error_str += f'\n\tUnable to determine Previous Instruction: inst_list_id is {inst_list_id}'
                     error_str += f'\n\tLength: {length}\n\tParam: {param.hex()}'
 
                 else:
                     error_str = f'{self.log_key}: Unknown Instruction Code:\n\tInstruction code: {param.hex()}'
                     error_str += f'\n\tSubscript: {cur_pos}\n\tInstruction List Index: {inst_list_id}'
-                    error_str += f'\n\tPrevious Instruction: {section.get_instruction_by_index().instruction_id}'
+                    if int(inst_list_id):
+                        error_str += f'\n\tPrevious Instruction: {section.get_instruction_by_index(inst_list_id).instruction_id}'
+                    else:
+                        error_str += f'\n\tUnable to determine Previous Instruction: inst_list_id is {inst_list_id}'
                     error_str += f'\n\tSCPT Position: {cur_pos}\n\tAbsolute Position: {absolute_pos}'
 
                 raise IndexError(error_str)
-
-            # self.cursor += 1
 
             if (self._cursor * 4) > bounds[1]:
                 error = f'{self.log_key}: Read cursor is past the end of current subscript: {sect_name}'
@@ -1778,26 +1778,26 @@ class SCTDecoder:
             for inst_key, inst in section.instructions.items():
                 for pID, param in inst.parameters.items():
                     if isinstance(param.value, dict):
-                        vars = self._extract_variables(param.value)
-                        self._add_variable_locations(vars, (s_name, inst_key, f'{pID}'))
-                for l, loop in enumerate(inst.loop_parameters):
+                        var_list = self._extract_variables(param.value)
+                        self._add_variable_locations(var_list, (s_name, inst_key, f'{pID}'))
+                for loop_id, loop in enumerate(inst.loop_parameters):
                     for pID, param in loop.items():
                         if isinstance(param.value, dict):
-                            vars = self._extract_variables(param.value)
-                            self._add_variable_locations(vars, (s_name, inst_key, f'{l}{sep}{pID}'))
+                            var_list = self._extract_variables(param.value)
+                            self._add_variable_locations(var_list, (s_name, inst_key, f'{loop_id}{sep}{pID}'))
 
         sct.variables = self._variables
 
-    def _extract_variables(self, cur_element, vars=None):
-        if vars is None:
-            vars = []
+    def _extract_variables(self, cur_element, var_list=None):
+        if var_list is None:
+            var_list = []
         if isinstance(cur_element, dict):
             for value in cur_element.values():
-                vars = self._extract_variables(value, vars=vars)
+                var_list = self._extract_variables(value, var_list=var_list)
         elif isinstance(cur_element, str):
             if 'Var:' in cur_element:
-                vars.append(cur_element)
-        return vars
+                var_list.append(cur_element)
+        return var_list
 
     def _add_variable_locations(self, var_list, trace):
         for var in var_list:
@@ -1809,7 +1809,8 @@ class SCTDecoder:
                 self._variables[keys[0]][key_1] = {'alias': '', 'usage': []}
             self._variables[keys[0]][key_1]['usage'].append(trace)
 
-    def _put_inst_ids_into_link_traces(self, decoded_sct):
+    @staticmethod
+    def _put_inst_ids_into_link_traces(decoded_sct):
         for section in decoded_sct.sections.values():
             for key, inst in section.instructions.items():
                 inst: SCTInstruction
@@ -1818,7 +1819,8 @@ class SCTDecoder:
                 for link in inst.links_out:
                     link.origin_trace[1] = key
 
-    def _populate_ungrouped_inst_values(self, decoded_sct):
+    @staticmethod
+    def _populate_ungrouped_inst_values(decoded_sct):
         for section in decoded_sct.sections.values():
             for i, key in enumerate(section.instruction_ids_ungrouped):
                 section.instructions[key].ungrouped_position = i
