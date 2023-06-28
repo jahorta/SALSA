@@ -6,11 +6,11 @@ from SALSA.GUI.widgets import DataTreeview
 
 tree_settings = {
     'script': {
-        'name': {'label': 'Name', 'width': 100, 'stretch': True}
+        'name': {'label': 'Name', 'width': 80, 'stretch': False}
     },
     'string': {
-        'location': {'label': 'Name', 'width': 100, 'stretch': True},
-        'string': {'label': 'Name', 'width': 200, 'stretch': True}
+        'location': {'label': 'Name', 'width': 110, 'stretch': False},
+        'string': {'label': 'Name', 'width': 100, 'stretch': True}
     }
 }
 
