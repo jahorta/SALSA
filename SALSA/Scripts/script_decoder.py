@@ -373,13 +373,19 @@ class SCTDecoder:
                         param += currWord
                     error_str = f'{self.log_key}: Extra SCPT parameter found:\n\tSCPT Position: {cur_pos}'
                     error_str += f'\n\tAbsolute Position: {absolute_pos}'
-                    error_str += f'\n\tPrevious Instruction: {section.get_instruction_by_index().instruction_id}'
+                    if int(inst_list_id):
+                        error_str += f'\n\tPrevious Instruction: {section.get_instruction_by_index(inst_list_id).instruction_id}'
+                    else:
+                        error_str += f'\n\tUnable to determine Previous Instruction: inst_list_id is {inst_list_id}'
                     error_str += f'\n\tLength: {length}\n\tParam: {param.hex()}'
 
                 else:
                     error_str = f'{self.log_key}: Unknown Instruction Code:\n\tInstruction code: {param.hex()}'
                     error_str += f'\n\tSubscript: {cur_pos}\n\tInstruction List Index: {inst_list_id}'
-                    error_str += f'\n\tPrevious Instruction: {section.get_instruction_by_index().instruction_id}'
+                    if int(inst_list_id):
+                        error_str += f'\n\tPrevious Instruction: {section.get_instruction_by_index(inst_list_id).instruction_id}'
+                    else:
+                        error_str += f'\n\tUnable to determine Previous Instruction: inst_list_id is {inst_list_id}'
                     error_str += f'\n\tSCPT Position: {cur_pos}\n\tAbsolute Position: {absolute_pos}'
 
                 raise IndexError(error_str)
