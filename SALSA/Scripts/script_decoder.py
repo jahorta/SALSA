@@ -1,10 +1,9 @@
 import copy
 import math
-import os
 import re
 import struct
 import difflib
-from typing import Dict, Tuple, List, Callable
+from typing import Dict, Tuple, List, Callable, Literal, Union
 
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Project.project_container import SCTScript, SCTSection, SCTLink, SCTInstruction, SCTParameter
@@ -20,7 +19,7 @@ ind_entry_len = 0x14
 ind_name_offset = 0x4
 ind_name_max_len = 0x10
 
-endian = {'gc': 'big', 'dc': 'little'}
+endian: Dict[str, Literal['big', 'little']] = {'gc': 'big', 'dc': 'little'}
 
 
 class SCTDecoder:
@@ -42,7 +41,7 @@ class SCTDecoder:
     _jmp_if_falses: Dict[str, List[int]]
     _switches: Dict[str, List[int]]
     _last_sect_pos: int
-    _cur_endian = endian['gc']
+    _cur_endian: Literal['big', 'little'] = endian['gc']
 
     _scpt_arithmetic_fxns: Dict[str, Callable] = {
         '*': scpt_arithmetic.mult,
@@ -206,7 +205,6 @@ class SCTDecoder:
         self.end = bounds[1]
         inst_list_id = inst_list_id_start
         sect_name = section.name
-        sct_start_pos = section.absolute_offset
 
         while (self._cursor * 4) < bounds[1]:
             self._cur_endian = 'big'
@@ -616,7 +614,7 @@ class SCTDecoder:
 
         raw = bytearray(b'')
         # Resolve the SCPT analysis
-        result_stack = [None] * 20
+        result_stack: List[Union[None, int, float]] = [None] * 20
         flag_stack = [0] * 20
         stack_index: int = 0
         max_index = 18
@@ -651,7 +649,7 @@ class SCTDecoder:
             elif currentWord in self._p_codes.compare.keys():
                 currVals = {'1': result_stack[stack_index], '2': result_stack[stack_index + 1]}
                 cur_result = {self._p_codes.compare[currentWord]: currVals}
-                nones = 0
+                nones: int = 0
                 for v in currVals.values():
                     if v is None:
                         nones += 1
@@ -1771,26 +1769,26 @@ class SCTDecoder:
             for inst_key, inst in section.instructions.items():
                 for pID, param in inst.parameters.items():
                     if isinstance(param.value, dict):
-                        vars = self._extract_variables(param.value)
-                        self._add_variable_locations(vars, (s_name, inst_key, f'{pID}'))
-                for l, loop in enumerate(inst.loop_parameters):
+                        var_list = self._extract_variables(param.value)
+                        self._add_variable_locations(var_list, (s_name, inst_key, f'{pID}'))
+                for loop_id, loop in enumerate(inst.loop_parameters):
                     for pID, param in loop.items():
                         if isinstance(param.value, dict):
-                            vars = self._extract_variables(param.value)
-                            self._add_variable_locations(vars, (s_name, inst_key, f'{l}{sep}{pID}'))
+                            var_list = self._extract_variables(param.value)
+                            self._add_variable_locations(var_list, (s_name, inst_key, f'{loop_id}{sep}{pID}'))
 
         sct.variables = self._variables
 
-    def _extract_variables(self, cur_element, vars=None):
-        if vars is None:
-            vars = []
+    def _extract_variables(self, cur_element, var_list=None):
+        if var_list is None:
+            var_list = []
         if isinstance(cur_element, dict):
             for value in cur_element.values():
-                vars = self._extract_variables(value, vars=vars)
+                var_list = self._extract_variables(value, var_list=var_list)
         elif isinstance(cur_element, str):
             if 'Var:' in cur_element:
-                vars.append(cur_element)
-        return vars
+                var_list.append(cur_element)
+        return var_list
 
     def _add_variable_locations(self, var_list, trace):
         for var in var_list:
@@ -1802,7 +1800,8 @@ class SCTDecoder:
                 self._variables[keys[0]][key_1] = {'alias': '', 'usage': []}
             self._variables[keys[0]][key_1]['usage'].append(trace)
 
-    def _put_inst_ids_into_link_traces(self, decoded_sct):
+    @staticmethod
+    def _put_inst_ids_into_link_traces(decoded_sct):
         for section in decoded_sct.sections.values():
             for key, inst in section.instructions.items():
                 inst: SCTInstruction
@@ -1811,7 +1810,8 @@ class SCTDecoder:
                 for link in inst.links_out:
                     link.origin_trace[1] = key
 
-    def _populate_ungrouped_inst_values(self, decoded_sct):
+    @staticmethod
+    def _populate_ungrouped_inst_values(decoded_sct):
         for section in decoded_sct.sections.values():
             for i, key in enumerate(section.instruction_ids_ungrouped):
                 section.instructions[key].ungrouped_position = i
