@@ -11,9 +11,9 @@ check_compressed = False
 # If last_file == None, goes till end
 
 # first_file = None
-first_file = 'me002a.sct'
+first_file = 'ME355A.sct'
 # last_file = None
-last_file = 'me008a.sct'
+last_file = 'ME355A.sct'
 
 # Determines whether files are exported if there is a difference
 file_out = True
