@@ -190,7 +190,7 @@ class SCTDecoder:
             if string == '':
                 section.add_error('Length of string == 0')
             section.set_type('String')
-            section.add_string(self._cursor * 4, string)
+            section.set_string(self._cursor * 4, string)
             garbage = self._get_garbage_after_string(bounds=bounds)
             if len(garbage) > 0:
                 section.add_garbage('end', garbage)

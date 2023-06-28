@@ -268,7 +268,7 @@ class SCTSection:
         self.length = length
         self.absolute_offset = pos
 
-    def add_string(self, pos: int, string: str):
+    def set_string(self, pos: int, string: str):
         self.strings[pos] = string
         self.string = string
 
