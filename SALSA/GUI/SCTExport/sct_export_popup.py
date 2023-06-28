@@ -27,6 +27,7 @@ class SCTExportPopup(tk.Toplevel):
         self.callbacks = callbacks
         self.selected = selected
         self.script_ids = {}
+        self.protocol('WM_DELETE_WINDOW', self.close)
 
         if self.log_key not in settings:
             settings[self.log_key] = {}
