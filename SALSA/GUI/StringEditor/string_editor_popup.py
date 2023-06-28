@@ -92,7 +92,7 @@ class StringPopup(tk.Toplevel):
         self.strings = DataTreeview(string_tree_frame, name='strings', columns=columns)
         self.strings.grid(row=0, column=0, sticky='NSEW')
         first = True
-        for name, d in tree_settings['script'].items():
+        for name, d in tree_settings['string'].items():
             label = d.get('label', default_tree_label)
             anchor = d.get('anchor', default_tree_anchor)
             minwidth = d.get('minwidth', default_tree_minwidth)
