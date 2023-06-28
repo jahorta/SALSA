@@ -1843,7 +1843,7 @@ class SCTDecoder:
 
         decoded_sct.string_groups[footer_str_group_name] = []
         for i, item in enumerate(footer_dialog_strings):
-            foot_id = f'{footer_str_id_prefix}{i:02d}'
+            foot_id = f'{footer_str_id_prefix}{i:03d}'
             decoded_sct.strings[foot_id] = item[1]
             decoded_sct.string_groups[footer_str_group_name].append(foot_id)
             decoded_sct.string_locations[foot_id] = footer_str_group_name
