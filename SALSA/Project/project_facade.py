@@ -1002,6 +1002,9 @@ class SCTProjectFacade:
         for parent in parents:
             cur_group = cur_group[parent]
 
+        if inst == self.get_inst_uuid_from_group_entry(cur_group[index + 1]):
+            index += 1
+
         if index + 1 < len(cur_group):
             # if cur_inst is an if/else/while
             if cur_inst.instruction_id == 0:
