@@ -889,8 +889,8 @@ class SCTDecoder:
             decoded_sct.section_groups.pop(group)
 
         for name, group in decoded_sct.section_groups.items():
-            if 'logical' not in name:
-                continue
+            # if 'logical' not in name:
+            #     continue
             new_name = group[0]
             if new_name[:2] != 'me':
 
