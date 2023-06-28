@@ -390,8 +390,6 @@ class SCTDecoder:
 
                 raise IndexError(error_str)
 
-            # self.cursor += 1
-
             if (self._cursor * 4) > bounds[1]:
                 error = f'{self.log_key}: Read cursor is past the end of current subscript: {sect_name}'
                 raise IndexError(error)
