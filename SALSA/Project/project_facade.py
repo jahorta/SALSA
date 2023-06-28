@@ -610,8 +610,9 @@ class SCTProjectFacade:
                 else:
                     sub_group = change.split(' ')[-1]
                     temp_cur_group = temp_cur_group[index][f'{inst}{sep}switch'][sub_group]
-                    first_uuid, _ = self.get_inst_group_bounds(cur_group)
+                    first_uuid = self.get_inst_uuid_from_group_entry(temp_cur_group)
                     ungrouped_index = cur_section.instruction_ids_ungrouped.index(first_uuid)
+                    cur_first_uuid = self.get_inst_uuid_from_group_entry(saved_children[change.split(alt_sep)[0]])
 
                 # Insert saved group into appropriate place in ungrouped
                 inst_list = self.extract_inst_uuids_from_group(saved_children[change.split(alt_sep)[0]])
@@ -660,11 +661,11 @@ class SCTProjectFacade:
                             break
                     if case_param is None:
                         print(f'{self.log_key}: Unable to find switch case for link change')
-                    prev_tgt_inst = cur_section.instructions[case_param.link.target_trace[1]]
-                    prev_tgt_inst.links_in.remove(case_param.link)
-                    case_param.link.target_trace[1] = inst_list[0]
-                    new_tgt_inst = cur_section.instructions[inst_list[0]]
-                    new_tgt_inst.links_in.append(cur_inst.parameters[0].link)
+                    self.change_link_tgt(tgt_sect=cur_section, link=case_param.link, new_tgt_uuid=cur_first_uuid)
+
+                    next_key = self.get_inst_uuid_from_group_entry(cur_group[index + 1])
+                    if inst in next_key:
+                        cur_group.pop(index + 1)
 
         cur_inst.generate_condition(self.get_script_variables_with_aliases(script))
         self._refresh_inst_positions(script, section)
@@ -847,18 +848,17 @@ class SCTProjectFacade:
             cur_group.insert(index + 1, {sub_group: []})
             return
 
-        goto_target_ind = cur_sect.instruction_ids_ungrouped.index(inst) + 1
-        goto_target_uuid = cur_sect.instruction_ids_ungrouped[goto_target_ind]
-        loop_param_num = len(cur_inst.loop_parameters)
-        if loop_param_num > 0:
-            for uuid in cur_inst.my_goto_uuids:
-                cur_tgt_uuid = cur_sect.instructions[uuid].parameters[0].link.target_trace[1]
-                cur_tgt_ind = cur_sect.instruction_ids_ungrouped.index(cur_tgt_uuid)
-                if cur_tgt_ind > goto_target_ind:
-                    goto_target_ind = cur_tgt_uuid
-                    goto_target_uuid = cur_tgt_uuid
+        # The remainder is for adding a case to the switch
+        goto_target_uuid = self.get_next_grouped_uuid(script=script, section=section, inst=inst)
+
+        for link in cur_inst.links_out:
+            loop_id = int(link.origin_trace[2].split(sep)[0])
+            link.origin_trace[2] = f'{loop_id+1}{sep}3'
 
         case_goto = SCTInstruction()
+        case_goto.my_master_uuids.append(inst)
+        cur_inst.my_goto_uuids.append(case_goto.ID)
+
         cur_sect.instructions[case_goto.ID] = case_goto
         case_goto.set_inst_id(10)
         case_goto.parameters[0] = SCTParameter(0, 'int|jump')
@@ -867,17 +867,20 @@ class SCTProjectFacade:
 
         switch_loop_params = {2: SCTParameter(2, 'int'), 3: SCTParameter(3, 'int|jump')}
         switch_loop_params[2].value = int(sub_group)
-        switch_loop_params[3].link = SCTLink('Jump', origin=-1, origin_trace=[section, inst, f'{loop_param_num}{sep}3'],
+        switch_loop_params[3].link = SCTLink('Jump', origin=-1, origin_trace=[section, inst, f'0{sep}3'],
                                              target=-1, target_trace=[section, case_goto.ID])
-        cur_inst.loop_parameters.append(switch_loop_params)
 
-        cur_inst.links_out.append(switch_loop_params[3].link)
+        cur_inst.loop_parameters.insert(0, switch_loop_params)
+        cur_inst.links_out.insert(0, switch_loop_params[3].link)
+        cur_inst.parameters[1].set_value(cur_inst.parameters[1].value + 1)
+
         case_goto.links_in.append(switch_loop_params[3].link)
         case_goto.links_out.append(case_goto.parameters[0].link)
         cur_sect.instructions[goto_target_uuid].links_in.append(case_goto.parameters[0].link)
 
-        cur_sect.instruction_ids_ungrouped.insert(goto_target_ind, case_goto.ID)
-        test_group[sub_group] = [case_goto.ID]
+        inst_pos = cur_sect.instruction_ids_ungrouped.index(inst)
+        cur_sect.instruction_ids_ungrouped.insert(inst_pos + 1, case_goto.ID)
+        cur_group[index][list(cur_group[index].keys())[0]] = {sub_group: [case_goto.ID], **test_group}
 
     # --------------------------- #
     # Inst group analysis methods #
