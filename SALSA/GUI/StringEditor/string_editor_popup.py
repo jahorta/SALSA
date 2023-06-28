@@ -22,7 +22,7 @@ default_tree_label = ''
 
 note_font = {}
 no_head_warning = 'Removing the header will allow for 5 lines of body text instead of 4.\nWARNING: Clicking this check box will delete the current header.'
-body_note = 'NOTE:"[" and "]" are used for open and close quotes respectively. Using " or \' will only give the close quote.'
+body_note = 'NOTE: [ and ] are used for open and close quotes respectively. Using " or \' will only give the close quote.'
 
 
 class StringPopup(tk.Toplevel):
