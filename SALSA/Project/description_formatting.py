@@ -226,6 +226,8 @@ def get_parameter_string(param_name, inst: SCTInstruction, base_inst: BaseInst, 
     if string_id is None:
         return f'No string found for parameter {param_name}'
     no_head, head, body = callbacks['get_str'](string_id)
+    if head is None:
+        head = ''
     connector = '\n' if no_head else ''
     return f'{head}{connector}{body}'
 
