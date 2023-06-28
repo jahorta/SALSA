@@ -127,7 +127,7 @@ class ProjectEditorView(tk.Frame):
         section_tree_frame.rowconfigure(1, weight=1)
         section_tree_frame.columnconfigure(0, weight=1)
 
-        section_tree_label = tk.Label(section_tree_frame, text='Sections')
+        section_tree_label = tk.Label(section_tree_frame, text='Sections (Subscripts)')
         section_tree_label.grid(row=0, column=0, sticky=tk.W)
         self.pane_frame.add(section_tree_frame, weight=1)
 
