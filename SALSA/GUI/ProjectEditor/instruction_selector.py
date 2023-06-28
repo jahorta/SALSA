@@ -91,11 +91,9 @@ class InstructionSelectorWidget(tk.Frame):
 
     def select_inst(self, name, new_ID):
         done = self.callbacks['set_inst_id'](*self.inst_trace, new_ID)
-        if not done:
-            self.search.focus_set()
-            return
         self.cancel(None)
-        self.callbacks['update_tree']()
+        if done:
+            self.callbacks['update_tree']()
 
     def cancel(self, e):
         self.result_dropdown.destroy()

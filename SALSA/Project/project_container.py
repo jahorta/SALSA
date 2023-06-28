@@ -1,10 +1,23 @@
 import uuid
 from itertools import count
 from dataclasses import dataclass, field as dc_field
-from typing import List, Union, Dict, Tuple
+from typing import List, Union, Dict, Tuple, Literal
 
 from SALSA.Common.constants import sep, uuid_sep
 from SALSA.Scripts import scpt_condition_changes as cond_changes
+
+
+@dataclass
+class Trace:
+    sct: str
+    sect: str
+    inst: str
+    param: Union[None, int]
+
+    def __getitem__(self, item: Literal[0, 1, 2, 3]):
+        if item > 3:
+            raise IndexError('Index out of bounds: Trace has 4 attributes')
+        return [self.sct, self.sect, self.inst, self.param][item]
 
 
 @dataclass

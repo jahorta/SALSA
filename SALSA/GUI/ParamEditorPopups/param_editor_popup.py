@@ -108,6 +108,7 @@ class SCPTEditWidget(tk.Frame):
         self.callbacks = callbacks
         self.scpt_codes = SCPTParamCodes(is_decoder=False)
         self.key = key
+        self.is_base = is_base
 
         indent = '\t'*key.count(sep)
         self.prefix_label = tk.Label(self, text=f'{indent} {prefix}')
@@ -122,6 +123,9 @@ class SCPTEditWidget(tk.Frame):
         self.option_option.configure(state='disabled')
         self.option_option.grid(row=0, column=2)
 
+        self.input_option_selection = ''
+        self.secondary_option_selection = ''
+
         self.input_vars = {
             'var': tk.IntVar(self),
             'decimal': [tk.IntVar(self), tk.IntVar(self)]
@@ -133,14 +137,32 @@ class SCPTEditWidget(tk.Frame):
             'decimal': DecimalWidget(self, textvariables=self.input_vars['decimal'])
         }
 
+        self.prev_active_widget = ''
         self.active_widget = ''
 
     def update_options(self, e):
-        option_list = list(self.scpt_codes.__getattribute__(self.class_selection.get()).keys())
+        class_selected = self.class_selection.get()
+        option_list = list(self.scpt_codes.__getattribute__(class_selected).keys())
         self.option_option.configure(state='normal')
         self.option_option['menu'].delete(0, 'end')
         for option in option_list:
             self.option_option['menu'].add_command(label=option, command=lambda o=option: self.choose_option(o))
+
+        if self.active_widget != '':
+            self.prev_active_widget = self.active_widget
+
+        if class_selected in ('compare', 'arithmetic'):
+            if self.active_widget != '':
+                self.set_active_input_widget('')
+            self.option_selection.set(option_list[0])
+        elif class_selected == 'secondary':
+            if self.active_widget != '':
+                self.set_active_input_widget('')
+            self.option_selection.set(self.secondary_option_selection)
+        elif class_selected == 'input':
+            if self.prev_active_widget != self.active_widget:
+                self.set_active_input_widget(self.prev_active_widget)
+            self.option_selection.set(self.secondary_option_selection)
 
     def choose_option(self, option):
         self.option_selection.set(option)
@@ -149,13 +171,16 @@ class SCPTEditWidget(tk.Frame):
     def update_input_entry(self):
         if self.class_selection.get() in ('compare', 'arithmetic'):
             # May need to ungrid other entry fields
-            self.callbacks['add_child_scpt_rows'](self.key)
+            self.callbacks['add_child_scpt_rows'](self.key, self.is_base)
             self.set_active_input_widget('')
             return
         self.callbacks['remove_child_scpt_rows'](self.key)
-        if self.class_selection.get() == 'secondary':
-            return
+
         option_selection = self.option_selection.get()
+        if self.class_selection.get() == 'secondary':
+            self.secondary_option_selection = option_selection
+            return
+        self.input_option_selection = option_selection
         widget_type = 'float'
         widget_type = 'var' if 'Var' in option_selection else widget_type
         widget_type = 'decimal' if 'decimal' in option_selection else widget_type
@@ -189,6 +214,7 @@ class SCPTEditWidget(tk.Frame):
             self.class_selection.set('secondary')
             self.update_options(None)
             self.option_selection.set(value)
+            self.secondary_option_selection = value
 
         # Value is either a variable or a decimal
         elif isinstance(value, str):
@@ -205,6 +231,7 @@ class SCPTEditWidget(tk.Frame):
                 dec_1 = int(all_value_parts[1])
                 self.input_vars['decimal'][0].set(dec_0)
                 self.input_vars['decimal'][1].set(dec_1)
+                self.input_option_selection = 'decimal'
             elif 'Var' in value:
                 var_parts = value.split(': ')
                 var_type = var_parts[0]
@@ -215,6 +242,7 @@ class SCPTEditWidget(tk.Frame):
                 self.set_active_input_widget('var')
                 self.input_vars['var'].set(var_value)
                 self.input_widgets['var'].load_alias(None)
+                self.input_option_selection = f'{var_type}: '
             else:
                 print(f'unknown value type: {value}')
 
@@ -227,6 +255,7 @@ class SCPTEditWidget(tk.Frame):
             if override:
                 value = 'override'
             self.input_widgets['float'].set_value(value)
+            self.input_option_selection = value
 
     def get_var_alias(self):
         var_type = self.option_selection.get().split(': ')[0]

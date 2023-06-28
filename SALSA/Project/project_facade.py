@@ -1,5 +1,5 @@
 import copy
-from typing import Union, Tuple
+from typing import Union, Tuple, Literal
 
 from SALSA.Common.script_string_utils import SAstr_to_head_and_body, head_and_body_to_SAstr
 from SALSA.Project.description_formatting import format_description
@@ -537,7 +537,7 @@ class SCTProjectFacade:
                     finished_change_indexes.append(i)
                 elif 'Insert' in change:
                     self.perform_group_change(script, section, inst, cur_group, change)
-                    saved_children[change_parts[0]] = cur_group[:-1]
+                    saved_children[change_parts[0]] = copy.deepcopy(cur_group)
                 else:
                     print(f'{self.log_key}: Unknown group change instruction: {change}')
 
@@ -607,9 +607,9 @@ class SCTProjectFacade:
                     first_uuid, _ = self.get_inst_group_bounds(cur_group)
                     ungrouped_index = cur_section.instruction_ids_ungrouped.index(first_uuid)
 
+                # Insert saved group into appropriate place in ungrouped
                 inst_list = self.extract_inst_uuids_from_group(saved_children[change.split(alt_sep)[0]])
-                for uuid in reversed(inst_list):
-                    cur_section.instruction_ids_ungrouped.insert(ungrouped_index, uuid)
+                cur_section.instruction_ids_ungrouped = cur_section.instruction_ids_ungrouped[:ungrouped_index] + inst_list + cur_section.instruction_ids_ungrouped[ungrouped_index:]
 
                 # insert saved_group into appropriate place in grouped
                 for item in reversed(saved_children[change.split(alt_sep)[0]]):
@@ -617,14 +617,19 @@ class SCTProjectFacade:
 
                 # Adjust if or switch for new linked inst values
                 if 'If' in change:
-                    pass
+                    cur_goto_uuid = cur_section.instructions[inst].my_goto_uuids[0]
+                    cur_goto_ind = cur_section.instruction_ids_ungrouped.index(cur_goto_uuid)
+                    prev_inst_uuid = cur_section.instruction_ids_ungrouped[cur_goto_ind-1]
+                    prev_inst = cur_section.instructions[prev_inst_uuid]
+                    if not prev_inst.instruction_id == 10:
+                        continue
+                    if prev_inst.links_out[0].target_trace[1] == cur_goto_uuid:
+                        continue
+                    self.change_link_tgt(tgt_sect=cur_section, link=prev_inst.links_out[0], new_tgt_uuid=cur_goto_uuid)
+
                 elif 'Else' in change:
-                    prev_tgt_uuid = cur_inst.parameters[1].link.target_trace[1]
-                    prev_tgt_inst = cur_section.instructions[prev_tgt_uuid]
-                    prev_tgt_inst.links_in.remove(cur_inst.parameters[1].link)
-                    cur_inst.parameters[1].link.target_trace[1] = inst_list[0]
-                    new_tgt_inst = cur_section.instructions[inst_list[0]]
-                    new_tgt_inst.links_in.append(cur_inst.parameters[1].link)
+                    self.change_link_tgt(tgt_sect=cur_section, link=cur_inst.links_out[0], new_tgt_uuid=inst_list[0])
+
                 else:
                     case_param = None
                     for loop in cur_inst.loop_parameters:
@@ -997,12 +1002,11 @@ class SCTProjectFacade:
             ori_sect = link.origin_trace[0]
             ori_inst_uuid = link.origin_trace[1]
             ori_inst = self.project.scripts[script].sections[ori_sect].instructions[ori_inst_uuid]
-            link_ind = ori_inst.links_out.index(link)
             if new_tgt_inst_uuid is None:
-                ori_inst.links_out.pop(link_ind)
+                ori_inst.links_out.pop(ori_inst.links_out.index(link))
             else:
-                ori_inst.links_out[link_ind].target_trace[1] = new_tgt_inst_uuid
-                cur_sect.instructions[new_tgt_inst_uuid].links_in.append(link)
+                self.change_link_tgt(tgt_sect=cur_sect, link=link, new_tgt_uuid=new_tgt_inst_uuid)
+
         for link in cur_inst.links_out:
             tgt_sect = link.target_trace[0]
             tgt_inst_uuid = link.target_trace[1]
@@ -1011,5 +1015,9 @@ class SCTProjectFacade:
         cur_inst.links_in = []
         cur_inst.links_out = []
 
-
-
+    def change_link_tgt(self, tgt_sect: SCTSection, link: SCTLink, new_tgt_uuid: str):
+        prev_tgt_uuid = link.target_trace[1]
+        tgt_sect.instructions[prev_tgt_uuid].links_in.remove(link)
+        tgt_sect.instructions[new_tgt_uuid].links_in.append(link)
+        link.target_trace[1] = new_tgt_uuid
+        print('a place to pause ')

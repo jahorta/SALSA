@@ -27,6 +27,7 @@ class SCTExportPopup(tk.Toplevel):
         self.callbacks = callbacks
         self.selected = selected
         self.script_ids = {}
+        self.protocol('WM_DELETE_WINDOW', self.close)
 
         if self.log_key not in settings:
             settings[self.log_key] = {}
@@ -130,9 +131,9 @@ class SCTExportPopup(tk.Toplevel):
             'add_spurious_refresh': self.option_vars['all_refresh'].get() == 'True',
             'compress_aklz': self.option_vars['compress_aklz'].get() == 'True'
         }
-        self.callbacks['export'](directory=directory,
-                                 scripts=[self.script_ids[int(s)] for s in self.scripts.selection()],
-                                 options=options)
+        scripts = [self.script_ids[int(s)] for s in self.scripts.selection()]
+        if len(scripts) > 0:
+            self.callbacks['export'](directory=directory, scripts=scripts, options=options)
         self.close()
 
     def close(self):

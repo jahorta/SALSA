@@ -95,7 +95,7 @@ class ProjectEditorController:
 
     def set_mem_offset(self):
         mem_offset_value = self.view.mem_offset_var.get()
-        self.cur_mem_offset = 0 if mem_offset_value is '' else int(mem_offset_value, 16)
+        self.cur_mem_offset = 0 if mem_offset_value == '' else int(mem_offset_value, 16)
         if self.current['section'] is not None:
             self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'), **self.current))
 
@@ -198,7 +198,10 @@ class ProjectEditorController:
                     if 'group_type' in entry.keys():
                         entry[col] += f' ({entry["group_type"]})'
                 elif col == 'absolute_offset':
-                    entry[col] = hex(int(entry[col])+self.cur_mem_offset) if entry[col] != '' else ''
+                    if entry[col] in ('', 'None') or entry[col] is None:
+                        entry[col] = ''
+                    else:
+                        entry[col] = hex(int(entry[col])+self.cur_mem_offset)
                 if first:
                     kwargs['text'] = entry[col]
                     first = False
