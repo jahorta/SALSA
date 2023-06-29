@@ -1,3 +1,5 @@
+loop_count_name = 'iteration'
+
 inst_defaults = {
     0: {
         "Location": "0x801f6044",
@@ -51,7 +53,7 @@ inst_defaults = {
                 "Default": None
             },
             1: {
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -545,7 +547,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -602,7 +604,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -669,7 +671,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -918,7 +920,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -2080,7 +2082,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None
             },
@@ -2105,7 +2107,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -2131,7 +2133,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -2158,7 +2160,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -2185,7 +2187,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -2246,7 +2248,7 @@ inst_defaults = {
         "Loop Iterations": 1,
         "Implement": True,
         "Parameter num": 13,
-        "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt|short\n2: int\n\nloop ((2)) iterations):\n\n3: scpt|float\n4: scpt|float\n5: scpt|float\n6: scpt|float\n7: scpt|int\n8: scpt|int\n9: scpt|float\n10: scpt|int\n11: scpt|int",
+        "Notes": f"Only runs if param1 & 1 == 1:\n\n1: scpt|short\n2: int\n\nloop ((2)) 'iterations'):\n\n3: scpt|float\n4: scpt|float\n5: scpt|float\n6: scpt|float\n7: scpt|int\n8: scpt|int\n9: scpt|float\n10: scpt|int\n11: scpt|int",
         "Parameters": {
             0: {
                 "Type": "scpt|short",
@@ -2255,7 +2257,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -2476,7 +2478,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -2497,7 +2499,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -2681,7 +2683,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -2968,7 +2970,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -3001,7 +3003,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -3067,7 +3069,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -3195,7 +3197,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -3217,7 +3219,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -3279,7 +3281,7 @@ inst_defaults = {
                 "Mask": None
             },
             1: {
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None
             }
@@ -3300,7 +3302,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -3352,7 +3354,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Mask": 0x0000ffff,
                 "Signed": False,
                 "Default": 0
@@ -3389,7 +3391,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Mask": 0x0000ffff,
                 "Signed": False,
                 "Default": 0
@@ -3441,7 +3443,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -3556,7 +3558,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -3631,7 +3633,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -3855,7 +3857,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -3961,7 +3963,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -3988,7 +3990,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -4089,7 +4091,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -4195,7 +4197,7 @@ inst_defaults = {
             },
             1: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -6178,7 +6180,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -6199,7 +6201,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -6370,7 +6372,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
@@ -6452,7 +6454,7 @@ inst_defaults = {
         "Parameters": {
             0: {
                 "Name": "Iterations",
-                "Type": "int|iterations",
+                "Type": f"int|{loop_count_name}",
                 "Signed": False,
                 "Mask": None,
                 "Default": 0
