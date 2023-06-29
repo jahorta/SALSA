@@ -75,25 +75,60 @@ class InstructionSelectorWidget(tk.Frame):
         self.search.focus_set()
 
         self.search.bind('<KeyPress-Escape>', self.cancel)
+        self.search.bind('<KeyPress-Return>', self.select_inst_by_enter)
+        self.search.bind('<KeyPress-Down>', self.move_to_results)
+
+        self.result_dropdown.bind('<KeyPress-Escape>', self.cancel)
+        self.result_dropdown.bind('<KeyPress-Return>', self.select_inst_by_enter)
+        self.result_dropdown.bind('<KeyPress-Up>', self.handle_dropdown_up_keypress)
 
     def update_search(self, current):
         self.update_menu(self.callbacks['get_relevant'](current))
 
     def update_menu(self, relevant_entries):
         self.result_dropdown.clear_all_entries()
+        if len(relevant_entries) == 0:
+            return
+        rows = min(self.entry_max, len(relevant_entries))
+        rows = max(rows, 1)
+        if len(relevant_entries) > rows:
+            relevant_entries = relevant_entries[:rows]
+        self.result_dropdown.configure(height=rows)
         for entry in relevant_entries:
             entry_parts = entry.split(' - ')
             inst_id = entry_parts[0]
             self.result_dropdown.insert_entry(parent='', index='end', text=entry, values=[], row_data=inst_id)
-        rows = min(self.entry_max, len(relevant_entries))
-        rows = max(rows, 1)
-        self.result_dropdown.configure(height=rows)
+        self.result_dropdown.selection_set(self.result_dropdown.get_children('')[0])
 
     def select_inst(self, name, new_ID):
         done = self.callbacks['set_inst_id'](*self.inst_trace, new_ID)
         self.cancel(None)
         if done:
             self.callbacks['update_tree']()
+
+    def move_to_results(self, e):
+        children = self.result_dropdown.get_children('')
+        if len(children) == 0:
+            return
+        self.result_dropdown.focus_set()
+        if len(children) == 1:
+            target_index = 0
+        else:
+            target_index = 1
+        targeted_item = self.result_dropdown.get_children('')[target_index]
+        self.result_dropdown.focus(targeted_item)
+        self.result_dropdown.selection_set([targeted_item])
+
+    def handle_dropdown_up_keypress(self, e):
+        children = e.widget.get_children('')
+        cur_item_ind = children.index(e.widget.selection()[0])
+        if cur_item_ind == 0:
+            self.search.focus_set()
+
+    def select_inst_by_enter(self, e):
+        if len(self.result_dropdown.get_children('')) == 0:
+            return
+        self.select_inst(name=None, new_ID=self.result_dropdown.row_data[self.result_dropdown.selection()[0]])
 
     def cancel(self, e):
         self.result_dropdown.destroy()
