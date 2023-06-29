@@ -312,6 +312,9 @@ class ProjectEditorView(tk.Frame):
             param = self.param_tree.row_data[selected_iid]
             if param is None:
                 return
+            type_column_ind = list(self.param_tree['columns']).index('type')
+            if loop_count_name in self.param_tree.item(selected_iid)['values'][type_column_ind]:
+                return
         self.callbacks['edit_param'](param)
 
     def sort_visible_headers(self, tree):
