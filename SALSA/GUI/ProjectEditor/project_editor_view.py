@@ -7,6 +7,7 @@ from typing import List, Dict
 import SALSA.GUI.widgets as w
 from SALSA.Common.constants import sep, alt_sep, alt_alt_sep
 from SALSA.Common.setting_class import settings
+from SALSA.BaseInstructions.bi_defaults import loop_count_name
 
 default_headers = {
     'script': ['name'],
@@ -19,7 +20,7 @@ default_header_order = {
     'script': ['name', 'section_num'],
     'section': ['name', 'absolute_offset'],
     'instruction': ['ungrouped_position', 'name', 'condition', 'instruction_id', 'frame_delay_param', 'skip_refresh', 'synopsis', 'absolute_offset'],
-    'parameter': ['name', 'section_num'],
+    'parameter': ['ID', 'name', 'type', 'value', 'formatted_value'],
 }
 
 header_settings = {
