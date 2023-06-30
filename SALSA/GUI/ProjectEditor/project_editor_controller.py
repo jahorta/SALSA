@@ -399,7 +399,7 @@ class ProjectEditorController:
         else:
             m.add_command(label='Remove Case', command=self.rcm_remove_switch_case)
 
-        m.bind('<Leave>', m.destroy)
+        m.bind('<Escape>', m.destroy)
         try:
             m.tk_popup(e.x_root, e.y_root)
         finally:
@@ -543,7 +543,7 @@ class ProjectEditorController:
                 pass
 
             m.add_command(label='Use Instruction Tree to edit a Switch', command=blank)
-        m.bind('<Leave>', m.destroy)
+        m.bind('<Escape>', m.destroy)
         try:
             m.tk_popup(e.x_root, e.y_root)
         finally:
