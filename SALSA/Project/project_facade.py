@@ -435,12 +435,18 @@ class SCTProjectFacade:
     # ---------------------------------------------- #
 
     def add_switch_case(self, script, section, instruction, **kwargs):
-        # TODO - implement add switch case
-        pass
+        cur_sect = self.project.scripts[script].sections[section]
+        parent_list, index = self.get_inst_grouped_parents_and_index(grouped_region=cur_sect.instruction_ids_grouped, inst=instruction)
+        cases = [int(loop[2].value) for loop in cur_sect.instructions[instruction].loop_parameters]
+        next_case = -1
+        while next_case in cases:
+            next_case += 1
+        self.add_inst_sub_group(script, section, instruction, parent_list, index, str(next_case))
+        self.update_loop_param_num(cur_sect.instructions[instruction])
 
-    def remove_switch_case(self, script, section, instructin, **kwargs):
-        # TODO - implement remove switch case
-        pass
+    def remove_switch_case(self, script, section, instruction, case, **kwargs):
+        return self.change_inst(script, section, instruction, case=case)
+
 
     def add_loop_param(self, script, section, instruction, **kwargs):
         inst = self.project.scripts[script].sections[section].instructions[instruction]
@@ -543,7 +549,7 @@ class SCTProjectFacade:
 
         return new_inst.ID
 
-    def change_inst(self, script, section, inst, new_id=None):
+    def change_inst(self, script, section, inst, new_id=None, case=None):
         # not entering a new_id will remove the instruction
         cur_section = self.project.scripts[script].sections[section]
         cur_inst = cur_section.instructions[inst]
@@ -556,18 +562,36 @@ class SCTProjectFacade:
         if cur_inst.instruction_id in self.base_insts.group_inst_list:
             inst_group = self.get_inst_group(script, section, inst)
             if cur_inst.instruction_id == 3:
-                inst_group = inst_group[f'{inst}{sep}switch']
+                inst_group = (inst_group[f'{inst}{sep}switch'] if case is None
+                              else {case: inst_group[f'{inst}{sep}switch'][case]})
             new_id = None if new_id is None else int(new_id)
-            change_type = self.callbacks['confirm_remove_inst_group'](new_id=new_id, children=inst_group)
+            warning_suffix = '' if case is None else f'case: ({case})'
+            change_type = self.callbacks['confirm_remove_inst_group'](new_id=new_id, children=inst_group, warning_suffix=warning_suffix)
             if 'cancel' in change_type:
                 return False
 
             custom_link_tgt = self.get_next_grouped_uuid(script, section, inst)
             for goto in cur_inst.my_goto_uuids:
+                if case is not None:
+                    parents, index = self.get_inst_grouped_parents_and_index(goto, cur_section.instruction_ids_grouped)
+                    if parents[-1] != case:
+                        continue
+
                 if goto in cur_section.instructions:
                     self.remove_inst(script, section, goto, custom_link_tgt=custom_link_tgt)
 
-            self.remove_inst_links(script, section, inst, custom_tgt=custom_link_tgt)
+            if case is None:
+                self.remove_inst_links(script, section, inst, custom_tgt=custom_link_tgt)
+            else:
+                loop_param_to_remove = None
+                for i, loop in enumerate(cur_inst.loop_parameters):
+                    if int(case) == loop[2].value:
+                        loop_param_to_remove = i
+                        break
+                if loop_param_to_remove is None:
+                    print(f'{self.log_key}: Could not find loop parameter for {case}')
+                cur_inst.links_out.remove(cur_inst.loop_parameters[loop_param_to_remove][3].link)
+                cur_inst.loop_parameters.pop(loop_param_to_remove)
 
             changes: list = change_type.split(alt_alt_sep)
             changes.reverse()
@@ -580,8 +604,12 @@ class SCTProjectFacade:
                     if key == change_parts[0]:
                         cur_group = group
                         break
+
                 if cur_group is None:
                     print(f'{self.log_key}: Unable to find group for processing: {change_parts[0]}')
+
+                if len(cur_group) == 0:
+                    continue
 
                 if 'Move' in change or 'Delete' in change:
                     self.perform_group_change(script, section, inst, cur_group, change)
@@ -598,15 +626,20 @@ class SCTProjectFacade:
         parent_list, index = self.get_inst_grouped_parents_and_index(inst, cur_section.instruction_ids_grouped)
 
         if index is None:
-            return
+            print(f'{self.log_key}: instruction not found in grouped instructions...')
+            return False
 
         cur_group = cur_section.instruction_ids_grouped
         for parent in parent_list:
             cur_group = cur_group[parent]
 
+        if case is not None:
+            cur_group[index][f'{inst}{sep}switch'].pop(case)
+            return True
+
         if new_id is None:
             cur_group.pop(index)
-            return
+            return True
 
         if cur_inst.instruction_id in self.base_insts.group_inst_list:
             cur_group[index] = inst

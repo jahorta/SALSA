@@ -461,30 +461,34 @@ class ProjectEditorController:
     def rcm_add_switch_case(self):
         sel_iid = self.trees['instruction'].focus()
         row_data = self.trees['instruction'].row_data[sel_iid]
-        # TODO - implement adding a switch case
+        if row_data is None:
+            row_data = self.trees['instruction'].row_data[self.trees['instruction'].parent(sel_iid)]
+        self.project.add_switch_case(self.current['script'], self.current['section'], row_data)
+        self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'), **self.current))
+
+    def rcm_remove_switch_case(self):
+        sel_iid = self.trees['instruction'].focus()
+        case = self.trees['instruction'].item(sel_iid)['values'][0].split(' ')[0]
+        inst = self.trees['instruction'].row_data[self.trees['instruction'].parent(sel_iid)]
+        refresh = self.project.remove_switch_case(self.current['script'], self.current['section'], inst, case)
+        if refresh:
+            self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'), **self.current))
 
     # ------------------------------------- #
     # Instruction Confirmation Messageboxes #
     # ------------------------------------- #
 
-    def confirm_change_inst_group(self, children, new_id=None):
+    def confirm_change_inst_group(self, children, warning_suffix='', new_id=None):
         # Create message to confirm change of instruction (separate method)
         cur_inst_id = self.project.get_inst_id(**self.current)
 
         message = f'Are you sure you want to'
 
-        if new_id is not None:
-            message += ' change '
-        else:
-            message += ' remove '
-        message += f'this instruction: {self.project.get_inst_id_name(cur_inst_id)}'
+        message += ' change ' if new_id is not None else ' remove '
+        message += f'this instruction: {self.project.get_inst_id_name(cur_inst_id)} {warning_suffix}'
         if new_id is not None:
             message += f' to {self.project.get_inst_id_name(new_id)}?'
-
-            if new_id not in self.project.base_insts.group_inst_list:
-                message += '\nThis will remove the instruction group.'
-            else:
-                message += '\nThis will change the instruction group type.'
+            message += '\nThis will remove the instruction group.' if new_id not in self.project.base_insts.group_inst_list else '\nThis will change the instruction group type.'
 
         cancel = not tk.messagebox.askokcancel(title='Confirm Instruction Group Removal', message=message)
         if cancel:
