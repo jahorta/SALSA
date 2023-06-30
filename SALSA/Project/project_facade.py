@@ -503,7 +503,7 @@ class SCTProjectFacade:
 
         if direction == 'inside':
             grouped_insert_loc = 0
-            cur_group = cur_group[index][list(cur_group.keys())[0]]
+            cur_group = cur_group[index][list(cur_group[index].keys())[0]]
             if case is not None:
                 cur_group = cur_group[case]
 
