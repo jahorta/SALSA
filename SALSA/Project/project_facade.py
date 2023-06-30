@@ -74,18 +74,16 @@ class SCTProjectFacade:
 
         return tree_list
 
-    def _create_tree(self, group, key_list, headers, base=None, base_key=None, key_only=False, prev_group_type=None):
+    def _create_tree(self, group, key_list, headers, base=None, base_key=None, key_only=False, key_only_key='', prev_group_type=None):
         tree_list = []
         for key in key_list:
             if isinstance(key, dict):
                 for ele_key, ele_value in key.items():
                     if sep not in ele_key:
+                        kok = 'name' if prev_group_type == 'switch' else ''
                         tree_list.extend(self._create_tree(group=group, key_list=[ele_key], headers=headers, base=base,
-                                                           base_key=base_key, key_only=True))
-                        if prev_group_type == 'switch':
-                            cur_group_type = 'case'
-                        else:
-                            cur_group_type = 'element'
+                                                           base_key=base_key, key_only=True, key_only_key=kok))
+                        cur_group_type = 'case' if prev_group_type == 'switch' else 'element'
                         tree_list[-1]['group_type'] = cur_group_type
                     else:
                         ele_key = ele_key.split(sep)
@@ -106,11 +104,11 @@ class SCTProjectFacade:
 
             if key_only:
                 values = {'row_data': None}
-                first = True
+                if key_only_key == '':
+                    key_only_key = headers[0]
                 for header in headers:
-                    if first:
+                    if key_only_key == header:
                         values[header] = key
-                        first = False
                         continue
                     values[header] = ''
                 tree_list.append(values)
