@@ -1101,7 +1101,7 @@ class SCTProjectFacade:
     # Inst link methods #
     # ----------------- #
 
-    def remove_inst_links(self, script, section, inst, custom_tgt=None):
+    def remove_inst_links(self, script, section, inst, custom_tgt=None, remove_link=False):
         cur_sect = self.project.scripts[script].sections[section]
         cur_inst = cur_sect.instructions[inst]
         if len(cur_inst.links_in) == 0 and len(cur_inst.links_out) == 0:
@@ -1117,7 +1117,7 @@ class SCTProjectFacade:
             ori_sect = link.origin_trace[0]
             ori_inst_uuid = link.origin_trace[1]
             ori_inst = self.project.scripts[script].sections[ori_sect].instructions[ori_inst_uuid]
-            if new_tgt_inst_uuid is None:
+            if new_tgt_inst_uuid is None or remove_link:
                 ori_inst.links_out.pop(ori_inst.links_out.index(link))
             else:
                 self.change_link_tgt(tgt_sect=cur_sect, link=link, new_tgt_uuid=new_tgt_inst_uuid, remove_from_tgt=False)
