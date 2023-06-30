@@ -85,6 +85,9 @@ class SCTProjectFacade:
                                                            base_key=base_key, key_only=True, key_only_key=kok))
                         cur_group_type = 'case' if prev_group_type == 'switch' else 'element'
                         tree_list[-1]['group_type'] = cur_group_type
+                        if prev_group_type == 'switch':
+                            tree_list[-1][headers[0]] = group[self.get_inst_uuid_from_group_entry(ele_value)].ungrouped_position
+                            tree_list[-1]['absolute_offset'] = group[self.get_inst_uuid_from_group_entry(ele_value)].absolute_offset
                     else:
                         ele_key = ele_key.split(sep)
                         tree_list.extend(
