@@ -700,6 +700,10 @@ class DataTreeview(ttk.Treeview):
         super().insert(parent=parent, iid=iid, text=text, values=values, **kwargs)
         return iid
 
+    def get_row_by_rowdata(self, row_data):
+        temp_row_data = [v for v in self.row_data.values()]
+        return list(self.row_data.keys())[temp_row_data.index(row_data)] if row_data in temp_row_data else None
+
     def select_by_rowdata(self, row_data):
         for iid, data in self.row_data.items():
             if row_data == data:
