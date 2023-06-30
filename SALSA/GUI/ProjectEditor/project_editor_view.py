@@ -284,7 +284,6 @@ class ProjectEditorView(tk.Frame):
     def set_mem_offset(self):
         self.callbacks['set_mem_offset']()
 
-
     def get_headers(self, tree_key=None, get_all=False):
         if tree_key is None:
             if get_all:
