@@ -263,8 +263,37 @@ class ProjectEditorController:
             ori_sect = link.origin_trace[0]
             ori_inst = self.project.get_inst_ind(script=self.current['script'], section=ori_sect,
                                                  inst=link.origin_trace[1])
-            ori_instruction = tk.Label(self.view.link_in.scroll_frame, text=ori_inst)
-            ori_instruction.grid(row=i, column=1)
+
+            ori_label = tk.Label(ori_frame, text=f'{ori_sect}{link_sep}{ori_inst}', font=self.link_font.font)
+            ori_label.grid(row=0, column=0)
+            ori_label.bind('<ButtonRelease-1>', self.goto_link)
+
+    def handle_link_font(self, e):
+        font = self.link_font.font if e.type == tk.EventType.Leave else self.link_font.hover_font
+        color = 'black' if e.type == tk.EventType.Leave else 'blue'
+        for child in e.widget.winfo_children():
+            child.configure(font=font, foreground=color)
+
+    def goto_link(self, e):
+        link_parts = e.widget['text'].split(link_sep)
+        sect = link_parts[0]
+        inst = self.project.get_inst_uuid_by_ind(script=self.current['script'], section=sect, inst_ind=link_parts[1])
+        if sect != self.current['section']:
+            sel_iid = self.trees['section'].get_row_by_rowdata(sect)
+            self.trees['section'].see(sel_iid)
+            self.trees['section'].focus(sel_iid)
+            self.trees['section'].selection_set([sel_iid])
+            self.on_select_tree_entry('section', sect)
+            self.view.after(10, self.goto_link_inst, inst)
+        else:
+            self.goto_link_inst(inst)
+
+    def goto_link_inst(self, inst):
+        sel_iid = self.trees['instruction'].get_row_by_rowdata(inst)
+        self.trees['instruction'].see(sel_iid)
+        self.trees['instruction'].focus(sel_iid)
+        self.trees['instruction'].selection_set([sel_iid])
+        self.on_select_tree_entry('instruction', inst)
 
     def clear_inst_details(self):
         self.view.inst_label.config(text='ID - Name')
