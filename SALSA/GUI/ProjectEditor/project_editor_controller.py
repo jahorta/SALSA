@@ -358,15 +358,19 @@ class ProjectEditorController:
         if self.current['section'] is None:
             return
         sel_iid = self.trees['instruction'].identify_row(e.y)
+        if sel_iid == '':
+            return
         self.trees['instruction'].selection_set(sel_iid)
         self.trees['instruction'].focus(sel_iid)
-        inst_uuid = self.trees['instruction'].row_data[sel_iid]
-        self.current['instruction'] = inst_uuid
-        is_removable = self.project.get_inst_is_removable(**self.current)
         inst_label = self.trees['instruction'].item(sel_iid)['values'][0]
         group_type = ''
         if '(' in inst_label and ')' in inst_label:
             group_type = inst_label.split('(')[1].split(')')[0]
+        if group_type == 'case':
+            sel_iid = self.trees['instruction'].parent(sel_iid)
+        inst_uuid = self.trees['instruction'].row_data[sel_iid]
+        self.current['instruction'] = inst_uuid
+        is_removable = self.project.get_inst_is_removable(**self.current)
         m = tk.Menu(self.view, tearoff=0)
 
         # if rightclicked row is group, add option for "Add Instruction in group"
