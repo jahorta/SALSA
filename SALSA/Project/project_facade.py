@@ -512,14 +512,8 @@ class SCTProjectFacade:
         ungroup_ref_inst_uuid = ref_inst_uuid
 
         if direction == 'below' and isinstance(cur_group[index], dict):
-            cur_group = cur_group[index][list(cur_group.keys())[0]]
-
-            # If it is a switch, there will be one more dict level for cases
-            if isinstance(cur_group, dict):
-                cur_group = cur_group[list(cur_group.keys())[-1]]
-
             # The ref inst for below is the last instruction of the group this should almost always be a goto
-            ungroup_ref_inst_uuid = cur_group[-1]
+            ungroup_ref_inst_uuid = self.get_inst_uuid_from_group_entry(cur_group[index], last=True)
 
         insert_pos = inst_sect.instruction_ids_ungrouped.index(ungroup_ref_inst_uuid)
         if direction in ('inside', 'below'):
