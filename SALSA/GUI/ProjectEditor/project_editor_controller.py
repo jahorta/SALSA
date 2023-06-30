@@ -397,7 +397,7 @@ class ProjectEditorController:
 
             m.add_command(label='Change Instruction', command=self.rcm_change_inst)
         else:
-            m.add_command(label='Delete Case', command=self.rcm_remove_inst)
+            m.add_command(label='Remove Case', command=self.rcm_remove_switch_case)
 
         m.bind('<Leave>', m.destroy)
         try:
