@@ -2,7 +2,7 @@ from typing import Union, Dict, Literal
 import tkinter as tk
 from tkinter import messagebox
 
-from GUI.fonts_used import SALSAFont
+from SALSA.GUI.fonts_used import SALSAFont
 from SALSA.GUI.ProjectEditor.instruction_selector import InstructionSelectorWidget
 from SALSA.GUI.ParamEditorPopups.param_editor_controller import ParamEditController
 from SALSA.Common.setting_class import settings

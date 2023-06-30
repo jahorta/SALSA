@@ -1,7 +1,7 @@
 import copy
 from typing import Union, Tuple, Literal
 
-from BaseInstructions.bi_defaults import loop_count_name
+from SALSA.BaseInstructions.bi_defaults import loop_count_name
 from SALSA.Common.script_string_utils import SAstr_to_head_and_body, head_and_body_to_SAstr
 from SALSA.Project.description_formatting import format_description
 from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter, SCTInstruction, SCTLink
