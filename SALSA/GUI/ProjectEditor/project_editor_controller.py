@@ -2,6 +2,7 @@ from typing import Union, Dict
 import tkinter as tk
 from tkinter import messagebox
 
+from GUI.fonts_used import SALSAFont
 from SALSA.GUI.ProjectEditor.instruction_selector import InstructionSelectorWidget
 from SALSA.GUI.ParamEditorPopups.param_editor_controller import ParamEditController
 from SALSA.Common.setting_class import settings
@@ -19,6 +20,8 @@ tree_children = {
 }
 
 tree_parents = {v: k for k, v in tree_children.items()}
+
+link_sep = ' - '
 
 
 class ProjectEditorController:
@@ -88,6 +91,8 @@ class ProjectEditorController:
         self.trees['instruction'].add_callback('select', self.on_select_tree_entry)
 
         self.has_changes = False
+
+        self.link_font = SALSAFont()
 
     def set_change_flag(self):
         self.has_changes = True
@@ -234,23 +239,28 @@ class ProjectEditorController:
             link: SCTLink
             if link.target_trace is None:
                 continue
+            tgt_frame = tk.Frame(self.view.link_out.scroll_frame)
+            tgt_frame.bind('<Enter>', self.handle_link_font)
+            tgt_frame.bind('<Leave>', self.handle_link_font)
+            tgt_frame.grid(row=i, column=0)
             tgt_sect = link.target_trace[0]
-            tgt_section = tk.Label(self.view.link_out.scroll_frame, text=tgt_sect)
-            tgt_section.grid(row=i, column=0)
-
             tgt_inst = self.project.get_inst_ind(script=self.current['script'], section=tgt_sect,
                                                  inst=link.target_trace[1])
-            tgt_instruction = tk.Label(self.view.link_out.scroll_frame, text=tgt_inst)
-            tgt_instruction.grid(row=i, column=1)
+
+            tgt_label = tk.Label(tgt_frame, text=f'{tgt_sect}{link_sep}{tgt_inst}', font=self.link_font.font)
+            tgt_label.grid(row=0, column=0)
+            tgt_label.bind('<ButtonRelease-1>', self.goto_link)
 
         for i, link in enumerate(details['links_in']):
             link: SCTLink
             if link.origin_trace is None:
                 continue
-            ori_sect = link.origin_trace[0]
-            ori_section = tk.Label(self.view.link_in.scroll_frame, text=ori_sect)
-            ori_section.grid(row=i, column=0)
+            ori_frame = tk.Frame(self.view.link_in.scroll_frame)
+            ori_frame.grid(row=i, column=0, sticky=tk.E+tk.W)
+            ori_frame.bind('<Enter>', self.handle_link_font)
+            ori_frame.bind('<Leave>', self.handle_link_font)
 
+            ori_sect = link.origin_trace[0]
             ori_inst = self.project.get_inst_ind(script=self.current['script'], section=ori_sect,
                                                  inst=link.origin_trace[1])
             ori_instruction = tk.Label(self.view.link_in.scroll_frame, text=ori_inst)
