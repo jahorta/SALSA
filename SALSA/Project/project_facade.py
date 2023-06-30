@@ -1,6 +1,7 @@
 import copy
 from typing import Union, Tuple, Literal
 
+from BaseInstructions.bi_defaults import loop_count_name
 from SALSA.Common.script_string_utils import SAstr_to_head_and_body, head_and_body_to_SAstr
 from SALSA.Project.description_formatting import format_description
 from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter, SCTInstruction, SCTLink
@@ -419,9 +420,49 @@ class SCTProjectFacade:
 
         return True
 
+    def has_loops(self, script, section, instruction, **kwargs):
+        cur_inst_id = self.project.scripts[script].sections[section].instructions[instruction].instruction_id
+        return self.base_insts.get_inst(cur_inst_id).loop is not None
+
+    def is_switch(self, script, section, instruction, **kwargs):
+        return self.project.scripts[script].sections[section].instructions[instruction].instruction_id == 3
+
     # ---------------------------------------------- #
     # Instruction and parameter manipulation methods #
     # ---------------------------------------------- #
+
+    def add_switch_case(self, script, section, instruction, **kwargs):
+        # TODO - implement add switch case
+        pass
+
+    def remove_switch_case(self, script, section, instructin, **kwargs):
+        # TODO - implement remove switch case
+        pass
+
+    def add_loop_param(self, script, section, instruction, **kwargs):
+        inst = self.project.scripts[script].sections[section].instructions[instruction]
+        loop = {}
+        for param_id in self.base_insts.get_inst(inst.instruction_id).loop:
+            base_param = self.base_insts.get_inst(inst.instruction_id).parameters[param_id]
+            loop_param = SCTParameter(param_id, base_param.type)
+            loop_param.set_value(base_param.default_value)
+            loop[int(param_id)] = loop_param
+        inst.loop_parameters = [loop, *inst.loop_parameters]
+        self.update_loop_param_num(inst)
+        return True
+
+    def remove_loop_param(self, script, section, instruction, loop_num, **kwargs):
+        inst = self.project.scripts[script].sections[section].instructions[instruction]
+        if len(inst.loop_parameters) <= loop_num:
+            return False
+        inst.loop_parameters.pop(loop_num)
+        self.update_loop_param_num(inst)
+        return True
+
+    def update_loop_param_num(self, inst):
+        for key, param in self.base_insts.get_inst(inst.instruction_id).parameters.items():
+            if loop_count_name in param.type:
+                inst.parameters[int(key)].set_value(len(inst.loop_parameters))
 
     def remove_inst(self, script, section, inst, custom_link_tgt=None):
         self.remove_inst_links(script, section, inst, custom_tgt=custom_link_tgt)

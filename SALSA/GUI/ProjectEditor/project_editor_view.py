@@ -254,6 +254,7 @@ class ProjectEditorView(tk.Frame):
         param_tree_scrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
         self.param_tree.config(yscrollcommand=param_tree_scrollbar.set)
         self.param_tree.bind('<Double-1>', lambda e: self.on_param_double_click('param', e))
+        self.param_tree.bind('<Button-3>', self.param_right_click)
 
         link_frame = tk.LabelFrame(inst_frame, text='Links')
         link_frame.grid(row=4, column=0, sticky='NSEW')
@@ -303,7 +304,6 @@ class ProjectEditorView(tk.Frame):
         self.sections_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
         self.insts_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
         self.insts_tree.bind('<Button-3>', self.callbacks['show_inst_menu'], add='+')
-        self.param_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
 
     def on_param_double_click(self, param, e):
         if param != 'delay':
@@ -316,6 +316,14 @@ class ProjectEditorView(tk.Frame):
             if loop_count_name in self.param_tree.item(selected_iid)['values'][type_column_ind]:
                 return
         self.callbacks['edit_param'](param)
+
+    def param_right_click(self, e):
+        if e.widget.identify('region', e.x, e.y) == 'heading':
+            return self.callbacks['show_header_selection_menu'](e)
+        row = self.param_tree.identify_row(e.y)
+        self.param_tree.focus(row)
+        self.param_tree.selection_set([row])
+        self.callbacks['param_rcm'](row, e)
 
     def sort_visible_headers(self, tree):
         self.visible_headers[tree] = [_ for _ in default_header_order[tree] if _ in self.visible_headers[tree]]

@@ -1,4 +1,4 @@
-from typing import Union, Dict
+from typing import Union, Dict, Literal
 import tkinter as tk
 from tkinter import messagebox
 
@@ -42,7 +42,8 @@ class ProjectEditorController:
             'show_header_selection_menu': self.show_header_selection_menu,
             'show_inst_menu': self.show_instruction_right_click_menu,
             'save_project': self.save_project,
-            'set_mem_offset': self.set_mem_offset
+            'set_mem_offset': self.set_mem_offset,
+            'param_rcm': self.param_right_click_menu
         }
         self.view.add_and_bind_callbacks(view_callbacks)
 
@@ -518,3 +519,38 @@ class ProjectEditorController:
         self.on_select_tree_entry('section', self.current['section'])
         self.trees['instruction'].select_by_rowdata(cur_inst_id)
         self.on_select_tree_entry('instruction', cur_inst_id)
+
+    def param_right_click_menu(self, row, e):
+        if not self.project.has_loops(**self.current):
+            return
+        m = tk.Menu(self.view, tearoff=0)
+        m.add_command(label='Add Loop Parameter', command=lambda: self.handle_loop_param_change('add'))
+
+        param = e.widget.row_data[row]
+        if param is None:
+            loop_num = int(e.widget.item(row)['text'][4:])
+            m.add_command(label='Remove Loop Parameter', command=lambda: self.handle_loop_param_change('remove', loop_num=loop_num))
+
+        if self.project.is_switch(**self.current):
+            m.entryconfigure('Add a Loop Parameter', state='disabled')
+            m.entryconfigure('Remove this Loop Parameter', state='disabled')
+
+            def blank():
+                pass
+
+            m.add_command(label='Use Instruction Tree to edit a Switch', command=blank)
+        m.bind('<Leave>', m.destroy)
+        try:
+            m.tk_popup(e.x_root, e.y_root)
+        finally:
+            m.grab_release()
+
+    def handle_loop_param_change(self, change: Literal['add', 'remove'], loop_num=None):
+        has_changed = False
+        if change == 'add':
+            has_changed = self.project.add_loop_param(**self.current)
+        if change == 'remove':
+            has_changed = self.project.remove_loop_param(**self.current, loop_num=loop_num)
+        if has_changed:
+            param_tree = self.project.get_parameter_tree(headings=self.view.get_headers('parameter'), **self.current)
+            self.update_tree('parameter', param_tree)
