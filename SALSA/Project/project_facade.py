@@ -238,6 +238,9 @@ class SCTProjectFacade:
     # Instruction position methods #
     # ---------------------------- #
 
+    def get_inst_uuid_by_ind(self, script, section, inst_ind):
+        return self.project.scripts[script].sections[section].instruction_ids_ungrouped[int(inst_ind)]
+
     def get_inst_ind(self, script, section, inst):
         return self.project.scripts[script].sections[section].instruction_ids_ungrouped.index(inst)
 
