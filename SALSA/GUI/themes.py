@@ -23,14 +23,6 @@ def theme_generator(colors: Colors):
                 "foreground": colors.text
             }
         },
-        "Ttoplevel": {
-            "configure": {
-                "background": colors.bg,
-                "highlightbackground": colors.bg_highlight,
-                "highlightcolor": colors.bg_highlight,
-                "highlightthickness": 2,
-            }
-        },
         "TLabelframe": {
             "configure": {
                 "highlightbackground": colors.bg_highlight,
@@ -64,12 +56,14 @@ def theme_generator(colors: Colors):
             "configure": {
                 "background": colors.bg,
                 "foreground": colors.text,
-                "fieldbackground": colors.bg_internal,
+                "highlightbackground": colors.bg_highlight,
+                "highlightcolor": colors.bg_highlight,
+                "fieldbackground": colors.bg_highlight,
+                "bordercolor": colors.bg_internal,
+                "selectbackground": colors.bg,
+                "selectforeground": colors.text,
                 "insertcolor": colors.text,
-                "bordercolor": colors.border,
-                "lightcolor": colors.bg_highlight,
-                "darkcolor": colors.bg,
-            }
+            },
         },
         "TCheckbutton": {
             "configure": {
@@ -176,6 +170,11 @@ def theme_generator(colors: Colors):
                 "activeforeground": colors.text,
             }
         },
+        "canvas.TFrame": {
+            'configure': {
+                "background": colors.bg_internal,
+            }
+        },
         "TCanvas": {
             'configure': {
                 "background": colors.bg_internal,
@@ -195,7 +194,15 @@ def theme_generator(colors: Colors):
             'configure': {
                 "fill": colors.text
             }
-        }
+        },
+        "Ttoplevel": {
+            "configure": {
+                "background": colors.bg,
+                "highlightbackground": colors.bg_highlight,
+                "highlightcolor": colors.bg_highlight,
+                "highlightthickness": 2,
+            }
+        },
     }
 
 
