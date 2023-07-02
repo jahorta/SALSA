@@ -69,6 +69,9 @@ class Application(tk.Tk):
         theme_name = list(themes.keys())[0] if self.is_darkmode else list(themes.keys())[1]
         self.style.theme_use(theme_name)
 
+        # maps dynamic style attributes for the current theme
+        self.map_current_theme(themes[theme_name])
+
         # Setup project details
         self.project = SCTProjectFacade(self.base_insts)
         self.project_filepath = ''
@@ -269,7 +272,15 @@ class Application(tk.Tk):
 
         self.style.theme_use(theme_name)
 
+        self.map_current_theme(theme)
+
         self.configure(bg=theme['.']['configure']['background'])
 
         self.project_edit_view.change_theme(dark_mode)
         self.gui.change_theme(dark_mode)
+
+    def map_current_theme(self, theme):
+        for item_key, arg_dict in theme.items():
+            if 'map' not in arg_dict:
+                continue
+            self.style.map(item_key, **arg_dict['map'])
