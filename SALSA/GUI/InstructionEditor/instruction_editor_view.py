@@ -244,7 +244,7 @@ class InstructionEditorView(tk.Toplevel):
         user_notes_label = ttk.Label(inst_notes_frame, text='User Notes')
         user_notes_label.grid(row=2, column=0, sticky=tk.W)
 
-        self.user_notes_text = tk.scrolledtext.ScrolledText(inst_notes_frame, wrap=tk.WORD, height=15, width=35)
+        self.user_notes_text = w.ThemedScrolledText(inst_notes_frame, wrap=tk.WORD, height=15, width=35)
         self.user_notes_text.grid(row=3, column=0, sticky='NSEW')
         self.user_notes_text.bind('<FocusIn>', self.on_text_focus_in)
         self.user_notes_text.bind('<FocusOut>', lambda e, k='user_notes': self.on_text_focus_out(k, e))
@@ -393,12 +393,12 @@ class InstructionEditorView(tk.Toplevel):
         self.configure(background=theme['.']['configure']['background'])
 
         # details_desc_text - scrolledtext
-        self.details_desc_text.configure(**theme['.']['configure'])
+        self.details_desc_text.configure(**theme['Tmessage']['configure'])
         # default_notes_text - scrolledtext
-        self.default_notes_text.configure(**theme['.']['configure'])
+        self.default_notes_text.configure(**theme['Tmessage']['configure'])
+        self.default_notes_msg.configure(**theme['Tmessage']['configure'])
+        # default_notes_text - scrolledtext
+        self.user_notes_text.configure(**theme['Tmessage']['configure'])
 
         # default_notes_frame - ScrollCanvasFrame
         self.default_notes_frame.change_theme(dark_mode)
-
-        # default_notes_msg - Message
-        pass
