@@ -236,8 +236,6 @@ class InstructionEditorView(tk.Toplevel):
         self.default_notes_msg.grid(row=0, column=0, sticky='NSEW')
         self.default_notes_frame.canvas.bind("<Configure>", lambda e: self.default_notes_msg.configure(width=e.width - 10), add='+')
 
-        self.change_theme(is_darkmode)
-
         def config_scrollframe():
             new_width = self.default_notes_frame.scroll_frame.winfo_width() - 10
             self.default_notes_msg.configure(width=new_width)
@@ -260,6 +258,8 @@ class InstructionEditorView(tk.Toplevel):
             self.default_notes_frame.grid_forget()
         elif user_type == 'user':
             self.user_notes_blocker.grid_forget()
+
+        self.change_theme(is_darkmode)
 
     # ------------------------------------------------------------ #
     # Methods to generate or use the instruction or parameter tree #
