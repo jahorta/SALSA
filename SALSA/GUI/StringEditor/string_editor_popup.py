@@ -3,6 +3,7 @@ from tkinter import ttk
 
 from SALSA.Common.setting_class import settings
 from SALSA.GUI.widgets import DataTreeview
+from SALSA.GUI.themes import dark_theme, light_theme
 
 tree_settings = {
     'script': {
@@ -33,13 +34,15 @@ class StringPopup(tk.Toplevel):
 
     option_settings = {}
 
-    def __init__(self, parent, callbacks, name, *args, **kwargs):
+    def __init__(self, parent, callbacks, name, is_darkmode, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.parent: tk.Tk = parent
         self.callbacks = callbacks
         self.name = name
         self.protocol('WM_DELETE_WINDOW', self.close)
+        theme = dark_theme if is_darkmode else light_theme
+        self.configure(**theme['Ttoplevel']['configure'])
 
         # if self.log_key not in settings:
         #     settings.add_group(self.log_key)
@@ -47,18 +50,18 @@ class StringPopup(tk.Toplevel):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
 
-        save_frame = tk.Frame(self)
-        save_frame.grid(row=0, column=0, sticky='NSEW')
+        save_frame = ttk.Frame(self)
+        save_frame.grid(row=0, column=0, padx=5, pady=5, sticky='NSEW')
 
-        self.save_button = tk.Button(save_frame, text='Save', command=self.save, state='disabled')
+        self.save_button = ttk.Button(save_frame, text='Save', command=self.save, state='disabled')
         self.save_button.grid(row=0, column=0, sticky=tk.W)
 
-        upper_frame = tk.Frame(self)
+        upper_frame = ttk.Frame(self)
         upper_frame.grid(row=1, column=0, sticky='NSEW')
         upper_frame.columnconfigure(1, weight=1)
         upper_frame.rowconfigure(0, weight=1)
 
-        script_tree_frame = tk.LabelFrame(upper_frame, text='Scripts')
+        script_tree_frame = ttk.LabelFrame(upper_frame, text='Scripts')
         script_tree_frame.grid(row=0, column=0, sticky='NSEW', padx=5)
         script_tree_frame.rowconfigure(0, weight=1)
 
@@ -77,13 +80,13 @@ class StringPopup(tk.Toplevel):
                 first = False
             self.scripts.heading(name, text=label, anchor=anchor)
             self.scripts.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
-        script_tree_scrollbar = tk.Scrollbar(script_tree_frame, orient='vertical', command=self.scripts.yview)
+        script_tree_scrollbar = ttk.Scrollbar(script_tree_frame, orient='vertical', command=self.scripts.yview)
         script_tree_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
         self.scripts.config(yscrollcommand=script_tree_scrollbar.set)
         self.scripts.config(show='tree')
         self.scripts.add_callback('select', self.on_script_select)
 
-        string_tree_frame = tk.LabelFrame(upper_frame, text='Strings')
+        string_tree_frame = ttk.LabelFrame(upper_frame, text='Strings')
         string_tree_frame.grid(row=0, column=1, sticky='NSEW', padx=5)
         string_tree_frame.columnconfigure(0, weight=1)
         string_tree_frame.rowconfigure(0, weight=1)
@@ -103,45 +106,45 @@ class StringPopup(tk.Toplevel):
                 first = False
             self.strings.heading(name, text=label, anchor=anchor)
             self.strings.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
-        string_tree_scrollbar = tk.Scrollbar(string_tree_frame, orient='vertical', command=self.strings.yview)
+        string_tree_scrollbar = ttk.Scrollbar(string_tree_frame, orient='vertical', command=self.strings.yview)
         string_tree_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
         self.strings.config(yscrollcommand=string_tree_scrollbar.set)
         self.strings.config(show='tree')
         self.strings.add_callback('select', self.edit_string)
 
-        lower_frame = tk.Frame(self)
+        lower_frame = ttk.Frame(self)
         lower_frame.grid(row=2, column=0, sticky='NSEW', padx=5)
         lower_frame.columnconfigure(0, weight=1)
 
-        no_head_frame = tk.Frame(lower_frame)
+        no_head_frame = ttk.Frame(lower_frame)
         no_head_frame.grid(row=0, column=0, sticky=tk.W)
 
         self.no_head_var = tk.IntVar()
-        self.no_head = tk.Checkbutton(no_head_frame, text='Remove Header', variable=self.no_head_var, onvalue=1, offvalue=0,
-                                      command=lambda: self.set_change('no_head', self.no_head_var.get() == 1), state='disabled')
+        self.no_head = ttk.Checkbutton(no_head_frame, text='Remove Header', variable=self.no_head_var, onvalue=1, offvalue=0,
+                                       command=lambda: self.set_change('no_head', self.no_head_var.get() == 1), state='disabled')
         self.no_head.grid(row=0, column=0, sticky=tk.W)
-        no_head_warning_label = tk.Label(no_head_frame, text=no_head_warning, anchor='w', justify=tk.LEFT)
+        no_head_warning_label = ttk.Label(no_head_frame, text=no_head_warning, anchor='w', justify=tk.LEFT)
         no_head_warning_label.grid(row=1, column=0)
 
-        head_frame = tk.Frame(lower_frame)
+        head_frame = ttk.Frame(lower_frame)
         head_frame.grid(row=1, column=0, sticky=tk.W)
 
-        head_label = tk.Label(head_frame, text='Textbox Header')
+        head_label = ttk.Label(head_frame, text='Textbox Header')
         head_label.grid(row=0, column=0, sticky=tk.W)
-        self.head_entry = tk.Entry(head_frame, state='disabled', width=70)
+        self.head_entry = ttk.Entry(head_frame, state='disabled', width=70)
         self.head_entry.grid(row=1, column=0, sticky=tk.W)
         self.head_entry.bind('<FocusIn>', self.on_entry_focus_in)
         self.head_entry.bind('<FocusOut>', lambda e, k='head': self.on_entry_focus_out(k, e))
-        self.head_add_quote = tk.Button(head_frame, text='add《》to header', command=self.add_quotes_to_head)
+        self.head_add_quote = ttk.Button(head_frame, text='add《》to header', command=self.add_quotes_to_head)
         self.head_add_quote.grid(row=1, column=1, sticky=tk.W)
 
-        body_label = tk.Label(lower_frame, text='Textbox Body')
+        body_label = ttk.Label(lower_frame, text='Textbox Body')
         body_label.grid(row=2, column=0, sticky=tk.W)
-        self.body_entry = tk.Text(lower_frame, wrap=tk.WORD, height=5)
+        self.body_entry = tk.Text(lower_frame, wrap=tk.WORD, height=5, **theme['text']['configure'])
         self.body_entry.grid(row=3, column=0, sticky=tk.W + tk.E)
         self.body_entry.bind('<FocusIn>', self.on_text_focus_in)
         self.body_entry.bind('<FocusOut>', lambda e, k='body': self.on_text_focus_out(k, e))
-        body_note_label = tk.Label(lower_frame, text=body_note, anchor='w', justify=tk.LEFT)
+        body_note_label = ttk.Label(lower_frame, text=body_note, anchor='w', justify=tk.LEFT)
         body_note_label.grid(row=4, column=0, sticky=tk.W)
 
         self.update_scripts()
@@ -171,6 +174,7 @@ class StringPopup(tk.Toplevel):
         self.no_head.configure(state=state)
         self.head_entry.configure(state=state)
         self.head_add_quote.configure(state=state)
+        self.body_entry.configure(state=state)
 
     def _clear_editor_fields(self):
         self.no_head_var.set(0)
@@ -290,4 +294,9 @@ class StringPopup(tk.Toplevel):
         self.focus()
         self.after(10, self.save_and_close)
 
+    def change_theme(self, dark_mode=True):
+        theme = dark_theme if dark_mode else light_theme
+
+        self.body_entry.configure(**theme['text']['configure'])
+        self.configure(**theme['Ttoplevel']['configure'])
 

@@ -1,10 +1,12 @@
 import tkinter as tk
 
+from SALSA.GUI.themes import dark_theme, light_theme
+
 
 class MainMenu(tk.Menu):
     """The application's main menu"""
 
-    def __init__(self, parent, callbacks, recent_files, **kwargs):
+    def __init__(self, parent, callbacks, recent_files, dark_mode, **kwargs):
         super().__init__(parent, **kwargs)
 
         self.recent_files = recent_files
@@ -44,6 +46,10 @@ class MainMenu(tk.Menu):
 
         self.view_menu = tk.Menu(self, tearoff=False)
         self.view_menu.add_command(label='Instruction editor', command=callbacks['view->inst'])
+        dark_mode = 1 if dark_mode else 0
+        self.dark_mode_var = tk.IntVar(self, dark_mode)
+        self.view_menu.add_checkbutton(label='Use Dark Mode', variable=self.dark_mode_var,
+                                       onvalue=1, offvalue=0, command=self.toggle_dark_mode)
         self.add_cascade(label='View', menu=self.view_menu)
 
         help_menu = tk.Menu(self, tearoff=False)
@@ -51,6 +57,10 @@ class MainMenu(tk.Menu):
         help_menu.add_command(label='Help', command=callbacks['help->help'])
         help_menu.add_command(label='About', command=callbacks['help->about'])
         self.add_cascade(label='Help', menu=help_menu)
+
+        self.all_menus = [self.file_menu, self.recent_menu, self.project_menu, analysis_menu, self.view_menu, help_menu]
+
+        self.toggle_dark_mode()
 
     def disable_script_commands(self):
         self.project_menu.entryconfig('Variable alias editor', state='disabled')
@@ -77,3 +87,11 @@ class MainMenu(tk.Menu):
             self.recent_menu.add_command(label=file, command=lambda x=i: self.callbacks['file->load_recent'](x))
         if self.no_recents:
             self.recent_menu.entryconfig('No Recent Files', state='disabled')
+
+    def toggle_dark_mode(self):
+        dark_mode = True if self.dark_mode_var.get() == 1 else False
+
+        # For when the custom themed menu is fully implemented
+        # self.change_theme(dark_mode)
+
+        self.callbacks['view->theme'](dark_mode)

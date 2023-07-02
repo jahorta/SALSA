@@ -2,6 +2,7 @@ import os.path
 import tkinter as tk
 from tkinter import filedialog, ttk
 
+from SALSA.GUI.themes import dark_theme, light_theme
 from SALSA.Common.setting_class import settings
 
 
@@ -19,7 +20,7 @@ class SCTExportPopup(tk.Toplevel):
         'compress_aklz': {'text': 'Compress file using AKLZ compression', 'default': 'False'}
     }
 
-    def __init__(self, parent, callbacks, name, selected, *args, **kwargs):
+    def __init__(self, parent, callbacks, name, selected, is_darkmode, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.parent: tk.Tk = parent
@@ -28,6 +29,8 @@ class SCTExportPopup(tk.Toplevel):
         self.selected = selected
         self.script_ids = {}
         self.protocol('WM_DELETE_WINDOW', self.close)
+        theme = dark_theme if is_darkmode else light_theme
+        self.configure(**theme['Ttoplevel']['configure'])
 
         if self.log_key not in settings:
             settings[self.log_key] = {}
@@ -38,20 +41,20 @@ class SCTExportPopup(tk.Toplevel):
 
         self.columnconfigure(0, weight=1)
 
-        directory_frame = tk.LabelFrame(self, text='Select a directory for export')
+        directory_frame = ttk.LabelFrame(self, text='Select a directory for export')
         directory_frame.grid(row=0, column=0, sticky='NSEW', padx=5)
         directory_frame.columnconfigure(0, weight=1)
 
         self.directory_var = tk.StringVar()
         if 'script export dir' in settings[self.log_key]:
             self.directory_var.set(settings[self.log_key]['script export dir'])
-        directory_entry = tk.Entry(directory_frame, textvariable=self.directory_var, width=30)
+        directory_entry = ttk.Entry(directory_frame, textvariable=self.directory_var, width=30)
         directory_entry.grid(row=0, column=0, sticky='NSEW')
 
-        directory_button = tk.Button(directory_frame, text='...', command=self.get_directory)
-        directory_button.grid(row=0, column=1, sticky=tk.W, padx=2)
+        directory_button = ttk.Button(directory_frame, text='...', command=self.get_directory)
+        directory_button.grid(row=0, column=1, sticky=tk.W, padx=4)
 
-        script_tree_frame = tk.LabelFrame(self, text='Select script(s) to export')
+        script_tree_frame = ttk.LabelFrame(self, text='Select script(s) to export')
         script_tree_frame.grid(row=1, column=0, sticky='NSEW', padx=5)
         script_tree_frame.columnconfigure(0, weight=1)
         script_tree_frame.rowconfigure(0, weight=1)
@@ -60,32 +63,32 @@ class SCTExportPopup(tk.Toplevel):
         self.scripts = ttk.Treeview(script_tree_frame, name='script', columns=[])
         self.scripts.grid(row=0, column=0, sticky='NSEW')
         self.scripts.heading('#0', text='Script')
-        script_tree_scrollbar = tk.Scrollbar(script_tree_frame, orient='vertical', command=self.scripts.yview)
+        script_tree_scrollbar = ttk.Scrollbar(script_tree_frame, orient='vertical', command=self.scripts.yview)
         script_tree_scrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
         self.scripts.config(yscrollcommand=script_tree_scrollbar.set)
         self.scripts.config(show='tree')
 
-        options_frame = tk.LabelFrame(self, text='Options')
+        options_frame = ttk.LabelFrame(self, text='Options')
         options_frame.grid(row=2, column=0, sticky='NSEW', padx=5)
 
         self.option_vars = {}
         row = 0
         for o_name, o_settings in self.option_settings.items():
             self.option_vars[o_name] = tk.StringVar()
-            garbage = tk.Checkbutton(options_frame, text=o_settings['text'], variable=self.option_vars[o_name],
+            garbage = ttk.Checkbutton(options_frame, text=o_settings['text'], variable=self.option_vars[o_name],
                                      onvalue='True', offvalue='False', command=lambda x=o_name: self.change_setting(x))
             garbage.grid(row=row, column=0, sticky=tk.W)
             self.option_vars[o_name].set(settings[self.log_key][o_name])
             row += 1
 
-        button_frame = tk.Frame(self)
+        button_frame = ttk.Frame(self)
         button_frame.grid(row=3, column=0, sticky=tk.E+tk.S, padx=5, pady=2)
 
-        self.export = tk.Button(button_frame, text='Export', command=self.export)
-        self.export.grid(row=0, column=0)
+        self.export = ttk.Button(button_frame, text='Export', command=self.export)
+        self.export.grid(row=0, column=0, padx=2)
 
-        self.quit = tk.Button(button_frame, text='Cancel', command=self.close)
-        self.quit.grid(row=0, column=1)
+        self.quit = ttk.Button(button_frame, text='Cancel', command=self.close)
+        self.quit.grid(row=0, column=1, padx=2)
 
         self.title(self.t)
         self.resizable(width=False, height=False)
@@ -138,3 +141,8 @@ class SCTExportPopup(tk.Toplevel):
 
     def close(self):
         self.callbacks['close'](self.name, self)
+
+    def change_theme(self, dark_mode):
+        theme = dark_theme if dark_mode else light_theme
+        self.configure(**theme['Ttoplevel']['configure'])
+        # self.variable_usage.change_theme(dark_mode=dark_mode)

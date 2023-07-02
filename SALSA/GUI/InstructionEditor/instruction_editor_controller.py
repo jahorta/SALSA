@@ -12,7 +12,7 @@ class InstructionEditorController:
 
     log_name = 'InstEditCtrlr'
 
-    def __init__(self, parent, name, inst_lib_facade: BaseInstLibFacade, callbacks):
+    def __init__(self, parent, name, inst_lib_facade: BaseInstLibFacade, callbacks, is_darkmode):
         self.name = name
         self.inst_lib = inst_lib_facade
 
@@ -25,7 +25,7 @@ class InstructionEditorController:
             'user_type': self.get_user_type,
             'show_param_editor': self.show_param_editor
         }
-        self.view = InstructionEditorView(parent=parent, callbacks=view_callbacks)
+        self.view = InstructionEditorView(parent=parent, callbacks=view_callbacks, is_darkmode=is_darkmode)
         self.callbacks = callbacks
 
         self.cur_inst = None
@@ -201,3 +201,6 @@ class InstructionEditorController:
         self.view.set_value(param_id, column_id, value)
         column_name = self.view.get_headers('parameter')[column_id]
         self.add_change(key=f'{param_id}{sep}{column_name}', value=value)
+
+    def change_theme(self, dark_mode):
+        self.view.change_theme(dark_mode)

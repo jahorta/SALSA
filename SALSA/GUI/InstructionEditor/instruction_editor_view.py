@@ -3,9 +3,11 @@ from tkinter.scrolledtext import ScrolledText
 from tkinter import ttk
 import json
 
+from SALSA.GUI.themes import dark_theme, light_theme
 from SALSA.GUI.widgets import ScrollLabelFrame
 from SALSA.Common.setting_class import settings
 from SALSA.Common.constants import sep
+from SALSA.GUI import widgets as w
 
 default_headers = {
     'instruction': ['inst_ID', 'name'],
@@ -28,7 +30,7 @@ header_settings = {
 }
 
 param_edit_fields = {
-    'name': {'widget': tk.Entry, 'args': {}, 'kwargs': {}},
+    'name': {'widget': ttk.Entry, 'args': {}, 'kwargs': {}},
     'default_value': {'widget': 'param_edit', 'args': {}, 'kwargs': {}}
 }
 
@@ -42,8 +44,10 @@ default_tree_label = ''
 class InstructionEditorView(tk.Toplevel):
 
     log_name = 'InstEditorView'
+    nm_key = '<<ChangeTheme>>'
+    nm_priority = 1
 
-    def __init__(self, parent, callbacks, *args, **kwargs):
+    def __init__(self, parent, callbacks, is_darkmode, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.title('SALSA - Instruction Editor')
@@ -65,16 +69,16 @@ class InstructionEditorView(tk.Toplevel):
 
         # Save, undo, redo buttons
 
-        self.save = tk.Button(self, text='Save', command=self.on_save)
+        self.save = ttk.Button(self, text='Save', command=self.on_save)
         self.save.grid(row=0, column=0, sticky=tk.W+tk.N, padx=2, pady=2)
         self.save['state'] = 'disabled'
 
-        inst_tree_frame = tk.Frame(self, bd=2)
+        inst_tree_frame = ttk.Frame(self)
         inst_tree_frame.grid(row=1, column=0, sticky='NSEW', padx=2, pady='0 2')
         inst_tree_frame.rowconfigure(0, weight=1)
 
         columns = list(header_settings['instruction'].keys())[1:]
-        self.inst_list_tree = ttk.Treeview(inst_tree_frame, name='instruction', columns=columns)
+        self.inst_list_tree = ttk.Treeview(inst_tree_frame, name='instruction', columns=columns, padding=0)
         self.inst_list_tree.grid(row=0, column=0, sticky='NSEW')
         first = True
         for name, d in header_settings['instruction'].items():
@@ -89,18 +93,18 @@ class InstructionEditorView(tk.Toplevel):
             self.inst_list_tree.heading(name, text=label, anchor=anchor)
             self.inst_list_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
         self.inst_list_tree['displaycolumns'] = self.visible_headers['instruction'][1:]
-        inst_tree_scrollbar = tk.Scrollbar(inst_tree_frame, orient='vertical', command=self.inst_list_tree.yview)
+        inst_tree_scrollbar = ttk.Scrollbar(inst_tree_frame, orient='vertical', command=self.inst_list_tree.yview)
         inst_tree_scrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
         self.inst_list_tree.config(yscrollcommand=inst_tree_scrollbar.set)
         self.inst_list_tree.bind('<<TreeviewSelect>>', self.on_select_instruction)
 
-        self.inst_details_frame = tk.Frame(self)
+        self.inst_details_frame = ttk.Frame(self)
         self.inst_details_frame.grid(row=1, column=1, sticky='NSEW')
         self.inst_details_frame.columnconfigure(0, weight=1)
         self.inst_details_frame.rowconfigure(0, weight=1)
         self.inst_details_frame.rowconfigure(1, weight=1)
 
-        top_details_frame = tk.Frame(self.inst_details_frame)
+        top_details_frame = ttk.Frame(self.inst_details_frame)
         top_details_frame.grid(row=0, column=0, sticky='NSEW')
         top_details_frame.columnconfigure(0, weight=1)
         top_details_frame.columnconfigure(1, weight=1)
@@ -108,81 +112,81 @@ class InstructionEditorView(tk.Toplevel):
 
         # Instruction details - Hardcoded
 
-        id_frame = tk.Frame(top_details_frame)
+        id_frame = ttk.Frame(top_details_frame)
         id_frame.grid(row=0, column=0, sticky=tk.W)
-        id_label_label = tk.Label(id_frame, text=f'Instruction ID: ')
+        id_label_label = ttk.Label(id_frame, text=f'Instruction ID: ')
         id_label_label.grid(row=0, column=0)
-        self.id_label = tk.Label(id_frame, text='')
+        self.id_label = ttk.Label(id_frame, text='')
         self.id_label.grid(row=0, column=1)
 
-        skip_frame = tk.Frame(top_details_frame)
+        skip_frame = ttk.Frame(top_details_frame)
         skip_frame.grid(row=0, column=1, sticky=tk.W)
-        skip_label_label = tk.Label(skip_frame, text=f'Frame Refresh: ')
+        skip_label_label = ttk.Label(skip_frame, text=f'Frame Refresh: ')
         skip_label_label.grid(row=0, column=0)
-        self.skip_label = tk.Label(skip_frame, text='')
+        self.skip_label = ttk.Label(skip_frame, text='')
         self.skip_label.grid(row=0, column=1)
 
-        param2_frame = tk.Frame(top_details_frame)
+        param2_frame = ttk.Frame(top_details_frame)
         param2_frame.grid(row=1, column=0, sticky=tk.W)
-        param2_label_label = tk.Label(param2_frame, text=f'FxnParameter2: ')
+        param2_label_label = ttk.Label(param2_frame, text=f'FxnParameter2: ')
         param2_label_label.grid(row=0, column=0)
-        self.param2_label = tk.Label(param2_frame, text='')
+        self.param2_label = ttk.Label(param2_frame, text='')
         self.param2_label.grid(row=0, column=1)
 
-        location_frame = tk.Frame(top_details_frame)
+        location_frame = ttk.Frame(top_details_frame)
         location_frame.grid(row=1, column=1, sticky=tk.W)
-        location_label_label = tk.Label(location_frame, text=f'Function Location: ')
+        location_label_label = ttk.Label(location_frame, text=f'Function Location: ')
         location_label_label.grid(row=0, column=0)
-        self.location_label = tk.Label(location_frame, text='')
+        self.location_label = ttk.Label(location_frame, text='')
         self.location_label.grid(row=0, column=1)
 
-        link_frame = tk.Frame(top_details_frame)
+        link_frame = ttk.Frame(top_details_frame)
         link_frame.grid(row=2, column=0, sticky=tk.W)
-        link_label_label = tk.Label(link_frame, text=f'Link Type: ')
+        link_label_label = ttk.Label(link_frame, text=f'Link Type: ')
         link_label_label.grid(row=0, column=0)
-        self.link_label = tk.Label(link_frame, text='')
+        self.link_label = ttk.Label(link_frame, text='')
         self.link_label.grid(row=0, column=1)
 
-        loop_params_frame = tk.Frame(top_details_frame)
+        loop_params_frame = ttk.Frame(top_details_frame)
         loop_params_frame.grid(row=3, column=0, sticky=tk.W)
-        loop_params_label_label = tk.Label(loop_params_frame, text=f'Loop Params: ')
+        loop_params_label_label = ttk.Label(loop_params_frame, text=f'Loop Params: ')
         loop_params_label_label.grid(row=0, column=0)
-        self.loop_params_label = tk.Label(loop_params_frame, text='')
+        self.loop_params_label = ttk.Label(loop_params_frame, text='')
         self.loop_params_label.grid(row=0, column=1)
 
-        self.warning_frame = tk.Frame(top_details_frame)
+        self.warning_frame = ttk.Frame(top_details_frame)
         self.warning_frame.grid(row=4, column=0, sticky=tk.W)
-        warning_label_label = tk.Label(self.warning_frame, text=f'Warning: ')
+        warning_label_label = ttk.Label(self.warning_frame, text=f'Warning: ')
         warning_label_label.grid(row=0, column=0)
-        self.warning_label = tk.Label(self.warning_frame, text='')
+        self.warning_label = ttk.Label(self.warning_frame, text='')
         self.warning_label.grid(row=0, column=1)
-        self.no_warning = tk.Label(top_details_frame, text=' ')
+        self.no_warning = ttk.Label(top_details_frame, text=' ')
         self.no_warning.grid(row=4, column=0, columnspan=2, sticky='NSEW')
 
         # Instruction details - Editable
 
-        name_frame = tk.Frame(top_details_frame)
+        name_frame = ttk.Frame(top_details_frame)
         name_frame.grid(row=5, column=0, columnspan=2, sticky=tk.W+tk.E)
-        name_label_label = tk.Label(name_frame, text='Name:')
+        name_label_label = ttk.Label(name_frame, text='Name:')
         name_label_label.grid(row=0, column=0)
-        self.details_name_entry = tk.Entry(name_frame)
+        self.details_name_entry = ttk.Entry(name_frame)
         self.details_name_entry.grid(row=0, column=1, sticky='nsew')
         self.details_name_entry.bind('<FocusIn>', self.on_entry_focus_in)
         self.details_name_entry.bind('<FocusOut>', lambda e, k='name': self.on_entry_focus_out(k, e))
-        self.details_name_label = tk.Label(name_frame, text='', anchor=tk.W)
+        self.details_name_label = ttk.Label(name_frame, text='', anchor=tk.W)
         self.details_name_label.grid(row=0, column=1, sticky='nsew')
 
-        desc_frame = tk.LabelFrame(top_details_frame, text='Description')
+        desc_frame = ttk.LabelFrame(top_details_frame, text='Description')
         desc_frame.grid(row=6, column=0, sticky='NSEW', columnspan=2)
         desc_frame.columnconfigure(0, weight=1)
         desc_frame.rowconfigure(0, weight=1)
-        self.details_desc_text = tk.scrolledtext.ScrolledText(desc_frame, wrap=tk.WORD, height=15, width=50)
+        self.details_desc_text = w.ThemedScrolledText(desc_frame, wrap=tk.WORD, height=15, width=50)
         self.details_desc_text.grid(row=0, column=0, sticky='NSEW')
         self.details_desc_text.bind('<FocusIn>', self.on_text_focus_in)
         self.details_desc_text.bind('<FocusOut>', lambda e, k='description': self.on_text_focus_out(k, e))
 
         # Instruction parameter setup frame
-        self.parameters_frame = tk.LabelFrame(self.inst_details_frame, text='Parameters')
+        self.parameters_frame = ttk.LabelFrame(self.inst_details_frame, text='Parameters')
         self.parameters_frame.grid(row=1, column=0, sticky='NSEW')
         self.parameters_frame.columnconfigure(0, weight=1)
         self.parameters_frame.rowconfigure(0, weight=1)
@@ -203,7 +207,7 @@ class InstructionEditorView(tk.Toplevel):
             self.param_list_tree.heading(name, text=label, anchor=anchor)
             self.param_list_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
         self.param_list_tree['displaycolumns'] = self.visible_headers['parameter'][1:]
-        param_tree_scrollbar = tk.Scrollbar(self.parameters_frame, orient='vertical', command=self.param_list_tree.yview)
+        param_tree_scrollbar = ttk.Scrollbar(self.parameters_frame, orient='vertical', command=self.param_list_tree.yview)
         param_tree_scrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
         self.param_list_tree.config(yscrollcommand=param_tree_scrollbar.set)
 
@@ -211,16 +215,16 @@ class InstructionEditorView(tk.Toplevel):
 
         # Instruction notes
 
-        inst_notes_frame = tk.LabelFrame(self, text='Notes')
+        inst_notes_frame = ttk.LabelFrame(self, text='Notes')
         inst_notes_frame.grid(row=1, column=2, sticky='NSEW')
         inst_notes_frame.rowconfigure(1, weight=1)
         inst_notes_frame.rowconfigure(3, weight=1)
         inst_notes_frame.columnconfigure(0, weight=1)
 
-        default_notes_label = tk.Label(inst_notes_frame, text='Instruction Notes')
+        default_notes_label = ttk.Label(inst_notes_frame, text='Instruction Notes')
         default_notes_label.grid(row=0, column=0, sticky=tk.W)
 
-        self.default_notes_text = tk.scrolledtext.ScrolledText(inst_notes_frame, wrap=tk.WORD, height=15, width=35)
+        self.default_notes_text = w.ThemedScrolledText(inst_notes_frame, wrap=tk.WORD, height=15, width=35)
         self.default_notes_text.grid(row=1, column=0, sticky='NSEW')
         self.default_notes_text.bind('<FocusIn>', self.on_text_focus_in)
         self.default_notes_text.bind('<FocusOut>', lambda e, k='default_notes': self.on_text_focus_out(k, e))
@@ -231,9 +235,15 @@ class InstructionEditorView(tk.Toplevel):
         self.default_notes_msg = tk.Message(self.default_notes_frame.scroll_frame)
         self.default_notes_msg.grid(row=0, column=0, sticky='NSEW')
         self.default_notes_frame.canvas.bind("<Configure>", lambda e: self.default_notes_msg.configure(width=e.width - 10), add='+')
-        self.after(10, lambda: self.default_notes_msg.configure(width=self.default_notes_frame.scroll_frame['width'] - 10))
 
-        user_notes_label = tk.Label(inst_notes_frame, text='User Notes')
+        self.change_theme(is_darkmode)
+
+        def config_scrollframe():
+            new_width = self.default_notes_frame.scroll_frame.winfo_width() - 10
+            self.default_notes_msg.configure(width=new_width)
+        self.after(10, config_scrollframe)
+
+        user_notes_label = ttk.Label(inst_notes_frame, text='User Notes')
         user_notes_label.grid(row=2, column=0, sticky=tk.W)
 
         self.user_notes_text = tk.scrolledtext.ScrolledText(inst_notes_frame, wrap=tk.WORD, height=15, width=35)
@@ -241,7 +251,7 @@ class InstructionEditorView(tk.Toplevel):
         self.user_notes_text.bind('<FocusIn>', self.on_text_focus_in)
         self.user_notes_text.bind('<FocusOut>', lambda e, k='user_notes': self.on_text_focus_out(k, e))
 
-        self.user_notes_blocker = tk.Label(inst_notes_frame, text=' ')
+        self.user_notes_blocker = ttk.Label(inst_notes_frame, text=' ')
         self.user_notes_blocker.grid(row=3, column=0, sticky='NSEW')
 
         user_type = self.callbacks['user_type']()
@@ -376,3 +386,19 @@ class InstructionEditorView(tk.Toplevel):
         values[column_id - 1] = value
         self.param_list_tree.item(sel_iid, values=values)
 
+    def change_theme(self, dark_mode):
+        theme = dark_theme if dark_mode else light_theme
+
+        # self - toplevel
+        self.configure(background=theme['.']['configure']['background'])
+
+        # details_desc_text - scrolledtext
+        self.details_desc_text.configure(**theme['.']['configure'])
+        # default_notes_text - scrolledtext
+        self.default_notes_text.configure(**theme['.']['configure'])
+
+        # default_notes_frame - ScrollCanvasFrame
+        self.default_notes_frame.change_theme(dark_mode)
+
+        # default_notes_msg - Message
+        pass

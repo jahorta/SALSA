@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Tuple, List
 
+from SALSA.GUI.themes import dark_theme, light_theme
 from SALSA.Common.setting_class import settings
 from SALSA.GUI import widgets as w
 
@@ -33,7 +34,7 @@ class VariablePopup(tk.Toplevel):
     option_settings = {}
     tree_names = ['Bit', 'Byte', 'Int', 'Float']
 
-    def __init__(self, parent, callbacks, name, *args, **kwargs):
+    def __init__(self, parent, callbacks, name, is_darkmode, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.parent: tk.Tk = parent
@@ -41,6 +42,8 @@ class VariablePopup(tk.Toplevel):
         self.name = name
         self.script_ids = {}
         self.protocol('WM_DELETE_WINDOW', self.on_close)
+        theme = dark_theme if is_darkmode else light_theme
+        self.configure(**theme['Ttoplevel']['configure'])
 
         if self.log_key not in settings:
             settings[self.log_key] = {}
@@ -49,7 +52,7 @@ class VariablePopup(tk.Toplevel):
             if s not in settings[self.log_key]:
                 settings[self.log_key][s] = v['default']
 
-        script_frame = tk.LabelFrame(self, text='Scripts')
+        script_frame = ttk.LabelFrame(self, text='Scripts')
         script_frame.grid(row=0, column=0, sticky='NSEW')
         script_frame.rowconfigure(0, weight=1)
 
@@ -60,7 +63,7 @@ class VariablePopup(tk.Toplevel):
         self.script_tree.heading('#0', text='Script', anchor=anchor)
         self.script_tree.column('#0', anchor=anchor, minwidth=10, width=100, stretch=True)
         self.script_tree.grid(row=0, column=0, sticky='NSEW')
-        script_tree_scroll = tk.Scrollbar(script_frame, orient='vertical', command=self.script_tree.yview)
+        script_tree_scroll = ttk.Scrollbar(script_frame, orient='vertical', command=self.script_tree.yview)
         script_tree_scroll.grid(row=0, column=1, sticky=tk.N + tk.S)
         self.script_tree.config(yscrollcommand=script_tree_scroll.set)
         self.script_tree.config(show='tree')
@@ -68,7 +71,7 @@ class VariablePopup(tk.Toplevel):
         self.cur_script = None
         self.cur_var_aliases = []
 
-        variable_frame = tk.LabelFrame(self, text='Variables')
+        variable_frame = ttk.LabelFrame(self, text='Variables')
         variable_frame.grid(row=0, column=1, sticky='NSEW')
         variable_frame.columnconfigure(0, weight=1)
         variable_frame.rowconfigure(0, weight=1)
@@ -97,7 +100,7 @@ class VariablePopup(tk.Toplevel):
                     first = False
                 self.var_trees[tree_name].heading(name, text=label, anchor=anchor)
                 self.var_trees[tree_name].column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
-            script_tree_scrollbar = tk.Scrollbar(tree_frame, orient='vertical', command=self.var_trees[tree_name].yview)
+            script_tree_scrollbar = ttk.Scrollbar(tree_frame, orient='vertical', command=self.var_trees[tree_name].yview)
             script_tree_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
             self.var_trees[tree_name].config(yscrollcommand=script_tree_scrollbar.set)
             self.var_trees[tree_name].bind("<Double-ButtonPress-1>", self.var_double_click)
@@ -106,15 +109,15 @@ class VariablePopup(tk.Toplevel):
             label = tree_name + 's'
             self.variable_notebook.add(tree_frame, text=label)
 
-        variable_usage_frame = tk.LabelFrame(self, text='Variable Usage')
+        variable_usage_frame = ttk.LabelFrame(self, text='Variable Usage')
         variable_usage_frame.grid(row=0, column=2, sticky='NSEW')
         variable_usage_frame.columnconfigure(0, weight=1)
         variable_usage_frame.rowconfigure(0, weight=1)
 
-        self.variable_usage = w.ScrollLabelFrame(variable_usage_frame)
+        self.variable_usage = w.ScrollLabelFrame(variable_usage_frame, is_darkmode=is_darkmode)
         self.variable_usage.grid(row=0, column=0, sticky='NSEW')
 
-        self.status_label = tk.Label(self, text='')
+        self.status_label = ttk.Label(self, text='')
         self.status_label.grid(row=1, column=0, columnspan=3)
 
         self.columnconfigure(1, weight=2)
@@ -272,3 +275,8 @@ class VariablePopup(tk.Toplevel):
 
     def on_close(self):
         self.callbacks['close'](self.name, self)
+
+    def change_theme(self, dark_mode):
+        theme = dark_theme if dark_mode else light_theme
+        self.configure(**theme['Ttoplevel']['configure'])
+        self.variable_usage.change_theme(dark_mode=dark_mode)

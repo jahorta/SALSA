@@ -5,10 +5,12 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Dict, List, Union
 
+from GUI.themes import light_theme, dark_theme
+
+
 # ------ #
 # Mixins #
 # ------ #
-from SALSA.Common.containers import Dimension, Vector2
 
 
 class ValidatedMixin:
@@ -104,13 +106,13 @@ class RequiredEntryMixin:
 # -------------- #
 
 
-class RequiredEntry(ValidatedMixin, RequiredEntryMixin, tk.Entry):
+class RequiredEntry(ValidatedMixin, RequiredEntryMixin, ttk.Entry):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
 
-class HexEntry(ValidatedMixin, tk.Entry):
+class HexEntry(ValidatedMixin, ttk.Entry):
     def __init__(self, *args, hex_max_length: int, hex_min_length: int, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -261,25 +263,22 @@ class RequiredFloatEntry(RequiredEntry):
 # Frame Classes #
 # ------------- #
 
-class ScrollLabelCanvas(tk.LabelFrame):
 
-    def __init__(self, parent, size: dict, has_label=True, *args, **kwargs):
-        if not has_label:
-            kwargs = kwargs
-            kwargs['text'] = ''
-            if 'bd' not in kwargs:
-                kwargs['bd'] = 0
+class ScrollCanvas(ttk.Frame):
+
+    def __init__(self, parent, size: dict, is_darkmode=True, *args, **kwargs):
 
         super().__init__(parent, *args, **kwargs)
 
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
-
         self.parent = parent
-        self.canvas = tk.Canvas(self, width=size['width'], height=size['height'])
+
+        theme = dark_theme if is_darkmode else light_theme
+        self.canvas = tk.Canvas(self, width=size['width'], height=size['height'], **theme['TCanvas']['configure'])
         self.canvas.grid(row=0, column=0, sticky='NSEW')
 
-        self.canvas_scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.canvas_scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
         self.canvas_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
 
         self.canvas.configure(yscrollcommand=self.canvas_scrollbar.set)
@@ -316,26 +315,125 @@ class ScrollLabelCanvas(tk.LabelFrame):
         else:
             self.canvas.unbind_all("<MouseWheel>")
 
+    def change_theme(self, dark_mode=True):
+        theme = dark_theme if dark_mode else light_theme
+        self.canvas.configure(**theme['TCanvas']['configure'])
+
+
+class ScrollLabelCanvas(ttk.LabelFrame):
+
+    def __init__(self, parent, size: dict, has_label=True, is_darkmode=True, *args, **kwargs):
+        if not has_label:
+            kwargs = kwargs
+            kwargs['text'] = ''
+
+        super().__init__(parent, *args, **kwargs)
+
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+        self.parent = parent
+
+        theme = dark_theme if is_darkmode else light_theme
+        self.canvas = tk.Canvas(self, width=size['width'], height=size['height'], **theme['TCanvas']['configure'])
+        self.canvas.grid(row=0, column=0, sticky='NSEW')
+
+        self.canvas_scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.canvas_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
+
+        self.canvas.configure(yscrollcommand=self.canvas_scrollbar.set)
+        self.canvas.config(scrollregion=self.canvas.bbox("all"))
+
+        self.canvas.bind('<Enter>', self.onEnter)  # bind wheel events when the cursor enters the control
+        self.canvas.bind('<Leave>', self.onLeave)  # unbind wheel events when the cursor leaves the control
+
+    # cross platform scroll wheel event
+    def onMouseWheel(self, event):
+        if platform.system() == 'Windows':
+            self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        elif platform.system() == 'Darwin':
+            self.canvas.yview_scroll(int(-1 * event.delta), "units")
+        else:
+            if event.num == 4:
+                self.canvas.yview_scroll(-1, "units")
+            elif event.num == 5:
+                self.canvas.yview_scroll(1, "units")
+
+    # bind wheel events when the cursor enters the control
+    def onEnter(self, event):
+        if platform.system() == 'Linux':
+            self.canvas.bind_all("<Button-4>", self.onMouseWheel)
+            self.canvas.bind_all("<Button-5>", self.onMouseWheel)
+        else:
+            self.canvas.bind_all("<MouseWheel>", self.onMouseWheel)
+
+    # unbind wheel events when the cursor leaves the control
+    def onLeave(self, event):
+        if platform.system() == 'Linux':
+            self.canvas.unbind_all("<Button-4>")
+            self.canvas.unbind_all("<Button-5>")
+        else:
+            self.canvas.unbind_all("<MouseWheel>")
+
+    def change_theme(self, dark_mode=True):
+        theme = dark_theme if dark_mode else light_theme
+        self.canvas.configure(**theme['TCanvas']['configure'])
+
 
 class TextScrollLabelCanvas(ScrollLabelCanvas):
 
-    def __init__(self, parent, size: dict, canvas_text_offset: dict, canvas_text: str, has_label=True):
-        super().__init__(parent, size, has_label=has_label)
+    def __init__(self, parent, size: dict, canvas_text_offset: dict, canvas_text: str, has_label=True, is_darkmode=True):
+        super().__init__(parent, size, has_label=has_label, is_darkmode=is_darkmode)
 
+        theme = dark_theme if is_darkmode else light_theme
+        fill = theme['TCanvasText']['configure']['fill']
         self.text = self.canvas.create_text((canvas_text_offset['x'], canvas_text_offset['y']),
-                                            anchor=tk.NW, text=canvas_text,
+                                            anchor=tk.NW, text=canvas_text, fill=fill,
                                             width=size['width'] - canvas_text_offset['x'])
+
+    def change_theme(self, dark_mode=True):
+        super().change_theme(dark_mode)
+
+        theme = dark_theme if dark_mode else light_theme
+        fill = theme['TCanvasText']['configure']['fill']
+
+        self.canvas.itemconfigure(self.text, fill=fill)
+
+
+class ScrollFrame(ScrollCanvas):
+
+    def __init__(self, parent, size=None, is_darkmode=True, *args, **kwargs):
+        size = {'width': 100, 'height': 100} if size is None else size
+        super().__init__(parent, size, is_darkmode=is_darkmode, *args, **kwargs)
+
+        self.scroll_frame = ttk.Frame(self.canvas)
+
+        self.canvas_window = self.canvas.create_window(0, 0, window=self.scroll_frame, anchor='nw',
+                                                       tags='self.viewport')
+
+        # bind an event whenever the size of the viewPort frame changes.
+        self.scroll_frame.bind("<Configure>", self.onCanvasContentChange)
+
+        self.onCanvasContentChange(None)
+
+        # whenever the size of the frame changes, alter the scroll region respectively.
+
+    def onCanvasContentChange(self, event):
+        """Reset the scroll region to encompass the canvas contents"""
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def change_theme(self, dark_mode=True):
+        super().change_theme(dark_mode)
 
 
 class ScrollLabelFrame(ScrollLabelCanvas):
 
-    def __init__(self, parent, size=None, has_label=True, *args, **kwargs):
+    def __init__(self, parent, size=None, has_label=True, is_darkmode=True, *args, **kwargs):
         size = {'width': 100, 'height': 100} if size is None else size
-        super().__init__(parent, size, has_label=has_label, *args, **kwargs)
+        super().__init__(parent, size, has_label=has_label, is_darkmode=is_darkmode, *args, **kwargs)
 
-        self.scroll_frame = tk.Frame(self.canvas)
+        self.scroll_frame = ttk.Frame(self.canvas)
 
-        self.canvas_window = self.canvas.create_window(0, 0, window=self.scroll_frame, anchor=tk.N + tk.W,
+        self.canvas_window = self.canvas.create_window(2, 2, window=self.scroll_frame, anchor='nw',
                                                        tags='self.viewport')
 
         # bind an event whenever the size of the viewPort frame changes.
@@ -347,6 +445,9 @@ class ScrollLabelFrame(ScrollLabelCanvas):
     def onCanvasContentChange(self, event):
         """Reset the scroll region to encompass the canvas contents"""
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def change_theme(self, dark_mode=True):
+        super().change_theme(dark_mode)
 
 
 # ----- #
@@ -719,5 +820,31 @@ class DataTreeview(ttk.Treeview):
         return [self.row_data[self.get_children()[int(s)]] for s in self.cur_selection]
 
 
-class GridReorganizer(ScrollLabelCanvas):
-    pass
+class ThemedScrolledText(tk.Text):
+
+    def __init__(self, master=None, **kw):
+        self.frame = ttk.Frame(master)
+        self.vbar = ttk.Scrollbar(self.frame)
+        self.vbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        kw.update({'yscrollcommand': self.vbar.set})
+        tk.Text.__init__(self, self.frame, **kw)
+        self.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.vbar['command'] = self.yview
+
+        # Copy geometry methods of self.frame without overriding Text
+        # methods -- hack!
+        text_meths = vars(tk.Text).keys()
+        methods = vars(tk.Pack).keys() | vars(tk.Grid).keys() | vars(tk.Place).keys()
+        methods = methods.difference(text_meths)
+
+        for m in methods:
+            if m[0] != '_' and m != 'config' and m != 'configure':
+                setattr(self, m, getattr(self.frame, m))
+
+    def __str__(self):
+        return str(self.frame)
+
+    def change_theme(self, dark_mode):
+        theme = dark_theme if dark_mode else light_theme
+        self.configure(**theme['text']['configure'])

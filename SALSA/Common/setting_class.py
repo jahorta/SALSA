@@ -1,6 +1,6 @@
 import os
 import configparser
-from typing import Tuple, List
+from typing import Tuple, List, Union
 
 
 class Settings(configparser.ConfigParser):
@@ -32,15 +32,15 @@ class Settings(configparser.ConfigParser):
         with open(self.filename, 'w') as configfile:
             self.write(configfile)
 
-    def add_group(self, section):
+    def add_group(self, section: str):
         self[section] = {}
         self._save_settings()
 
-    def set_single(self, group, setting, value):
+    def set_single(self, group: str, setting: str, value: str):
         self[group][setting] = value
         self._save_settings()
 
-    def set_multiple(self, setting_list: List[Tuple]):
+    def set_multiple(self, setting_list: List[Tuple[str, str, str]]):
         for s in setting_list:
             self[s[0]][s[1]] = s[2]
         self._save_settings()

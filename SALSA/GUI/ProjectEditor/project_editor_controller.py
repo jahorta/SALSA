@@ -120,7 +120,9 @@ class ProjectEditorController:
     def on_select_tree_entry(self, tree_key, entry):
         self.clear_inst_details()
         if tree_key == 'instruction':
+            self.callbacks['toggle_frame_state'](self.view.inst_frame, 'normal')
             return self.on_select_instruction(entry)
+        self.callbacks['toggle_frame_state'](self.view.inst_frame, 'disabled')
         kwargs = {'style': settings[self.log_name]['style']}
         self.current[tree_key] = entry
         cur_key = tree_key
@@ -243,7 +245,7 @@ class ProjectEditorController:
             tgt_frame = tk.Frame(self.view.link_out.scroll_frame)
             tgt_frame.bind('<Enter>', self.handle_link_font)
             tgt_frame.bind('<Leave>', self.handle_link_font)
-            tgt_frame.grid(row=i, column=0)
+            tgt_frame.grid(row=i, column=0, sticky=tk.E+tk.W)
             tgt_sect = link.target_trace[0]
             tgt_inst = self.project.get_inst_ind(script=self.current['script'], section=tgt_sect,
                                                  inst=link.target_trace[1])
@@ -562,3 +564,6 @@ class ProjectEditorController:
         if has_changed:
             param_tree = self.project.get_parameter_tree(headings=self.view.get_headers('parameter'), **self.current)
             self.update_tree('parameter', param_tree)
+
+    def add_callback(self, key: str, callback: callable):
+        self.callbacks[key] = callback

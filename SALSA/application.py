@@ -1,16 +1,31 @@
 import os
+import random
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, ttk
 
+from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
 from SALSA.FileModels.project_model import ProjectModel
 from SALSA.FileModels.sct_model import SCTModel
 from SALSA.GUI.ProjectEditor.project_editor_controller import ProjectEditorController
 from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
 from SALSA.GUI.gui_controller import GUIController
-from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.GUI import menus
+from SALSA.GUI.themes import themes, theme_non_color_maps
 from SALSA.Project.project_facade import SCTProjectFacade
+
+default_style = 'clam'
+
+
+default_settings = {
+    'darkmode': 'False'
+}
+
+icons = [
+    ('./SALSA/GUI/Icons/icon-1.png', './SALSA/GUI/Icons/icon-1-16.png'),
+    ('./SALSA/GUI/Icons/icon-2.png', './SALSA/GUI/Icons/icon-2-16.png'),
+    ('./SALSA/GUI/Icons/icon-3.png', './SALSA/GUI/Icons/icon-3-16.png')
+]
 
 
 class Application(tk.Tk):
@@ -25,6 +40,10 @@ class Application(tk.Tk):
         if self.log_key not in settings:
             settings[self.log_key] = {}
 
+        for s in default_settings:
+            if settings[self.log_key].get(s, None) is None:
+                settings.set_single(self.log_key, s, default_settings[s])
+
         # Load base instructions
         self.base_insts = BaseInstLibFacade()
 
@@ -33,21 +52,40 @@ class Application(tk.Tk):
         self.resizable(width=True, height=True)
         self.protocol('WM_DELETE_WINDOW', self.on_quit)
 
+        icon_ind = random.randint(0, 2)
+        large_icon = tk.PhotoImage(file=icons[icon_ind][0])
+        small_icon = tk.PhotoImage(file=icons[icon_ind][1])
+        self.iconphoto(True, large_icon, small_icon)
+
+        self.is_darkmode = True if settings[self.log_key]['darkmode'] == 'True' else False
+        self.style = ttk.Style()
+        for theme, theme_settings in themes.items():
+            self.style.theme_create(theme, parent=default_style, settings=theme_settings)
+
+        for key, maps in theme_non_color_maps.items():
+            for mk, mv in maps.items():
+                self.style.map(key, **{mk: mv})
+
+        theme_name = list(themes.keys())[0] if self.is_darkmode else list(themes.keys())[1]
+        self.style.theme_use(theme_name)
+
         # Setup project details
         self.project = SCTProjectFacade(self.base_insts)
         self.project_filepath = ''
 
         # Setup script editor view and controller
-        self.project_edit_view = ProjectEditorView(self)
-        self.project_edit_view.grid(row=0, column=0, sticky='NSEW', pady=5)
+        self.project_edit_view = ProjectEditorView(self, is_darkmode=self.is_darkmode)
+        self.project_edit_view.grid(row=0, column=0, sticky='NSEW', pady=5, padx=5)
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
-        project_view_callbacks = {'save_project': self.on_save_project}
-        self.project_edit_controller = ProjectEditorController(self, self.project_edit_view, self.project, callbacks=project_view_callbacks)
+        project_controller_callbacks = {'save_project': self.on_save_project}
+        self.project_edit_controller = ProjectEditorController(self, self.project_edit_view, self.project, callbacks=project_controller_callbacks)
 
         self.gui = GUIController(parent=self, scpt_editor_view=self.project_edit_view,
                                  project_facade=self.project, inst_lib_facade=self.base_insts)
+
+        self.project_edit_controller.add_callback('toggle_frame_state', self.gui.toggle_frame_state)
 
         # Create Models
         self.proj_model = ProjectModel()
@@ -68,29 +106,38 @@ class Application(tk.Tk):
             'prj->string': self.gui.show_strings_popup,
             'analysis->export': self.gui.show_analysis_view,
             'view->inst': self.gui.show_instruction_view,
+            'view->theme': self.change_theme,
             'help->help': self.gui.show_help,
             'help->about': self.gui.show_about,
         }
 
         # Implement Menu
-        self.menu = menus.MainMenu(parent=self, callbacks=self.menu_callbacks, recent_files=recent_files)
+        self.menu = menus.MainMenu(parent=self, callbacks=self.menu_callbacks, recent_files=recent_files, dark_mode=self.is_darkmode)
         self.config(menu=self.menu)
 
         # Connect recent files in proj_model to menu
         self.proj_model.add_callback('menu->update_recents', self.menu.update_recents)
 
+        def return_darkmode():
+            return self.is_darkmode
+
         # Set menu options available only when in script mode
         self.gui.add_callbacks({
             'script': self.menu.enable_script_commands,
             'no_script': self.menu.disable_script_commands,
-            'export_sct': self.on_export_scts
+            'export_sct': self.on_export_scts,
+            'is_darkmode': return_darkmode,
         })
 
         self.gui.disable_script_view()
 
+        # self.bind('<<ChangeTheme>>', self.propagate_change_theme)
+        self.change_theme(self.is_darkmode)
+
     def on_new_project(self):
         self.project.create_new_project()
         self.gui.enable_script_view()
+        self.gui.toggle_frame_state(self.project_edit_view.inst_frame, 'disabled')
         self.project_edit_controller.update_tree(None, None)
 
     def on_save_as_project(self):
@@ -147,6 +194,7 @@ class Application(tk.Tk):
         self.gui.stop_status_popup()
 
         self.gui.enable_script_view()
+        self.gui.toggle_frame_state(self.project_edit_view.inst_frame, 'disabled')
 
     def on_print_debug(self):
         print(f'\nWindow Dimensions:\nHeight: {self.winfo_height()}\nWidth: {self.winfo_width()}')
@@ -212,3 +260,16 @@ class Application(tk.Tk):
             self._notify_export_sct(script_paths, script_names, options, compress)
         else:
             self.gui.stop_status_popup()
+
+    def change_theme(self, dark_mode=True):
+        self.is_darkmode = dark_mode
+        settings.set_single(self.log_key, 'darkmode', str(dark_mode))
+        theme_name = list(themes.keys())[0] if dark_mode else list(themes.keys())[1]
+        theme = themes[theme_name]
+
+        self.style.theme_use(theme_name)
+
+        self.configure(bg=theme['.']['configure']['background'])
+
+        self.project_edit_view.change_theme(dark_mode)
+        self.gui.change_theme(dark_mode)

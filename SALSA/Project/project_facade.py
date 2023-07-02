@@ -28,10 +28,9 @@ class SCTProjectFacade:
         self.cur_script = None
 
     def load_project(self, prj: SCTProject):
-        new_project = SCTProject()
-        if prj.version == new_project.version:
-            self.project = prj
+        if prj.version != SCTProject.version:
             return
+        self.project = prj
 
     def create_new_project(self):
         self.project = SCTProject()
@@ -346,6 +345,8 @@ class SCTProjectFacade:
         return SAstr_to_head_and_body(self.project.scripts[script].strings[string_id])
 
     def edit_string(self, script, string_id, changes):
+        if script == '' or string_id == '':
+            return
         no_head, head, body = SAstr_to_head_and_body(self.project.scripts[script].strings[string_id])
         if 'no_head' in changes:
             no_head = changes['no_head']
