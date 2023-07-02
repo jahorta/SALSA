@@ -5,7 +5,7 @@ import json
 from typing import List, Dict
 
 import SALSA.GUI.widgets as w
-from GUI.themes import light_theme, dark_theme
+from SALSA.GUI.themes import light_theme, dark_theme
 from SALSA.Common.constants import sep, alt_sep, alt_alt_sep
 from SALSA.Common.setting_class import settings
 from SALSA.BaseInstructions.bi_defaults import loop_count_name

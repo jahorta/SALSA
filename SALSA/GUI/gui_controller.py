@@ -4,7 +4,7 @@ from tkinter import ttk
 from typing import Union, TypedDict, Literal
 import webbrowser
 
-from GUI.themes import light_theme, dark_theme
+from SALSA.GUI.themes import light_theme, dark_theme
 from SALSA.GUI import widgets as w
 from SALSA.GUI.AnalysisPopup.analysis_controller import AnalysisController
 from SALSA.GUI.InstructionEditor.instruction_editor_controller import InstructionEditorController

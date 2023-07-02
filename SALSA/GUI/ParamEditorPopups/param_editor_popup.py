@@ -4,7 +4,7 @@ from tkinter import ttk
 from typing import Union, Dict, List
 
 import SALSA.GUI.widgets as w
-from GUI.themes import light_theme, dark_theme
+from SALSA.GUI.themes import light_theme, dark_theme
 from SALSA.Common.constants import sep
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 

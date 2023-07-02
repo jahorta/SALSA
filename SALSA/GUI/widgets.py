@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Dict, List, Union
 
-from GUI.themes import light_theme, dark_theme
+from SALSA.GUI.themes import light_theme, dark_theme
 
 
 # ------ #
