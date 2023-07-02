@@ -30,7 +30,8 @@ class ValidatedMixin:
         )
 
     def _toggle_error(self, on=False):
-        self.config(foreground=('red' if on else 'black'))
+        # self.config(foreground=('red' if on else 'black'))
+        pass
 
     def _validate(self, proposed, current, char, event, index, action):
         """The validation method.
