@@ -46,6 +46,14 @@ def theme_generator(colors: Colors):
                 "foreground": colors.text
             }
         },
+        "link.TLabel": {
+            "configure": {
+                "foreground": colors.text
+            },
+            "map": {
+                "foreground": [("active", colors.link), ("pressed", colors.selector), ("disabled", colors.bg_internal)]
+            }
+        },
         "TButton": {
             "configure": {
                 "background": colors.button,
