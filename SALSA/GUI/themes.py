@@ -186,7 +186,9 @@ def theme_generator(colors: Colors):
         "Tmessage": {
             'configure': {
                 "background": colors.bg_internal,
-                "foreground": colors.text
+                "foreground": colors.text,
+                "highlightbackground": colors.border,
+                "highlightcolor": colors.border
             }
         },
         "TCanvasText": {
