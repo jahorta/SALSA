@@ -35,6 +35,13 @@ def theme_generator(colors: Colors):
         },
         "TLabel": {
             "configure": {
+                "background": colors.bg,
+                "foreground": colors.text
+            }
+        },
+        "canvas.TLabel": {
+            "configure": {
+                "background": colors.bg_internal,
                 "foreground": colors.text
             }
         },
@@ -58,7 +65,7 @@ def theme_generator(colors: Colors):
                 "foreground": colors.text,
                 "highlightbackground": colors.bg_highlight,
                 "highlightcolor": colors.bg_highlight,
-                "fieldbackground": colors.bg_highlight,
+                "fieldbackground": colors.bg_internal,
                 "bordercolor": colors.bg_internal,
                 "selectbackground": colors.bg,
                 "selectforeground": colors.text,
