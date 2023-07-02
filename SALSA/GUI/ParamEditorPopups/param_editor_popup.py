@@ -1,8 +1,10 @@
 import math
 import tkinter as tk
+from tkinter import ttk
 from typing import Union, Dict, List
 
 import SALSA.GUI.widgets as w
+from GUI.themes import light_theme, dark_theme
 from SALSA.Common.constants import sep
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 
@@ -12,7 +14,7 @@ from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 # --------------------------- #
 
 # SCPT decimal input widget
-class DecimalWidget(tk.Frame):
+class DecimalWidget(ttk.Frame):
 
     def __init__(self, parent, textvariables, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
@@ -33,7 +35,7 @@ class DecimalWidget(tk.Frame):
 
 
 # SCPT variable input widget
-class SCPTVarWidget(tk.Frame):
+class SCPTVarWidget(ttk.Frame):
 
     def __init__(self, parent, textvariable, callbacks, is_base, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
@@ -47,7 +49,7 @@ class SCPTVarWidget(tk.Frame):
             self.var_entry.bind('<FocusOut>', self.load_alias)
             self.var_entry.bind('<Return>', self.load_alias)
 
-        self.alias_label = tk.Label(self, text='No Alias')
+        self.alias_label = ttk.Label(self, text='No Alias')
         self.alias_label.grid(row=0, column=1, sticky=tk.W)
 
     def load_alias(self, e):
@@ -57,7 +59,7 @@ class SCPTVarWidget(tk.Frame):
         self.alias_label.config(text=alias)
 
 
-class SCPTFloatWidget(tk.Frame):
+class SCPTFloatWidget(ttk.Frame):
 
     def __init__(self, parent, callbacks, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
@@ -70,7 +72,7 @@ class SCPTFloatWidget(tk.Frame):
         self.float.grid(row=0, column=0)
 
         self.override_value = tk.IntVar(self, 0)
-        override = tk.Checkbutton(self, text='Override Parameter', variable=self.override_value, command=self.override_clicked)
+        override = ttk.Checkbutton(self, text='Override Parameter', variable=self.override_value, command=self.override_clicked)
         override.grid(row=0, column=1)
 
     def override_clicked(self):
@@ -100,7 +102,7 @@ class SCPTFloatWidget(tk.Frame):
 
 
 # Single row widget of SCPT parameter
-class SCPTEditWidget(tk.Frame):
+class SCPTEditWidget(ttk.Frame):
 
     def __init__(self, parent, callbacks, key: str, is_base, *args, prefix='', **kwargs):
         super().__init__(parent, *args, **kwargs)
@@ -109,19 +111,20 @@ class SCPTEditWidget(tk.Frame):
         self.scpt_codes = SCPTParamCodes(is_decoder=False)
         self.key = key
         self.is_base = is_base
+        self.rowconfigure(0, weight=1)
 
         indent = '\t'*key.count(sep)
-        self.prefix_label = tk.Label(self, text=f'{indent} {prefix}')
+        self.prefix_label = ttk.Label(self, text=f'{indent} {prefix}')
         self.prefix_label.grid(row=0, column=0)
 
         self.class_selection = tk.StringVar(self)
-        self.class_option = tk.OptionMenu(self, self.class_selection, *self.scpt_codes.classes, command=self.update_options)
-        self.class_option.grid(row=0, column=1)
+        self.class_option = ttk.OptionMenu(self, self.class_selection, *self.scpt_codes.classes, command=self.update_options)
+        self.class_option.grid(row=0, column=1, sticky='NSEW')
 
         self.option_selection = tk.StringVar(self, '---')
-        self.option_option = tk.OptionMenu(self, self.option_selection, '---')
+        self.option_option = ttk.OptionMenu(self, self.option_selection, '---')
         self.option_option.configure(state='disabled')
-        self.option_option.grid(row=0, column=2)
+        self.option_option.grid(row=0, column=2, sticky='NSEW')
 
         self.input_option_selection = ''
         self.secondary_option_selection = ''
@@ -192,7 +195,7 @@ class SCPTEditWidget(tk.Frame):
         if widget_key == '':
             return
         self.active_widget = widget_key
-        self.input_widgets[widget_key].grid(row=0, column=3, sticky=tk.W)
+        self.input_widgets[widget_key].grid(row=0, column=3, sticky='NSEW')
 
     def set_widget_values(self, value, override=None):
         self.option_option.configure(state='normal')
@@ -280,7 +283,7 @@ class IntEditWidget(tk.Frame):
     def __init__(self, parent, name, signed=True, b_min=-math.inf, b_max=math.inf, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
-        label = tk.Label(self, text=f'{name}: ')
+        label = ttk.Label(self, text=f'{name}: ')
         label.grid(row=0, column=0, sticky=tk.W)
 
         self.entry_field = w.RequiredIntEntry(self, width=15, signed=signed, b_min=b_min, b_max=b_max)
@@ -307,7 +310,7 @@ class VarSelectionWidget(IntEditWidget):
     def __init__(self, parent, callback, var_type, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
-        self.var_alias_label = tk.Label(self, text='')
+        self.var_alias_label = ttk.Label(self, text='')
         self.var_alias_label.grid(row=0, column=1)
 
         self.get_alias_callback = callback
@@ -331,11 +334,11 @@ class FooterEditWidget(tk.Frame):
     def __init__(self, parent, name, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
-        label = tk.Label(self, text=f'{name}: ')
+        label = ttk.Label(self, text=f'{name}: ')
         label.grid(row=0, column=0, sticky=tk.W)
 
         self.entry_variable = tk.StringVar(self)
-        entry_field = tk.Entry(self, textvariable=self.entry_variable, width=25)
+        entry_field = ttk.Entry(self, textvariable=self.entry_variable, width=25)
         entry_field.grid(row=0, column=1, sticky=tk.W)
 
     def remove_value(self):
@@ -353,11 +356,11 @@ class ObjectSelectionWidget(tk.Frame):
     def __init__(self, parent, name, selection_list: List[str], *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
-        label = tk.Label(self, text=f'{name}: ')
+        label = ttk.Label(self, text=f'{name}: ')
         label.grid(row=0, column=0, sticky=tk.W)
 
         self.entry_variable = tk.StringVar(self)
-        option_field = tk.OptionMenu(self, self.entry_variable, *selection_list)
+        option_field = ttk.OptionMenu(self, self.entry_variable, *selection_list)
         option_field.grid(row=0, column=1, sticky=tk.W)
 
     def remove_value(self):
@@ -382,7 +385,7 @@ class ParamEditPopup(tk.Toplevel):
 
     option_settings = {}
 
-    def __init__(self, parent, *args, **kwargs):
+    def __init__(self, parent, is_darkmode, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.parent: tk.Tk = parent
@@ -390,6 +393,8 @@ class ParamEditPopup(tk.Toplevel):
 
         self.title(self.t)
         self.geometry(f'{self.w}x{self.h}')
+        theme = dark_theme if is_darkmode else light_theme
+        self.configure(**theme['Ttoplevel']['configure'])
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -400,14 +405,14 @@ class ParamEditPopup(tk.Toplevel):
 
         self.row_widgets = []
 
-        button_frame = tk.Frame(self)
+        button_frame = ttk.Frame(self)
         button_frame.grid(row=1, column=0, sticky=tk.E)
 
-        clear_button = tk.Button(button_frame, text='Clear Value', command=self.on_clear)
+        clear_button = ttk.Button(button_frame, text='Clear Value', command=self.on_clear)
         clear_button.grid(row=0, column=0)
-        ok_button = tk.Button(button_frame, text='Ok', command=self.on_ok)
+        ok_button = ttk.Button(button_frame, text='Ok', command=self.on_ok)
         ok_button.grid(row=0, column=1, padx=10)
-        cancel_button = tk.Button(button_frame, text='Cancel', command=self.on_close)
+        cancel_button = ttk.Button(button_frame, text='Cancel', command=self.on_close)
         cancel_button.grid(row=0, column=2)
         self.protocol('WM_DELETE_WINDOW', self.on_close)
 
@@ -423,3 +428,6 @@ class ParamEditPopup(tk.Toplevel):
 
     def on_close(self):
         self.callbacks['close']()
+
+    def change_theme(self, is_darkmode):
+        pass

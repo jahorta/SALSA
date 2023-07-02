@@ -13,12 +13,13 @@ class ParamEditController:
 
     log_code = 'ParamEditCtrlr'
 
-    def __init__(self, parent, callbacks):
+    def __init__(self, parent, callbacks, is_darkmode):
         self.column_id = None
         self.param_id = None
         self.parent = parent
         self.callbacks = callbacks
         self.view: Union[None, ParamEditPopup] = None
+        self.is_darkmode = is_darkmode
 
         self.setup_view_fxns = {
             'int': self.setup_int_view,
@@ -47,7 +48,9 @@ class ParamEditController:
     # ------------------------------------- #
 
     def show_param_editor(self, param: Union[SCTParameter, None], base_param: BaseParam, param_id=None, column_id=None):
-        self.view = ParamEditPopup(self.parent)
+        if self.view is not None:
+            return
+        self.view = ParamEditPopup(self.parent, is_darkmode=self.is_darkmode)
         self.view.main_frame_label.config(text=base_param.type)
         self.param = param
         if self.param is not None:
@@ -327,3 +330,7 @@ class ParamEditController:
 
     def clear_int(self):
         self.int_field.remove_value()
+
+    def change_theme(self, is_darkmode):
+        if self.view is not None:
+            self.view.change_theme(is_darkmode)

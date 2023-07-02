@@ -83,7 +83,9 @@ class Application(tk.Tk):
         self.columnconfigure(0, weight=1)
 
         project_controller_callbacks = {'save_project': self.on_save_project}
-        self.project_edit_controller = ProjectEditorController(self, self.project_edit_view, self.project, callbacks=project_controller_callbacks)
+        self.project_edit_controller = ProjectEditorController(self, self.project_edit_view, self.project,
+                                                               callbacks=project_controller_callbacks,
+                                                               is_darkmode=self.is_darkmode)
 
         self.gui = GUIController(parent=self, scpt_editor_view=self.project_edit_view,
                                  project_facade=self.project, inst_lib_facade=self.base_insts)

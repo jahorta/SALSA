@@ -32,7 +32,8 @@ class InstructionEditorController:
         self.param_details = None
         self.changed_values = {}
 
-        self.param_editor = ParamEditController(self.view, callbacks={'set_change': self.add_param_editor_change})
+        self.param_editor = ParamEditController(self.view, callbacks={'set_change': self.add_param_editor_change},
+                                                is_darkmode=is_darkmode)
 
         self.populate_instruction_tree()
 
