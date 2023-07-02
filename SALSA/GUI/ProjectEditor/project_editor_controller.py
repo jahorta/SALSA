@@ -1,6 +1,6 @@
 from typing import Union, Dict, Literal
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 
 from SALSA.GUI.fonts_used import SALSAFont
 from SALSA.GUI.ProjectEditor.instruction_selector import InstructionSelectorWidget
@@ -250,7 +250,8 @@ class ProjectEditorController:
             tgt_inst = self.project.get_inst_ind(script=self.current['script'], section=tgt_sect,
                                                  inst=link.target_trace[1])
 
-            tgt_label = tk.Label(tgt_frame, text=f'{tgt_sect}{link_sep}{tgt_inst}', font=self.link_font.font)
+            tgt_label = ttk.Label(tgt_frame, text=f'{tgt_sect}{link_sep}{tgt_inst}',
+                                  font=self.link_font.font, style='link.TLabel')
             tgt_label.grid(row=0, column=0)
             tgt_label.bind('<ButtonRelease-1>', self.goto_link)
 
@@ -267,15 +268,15 @@ class ProjectEditorController:
             ori_inst = self.project.get_inst_ind(script=self.current['script'], section=ori_sect,
                                                  inst=link.origin_trace[1])
 
-            ori_label = tk.Label(ori_frame, text=f'{ori_sect}{link_sep}{ori_inst}', font=self.link_font.font)
+            ori_label = ttk.Label(ori_frame, text=f'{ori_sect}{link_sep}{ori_inst}',
+                                  font=self.link_font.font, style='link.TLabel')
             ori_label.grid(row=0, column=0)
             ori_label.bind('<ButtonRelease-1>', self.goto_link)
 
     def handle_link_font(self, e):
         font = self.link_font.font if e.type == tk.EventType.Leave else self.link_font.hover_font
-        color = 'black' if e.type == tk.EventType.Leave else 'blue'
         for child in e.widget.winfo_children():
-            child.configure(font=font, foreground=color)
+            child.configure(font=font)
 
     def goto_link(self, e):
         link_parts = e.widget['text'].split(link_sep)
