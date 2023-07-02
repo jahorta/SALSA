@@ -265,17 +265,14 @@ class ProjectEditorView(ttk.Frame):
         link_in_label = ttk.Label(link_frame, text='Incoming Links')
         link_in_label.grid(row=0, column=0, sticky=tk.W)
         self.link_in = w.ScrollFrame(link_frame, size={'width': 100, 'height': 100})
-        self.link_in.grid(row=1, column=0, sticky=tk.W+tk.E)
+        self.link_in.grid(row=1, column=0, sticky=tk.W+tk.E, padx='0 5')
         self.link_in.columnconfigure(0, weight=1)
         self.link_in.rowconfigure(0, weight=1)
-
-        link_sep = ttk.Separator(link_frame, orient='vertical')
-        link_sep.grid(row=0, column=1, rowspan=2, sticky=tk.N+tk.S)
 
         link_out_label = ttk.Label(link_frame, text='Outgoing Links')
         link_out_label.grid(row=0, column=2, sticky=tk.W)
         self.link_out = w.ScrollFrame(link_frame, size={'width': 100, 'height': 100})
-        self.link_out.grid(row=1, column=2, sticky=tk.W+tk.E)
+        self.link_out.grid(row=1, column=2, sticky=tk.W+tk.E, padx='5 0')
         self.link_out.columnconfigure(0, weight=1)
         self.link_out.rowconfigure(0, weight=1)
 

@@ -245,14 +245,16 @@ class ProjectEditorController:
             tgt_frame = tk.Frame(self.view.link_out.scroll_frame)
             tgt_frame.bind('<Enter>', self.handle_link_font)
             tgt_frame.bind('<Leave>', self.handle_link_font)
-            tgt_frame.grid(row=i, column=0, sticky=tk.E+tk.W)
+            tgt_frame.grid(row=i, column=0, sticky=tk.E+tk.W, pady='5 0', padx=5)
+            tgt_frame.columnconfigure(0, weight=1)
+
             tgt_sect = link.target_trace[0]
             tgt_inst = self.project.get_inst_ind(script=self.current['script'], section=tgt_sect,
                                                  inst=link.target_trace[1])
 
             tgt_label = ttk.Label(tgt_frame, text=f'{tgt_sect}{link_sep}{tgt_inst}',
                                   font=self.link_font.font, style='link.TLabel')
-            tgt_label.grid(row=0, column=0)
+            tgt_label.grid(row=0, column=0, sticky=tk.E+tk.W)
             tgt_label.bind('<ButtonRelease-1>', self.goto_link)
 
         for i, link in enumerate(details['links_in']):
@@ -260,9 +262,10 @@ class ProjectEditorController:
             if link.origin_trace is None:
                 continue
             ori_frame = tk.Frame(self.view.link_in.scroll_frame)
-            ori_frame.grid(row=i, column=0, sticky=tk.E+tk.W)
+            ori_frame.grid(row=i, column=0, sticky=tk.E+tk.W, pady='5 0', padx=5)
             ori_frame.bind('<Enter>', self.handle_link_font)
             ori_frame.bind('<Leave>', self.handle_link_font)
+            ori_frame.columnconfigure(0, weight=1)
 
             ori_sect = link.origin_trace[0]
             ori_inst = self.project.get_inst_ind(script=self.current['script'], section=ori_sect,
@@ -270,7 +273,7 @@ class ProjectEditorController:
 
             ori_label = ttk.Label(ori_frame, text=f'{ori_sect}{link_sep}{ori_inst}',
                                   font=self.link_font.font, style='link.TLabel')
-            ori_label.grid(row=0, column=0)
+            ori_label.grid(row=0, column=0, sticky=tk.E+tk.W)
             ori_label.bind('<ButtonRelease-1>', self.goto_link)
 
     def handle_link_font(self, e):
