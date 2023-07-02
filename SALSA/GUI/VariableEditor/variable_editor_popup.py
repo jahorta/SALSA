@@ -84,6 +84,8 @@ class VariablePopup(tk.Toplevel):
         for tree_name in self.tree_names:
             tree_frame = tk.Frame(self.variable_notebook)
             tree_frame.grid(row=0, column=0, sticky='NSEW')
+            tree_frame.rowconfigure(0, weight=1)
+            tree_frame.columnconfigure(0, weight=1)
             columns = list(header_settings.keys())[1:]
             self.var_trees[tree_name] = w.DataTreeview(tree_frame, name=tree_name, columns=columns, can_open=False,
                                                        selectmode='extended')
