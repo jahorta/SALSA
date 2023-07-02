@@ -406,7 +406,7 @@ class ScrollFrame(ScrollCanvas):
         size = {'width': 100, 'height': 100} if size is None else size
         super().__init__(parent, size, is_darkmode=is_darkmode, *args, **kwargs)
 
-        self.scroll_frame = ttk.Frame(self.canvas)
+        self.scroll_frame = ttk.Frame(self.canvas, style='canvas.TFrame')
 
         self.canvas_window = self.canvas.create_window(0, 0, window=self.scroll_frame, anchor='nw',
                                                        tags='self.viewport')
@@ -432,7 +432,7 @@ class ScrollLabelFrame(ScrollLabelCanvas):
         size = {'width': 100, 'height': 100} if size is None else size
         super().__init__(parent, size, has_label=has_label, is_darkmode=is_darkmode, *args, **kwargs)
 
-        self.scroll_frame = ttk.Frame(self.canvas)
+        self.scroll_frame = ttk.Frame(self.canvas, style='canvas.TFrame')
 
         self.canvas_window = self.canvas.create_window(2, 2, window=self.scroll_frame, anchor='nw',
                                                        tags='self.viewport')
