@@ -110,7 +110,7 @@ def theme_generator(colors: Colors):
         },
         "Item": {
             "configure": {
-                "foreground": colors.blue,
+                "foreground": colors.link,
                 "focuscolor": colors.selector
             }
         },
@@ -207,7 +207,7 @@ themes = {
         selector_text="#aaaaaa",
         border='#5d5d5d',
         button="#3c4f4f",
-        blue='#333388'
+        link='#333388'
     )),
     'light': theme_generator(colors=Colors(
         bg='#eeeeee',
@@ -218,7 +218,7 @@ themes = {
         selector_text="white",
         border='#888888',
         button="#acafd1",
-        blue='#aaaaff'
+        link='#aaaaff'
     )),
 }
 
