@@ -100,6 +100,10 @@ def theme_generator(colors: Colors):
                 "fieldbackground": colors.bg_internal,
                 "lightcolor": colors.border,
                 "darkcolor": colors.bg_internal
+            },
+            "map": {
+                "background": [('selected', colors.selector)],
+                "foreground": [('selected', colors.selector_text)]
             }
         },
         "Heading": {
