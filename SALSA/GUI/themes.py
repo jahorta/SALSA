@@ -12,7 +12,7 @@ class Colors:
     selector_text: str
     border: str
     button: str
-    blue: str
+    link: str
 
 
 def theme_generator(colors: Colors):
