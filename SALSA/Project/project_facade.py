@@ -568,7 +568,7 @@ class SCTProjectFacade:
                         continue
 
                 if goto in cur_section.instructions:
-                    self.remove_inst(script, section, goto, custom_link_tgt=custom_link_tgt)
+                    self.remove_inst(script, section, goto, custom_link_tgt=custom_link_tgt, result=None)
 
             if case is None:
                 self.remove_inst_links(script, section, inst, custom_tgt=custom_link_tgt)
