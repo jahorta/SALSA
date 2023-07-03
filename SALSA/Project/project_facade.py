@@ -450,9 +450,8 @@ class SCTProjectFacade:
         self.add_inst_sub_group(script, section, instruction, parent_list, index, str(next_case))
         self.update_loop_param_num(cur_sect.instructions[instruction])
 
-    def remove_switch_case(self, script, section, instruction, case, **kwargs):
-        return self.change_inst(script, section, instruction, case=case)
-
+    def remove_switch_case(self, script, section, instruction, case, result, **kwargs):
+        return self.change_inst(script, section, instruction, case=case, change_type=result)
 
     def add_loop_param(self, script, section, instruction, **kwargs):
         inst = self.project.scripts[script].sections[section].instructions[instruction]
@@ -479,11 +478,11 @@ class SCTProjectFacade:
             if loop_count_name in param.type:
                 inst.parameters[int(key)].set_value(len(inst.loop_parameters))
 
-    def remove_inst(self, script, section, inst, custom_link_tgt=None):
+    def remove_inst(self, script, section, inst, result, custom_link_tgt=None):
         self.remove_inst_links(script, section, inst, custom_tgt=custom_link_tgt)
         # This will handle inst group children, remove any inst links in the group
         # and remove the inst from the grouped representation of insts
-        self.change_inst(script, section, inst)
+        self.change_inst(script, section, inst, change_type=result)
         cur_sect = self.project.scripts[script].sections[section]
         cur_sect.instructions.pop(inst)
         if inst in cur_sect.instruction_ids_ungrouped:
@@ -549,7 +548,7 @@ class SCTProjectFacade:
 
         return new_inst.ID
 
-    def change_inst(self, script, section, inst, new_id=None, case=None):
+    def change_inst(self, script, section, inst, new_id=None, case=None, change_type=None):
         # not entering a new_id will remove the instruction
         cur_section = self.project.scripts[script].sections[section]
         cur_inst = cur_section.instructions[inst]
@@ -560,6 +559,8 @@ class SCTProjectFacade:
         saved_children = {}
         changes = []
         if cur_inst.instruction_id in self.base_insts.group_inst_list:
+            if change_type is None:
+                raise ValueError('Current inst is a group type, but no group resolution was given')
             inst_group = self.get_inst_group(script, section, inst)
             if cur_inst.instruction_id == 3:
                 inst_group = (inst_group[f'{inst}{sep}switch'] if case is None
