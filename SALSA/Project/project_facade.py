@@ -1136,7 +1136,8 @@ class SCTProjectFacade:
 
             cur_inst.links_out = []
 
-    def change_link_tgt(self, tgt_sect: SCTSection, link: SCTLink, new_tgt_uuid: str, remove_from_tgt=True):
+    @staticmethod
+    def change_link_tgt(tgt_sect: SCTSection, link: SCTLink, new_tgt_uuid: str, remove_from_tgt=True):
         prev_tgt_uuid = link.target_trace[1]
         if remove_from_tgt:
             tgt_sect.instructions[prev_tgt_uuid].links_in.remove(link)
