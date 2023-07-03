@@ -1069,8 +1069,10 @@ class SCTProjectFacade:
         for parent in parents:
             cur_group = cur_group[parent]
 
-        if inst == self.get_inst_uuid_from_group_entry(cur_group[index + 1]):
-            index += 1
+        if isinstance(cur_group[index], dict) and index + 1 < len(cur_group[index]):
+            if 'if' in list(cur_group[index].keys())[0]:
+                if inst == self.get_inst_uuid_from_group_entry(cur_group[index + 1]):
+                    index += 1
 
         if index + 1 < len(cur_group):
             # if cur_inst is an if/else/while
