@@ -460,7 +460,17 @@ class ProjectEditorController:
     def rcm_remove_inst(self):
         sel_iid = self.trees['instruction'].focus()
         cur_inst_uuid = self.trees['instruction'].row_data[sel_iid]
-        self.project.remove_inst(self.current['script'], self.current['section'], cur_inst_uuid)
+        end_kwargs = {'result': None, 'cur_inst_uuid': cur_inst_uuid}
+        if self.project.is_group(**self.current):
+            children = self.project.get_inst_group(self.current['script'], self.current['section'], cur_inst_uuid)
+            return self.confirm_change_inst_group(children=children, end_callback=self.finish_remove_inst, end_kwargs=end_kwargs)
+        self.finish_remove_inst(**end_kwargs)
+
+    def finish_remove_inst(self, result, cur_inst_uuid):
+        if result is not None:
+            if result == 'cancel':
+                return
+        self.project.remove_inst(self.current['script'], self.current['section'], cur_inst_uuid, result)
         self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'), **self.current))
 
     def rcm_change_inst(self):
