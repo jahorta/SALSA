@@ -69,6 +69,7 @@ class ProjectEditorView(ttk.Frame):
             settings[self.log_name] = {}
 
         self.callbacks = None
+        self.is_darkmode = is_darkmode
 
         # if 'headers' not in settings[self.log_name].keys():
         settings.set_single(self.log_name, 'headers', json.dumps(default_headers))
@@ -384,6 +385,7 @@ class ProjectEditorView(ttk.Frame):
                                end_kwargs=end_kwargs)
 
     def change_theme(self, dark_mode):
+        self.is_darkmode = dark_mode
         theme = dark_theme if dark_mode else light_theme
 
         self.inst_description.configure(**theme['Tmessage']['configure'])
