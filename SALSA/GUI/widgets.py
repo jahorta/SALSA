@@ -23,6 +23,8 @@ class ValidatedMixin:
         vcmd = self.register(self._validate)
         invcmd = self.register(self._invalid)
 
+        self.valid = True
+
         self.config(
             validate='all',
             validatecommand=(vcmd, '%P', '%s', '%S', '%V', '%i', '%d'),
@@ -52,6 +54,7 @@ class ValidatedMixin:
                 index=index,
                 action=action
             )
+        self.valid = valid
         return valid
 
     def _focusout_validate(self, **kwargs):
@@ -244,7 +247,7 @@ class RequiredFloatEntry(RequiredEntry):
         valid = super()._key_validate(char=char, index=index, current=current, proposed=proposed, action=action,
                                       **kwargs)
 
-        if char not in '1234567890.':
+        if char not in '-1234567890.':
             return False
 
         if proposed == '':
@@ -254,6 +257,11 @@ class RequiredFloatEntry(RequiredEntry):
             return False
 
         return valid
+
+    def _focusout_invalid(self, proposed, **kwargs):
+
+        if not re.search('^-?[0-9]+[.][0-9]+', proposed):
+            return False
 
     def set_bounds(self, b_min=-math.inf, b_max=math.inf):
         self.min = b_min
