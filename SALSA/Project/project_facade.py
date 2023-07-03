@@ -1077,7 +1077,11 @@ class SCTProjectFacade:
         if index + 1 < len(cur_group):
             # if cur_inst is an if/else/while
             if cur_inst.instruction_id == 0:
-                new_tgt_inst_uuid = cur_sect.instructions[cur_inst.my_goto_uuids[0]].links_out[0].target_trace[1]
+                my_goto = cur_sect.instructions[cur_inst.my_goto_uuids[0]]
+                if len(my_goto.links_out) == 0:
+                    new_tgt_inst_uuid = self.get_inst_uuid_from_group_entry(cur_group[index + 1])
+                else:
+                    new_tgt_inst_uuid = my_goto.links_out[0].target_trace[1]
             else:
                 new_tgt_inst_uuid = self.get_inst_uuid_from_group_entry(cur_group[index + 1])
         else:
