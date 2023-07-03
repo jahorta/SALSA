@@ -2,6 +2,7 @@ from typing import Union, Dict, Literal
 import tkinter as tk
 from tkinter import messagebox, ttk
 
+from SALSA.Common.constants import sep
 from SALSA.GUI.fonts_used import SALSAFont
 from SALSA.GUI.ProjectEditor.instruction_selector import InstructionSelectorWidget
 from SALSA.GUI.ParamEditorPopups.param_editor_controller import ParamEditController
@@ -476,9 +477,21 @@ class ProjectEditorController:
         sel_iid = self.trees['instruction'].focus()
         case = self.trees['instruction'].item(sel_iid)['values'][0].split(' ')[0]
         inst = self.trees['instruction'].row_data[self.trees['instruction'].parent(sel_iid)]
-        refresh = self.project.remove_switch_case(self.current['script'], self.current['section'], inst, case)
-        if refresh:
-            self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'), **self.current))
+
+        children = self.project.get_inst_group(self.current['script'], self.current['section'], inst)
+        children = {case: children[f'{inst}{sep}switch'][case]}
+        end_callback = self.finish_remove_switch_case
+        end_kwargs = {'instruction': inst, 'case': case, 'result': None}
+        warning_suffix = '' if case is None else f'case: ({case})'
+
+        self.confirm_change_inst_group(children=children, end_callback=end_callback, end_kwargs=end_kwargs,
+                                       warning_suffix=warning_suffix, new_id=None)
+
+    def finish_remove_switch_case(self, **kwargs):
+        if kwargs['result'] == 'cancel':
+            return
+        self.project.remove_switch_case(script=self.current['script'], section=self.current['section'], **kwargs)
+        self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'), **self.current))
 
     # ------------------------------------- #
     # Instruction Confirmation Messageboxes #
