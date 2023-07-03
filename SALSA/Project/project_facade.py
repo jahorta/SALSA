@@ -559,10 +559,6 @@ class SCTProjectFacade:
                 inst_group = (inst_group[f'{inst}{sep}switch'] if case is None
                               else {case: inst_group[f'{inst}{sep}switch'][case]})
             new_id = None if new_id is None else int(new_id)
-            warning_suffix = '' if case is None else f'case: ({case})'
-            change_type = self.callbacks['confirm_remove_inst_group'](new_id=new_id, children=inst_group, warning_suffix=warning_suffix)
-            if 'cancel' in change_type:
-                return False
 
             custom_link_tgt = self.get_next_grouped_uuid(script, section, inst)
             for goto in cur_inst.my_goto_uuids:
