@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Dict, List, Union
 
+from Common.constants import sep
 from SALSA.GUI.themes import light_theme, dark_theme
 
 
@@ -827,6 +828,38 @@ class DataTreeview(ttk.Treeview):
 
     def get_selection(self):
         return [self.row_data[self.get_children()[int(s)]] for s in self.cur_selection]
+
+    def get_open_elements(self, parent='', open_items=None):
+        if open_items is None:
+            open_items = []
+        for child in self.get_children(parent):
+            is_open = self.item(child)['open']
+            if not isinstance(is_open, bool):
+                is_open = is_open == 1
+            if not is_open:
+                continue
+            child_uuid = self.row_data.get(child, None)
+            if child_uuid is None:
+                child_uuid = f'{self.row_data[parent]}{sep}{self.item(child)["values"][0].split(" ")[0]}'
+            open_items.append(child_uuid)
+            self.get_open_elements(parent=child, open_items=open_items)
+        return open_items
+
+    def open_tree_elements(self, open_items):
+        for item_uuid in open_items:
+            if sep in item_uuid:
+                item_uuid, case = item_uuid.split(sep)
+                row_id = None
+                for child in self.get_children(self.get_row_by_rowdata(item_uuid)):
+                    if case in self.item(child)['values'][0]:
+                        row_id = child
+                        break
+            else:
+                row_id = self.get_row_by_rowdata(item_uuid)
+            if row_id is None:
+                continue
+            self.see(row_id)
+            self.item(row_id, open=True)
 
 
 class ThemedScrolledText(tk.Text):
