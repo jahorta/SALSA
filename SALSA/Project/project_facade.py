@@ -255,21 +255,21 @@ class SCTProjectFacade:
     # ----------------------- #
 
     def get_script_variables_with_aliases(self, script):
-        globals = self.project.global_variables
+        global_vars = self.project.global_variables
         var_dict = None if script is None else self.project.scripts[script].variables
         if var_dict is None:
-            var_dict = globals
-        vars = {}
+            var_dict = global_vars
+        all_vars = {}
         for var_type, var_list in var_dict.items():
-            vars[var_type] = {}
+            all_vars[var_type] = {}
             var_order = sorted(list(var_list.keys()))
             for key in var_order:
-                vars[var_type][key] = {'alias': var_list[key]['alias']}
-                if var_dict is not globals:
-                    vars[var_type][key]['is_global'] = key in globals[var_type]
+                all_vars[var_type][key] = {'alias': var_list[key]['alias']}
+                if var_dict is not global_vars:
+                    all_vars[var_type][key]['is_global'] = key in global_vars[var_type]
                 else:
-                    vars[var_type][key]['is_global'] = True
-        return vars
+                    all_vars[var_type][key]['is_global'] = True
+        return all_vars
 
     def get_var_alias(self, script, var_type, var_id):
         if var_id not in self.project.scripts[script].variables[var_type]:
