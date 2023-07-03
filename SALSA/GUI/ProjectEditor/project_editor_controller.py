@@ -441,6 +441,9 @@ class ProjectEditorController:
 
     def show_inst_selector(self, inst_trace, sel_iid):
         callbacks = {
+            'is_group': self.project.is_group,
+            'get_children': self.project.get_inst_group,
+            'group_inst_handler': self.confirm_change_inst_group,
             'set_inst_id': self.project.change_inst,
             'get_relevant': self.project.base_insts.get_relevant,
             'update_tree': lambda: self.update_tree('instruction', self.project.get_tree(
