@@ -514,6 +514,7 @@ class ProjectEditorController:
     def confirm_change_inst_group(self, children, end_callback, end_kwargs, warning_suffix='', new_id=None):
         # Create message to confirm change of instruction (separate method)
         cur_inst_id = self.project.get_inst_id(**self.current)
+        new_id = None if new_id is None else int(new_id)
 
         message = f'Are you sure you want to'
 
