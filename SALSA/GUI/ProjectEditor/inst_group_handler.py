@@ -19,7 +19,12 @@ class InstGroupHandlerDialog(tk.Toplevel):
         self.transient(master)
         self.grab_set()
         self.wm_focusmodel('active')
-        self.protocol('WM_DELETE_WINDOW', lambda event: self.close(event, True))
+        self.protocol('WM_DELETE_WINDOW', lambda event: self.close(True))
+
+        x, y, w, h = master.winfo_rootx(), master.winfo_rooty(), master.winfo_width(), master.winfo_height()
+        x += int(w/2.1)
+        y += int(h/2.1)
+        self.after(10, self.center, x, y)
 
         self.labels = head_labels
         self.row_labels = row_labels
@@ -28,7 +33,7 @@ class InstGroupHandlerDialog(tk.Toplevel):
         self.new_id = new_inst_id
 
         message_frame = ttk.Frame(self)
-        message_frame.grid(row=0, column=0)
+        message_frame.grid(row=0, column=0, padx=10, pady=20)
 
         cur_col = 0
         for label in head_labels:
@@ -55,7 +60,10 @@ class InstGroupHandlerDialog(tk.Toplevel):
         cancel_button = ttk.Button(button_frame, text='Cancel', command=lambda: self.close(True))
         cancel_button.grid(row=0, column=1, padx=5)
 
-        self.tkraise()
+    def center(self, x, y):
+        x -= self.winfo_width()//2
+        y -= self.winfo_height()//2
+        self.geometry(f'+{x}+{y}')
 
     def close(self, result):
         self.destroy()
