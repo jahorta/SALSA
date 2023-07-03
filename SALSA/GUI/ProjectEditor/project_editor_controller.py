@@ -314,8 +314,12 @@ class ProjectEditorController:
         for child in self.view.link_in.scroll_frame.winfo_children():
             child.destroy()
 
-    def on_set_inst_start(self, start, newID):
-        pass
+    def refresh_tree(self, tree_key):
+        open_items = self.trees[tree_key].get_open_elements()
+        kwargs = {'script': self.current['script']} if tree_key != 'script' else {}
+        kwargs |= {'section': self.current['section']} if tree_key not in ('script', 'section') else {}
+        self.update_tree(tree_key, self.project.get_tree(self.view.get_headers(tree_key), **kwargs))
+        self.trees[tree_key].open_tree_elements(open_items)
 
     # ----------------- #
     # Right Click Menus #
@@ -447,8 +451,7 @@ class ProjectEditorController:
             'group_inst_handler': self.confirm_change_inst_group,
             'set_inst_id': self.project.change_inst,
             'get_relevant': self.project.base_insts.get_relevant,
-            'update_tree': lambda: self.update_tree('instruction', self.project.get_tree(
-                self.view.get_headers('instruction'), **self.current))
+            'update_tree': lambda:  self.refresh_tree('instruction')
         }
         cell_bbox = self.trees['instruction'].bbox(sel_iid, 'name')
         x_mod = self.trees['instruction'].winfo_x()
@@ -472,7 +475,7 @@ class ProjectEditorController:
             if result == 'cancel':
                 return
         self.project.remove_inst(self.current['script'], self.current['section'], cur_inst_uuid, result)
-        self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'), **self.current))
+        self.refresh_tree('instruction')
 
     def rcm_change_inst(self):
         sel_iid = self.trees['instruction'].focus()
@@ -486,7 +489,7 @@ class ProjectEditorController:
         if row_data is None:
             row_data = self.trees['instruction'].row_data[self.trees['instruction'].parent(sel_iid)]
         self.project.add_switch_case(self.current['script'], self.current['section'], row_data)
-        self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'), **self.current))
+        self.refresh_tree('instruction')
 
     def rcm_remove_switch_case(self):
         sel_iid = self.trees['instruction'].focus()
@@ -506,7 +509,7 @@ class ProjectEditorController:
         if kwargs['result'] == 'cancel':
             return
         self.project.remove_switch_case(script=self.current['script'], section=self.current['section'], **kwargs)
-        self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'), **self.current))
+        self.refresh_tree('instruction')
 
     # ------------------------------------- #
     # Instruction Confirmation Messageboxes #
