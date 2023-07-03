@@ -47,6 +47,7 @@ def theme_generator(colors: Colors):
         },
         "link.TLabel": {
             "configure": {
+                "background": colors.bg_internal,
                 "foreground": colors.text
             },
             "map": {
