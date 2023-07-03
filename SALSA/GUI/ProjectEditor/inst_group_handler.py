@@ -65,10 +65,10 @@ class InstGroupHandlerDialog(tk.Toplevel):
         y -= self.winfo_height()//2
         self.geometry(f'+{x}+{y}')
 
-    def close(self, result):
+    def close(self, cancel: bool):
         self.destroy()
         response = ''
-        if result:
+        if cancel:
             response = 'cancel'
         else:
             for i, row_label in enumerate(self.row_labels):
