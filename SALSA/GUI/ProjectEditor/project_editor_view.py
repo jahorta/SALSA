@@ -6,6 +6,7 @@ from typing import List, Dict
 
 import SALSA.GUI.widgets as w
 from SALSA.GUI.themes import light_theme, dark_theme
+from SALSA.GUI.ProjectEditor.inst_group_handler import InstGroupHandlerDialog
 from SALSA.Common.constants import sep, alt_sep, alt_alt_sep
 from SALSA.Common.setting_class import settings
 from SALSA.BaseInstructions.bi_defaults import loop_count_name
@@ -352,7 +353,7 @@ class ProjectEditorView(ttk.Frame):
         for k, v in width_ratios.items():
             cur_tree.column(k, width=int(v*widget_width))
 
-    def inst_group_handling(self, cur_inst_id, new_id, children):
+    def inst_group_handling(self, cur_inst_id, new_id, children, end_callback, end_kwargs):
         # create message to decide how to handle group entries
         children = [{k: children[k]} for k in children.keys()]
         if cur_inst_id == 0:
@@ -378,48 +379,10 @@ class ProjectEditorView(ttk.Frame):
             if new_id == 3:
                 entry_vars.append(tk.IntVar(self))
 
-        cancel_group_change = True
-
-        class InstGroupHandlerDialog(tk.simpledialog.Dialog):
-
-            def body(self, master):
-
-                cur_col = 0
-                for label in labels:
-                    ttk.Label(master, text=label).grid(row=0, column=cur_col)
-                    cur_col += 1
-
-                for i, row_label in enumerate(row_labels):
-                    cur_col = 0
-                    if cur_inst_id == 0:
-                        row_label = row_label.split(sep)[1]
-                    ttk.Label(master, text=row_label).grid(row=i+1, column=cur_col)
-                    cur_col += 1
-                    for label in labels[1:]:
-                        ttk.Radiobutton(master, text='', variable=radio_vars[i], value=cur_col).grid(row=i+1, column=cur_col)
-                        cur_col += 1
-                    if new_id == 3:
-                        ttk.Entry(master, textvariable=entry_vars[i]).grid(row=i+1, column=cur_col)
-
-            def apply(self):
-                nonlocal cancel_group_change
-                cancel_group_change = False
-
-        InstGroupHandlerDialog(self, title='Group Handling')
-
-        if cancel_group_change:
-            return 'cancel'
-
-        response = ''
-        for i, row_label in enumerate(row_labels):
-            if i > 0:
-                response += f'{alt_alt_sep}'
-            choice = labels[radio_vars[i].get()]
-            response += f'{row_label}{alt_sep}{choice}'
-            if new_id == 3 and choice == 'Insert in Switch Case':
-                response += f'{alt_sep} {entry_vars[i].get()}'
-
-        return response
+        InstGroupHandlerDialog(self, title='Group Handling', radio_vars=radio_vars, entry_vars=entry_vars,
+                               head_labels=labels, row_labels=row_labels, inst_id=cur_inst_id, new_inst_id=new_id,
+                               is_darkmode=self.is_darkmode, end_callback=end_callback,
+                               end_kwargs=end_kwargs)
 
     def change_theme(self, dark_mode):
         theme = dark_theme if dark_mode else light_theme

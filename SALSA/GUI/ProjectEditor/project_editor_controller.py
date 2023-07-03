@@ -511,7 +511,7 @@ class ProjectEditorController:
     # Instruction Confirmation Messageboxes #
     # ------------------------------------- #
 
-    def confirm_change_inst_group(self, children, warning_suffix='', new_id=None):
+    def confirm_change_inst_group(self, children, end_callback, end_kwargs, warning_suffix='', new_id=None):
         # Create message to confirm change of instruction (separate method)
         cur_inst_id = self.project.get_inst_id(**self.current)
 
@@ -525,8 +525,9 @@ class ProjectEditorController:
 
         cancel = not tk.messagebox.askokcancel(title='Confirm Instruction Group Removal', message=message)
         if cancel:
-            return 'cancel'
-        return self.view.inst_group_handling(cur_inst_id, new_id, children)
+            end_kwargs['result'] = cancel
+            return end_callback(**end_kwargs)
+        return self.view.inst_group_handling(cur_inst_id, new_id, children, end_callback, end_kwargs)
 
     # ------------------------ #
     # Parameter editor methods #
