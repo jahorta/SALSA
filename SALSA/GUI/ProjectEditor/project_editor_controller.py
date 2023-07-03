@@ -425,7 +425,8 @@ class ProjectEditorController:
 
             case = self.trees['instruction'].item(sel_iid)['values'][0]
 
-        inst_uuid = self.project.add_inst(self.current['script'], self.current['section'], pre_rowdata, case=case, direction=direction)
+        inst_uuid = self.project.add_inst(self.current['script'], self.current['section'],
+                                          pre_rowdata, case=case.split(' ')[0], direction=direction)
         inst_trace = [self.current['script'], self.current['section'], inst_uuid]
         self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'),
                                                               self.current['script'], self.current['section']))
