@@ -433,6 +433,9 @@ class SCTProjectFacade:
     def is_switch(self, script, section, instruction, **kwargs):
         return self.project.scripts[script].sections[section].instructions[instruction].instruction_id == 3
 
+    def is_group(self, script, section, instruction, **kwargs):
+        return self.project.scripts[script].sections[section].instructions[instruction].instruction_id in (0, 3)
+
     # ---------------------------------------------- #
     # Instruction and parameter manipulation methods #
     # ---------------------------------------------- #
