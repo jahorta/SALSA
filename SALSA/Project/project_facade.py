@@ -511,6 +511,8 @@ class SCTProjectFacade:
             if case is not None:
                 cur_group = cur_group[case]
 
+        steal_links_from_uuid = self.get_inst_uuid_from_group_entry(cur_group[index])
+
         cur_group.insert(grouped_insert_loc, new_inst.ID)
 
         ungroup_ref_inst_uuid = ref_inst_uuid
@@ -532,19 +534,10 @@ class SCTProjectFacade:
                     loop[3].link.target_trace[1] = new_inst.ID
                     break
 
-        # if new inst is below, and clicked is a switch, change targets of all links which contain the prev_below inst to cur_below inst for the switch
-        if direction == 'below' and inst_sect.instructions[ref_inst_uuid].instruction_id == 3:
-            switch = inst_sect.instructions[ref_inst_uuid]
-            old_target = inst_sect.instruction_ids_ungrouped[insert_pos + 1]
-            for loop in switch.loop_parameters:
-                if loop[3].link.target_trace[1] == old_target:
-                    loop[3].link.target_trace[1] = new_inst.ID
-
-        # if new inst is below, and clicked is if, change target of goto to new inst
-        if direction == 'below' and inst_sect.instructions[ref_inst_uuid].instruction_id == 0:
-            if_inst = inst_sect.instructions[ref_inst_uuid]
-            goto_inst = inst_sect.instructions[if_inst.my_goto_uuids[0]]
-            goto_inst.parameters[0].link.target_trace[1] = new_inst.ID
+        remove_direction: Literal['in', 'out'] = 'in'
+        if direction == 'below':
+            remove_direction = 'out'
+        self.remove_inst_links(script=script, section=section, inst=steal_links_from_uuid, custom_tgt=new_inst.ID, direction=remove_direction)
 
         return new_inst.ID
 
