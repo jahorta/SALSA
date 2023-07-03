@@ -191,6 +191,7 @@ class GUIController:
         self.status_popup = tk.Toplevel(self.scpt_view, background=bg)
         self.status_popup.title = title
         self.status_popup.overrideredirect(True)
+        self.status_popup.wm_focusmodel('active')
         self.status_popup.columnconfigure(0, weight=1)
         self.status_popup.rowconfigure(0, weight=1)
 
