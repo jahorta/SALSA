@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import simpledialog
 import tkinter.ttk as ttk
 import json
 from typing import List, Dict
