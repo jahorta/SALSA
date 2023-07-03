@@ -48,10 +48,7 @@ def theme_generator(colors: Colors):
         "link.TLabel": {
             "configure": {
                 "background": colors.bg_internal,
-                "foreground": colors.text
-            },
-            "map": {
-                "foreground": [("active", colors.link), ("pressed", colors.selector), ("disabled", colors.bg_internal)]
+                "foreground": colors.link
             }
         },
         "TButton": {
@@ -228,9 +225,9 @@ themes = {
         selector_text="#cccccc",
         border='#5d5d5d',
         button="#3c4f4f",
-        link='#333388'
+        link='#5588ff'
     )),
-    'light': theme_generator(colors=Colors(
+    'light': theme_generator(Colors(
         bg='#eeeeee',
         bg_internal='white',
         bg_highlight='#dddddd',
@@ -239,7 +236,7 @@ themes = {
         selector_text="white",
         border='#888888',
         button="#acafd1",
-        link='#aaaaff'
+        link='#0055ee'
     )),
 }
 

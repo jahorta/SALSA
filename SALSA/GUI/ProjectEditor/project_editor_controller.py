@@ -254,7 +254,7 @@ class ProjectEditorController:
                                                  inst=link.target_trace[1])
 
             tgt_label = ttk.Label(tgt_frame, text=f'{tgt_sect}{link_sep}{tgt_inst}',
-                                  font=self.link_font.font, style='link.TLabel')
+                                  font=self.link_font.font, style='canvas.TLabel')
             tgt_label.grid(row=0, column=0, sticky=tk.E+tk.W)
             tgt_label.bind('<ButtonRelease-1>', self.goto_link)
 
@@ -273,14 +273,15 @@ class ProjectEditorController:
                                                  inst=link.origin_trace[1])
 
             ori_label = ttk.Label(ori_frame, text=f'{ori_sect}{link_sep}{ori_inst}',
-                                  font=self.link_font.font, style='link.TLabel')
+                                  font=self.link_font.font, style='canvas.TLabel')
             ori_label.grid(row=0, column=0, sticky=tk.E+tk.W)
             ori_label.bind('<ButtonRelease-1>', self.goto_link)
 
     def handle_link_font(self, e):
         font = self.link_font.font if e.type == tk.EventType.Leave else self.link_font.hover_font
+        style = 'canvas.TLabel' if e.type == tk.EventType.Leave else 'link.TLabel'
         for child in e.widget.winfo_children():
-            child.configure(font=font)
+            child.configure(font=font, style=style)
 
     def goto_link(self, e):
         link_parts = e.widget['text'].split(link_sep)
