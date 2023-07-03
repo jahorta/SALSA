@@ -1,12 +1,12 @@
 import json
 import tkinter as tk
-
+from tkinter import ttk
 
 import SALSA.GUI.widgets as w
 from SALSA.Common.setting_class import settings
 
 
-class SearchWidget(w.ValidatedMixin, tk.Entry):
+class SearchWidget(w.ValidatedMixin, ttk.Entry):
 
     def __init__(self, parent, callbacks, *a, **kw):
         super().__init__(parent, *a, **kw)
@@ -38,7 +38,7 @@ default_tree_stretch = False
 default_tree_label = ''
 
 
-class InstructionSelectorWidget(tk.Frame):
+class InstructionSelectorWidget(ttk.Frame):
 
     log_name = 'InstSelView'
     entry_max = 10
@@ -57,7 +57,7 @@ class InstructionSelectorWidget(tk.Frame):
 
         self.visible_headers = json.loads(settings[self.log_name]['headers'])
 
-        search_label = tk.Label(self, text='Search: ')
+        search_label = ttk.Label(self, text='Search: ')
         search_label.grid(row=0, column=0)
         self.search_var = tk.StringVar(self, '')
         self.search = SearchWidget(self, textvariable=self.search_var, callbacks={'search': self.update_search})
