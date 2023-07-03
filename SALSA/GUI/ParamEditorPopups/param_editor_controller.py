@@ -20,6 +20,8 @@ class ParamEditController:
         self.callbacks = callbacks
         self.view: Union[None, ParamEditPopup] = None
         self.is_darkmode = is_darkmode
+        self.end_callback = None
+        self.end_kwargs = None
 
         self.setup_view_fxns = {
             'int': self.setup_int_view,
@@ -47,7 +49,10 @@ class ParamEditController:
     # Param Editor Show and Close functions #
     # ------------------------------------- #
 
-    def show_param_editor(self, param: Union[SCTParameter, None], base_param: BaseParam, param_id=None, column_id=None):
+    def show_param_editor(self, param: Union[SCTParameter, None], base_param: BaseParam, param_id=None, column_id=None,
+                          end_callback=None, end_kwargs=None):
+        self.end_callback = end_callback
+        self.end_kwargs = end_kwargs
         if self.view is not None:
             return
         self.view = ParamEditPopup(self.parent, is_darkmode=self.is_darkmode)
@@ -69,6 +74,8 @@ class ParamEditController:
         self.base_param = None
         self.param_id = None
         self.column_id = None
+        if self.end_callback is not None:
+            self.end_callback(**self.end_kwargs)
 
     def clear_value(self, param_base_type):
         if param_base_type == 'scpt':

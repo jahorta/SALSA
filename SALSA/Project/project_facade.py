@@ -224,6 +224,9 @@ class SCTProjectFacade:
     def set_delay_parameter(self, delay_parameter, script, section, instruction, **kwargs):
         self.project.scripts[script].sections[section].instructions[instruction].frame_delay_param = delay_parameter
 
+    def remove_delay_parameter(self, script, section, instruction, **kwargs):
+        self.project.scripts[script].sections[section].instructions[instruction].frame_delay_param = None
+
     def update_inst_field(self, field, value, script, section, instruction, **kwargs):
         inst = self.project.scripts[script].sections[section].instructions[instruction]
         inst.__setattr__(field, value)

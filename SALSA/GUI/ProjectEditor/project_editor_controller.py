@@ -541,8 +541,18 @@ class ProjectEditorController:
         inst_id = self.project.get_inst_id(**self.current)
         base_param = self.project.get_base_parameter(inst_id, paramID)
         if param is None and paramID == 'delay':
-            param = self.project.add_delay_parameter(**self.current)
-        self.param_editor.show_param_editor(param=param, base_param=base_param)
+            param = self.project.create_delay_parameter()
+        end_callback = self.finish_edit_delay_parameter if paramID == 'delay' else None
+        end_kwargs = {'param': param} if paramID == 'delay' else None
+        self.param_editor.show_param_editor(param=param, base_param=base_param, param_id=paramID,
+                                            end_callback=end_callback, end_kwargs=end_kwargs)
+
+    def finish_edit_delay_parameter(self, param):
+        if param.value in (0, '0', None, 'None'):
+            self.project.remove_delay_parameter(**self.current)
+            return
+        else:
+            self.project.set_delay_parameter(delay_parameter=param, **self.current)
 
     def get_var_alias(self, var_type, var_id):
         return self.project.get_var_alias(self.current['script'], var_type, var_id)
