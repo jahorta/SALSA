@@ -1073,28 +1073,12 @@ class SCTDecoder:
                 target_inst_id += 1
 
             link.target_trace = [target_sct.name, target_inst_id]
-            target_inst = decoded_sct.sections[link.target_trace[0]].get_instruction_by_index(link.target_trace[1])
-            link_value = ('SCT', f'{target_sct.name}{sep}{target_inst.ID}')
-            self.successful_scpt_links.append((link, link_value))
+            self.successful_scpt_links.append(link)
 
         return True
 
     def _resolve_scpt_links(self, decoded_sct: SCTScript):
         for link in self.successful_scpt_links:
-
-            # Insert a value for the link into the parameter which defines it
-            link, link_value = link
-            origin_inst = decoded_sct.sections[link.origin_trace[0]].get_instruction_by_index(link.origin_trace[1])
-            if sep in link.origin_trace[2]:
-                p_trace = link.origin_trace[2].split(sep)
-                loop = int(p_trace[0])
-                param_i = int(p_trace[1])
-                param: SCTParameter = origin_inst.loop_parameters[loop][param_i]
-                param.link_value = link_value
-            else:
-                param_i = int(link.origin_trace[2])
-                param: SCTParameter = origin_inst.parameters[param_i]
-                param.link_value = link_value
 
             # add the origin of a link to its target
             target_inst = decoded_sct.sections[link.target_trace[0]].get_instruction_by_index(link.target_trace[1])
@@ -1131,7 +1115,6 @@ class SCTDecoder:
             origin_inst = decoded_sct.sections[link.origin_trace[0]].get_instruction_by_index(link.origin_trace[1])
             param: SCTParameter = origin_inst.parameters[int(link.origin_trace[2])]
             param.linked_string = target_sct_str
-            param.link_value = ('String', target_sct_str)
 
         # setup footer links
         for link in self._str_foot_links:
@@ -1139,7 +1122,7 @@ class SCTDecoder:
             origin_inst = decoded_sct.sections[link.origin_trace[0]].get_instruction_by_index(link.origin_trace[1])
             param: SCTParameter = origin_inst.parameters[int(link.origin_trace[2])]
             param.linked_string = foot_str
-            param.link_value = ('Footer', foot_str)
+            param.link.type = 'Footer'
 
     @staticmethod
     def _create_string_groups(decoded_sct):
@@ -1850,4 +1833,3 @@ class SCTDecoder:
             inst = decoded_sct.sections[item[0][0]].instructions[item[0][1]]
             param = inst.parameters[int(inst.links_out[0].origin_trace[2])]
             param.linked_string = foot_id
-            param.link_value = ('Footer', foot_id)
