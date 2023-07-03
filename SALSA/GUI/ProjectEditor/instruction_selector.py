@@ -101,10 +101,20 @@ class InstructionSelectorWidget(ttk.Frame):
         self.result_dropdown.selection_set(self.result_dropdown.get_children('')[0])
 
     def select_inst(self, name, new_ID):
-        done = self.callbacks['set_inst_id'](*self.inst_trace, new_ID)
+        end_callback = self.finish_select_inst
+        end_kwargs = {'result': None, 'new_ID': new_ID}
+        children = self.callbacks['get_children'](*self.inst_trace)
+        if self.callbacks['is_group'](*self.inst_trace):
+            return self.callbacks['group_inst_handler'](children=children, new_id=new_ID, end_callback=end_callback, end_kwargs=end_kwargs)
+        end_callback(**end_kwargs)
+
+    def finish_select_inst(self, result, new_ID):
+        if result is not None:
+            if result == 'cancel':
+                return
+        self.callbacks['set_inst_id'](*self.inst_trace, new_id=new_ID, change_type=result)
         self.cancel(None)
-        if done:
-            self.callbacks['update_tree']()
+        self.callbacks['update_tree']()
 
     def move_to_results(self, e):
         children = self.result_dropdown.get_children('')
