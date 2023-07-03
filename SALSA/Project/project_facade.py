@@ -1102,7 +1102,8 @@ class SCTProjectFacade:
     # Inst link methods #
     # ----------------- #
 
-    def remove_inst_links(self, script, section, inst, custom_tgt=None, remove_link=False):
+    def remove_inst_links(self, script, section, inst, custom_tgt=None, remove_link=False,
+                          direction: Literal['in', 'out', 'in out'] = 'in out'):
         cur_sect = self.project.scripts[script].sections[section]
         cur_inst = cur_sect.instructions[inst]
         if len(cur_inst.links_in) == 0 and len(cur_inst.links_out) == 0:
@@ -1114,22 +1115,26 @@ class SCTProjectFacade:
             cur_group = cur_group[parent]
 
         new_tgt_inst_uuid = self.get_next_grouped_uuid(script, section, inst) if custom_tgt is None else custom_tgt
-        for link in cur_inst.links_in:
-            ori_sect = link.origin_trace[0]
-            ori_inst_uuid = link.origin_trace[1]
-            ori_inst = self.project.scripts[script].sections[ori_sect].instructions[ori_inst_uuid]
-            if new_tgt_inst_uuid is None or remove_link:
-                ori_inst.links_out.pop(ori_inst.links_out.index(link))
-            else:
-                self.change_link_tgt(tgt_sect=cur_sect, link=link, new_tgt_uuid=new_tgt_inst_uuid, remove_from_tgt=False)
 
-        for link in cur_inst.links_out:
-            tgt_sect = link.target_trace[0]
-            tgt_inst_uuid = link.target_trace[1]
-            self.project.scripts[script].sections[tgt_sect].instructions[tgt_inst_uuid].links_in.remove(link)
+        if 'in' in direction:
+            for link in cur_inst.links_in:
+                ori_sect = link.origin_trace[0]
+                ori_inst_uuid = link.origin_trace[1]
+                ori_inst = self.project.scripts[script].sections[ori_sect].instructions[ori_inst_uuid]
+                if new_tgt_inst_uuid is None or remove_link:
+                    ori_inst.links_out.pop(ori_inst.links_out.index(link))
+                else:
+                    self.change_link_tgt(tgt_sect=cur_sect, link=link, new_tgt_uuid=new_tgt_inst_uuid, remove_from_tgt=False)
 
-        cur_inst.links_in = []
-        cur_inst.links_out = []
+            cur_inst.links_in = []
+
+        if 'out' in direction:
+            for link in cur_inst.links_out:
+                tgt_sect = link.target_trace[0]
+                tgt_inst_uuid = link.target_trace[1]
+                self.project.scripts[script].sections[tgt_sect].instructions[tgt_inst_uuid].links_in.remove(link)
+
+            cur_inst.links_out = []
 
     def change_link_tgt(self, tgt_sect: SCTSection, link: SCTLink, new_tgt_uuid: str, remove_from_tgt=True):
         prev_tgt_uuid = link.target_trace[1]
