@@ -9,6 +9,7 @@ class Colors:
     bg_internal: str
     text: str
     selector: str
+    bright_selector: str
     selector_text: str
     border: str
     button: str
@@ -65,9 +66,9 @@ def theme_generator(colors: Colors):
                 "highlightcolor": colors.bg_highlight,
                 "fieldbackground": colors.bg_internal,
                 "bordercolor": colors.bg_internal,
-                "selectbackground": colors.bg,
-                "selectforeground": colors.text,
-                "insertcolor": colors.text,
+                "selectbackground": colors.bright_selector,
+                "selectforeground": colors.selector_text,
+                "insertcolor": colors.selector_text,
             },
         },
         "TCheckbutton": {
@@ -222,6 +223,7 @@ themes = {
         bg_highlight="#4d4d4d",
         text="#bbbbbb",
         selector='#333366',
+        bright_selector='#6666cc',
         selector_text="#cccccc",
         border='#5d5d5d',
         button="#3c4f4f",
@@ -233,7 +235,8 @@ themes = {
         bg_highlight='#dddddd',
         text='black',
         selector='#4444dd',
-        selector_text="white",
+        bright_selector='#3333bb',
+        selector_text='white',
         border='#888888',
         button="#acafd1",
         link='#0055ee'
