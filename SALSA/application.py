@@ -200,7 +200,7 @@ class Application(tk.Tk):
             return
         self.menu.update_recents(self.proj_model.get_recent_filenames())
         self.project_edit_controller.load_project()
-
+        self.gui.stop_status_popup()
         self.gui.enable_script_view()
         self.gui.toggle_frame_state(self.project_edit_view.inst_frame, 'disabled')
 
