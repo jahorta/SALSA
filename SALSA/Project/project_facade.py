@@ -83,7 +83,7 @@ class SCTProjectFacade:
             inst_list = self.project.scts[script].sects[section].get_inst_list(style)
             instructions = self.project.scts[script].sects[section].insts
             tree_list = self._create_tree(group=instructions, key_list=inst_list, headers=headers,
-                                          base=self.base_insts.get_all_insts(), base_key='instruction_id')
+                                          base=self.base_insts.get_all_insts(), base_key='base_id')
 
         return tree_list
 
