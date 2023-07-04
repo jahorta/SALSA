@@ -16,7 +16,7 @@ def description_insert_param_values(inst: SCTInstruction, base_inst: BaseInst):
     if '<loop>' in desc:
         desc = desc.replace('<loop>', get_loop_desc(inst, base_inst))
     paramSets = {}
-    for key, param in inst.parameters.items():
+    for key, param in inst.params.items():
         paramSets[base_inst.parameters[key].name] = param.formatted_value
     for key, value in paramSets.items():
         keyword = f'<{key}>'
@@ -29,10 +29,10 @@ def get_loop_desc(inst, base_inst):
     result = ''
     if base_inst.loop is None:
         return result
-    iterations = inst.parameters[base_inst.loop_iter].value
+    iterations = inst.params[base_inst.loop_iter].value
     for i in range(iterations):
         result += f'loop {i}'
-        for param in inst.loop_parameters[i].values():
+        for param in inst.l_params[i].values():
             result += f'\n\t{param.ID}\t{param.formatted_value}'
         result += '\n'
     return result
@@ -220,7 +220,7 @@ def replace_vars_with_locs(param1: str, **kwargs):
 
 def get_parameter_string(param_name, inst: SCTInstruction, base_inst: BaseInst, callbacks):
     string_id = None
-    for param in inst.parameters.values():
+    for param in inst.params.values():
         if base_inst.parameters[param.ID].name == param_name:
             string_id = param.linked_string
     if string_id is None:

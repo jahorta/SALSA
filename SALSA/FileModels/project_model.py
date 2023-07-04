@@ -17,7 +17,7 @@ class ProjectModel:
         self.max_recents = 10
         self._load_recent_filelist()
 
-    def load_project(self, filepath):
+    def load_project(self, filepath, ignore_dir=False):
         if filepath == '' or filepath is None:
             print('Unable to save file, no filepath')
             return
@@ -25,7 +25,8 @@ class ProjectModel:
             print('File does not exist')
             return
 
-        settings.set_single(self.log_key, 'directory', os.path.dirname(filepath))
+        if not ignore_dir:
+            settings.set_single(self.log_key, 'directory', os.path.dirname(filepath))
         with open(filepath, 'rb') as fh:
             proj = pickle.load(fh)
 

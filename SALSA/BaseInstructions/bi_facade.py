@@ -64,7 +64,7 @@ class BaseInstLibFacade:
             elements = self.lib.insts
             id_key = 'inst_ID'
         else:
-            elements = self.lib.insts[inst_id].parameters
+            elements = self.lib.insts[inst_id].params
             elements = [elements[k] for k in range(len(elements))]
             id_key = 'param_ID'
 
@@ -99,7 +99,7 @@ class BaseInstLibFacade:
         locked_key = 'instruction'
         if len(item_code) > 1:
             param_id = int(item_code.pop(0))
-            element = element.parameters[param_id]
+            element = element.params[param_id]
             locked_key = 'parameter'
         field = locked_conversions[locked_key][item_code[0]]
         result = field in element.locked_fields

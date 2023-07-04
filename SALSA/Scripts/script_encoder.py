@@ -107,8 +107,8 @@ class SCTEncoder:
         self.add_spurious_refresh = add_spurious_refresh
 
         # encode sections in order
-        for name in self.script.sections_ungrouped:
-            section = self.script.sections[name]
+        for name in self.script.sect_list:
+            section = self.script.sects[name]
             self._encode_section(name=name, section=section)
 
             # if string group header is added, add strings below it
@@ -179,9 +179,9 @@ class SCTEncoder:
         if len(section.internal_sections_inst.keys()) > 0:
             sect_list = list(section.internal_sections_inst)
         sect_name = name
-        for inst_id in section.instruction_ids_ungrouped:
-            inst = section.instructions[inst_id]
-            if inst.instruction_id == 9:
+        for inst_id in section.inst_list:
+            inst = section.insts[inst_id]
+            if inst.base_id == 9:
                 sect_name = sect_list[0]
                 self.header_dict[sect_name] = len(self.sct_body)
                 sect_list.pop(0)
@@ -193,8 +193,8 @@ class SCTEncoder:
                 self.sct_body.extend(section.garbage['end'])
 
     def _encode_instruction(self, instruction, trace):
-        base_inst = self.bi.get_inst(instruction.instruction_id)
-        trace.append(str(instruction.instruction_id))
+        base_inst = self.bi.get_inst(instruction.base_id)
+        trace.append(str(instruction.base_id))
         self.inst_positions[instruction.ID] = len(self.sct_body)
         if self.update_inst_pos:
             instruction.absolute_offset = len(self.sct_body)
@@ -206,16 +206,16 @@ class SCTEncoder:
 
         delay_pos = None
         inst_pos = -1
-        if instruction.frame_delay_param is not None or instruction.frame_delay_param == 0:
+        if instruction.delay_param is not None or instruction.delay_param == 0:
             self.sct_body.extend(self._make_word(129))
             base_param = self.bi.get_inst(129).parameters[0]
-            self._encode_param(param=instruction.frame_delay_param, base_param=base_param, trace=[*trace, str(-1)])
+            self._encode_param(param=instruction.delay_param, base_param=base_param, trace=[*trace, str(-1)])
             delay_pos = len(self.sct_body)
             self.sct_body.extend(b'0000')
             inst_pos = len(self.sct_body)
 
         # add instruction code to sct_body
-        self.sct_body.extend(self._make_word(instruction.instruction_id))
+        self.sct_body.extend(self._make_word(instruction.base_id))
 
         loop_iter_param_location = None
         loop_iter_param_value = None
@@ -224,8 +224,8 @@ class SCTEncoder:
             if base_inst.loop_iter is not None:
                 if p_id == base_inst.loop_iter:
                     loop_iter_param_location = len(self.sct_body)
-                    loop_iter_param_value = instruction.parameters[p_id].value
-            self._encode_param(param=instruction.parameters[p_id], base_param=base_inst.parameters[p_id],
+                    loop_iter_param_value = instruction.params[p_id].value
+            self._encode_param(param=instruction.params[p_id], base_param=base_inst.parameters[p_id],
                                trace=[*trace, str(p_id)])
 
         do_loop = True
@@ -233,7 +233,7 @@ class SCTEncoder:
         # Check for an external loop bypass
         if base_inst.loop_cond is not None:
             if base_inst.loop_cond['Location'] == 'External':
-                value1 = instruction.parameters[base_inst.loop_cond['Parameter']].value
+                value1 = instruction.params[base_inst.loop_cond['Parameter']].value
                 if not isinstance(value1, int):
                     value1 = int(value1)
                 value2 = base_inst.loop_cond['Value']
@@ -247,7 +247,7 @@ class SCTEncoder:
         break_loops = False
         loop_iters_performed = 0
         if do_loop:
-            for i, loop in enumerate(instruction.loop_parameters):
+            for i, loop in enumerate(instruction.l_params):
                 for p_id, param in loop.items():
                     self._encode_param(param=loop[p_id], base_param=base_inst.parameters[p_id],
                                        trace=[*trace, f'{i}|{p_id}'])
@@ -283,7 +283,7 @@ class SCTEncoder:
                 self._sct_body_insert_hex(location=loop_iter_param_location, value=self._make_word(loop_iters_performed))
 
         for p_id in base_inst.params_after:
-            self._encode_param(param=instruction.parameters[p_id], base_param=base_inst.parameters[p_id],
+            self._encode_param(param=instruction.params[p_id], base_param=base_inst.parameters[p_id],
                                trace=[*trace, str(p_id)])
 
         # add garbage at then of instruction if needed

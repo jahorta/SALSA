@@ -125,7 +125,7 @@ class InstructionEditorController:
             if sep in field:
                 field_parts = field.split(sep)
                 param_id = int(field_parts[0])
-                setattr(details.parameters[param_id], field_parts[1], value)
+                setattr(details.params[param_id], field_parts[1], value)
             else:
                 setattr(details, field, value)
 

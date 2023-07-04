@@ -187,7 +187,7 @@ class BaseInst:
         return_diffs['Notes'] = self.user_notes
         parameter_diffs = {}
         for key, param in self.parameters.items():
-            diffs = param.get_differences(other_inst.parameters[key])
+            diffs = param.get_differences(other_inst.params[key])
             if len(diffs) > 0:
                 parameter_diffs[key] = diffs
         if len(parameter_diffs) > 0:

@@ -1,6 +1,7 @@
 import copy
 from typing import Union, Tuple, Literal
 
+from Project.Updater.project_updater import ProjectUpdater
 from SALSA.BaseInstructions.bi_defaults import loop_count_name
 from SALSA.Common.script_string_utils import SAstr_to_head_and_body, head_and_body_to_SAstr
 from SALSA.Project.description_formatting import format_description
@@ -69,18 +70,18 @@ class SCTProjectFacade:
         if self.project is None:
             return
         if script is None:
-            scripts = self.project.scripts
+            scripts = self.project.scts
             tree_list = self._create_tree(group=scripts, key_list=list(scripts.keys()), headers=headers)
         elif section is None:
             self.cur_script = script
-            section_list = self.project.scripts[script].get_sect_list(style)
-            sections = self.project.scripts[script].sections
+            section_list = self.project.scts[script].get_sect_list(style)
+            sections = self.project.scts[script].sects
             tree_list = self._create_tree(group=sections, key_list=section_list, headers=headers)
         else:
             self.cur_script = script
             self._refresh_inst_positions(script=script, section=section)
-            inst_list = self.project.scripts[script].sections[section].get_inst_list(style)
-            instructions = self.project.scripts[script].sections[section].instructions
+            inst_list = self.project.scts[script].sects[section].get_inst_list(style)
+            instructions = self.project.scts[script].sects[section].insts
             tree_list = self._create_tree(group=instructions, key_list=inst_list, headers=headers,
                                           base=self.base_insts.get_all_insts(), base_key='instruction_id')
 
@@ -157,34 +158,34 @@ class SCTProjectFacade:
         return tree_list
 
     def get_parameter_tree(self, script, section, instruction, headings, **kwargs):
-        inst = self.project.scripts[script].sections[section].instructions[instruction]
-        base_inst = self.base_insts.get_inst(inst.instruction_id)
+        inst = self.project.scts[script].sects[section].insts[instruction]
+        base_inst = self.base_insts.get_inst(inst.base_id)
 
-        tree = self._create_tree(inst.parameters, base_inst.params_before, headings, base=base_inst.parameters,
+        tree = self._create_tree(inst.params, base_inst.params_before, headings, base=base_inst.parameters,
                                  base_key='ID')
 
         for param in base_inst.params_before:
-            if inst.parameters[param].link is None:
+            if inst.params[param].link is None:
                 continue
-            link_type = inst.parameters[param].link.type
+            link_type = inst.params[param].link.type
             if link_type == 'Footer':
                 tree[param]['type'] = 'Footer Entry'
-                tree[param]['value'] = inst.parameters[param].linked_string
+                tree[param]['value'] = inst.params[param].linked_string
             elif link_type in ('Jump', 'Subscript'):
                 tree[param]['type'] = 'Jump'
-                tgt_sect = inst.parameters[param].link.target_trace[0]
-                tgt_inst = inst.parameters[param].link.target_trace[1]
-                target_inst = self.project.scripts[script].sections[tgt_sect].instructions[tgt_inst]
-                tgt_name = self.base_insts.get_inst(target_inst.instruction_id).name
+                tgt_sect = inst.params[param].link.target_trace[0]
+                tgt_inst = inst.params[param].link.target_trace[1]
+                target_inst = self.project.scts[script].sects[tgt_sect].insts[tgt_inst]
+                tgt_name = self.base_insts.get_inst(target_inst.base_id).name
                 tree[param]['value'] = f'{tgt_sect} - {target_inst.ungrouped_position} {tgt_name}'
             elif link_type == 'String':
                 tree[param]['type'] = 'String'
-                tree[param]['value'] = inst.parameters[param].linked_string
+                tree[param]['value'] = inst.params[param].linked_string
 
         if base_inst.loop is None:
             return tree
 
-        for loop, params in enumerate(inst.loop_parameters):
+        for loop, params in enumerate(inst.l_params):
             temp_tree = self._create_tree(params, [f'loop{loop}'], headings, key_only=True)
             temp_tree += ['group']
             loop_items = self._create_tree(params, base_inst.loop, headings, base=base_inst.parameters, base_key='ID')
@@ -196,20 +197,20 @@ class SCTProjectFacade:
             temp_tree += ['ungroup']
             tree += temp_tree
 
-        tree += self._create_tree(inst.parameters, base_inst.params_after, headings, base=base_inst.parameters,
+        tree += self._create_tree(inst.params, base_inst.params_after, headings, base=base_inst.parameters,
                                   base_key='ID')
 
         return tree
 
     def get_instruction_details(self, script, section, instruction, **kwargs):
         try:
-            instruction = self.project.scripts[script].sections[section].instructions[instruction]
+            instruction = self.project.scts[script].sects[section].insts[instruction]
         except KeyError as e:
             print(self.log_key, e)
             return None
-        if instruction.instruction_id is None:
+        if instruction.base_id is None:
             return None
-        base_inst = self.base_insts.get_inst(instruction.instruction_id)
+        base_inst = self.base_insts.get_inst(instruction.base_id)
         instruction_details = copy.deepcopy(base_inst.__dict__)
         instruction_details['base_parameters'] = instruction_details['parameters']
         for key, value in instruction.__dict__.items():
@@ -218,30 +219,30 @@ class SCTProjectFacade:
         return instruction_details
 
     def add_script_to_project(self, script_name, script):
-        self.project.scripts[script_name] = script
-        script_keys = sorted(list(self.project.scripts.keys()), key=str.casefold)
-        self.project.scripts = {k: self.project.scripts[k] for k in script_keys}
+        self.project.scts[script_name] = script
+        script_keys = sorted(list(self.project.scts.keys()), key=str.casefold)
+        self.project.scts = {k: self.project.scts[k] for k in script_keys}
         if 'update_scripts' not in self.callbacks:
             return
         self.callbacks['update_scripts']()
 
     def get_project_script_by_name(self, name):
-        if name not in self.project.scripts.keys():
+        if name not in self.project.scts.keys():
             print(f'{self.log_key}: No script loaded with the name: {name}')
             return None
-        return self.project.scripts[name]
+        return self.project.scts[name]
 
     def create_delay_parameter(self):
         return SCTParameter(_id=-1, _type='scpt-int')
 
     def set_delay_parameter(self, delay_parameter, script, section, instruction, **kwargs):
-        self.project.scripts[script].sections[section].instructions[instruction].frame_delay_param = delay_parameter
+        self.project.scts[script].sects[section].insts[instruction].delay_param = delay_parameter
 
     def remove_delay_parameter(self, script, section, instruction, **kwargs):
-        self.project.scripts[script].sections[section].instructions[instruction].frame_delay_param = None
+        self.project.scts[script].sects[section].insts[instruction].delay_param = None
 
     def update_inst_field(self, field, value, script, section, instruction, **kwargs):
-        inst = self.project.scripts[script].sections[section].instructions[instruction]
+        inst = self.project.scts[script].sects[section].insts[instruction]
         inst.__setattr__(field, value)
 
     # def get_project_script_by_index(self, index):
@@ -256,15 +257,15 @@ class SCTProjectFacade:
     # ---------------------------- #
 
     def get_inst_uuid_by_ind(self, script, section, inst_ind):
-        return self.project.scripts[script].sections[section].instruction_ids_ungrouped[int(inst_ind)]
+        return self.project.scts[script].sects[section].inst_list[int(inst_ind)]
 
     def get_inst_ind(self, script, section, inst):
-        return self.project.scripts[script].sections[section].instruction_ids_ungrouped.index(inst)
+        return self.project.scts[script].sects[section].inst_list.index(inst)
 
     def _refresh_inst_positions(self, script, section):
-        section = self.project.scripts[script].sections[section]
-        for i, inst_id in enumerate(section.instruction_ids_ungrouped):
-            section.instructions[inst_id].ungrouped_position = i
+        section = self.project.scts[script].sects[section]
+        for i, inst_id in enumerate(section.inst_list):
+            section.insts[inst_id].ungrouped_position = i
 
     # ----------------------- #
     # Script variable methods #
@@ -272,7 +273,7 @@ class SCTProjectFacade:
 
     def get_script_variables_with_aliases(self, script):
         global_vars = self.project.global_variables
-        var_dict = None if script is None else self.project.scripts[script].variables
+        var_dict = None if script is None else self.project.scts[script].variables
         if var_dict is None:
             var_dict = global_vars
         all_vars = {}
@@ -288,13 +289,13 @@ class SCTProjectFacade:
         return all_vars
 
     def get_var_alias(self, script, var_type, var_id):
-        if var_id not in self.project.scripts[script].variables[var_type]:
+        if var_id not in self.project.scts[script].variables[var_type]:
             return 'No Alias'
-        return self.project.scripts[script].variables[var_type][var_id]['alias']
+        return self.project.scts[script].variables[var_type][var_id]['alias']
 
     def set_variable_alias(self, script, var_type, var_id, alias):
         var_dict = self.project.global_variables[var_type] if script is None \
-            else self.project.scripts[script].variables[var_type]
+            else self.project.scts[script].variables[var_type]
 
         if var_id not in var_dict:
             var_dict[var_id] = {'alias': alias}
@@ -307,9 +308,9 @@ class SCTProjectFacade:
 
     def get_variable_usages(self, script, var_type, var_id):
         if script is not None:
-            return self.project.scripts[script].variables[var_type][var_id]['usage']
+            return self.project.scts[script].variables[var_type][var_id]['usage']
         usage = []
-        for name, cur_script in self.project.scripts.values():
+        for name, cur_script in self.project.scts.values():
             if var_id in cur_script.variables[var_type]:
                 usage.append((name, *cur_script.variables[var_type][var_id]['usage']))
 
@@ -320,27 +321,27 @@ class SCTProjectFacade:
             var_parts = change.split(': ')
             var_type = var_parts[0]
             var_key = int(var_parts[1])
-            if var_key in self.project.scripts[script].variables[var_type]:
-                self.project.scripts[script].variables[var_type][var_key]['usage'].append(trace)
+            if var_key in self.project.scts[script].variables[var_type]:
+                self.project.scts[script].variables[var_type][var_key]['usage'].append(trace)
             else:
-                self.project.scripts[script].variables[var_type][var_key] = {'alias': '', 'usage': [trace]}
+                self.project.scts[script].variables[var_type][var_key] = {'alias': '', 'usage': [trace]}
 
         for change in changes['remove']:
             var_parts = change.split(': ')
             var_type = var_parts[0]
             var_key = int(var_parts[1])
-            if trace not in self.project.scripts[script].variables[var_type][var_key]['usage']:
+            if trace not in self.project.scts[script].variables[var_type][var_key]['usage']:
                 print(f'{self.log_key}: No variable usage to remove for {trace} in {var_type}: {var_key}')
                 continue
-            self.project.scripts[script].variables[var_type][var_key]['usage'].remove(trace)
+            self.project.scts[script].variables[var_type][var_key]['usage'].remove(trace)
 
     # ------------------------------ #
     # String Editor Callback Methods #
     # ------------------------------ #
 
     def get_string_tree(self, script, headers):
-        string_groups = self.project.scripts[script].string_groups
-        strings = self.project.scripts[script].strings
+        string_groups = self.project.scts[script].string_groups
+        strings = self.project.scts[script].strings
         string_tree = []
         for key, group in string_groups.items():
             string_tree.append({headers[0]: key, headers[1]: '', 'row_data': None})
@@ -359,19 +360,19 @@ class SCTProjectFacade:
 
     def get_string_to_edit(self, string_id, script=None):
         script = self.cur_script if script is None else script
-        return SAstr_to_head_and_body(self.project.scripts[script].strings[string_id])
+        return SAstr_to_head_and_body(self.project.scts[script].strings[string_id])
 
     def edit_string(self, script, string_id, changes):
         if script == '' or string_id == '':
             return
-        no_head, head, body = SAstr_to_head_and_body(self.project.scripts[script].strings[string_id])
+        no_head, head, body = SAstr_to_head_and_body(self.project.scts[script].strings[string_id])
         if 'no_head' in changes:
             no_head = changes['no_head']
         if 'head' in changes:
             head = changes['head']
         if 'body' in changes:
             body = changes['body']
-        self.project.scripts[script].strings[string_id] = head_and_body_to_SAstr(no_head, head, body)
+        self.project.scts[script].strings[string_id] = head_and_body_to_SAstr(no_head, head, body)
         self.callbacks['set_change']()
 
     # ----------------------------- #
@@ -379,44 +380,44 @@ class SCTProjectFacade:
     # ----------------------------- #
 
     def get_section_list(self, script):
-        return list(self.project.scripts[script].sections.keys())
+        return list(self.project.scts[script].sects.keys())
 
     def get_inst_list(self, script, section, goto_uuid=None):
-        cur_sect = self.project.scripts[script].sections[section]
-        inst_list = cur_sect.instruction_ids_ungrouped
+        cur_sect = self.project.scts[script].sects[section]
+        inst_list = cur_sect.inst_list
         if goto_uuid is not None:
             first_blocked = 0
             master_uuid = None
-            if len(cur_sect.instructions[goto_uuid].my_master_uuids) < 0:
-                master_uuid = cur_sect.instructions[goto_uuid].my_master_uuids[0]
+            if len(cur_sect.insts[goto_uuid].my_master_uuids) < 0:
+                master_uuid = cur_sect.insts[goto_uuid].my_master_uuids[0]
                 first_blocked = inst_list.index(master_uuid)
-            last_blocked = cur_sect.instruction_ids_ungrouped.index(goto_uuid)
+            last_blocked = cur_sect.inst_list.index(goto_uuid)
             if master_uuid is not None:
-                if cur_sect.instructions[master_uuid].instruction_id == 3:
-                    last_blocked = max(*[cur_sect.instruction_ids_ungrouped.index(i) for i in
-                                         cur_sect.instructions[master_uuid].my_goto_uuids], last_blocked)
-            inst_list = cur_sect.instruction_ids_ungrouped[:first_blocked] + cur_sect.instruction_ids_ungrouped[
+                if cur_sect.insts[master_uuid].base_id == 3:
+                    last_blocked = max(*[cur_sect.inst_list.index(i) for i in
+                                         cur_sect.insts[master_uuid].my_goto_uuids], last_blocked)
+            inst_list = cur_sect.inst_list[:first_blocked] + cur_sect.inst_list[
                                                                              last_blocked + 1:]
 
-        return [f'{cur_sect.instructions[i].ungrouped_position}: '
-                f'{self.base_insts.get_inst(cur_sect.instructions[i].instruction_id).name}'
-                f'{sep}{cur_sect.instructions[i].ID}' for i in inst_list]
+        return [f'{cur_sect.insts[i].ungrouped_position}: '
+                f'{self.base_insts.get_inst(cur_sect.insts[i].base_id).name}'
+                f'{sep}{cur_sect.insts[i].ID}' for i in inst_list]
 
     # ------------------------------------------ #
     # Instruction and parameter analysis methods #
     # ------------------------------------------ #
 
     def get_parameter(self, script, section, instruction, parameter):
-        instruction = self.project.scripts[script].sections[section].instructions[instruction]
+        instruction = self.project.scts[script].sects[section].insts[instruction]
         if parameter == 'delay':
-            return instruction.frame_delay_param
+            return instruction.delay_param
         if sep in parameter:
             param_parts = parameter.split(sep)
-            return instruction.loop_parameters[int(param_parts[0])][int(param_parts[1])]
-        return instruction.parameters[int(parameter)]
+            return instruction.l_params[int(param_parts[0])][int(param_parts[1])]
+        return instruction.params[int(parameter)]
 
     def get_inst_id(self, script, section, instruction, **kwargs):
-        return self.project.scripts[script].sections[section].instructions[instruction].instruction_id
+        return self.project.scts[script].sects[section].insts[instruction].base_id
 
     def get_inst_id_name(self, inst_id):
         return self.base_insts.get_inst(inst_id).name
@@ -429,90 +430,90 @@ class SCTProjectFacade:
         return self.base_insts.get_inst(inst_id).parameters[int(b_param_id)]
 
     def get_inst_is_removable(self, script, section, instruction, **kwargs):
-        cur_sect = self.project.scripts[script].sections[section]
-        inst_ind = cur_sect.instruction_ids_ungrouped.index(instruction)
+        cur_sect = self.project.scts[script].sects[section]
+        inst_ind = cur_sect.inst_list.index(instruction)
 
         # Checks for initial label and return of a function
-        if inst_ind == 0 or inst_ind + 1 == len(cur_sect.instruction_ids_ungrouped):
+        if inst_ind == 0 or inst_ind + 1 == len(cur_sect.inst_list):
             return False
 
         # Checks if the instruction is a goto with a master
-        if len(cur_sect.instructions[instruction].my_master_uuids) > 0:
+        if len(cur_sect.insts[instruction].my_master_uuids) > 0:
             return False
 
         return True
 
     def has_loops(self, script, section, instruction, **kwargs):
-        cur_inst_id = self.project.scripts[script].sections[section].instructions[instruction].instruction_id
+        cur_inst_id = self.project.scts[script].sects[section].insts[instruction].base_id
         return self.base_insts.get_inst(cur_inst_id).loop is not None
 
     def is_switch(self, script, section, instruction, **kwargs):
-        return self.project.scripts[script].sections[section].instructions[instruction].instruction_id == 3
+        return self.project.scts[script].sects[section].insts[instruction].base_id == 3
 
     def is_group(self, script, section, instruction, **kwargs):
-        return self.project.scripts[script].sections[section].instructions[instruction].instruction_id in (0, 3)
+        return self.project.scts[script].sects[section].insts[instruction].base_id in (0, 3)
 
     # ---------------------------------------------- #
     # Instruction and parameter manipulation methods #
     # ---------------------------------------------- #
 
     def add_switch_case(self, script, section, instruction, **kwargs):
-        cur_sect = self.project.scripts[script].sections[section]
-        parent_list, index = self.get_inst_grouped_parents_and_index(grouped_region=cur_sect.instruction_ids_grouped, inst=instruction)
-        cases = [int(loop[2].value) for loop in cur_sect.instructions[instruction].loop_parameters]
+        cur_sect = self.project.scts[script].sects[section]
+        parent_list, index = self.get_inst_grouped_parents_and_index(grouped_region=cur_sect.inst_tree, inst=instruction)
+        cases = [int(loop[2].value) for loop in cur_sect.insts[instruction].l_params]
         next_case = -1
         while next_case in cases:
             next_case += 1
         self.add_inst_sub_group(script, section, instruction, parent_list, index, str(next_case))
-        self.update_loop_param_num(cur_sect.instructions[instruction])
+        self.update_loop_param_num(cur_sect.insts[instruction])
 
     def remove_switch_case(self, script, section, instruction, case, result, **kwargs):
         return self.change_inst(script, section, instruction, case=case, change_type=result)
 
     def add_loop_param(self, script, section, instruction, **kwargs):
-        inst = self.project.scripts[script].sections[section].instructions[instruction]
+        inst = self.project.scts[script].sects[section].insts[instruction]
         loop = {}
-        for param_id in self.base_insts.get_inst(inst.instruction_id).loop:
-            base_param = self.base_insts.get_inst(inst.instruction_id).parameters[param_id]
+        for param_id in self.base_insts.get_inst(inst.base_id).loop:
+            base_param = self.base_insts.get_inst(inst.base_id).parameters[param_id]
             loop_param = SCTParameter(param_id, base_param.type)
             loop_param.set_value(base_param.default_value)
             loop[int(param_id)] = loop_param
-        inst.loop_parameters = [loop, *inst.loop_parameters]
+        inst.l_params = [loop, *inst.l_params]
         self.update_loop_param_num(inst)
         return True
 
     def remove_loop_param(self, script, section, instruction, loop_num, **kwargs):
-        inst = self.project.scripts[script].sections[section].instructions[instruction]
-        if len(inst.loop_parameters) <= loop_num:
+        inst = self.project.scts[script].sects[section].insts[instruction]
+        if len(inst.l_params) <= loop_num:
             return False
-        inst.loop_parameters.pop(loop_num)
+        inst.l_params.pop(loop_num)
         self.update_loop_param_num(inst)
         return True
 
     def update_loop_param_num(self, inst):
-        for key, param in self.base_insts.get_inst(inst.instruction_id).parameters.items():
+        for key, param in self.base_insts.get_inst(inst.base_id).parameters.items():
             if loop_count_name in param.type:
-                inst.parameters[int(key)].set_value(len(inst.loop_parameters))
+                inst.params[int(key)].set_value(len(inst.l_params))
 
     def remove_inst(self, script, section, inst, result, custom_link_tgt=None):
         self.remove_inst_links(script, section, inst, custom_tgt=custom_link_tgt)
         # This will handle inst group children, remove any inst links in the group
         # and remove the inst from the grouped representation of insts
         self.change_inst(script, section, inst, change_type=result)
-        cur_sect = self.project.scripts[script].sections[section]
-        cur_sect.instructions.pop(inst)
-        if inst in cur_sect.instruction_ids_ungrouped:
-            cur_sect.instruction_ids_ungrouped.remove(inst)
+        cur_sect = self.project.scts[script].sects[section]
+        cur_sect.insts.pop(inst)
+        if inst in cur_sect.inst_list:
+            cur_sect.inst_list.remove(inst)
             self._refresh_inst_positions(script, section)
 
     def add_inst(self, script, section, ref_inst_uuid, case=None, direction='below'):
         new_inst = SCTInstruction()
-        inst_sect = self.project.scripts[script].sections[section]
-        inst_sect.instructions[new_inst.ID] = new_inst
+        inst_sect = self.project.scts[script].sects[section]
+        inst_sect.insts[new_inst.ID] = new_inst
 
-        inst_parents, index = self.get_inst_grouped_parents_and_index(ref_inst_uuid, inst_sect.instruction_ids_grouped)
+        inst_parents, index = self.get_inst_grouped_parents_and_index(ref_inst_uuid, inst_sect.inst_tree)
 
-        cur_group = inst_sect.instruction_ids_grouped
+        cur_group = inst_sect.inst_tree
         for key in inst_parents:
             cur_group = cur_group[key]
 
@@ -537,15 +538,15 @@ class SCTProjectFacade:
             # The ref inst for below is the last instruction of the group this should almost always be a goto
             ungroup_ref_inst_uuid = self.get_inst_uuid_from_group_entry(cur_group[index], last=True)
 
-        insert_pos = inst_sect.instruction_ids_ungrouped.index(ungroup_ref_inst_uuid)
+        insert_pos = inst_sect.inst_list.index(ungroup_ref_inst_uuid)
         if direction in ('inside', 'below'):
             insert_pos += 1
-        inst_sect.instruction_ids_ungrouped.insert(insert_pos, new_inst.ID)
+        inst_sect.inst_list.insert(insert_pos, new_inst.ID)
 
         # if new inst is inside, and clicked is a switch case, change target of link of case to new inst
         if case is not None:
-            switch = inst_sect.instructions[ref_inst_uuid]
-            for loop in switch.loop_parameters:
+            switch = inst_sect.insts[ref_inst_uuid]
+            for loop in switch.l_params:
                 if loop[2].value == int(case):
                     loop[3].link.target_trace[1] = new_inst.ID
                     break
@@ -559,19 +560,19 @@ class SCTProjectFacade:
 
     def change_inst(self, script, section, inst, new_id=None, case=None, change_type=None):
         # not entering a new_id will remove the instruction
-        cur_section = self.project.scripts[script].sections[section]
-        cur_inst = cur_section.instructions[inst]
+        cur_section = self.project.scts[script].sects[section]
+        cur_inst = cur_section.insts[inst]
         if new_id is not None:
-            if cur_inst.instruction_id == new_id:
+            if cur_inst.base_id == new_id:
                 return True
 
         saved_children = {}
         changes = []
-        if cur_inst.instruction_id in self.base_insts.group_inst_list:
+        if cur_inst.base_id in self.base_insts.group_inst_list:
             if change_type is None:
                 raise ValueError('Current inst is a group type, but no group resolution was given')
             inst_group = self.get_inst_group(script, section, inst)
-            if cur_inst.instruction_id == 3:
+            if cur_inst.base_id == 3:
                 inst_group = (inst_group[f'{inst}{sep}switch'] if case is None
                               else {case: inst_group[f'{inst}{sep}switch'][case]})
             new_id = None if new_id is None else int(new_id)
@@ -579,25 +580,25 @@ class SCTProjectFacade:
             custom_link_tgt = self.get_next_grouped_uuid(script, section, inst)
             for goto in cur_inst.my_goto_uuids:
                 if case is not None:
-                    parents, index = self.get_inst_grouped_parents_and_index(goto, cur_section.instruction_ids_grouped)
+                    parents, index = self.get_inst_grouped_parents_and_index(goto, cur_section.inst_tree)
                     if parents[-1] != case:
                         continue
 
-                if goto in cur_section.instructions:
+                if goto in cur_section.insts:
                     self.remove_inst(script, section, goto, custom_link_tgt=custom_link_tgt, result=None)
 
             if case is None:
                 self.remove_inst_links(script, section, inst, custom_tgt=custom_link_tgt)
             else:
                 loop_param_to_remove = None
-                for i, loop in enumerate(cur_inst.loop_parameters):
+                for i, loop in enumerate(cur_inst.l_params):
                     if int(case) == loop[2].value:
                         loop_param_to_remove = i
                         break
                 if loop_param_to_remove is None:
                     print(f'{self.log_key}: Could not find loop parameter for {case}')
-                cur_inst.links_out.remove(cur_inst.loop_parameters[loop_param_to_remove][3].link)
-                cur_inst.loop_parameters.pop(loop_param_to_remove)
+                cur_inst.links_out.remove(cur_inst.l_params[loop_param_to_remove][3].link)
+                cur_inst.l_params.pop(loop_param_to_remove)
 
             changes: list = change_type.split(alt_alt_sep)
             changes.reverse()
@@ -629,13 +630,13 @@ class SCTProjectFacade:
             for i in reversed(finished_change_indexes):
                 changes.pop(i)
 
-        parent_list, index = self.get_inst_grouped_parents_and_index(inst, cur_section.instruction_ids_grouped)
+        parent_list, index = self.get_inst_grouped_parents_and_index(inst, cur_section.inst_tree)
 
         if index is None:
             print(f'{self.log_key}: instruction not found in grouped instructions...')
             return False
 
-        cur_group = cur_section.instruction_ids_grouped
+        cur_group = cur_section.inst_tree
         for parent in parent_list:
             cur_group = cur_group[parent]
 
@@ -647,7 +648,7 @@ class SCTProjectFacade:
             cur_group.pop(index)
             return True
 
-        if cur_inst.instruction_id in self.base_insts.group_inst_list:
+        if cur_inst.base_id in self.base_insts.group_inst_list:
             cur_group[index] = inst
 
         # Change inst id
@@ -666,7 +667,7 @@ class SCTProjectFacade:
                 new_param.set_value('override', get_scpt_override(base_param.type))
             else:
                 new_param.set_value(base_param.default_value)
-            cur_inst.parameters[i] = new_param
+            cur_inst.params[i] = new_param
 
         if int(new_id) in self.base_insts.group_inst_list:
             self.setup_group_type_inst(script, section, inst, cur_inst, parent_list, index)
@@ -683,23 +684,23 @@ class SCTProjectFacade:
                 # insert inst list into appropriate place in ungrouped
                 temp_cur_group = cur_group
                 if 'If' in change:
-                    ungrouped_index = cur_section.instruction_ids_ungrouped.index(inst) + 1
+                    ungrouped_index = cur_section.inst_list.index(inst) + 1
                     temp_cur_group = temp_cur_group[index][f'{inst}{sep}if']
                     cur_first_uuid = self.get_inst_uuid_from_group_entry(temp_cur_group[0])
                 elif 'Else' in change:
-                    goto_inst = cur_section.instructions[cur_inst.my_goto_uuids[0]]
-                    ungrouped_index = cur_section.instruction_ids_ungrouped.index(goto_inst.ID) + 1
+                    goto_inst = cur_section.insts[cur_inst.my_goto_uuids[0]]
+                    ungrouped_index = cur_section.inst_list.index(goto_inst.ID) + 1
                     temp_cur_group = temp_cur_group[index + 1][f'{inst}{sep}else']
                 else:
                     sub_group = change.split(' ')[-1]
                     temp_cur_group = temp_cur_group[index][f'{inst}{sep}switch'][sub_group]
                     first_uuid = self.get_inst_uuid_from_group_entry(temp_cur_group)
-                    ungrouped_index = cur_section.instruction_ids_ungrouped.index(first_uuid)
+                    ungrouped_index = cur_section.inst_list.index(first_uuid)
                     cur_first_uuid = self.get_inst_uuid_from_group_entry(saved_children[change.split(alt_sep)[0]])
 
                 # Insert saved group into appropriate place in ungrouped
                 inst_list = self.extract_inst_uuids_from_group(saved_children[change.split(alt_sep)[0]])
-                cur_section.instruction_ids_ungrouped = cur_section.instruction_ids_ungrouped[:ungrouped_index] + inst_list + cur_section.instruction_ids_ungrouped[ungrouped_index:]
+                cur_section.inst_list = cur_section.inst_list[:ungrouped_index] + inst_list + cur_section.inst_list[ungrouped_index:]
 
                 # insert saved_group into appropriate place in grouped
                 for item in reversed(saved_children[change.split(alt_sep)[0]]):
@@ -707,20 +708,20 @@ class SCTProjectFacade:
 
                 # Adjust if or switch for new linked inst values
                 if 'If' in change:
-                    next_inst_ind = cur_section.instruction_ids_ungrouped.index(cur_first_uuid)
-                    prev_inst_uuid = cur_section.instruction_ids_ungrouped[next_inst_ind-1]
-                    prev_inst = cur_section.instructions[prev_inst_uuid]
+                    next_inst_ind = cur_section.inst_list.index(cur_first_uuid)
+                    prev_inst_uuid = cur_section.inst_list[next_inst_ind - 1]
+                    prev_inst = cur_section.insts[prev_inst_uuid]
                     # Skip if it is not a goto
-                    if not prev_inst.instruction_id == 10:
+                    if not prev_inst.base_id == 10:
                         continue
                     # Skip if the target is already correct
                     prev_tgt = prev_inst.links_out[0].target_trace[1]
                     if prev_tgt == cur_first_uuid:
                         continue
                     if len(prev_inst.my_master_uuids) != 0:
-                        prev_master = cur_section.instructions[prev_inst.my_master_uuids[0]]
+                        prev_master = cur_section.insts[prev_inst.my_master_uuids[0]]
                         # Skip if If is a While
-                        if cur_section.instruction_ids_ungrouped.index(prev_tgt) > cur_section.instruction_ids_ungrouped.index(prev_master.ID):
+                        if cur_section.inst_list.index(prev_tgt) > cur_section.inst_list.index(prev_master.ID):
                             self.change_link_tgt(tgt_sect=cur_section, link=prev_inst.links_out[0],
                                                  new_tgt_uuid=cur_first_uuid)
                     else:
@@ -729,7 +730,7 @@ class SCTProjectFacade:
                         continue
                     # Skip if prev has no master, master can only be If or Switch
                     # Skip prev master is switch. prev_inst will not be a goto if an If with Else
-                    if prev_master.instruction_id == 3:
+                    if prev_master.base_id == 3:
                         continue
                     self.change_link_tgt(tgt_sect=cur_section, link=prev_master.links_out[0], new_tgt_uuid=cur_first_uuid)
 
@@ -738,7 +739,7 @@ class SCTProjectFacade:
 
                 else:
                     case_param = None
-                    for loop in cur_inst.loop_parameters:
+                    for loop in cur_inst.l_params:
                         if loop[2].value == int(sub_group):
                             case_param = loop[3]
                             break
@@ -756,11 +757,11 @@ class SCTProjectFacade:
         return True
 
     def remove_inst_parameters(self, script, section, inst, loop=True):
-        cur_inst = self.project.scripts[script].sections[section].instructions[inst]
-        cur_inst.parameters = {}
+        cur_inst = self.project.scts[script].sects[section].insts[inst]
+        cur_inst.params = {}
         if not loop:
             return
-        cur_inst.loop_parameters = []
+        cur_inst.l_params = []
 
     # ------------------------------- #
     # Inst group manipulation methods #
@@ -768,21 +769,21 @@ class SCTProjectFacade:
 
     def setup_group_type_inst(self, script, section, inst_id, inst, parent_list, index):
 
-        inst_sect = self.project.scripts[script].sections[section]
+        inst_sect = self.project.scts[script].sects[section]
 
-        cur_group = inst_sect.instruction_ids_grouped
+        cur_group = inst_sect.inst_tree
         for key in parent_list:
             cur_group = cur_group[key]
 
-        if inst.instruction_id == 0:
-            target_inst_UUID_index = inst_sect.instruction_ids_ungrouped.index(inst_id) + 1
-            target_inst_UUID = inst_sect.instruction_ids_ungrouped[target_inst_UUID_index]
+        if inst.base_id == 0:
+            target_inst_UUID_index = inst_sect.inst_list.index(inst_id) + 1
+            target_inst_UUID = inst_sect.inst_list[target_inst_UUID_index]
 
             inst_link = SCTLink(origin=-1, origin_trace=[section, inst.ID, 1], type='Jump',
                                 target=-1, target_trace=[section, target_inst_UUID])
-            inst.parameters[1].link = inst_link
+            inst.params[1].link = inst_link
             inst.links_out.append(inst_link)
-            inst_sect.instructions[target_inst_UUID].links_in.append(inst_link)
+            inst_sect.insts[target_inst_UUID].links_in.append(inst_link)
 
             goto_inst = SCTInstruction()
             goto_inst.set_inst_id(10)
@@ -791,24 +792,24 @@ class SCTProjectFacade:
             goto_link = SCTLink(origin=-1, origin_trace=[section, goto_inst.ID, 0], type='Jump',
                                 target=-1, target_trace=[section, target_inst_UUID])
             goto_param.link = goto_link
-            inst_sect.instructions[target_inst_UUID].links_in.append(goto_link)
+            inst_sect.insts[target_inst_UUID].links_in.append(goto_link)
             goto_inst.links_out.append(goto_link)
 
             inst.my_goto_uuids = [goto_inst.ID]
             goto_inst.my_master_uuids = [inst.ID]
 
-            inst_sect.instructions[goto_inst.ID] = goto_inst
+            inst_sect.insts[goto_inst.ID] = goto_inst
 
-            inst_sect.instruction_ids_ungrouped.insert(target_inst_UUID_index, goto_inst.ID)
+            inst_sect.inst_list.insert(target_inst_UUID_index, goto_inst.ID)
 
             grouped_insertion = {f'{inst_id}{sep}if': [goto_inst.ID]}
 
-        elif inst.instruction_id == 3:
+        elif inst.base_id == 3:
             grouped_insertion = {f'{inst_id}{sep}switch': {}}
             inst.my_goto_uuids = []
         else:
             print(
-                f'{self.log_key}: Setup Group Type Inst: Unknown group type inst ({inst.instruction_id}). Group not made.')
+                f'{self.log_key}: Setup Group Type Inst: Unknown group type inst ({inst.base_id}). Group not made.')
             grouped_insertion = inst_id
 
         cur_group.pop(index)
@@ -816,46 +817,46 @@ class SCTProjectFacade:
 
     def perform_group_change(self, script, section, inst, cur_group, change):
         # Handles Move Above, Move Below, Delete
-        cur_sect = self.project.scripts[script].sections[section]
+        cur_sect = self.project.scts[script].sects[section]
 
         start_inst_key, end_inst_key = self.get_inst_group_bounds(cur_group)
 
         # Remove Instructions from current place in ungrouped in new temp ungrouped
         start_inst_uuid = start_inst_key if sep not in start_inst_key else start_inst_key.split(sep)[0]
         end_inst_uuid = end_inst_key if sep not in end_inst_key else end_inst_key.split(sep)[0]
-        start_ind = cur_sect.instruction_ids_ungrouped.index(start_inst_uuid)
-        end_ind = cur_sect.instruction_ids_ungrouped.index(end_inst_uuid)
-        group_insts = cur_sect.instruction_ids_ungrouped[start_ind: end_ind + 1]
+        start_ind = cur_sect.inst_list.index(start_inst_uuid)
+        end_ind = cur_sect.inst_list.index(end_inst_uuid)
+        group_insts = cur_sect.inst_list[start_ind: end_ind + 1]
         temp_ungrouped = []
-        temp_ungrouped += cur_sect.instruction_ids_ungrouped[:start_ind] if start_ind > 0 else []
-        temp_ungrouped += cur_sect.instruction_ids_ungrouped[end_ind + 1:] if end_ind < len(
-            cur_sect.instruction_ids_ungrouped) - 1 else []
+        temp_ungrouped += cur_sect.inst_list[:start_ind] if start_ind > 0 else []
+        temp_ungrouped += cur_sect.inst_list[end_ind + 1:] if end_ind < len(
+            cur_sect.inst_list) - 1 else []
 
         # Remove instructions from current place in grouped in new temp grouped
-        parents, grouped_ind = self.get_inst_grouped_parents_and_index(inst, cur_sect.instruction_ids_grouped)
+        parents, grouped_ind = self.get_inst_grouped_parents_and_index(inst, cur_sect.inst_tree)
 
-        cur_temp_group = cur_sect.instruction_ids_grouped
+        cur_temp_group = cur_sect.inst_tree
         for parent in parents:
             cur_temp_group = cur_temp_group[parent]
 
         if "Delete" in change:
             for del_inst in reversed(group_insts):
                 links_removed = False
-                if len(cur_sect.instructions[del_inst].links_in) > 0:
-                    for link in cur_sect.instructions[del_inst].links_in:
+                if len(cur_sect.insts[del_inst].links_in) > 0:
+                    for link in cur_sect.insts[del_inst].links_in:
                         if link.origin_trace is None:
                             continue
                         if link.origin_trace[1] in temp_ungrouped:
                             links_removed = True
                             self.remove_inst_links(script, section, del_inst)
-                if not links_removed and len(cur_sect.instructions[del_inst].links_out) > 0:
-                    for link in cur_sect.instructions[del_inst].links_out:
+                if not links_removed and len(cur_sect.insts[del_inst].links_out) > 0:
+                    for link in cur_sect.insts[del_inst].links_out:
                         if link.target_trace is None:
                             continue
                         if link.target_trace[1] in temp_ungrouped:
                             self.remove_inst_links(script, section, del_inst)
-            new_insts = {k: cur_sect.instructions[k] for k in cur_sect.instructions if k not in group_insts}
-            cur_sect.instructions = new_insts
+            new_insts = {k: cur_sect.insts[k] for k in cur_sect.insts if k not in group_insts}
+            cur_sect.insts = new_insts
             new_ungrouped = temp_ungrouped
 
         elif 'Move' in change:
@@ -878,23 +879,23 @@ class SCTProjectFacade:
             if 'Below' in change:
                 new_tgt_uuid = ungrouped_after[0]
             prev_inst_uuid = new_ungrouped[new_ungrouped.index(new_tgt_uuid) - 1]
-            prev_inst = cur_sect.instructions[prev_inst_uuid]
+            prev_inst = cur_sect.insts[prev_inst_uuid]
             # Skip if it is not a goto
-            if prev_inst.instruction_id == 10:
+            if prev_inst.base_id == 10:
                 # Skip if the target is already correct
                 prev_tgt = prev_inst.links_out[0].target_trace[1]
                 if prev_tgt == new_tgt_uuid:
                     pass
                 elif len(prev_inst.my_master_uuids) != 0:
-                    prev_master = cur_sect.instructions[prev_inst.my_master_uuids[0]]
+                    prev_master = cur_sect.insts[prev_inst.my_master_uuids[0]]
                     # Skip if If is a While
-                    if cur_sect.instruction_ids_ungrouped.index(prev_tgt) > cur_sect.instruction_ids_ungrouped.index(
+                    if cur_sect.inst_list.index(prev_tgt) > cur_sect.inst_list.index(
                             prev_master.ID):
                         self.change_link_tgt(tgt_sect=cur_sect, link=prev_inst.links_out[0],
                                              new_tgt_uuid=new_tgt_uuid)
                     # Skip if prev has no master, master can only be If or Switch
                     # Skip prev master is switch. prev_inst will not be a goto if an If with Else
-                    if prev_master.instruction_id != 3:
+                    if prev_master.base_id != 3:
                         self.change_link_tgt(tgt_sect=cur_sect, link=prev_master.links_out[0], new_tgt_uuid=new_tgt_uuid)
                 else:
                     self.change_link_tgt(tgt_sect=cur_sect, link=prev_inst.links_out[0],
@@ -907,21 +908,21 @@ class SCTProjectFacade:
             print(f'{self.log_key}: Unknown change request: {change}')
             return
 
-        cur_sect.instruction_ids_ungrouped = new_ungrouped
+        cur_sect.inst_list = new_ungrouped
 
     def add_inst_sub_group(self, script, section, inst, parent_list, index, sub_group):
-        cur_sect = self.project.scripts[script].sections[section]
-        cur_group = cur_sect.instruction_ids_grouped
-        cur_inst = cur_sect.instructions[inst]
+        cur_sect = self.project.scts[script].sects[section]
+        cur_group = cur_sect.inst_tree
+        cur_inst = cur_sect.insts[inst]
         for parent in parent_list:
             cur_group = cur_group[parent]
 
         test_group = cur_group
-        if cur_inst.instruction_id == 3:
+        if cur_inst.base_id == 3:
             test_group = test_group[index]
             test_group = test_group[list(test_group.keys())[0]]
 
-        if cur_inst.instruction_id == 0:
+        if cur_inst.base_id == 0:
             sub_group = f'{inst}{sep}{sub_group}'
 
         if self._inst_sub_group_present(test_group, sub_group):
@@ -942,27 +943,27 @@ class SCTProjectFacade:
         case_goto.my_master_uuids.append(inst)
         cur_inst.my_goto_uuids.append(case_goto.ID)
 
-        cur_sect.instructions[case_goto.ID] = case_goto
+        cur_sect.insts[case_goto.ID] = case_goto
         case_goto.set_inst_id(10)
-        case_goto.parameters[0] = SCTParameter(0, 'int|jump')
-        case_goto.parameters[0].link = SCTLink('Jump', origin=-1, origin_trace=[section, case_goto.ID, 0],
-                                               target=-1, target_trace=[section, goto_target_uuid])
+        case_goto.params[0] = SCTParameter(0, 'int|jump')
+        case_goto.params[0].link = SCTLink('Jump', origin=-1, origin_trace=[section, case_goto.ID, 0],
+                                           target=-1, target_trace=[section, goto_target_uuid])
 
         switch_loop_params = {2: SCTParameter(2, 'int'), 3: SCTParameter(3, 'int|jump')}
         switch_loop_params[2].value = int(sub_group)
         switch_loop_params[3].link = SCTLink('Jump', origin=-1, origin_trace=[section, inst, f'0{sep}3'],
                                              target=-1, target_trace=[section, case_goto.ID])
 
-        cur_inst.loop_parameters.insert(0, switch_loop_params)
+        cur_inst.l_params.insert(0, switch_loop_params)
         cur_inst.links_out.insert(0, switch_loop_params[3].link)
-        cur_inst.parameters[1].set_value(cur_inst.parameters[1].value + 1)
+        cur_inst.params[1].set_value(cur_inst.params[1].value + 1)
 
         case_goto.links_in.append(switch_loop_params[3].link)
-        case_goto.links_out.append(case_goto.parameters[0].link)
-        cur_sect.instructions[goto_target_uuid].links_in.append(case_goto.parameters[0].link)
+        case_goto.links_out.append(case_goto.params[0].link)
+        cur_sect.insts[goto_target_uuid].links_in.append(case_goto.params[0].link)
 
-        inst_pos = cur_sect.instruction_ids_ungrouped.index(inst)
-        cur_sect.instruction_ids_ungrouped.insert(inst_pos + 1, case_goto.ID)
+        inst_pos = cur_sect.inst_list.index(inst)
+        cur_sect.inst_list.insert(inst_pos + 1, case_goto.ID)
         cur_group[index][list(cur_group[index].keys())[0]] = {sub_group: [case_goto.ID], **test_group}
 
     # --------------------------- #
@@ -970,10 +971,10 @@ class SCTProjectFacade:
     # --------------------------- #
 
     def get_inst_group(self, script, section, inst_uuid) -> Union[None, dict]:
-        cur_sect = self.project.scripts[script].sections[section]
-        parents, index = self.get_inst_grouped_parents_and_index(inst_uuid, cur_sect.instruction_ids_grouped)
+        cur_sect = self.project.scts[script].sects[section]
+        parents, index = self.get_inst_grouped_parents_and_index(inst_uuid, cur_sect.inst_tree)
 
-        cur_level = cur_sect.instruction_ids_grouped
+        cur_level = cur_sect.inst_tree
         for parent in parents:
             cur_level = cur_level[parent]
 
@@ -1078,10 +1079,10 @@ class SCTProjectFacade:
         return item_uuid
 
     def get_next_grouped_uuid(self, script, section, inst):
-        cur_sect = self.project.scripts[script].sections[section]
-        cur_inst = cur_sect.instructions[inst]
-        parents, index = self.get_inst_grouped_parents_and_index(inst, cur_sect.instruction_ids_grouped)
-        cur_group = cur_sect.instruction_ids_grouped
+        cur_sect = self.project.scts[script].sects[section]
+        cur_inst = cur_sect.insts[inst]
+        parents, index = self.get_inst_grouped_parents_and_index(inst, cur_sect.inst_tree)
+        cur_group = cur_sect.inst_tree
         for parent in parents:
             cur_group = cur_group[parent]
 
@@ -1092,8 +1093,8 @@ class SCTProjectFacade:
 
         if index + 1 < len(cur_group):
             # if cur_inst is an if/else/while
-            if cur_inst.instruction_id == 0:
-                my_goto = cur_sect.instructions[cur_inst.my_goto_uuids[0]]
+            if cur_inst.base_id == 0:
+                my_goto = cur_sect.insts[cur_inst.my_goto_uuids[0]]
                 if len(my_goto.links_out) == 0:
                     new_tgt_inst_uuid = self.get_inst_uuid_from_group_entry(cur_group[index + 1])
                 else:
@@ -1120,13 +1121,13 @@ class SCTProjectFacade:
 
     def remove_inst_links(self, script, section, inst, custom_tgt=None, remove_link=False,
                           direction: Literal['in', 'out', 'in out'] = 'in out'):
-        cur_sect = self.project.scripts[script].sections[section]
-        cur_inst = cur_sect.instructions[inst]
+        cur_sect = self.project.scts[script].sects[section]
+        cur_inst = cur_sect.insts[inst]
         if len(cur_inst.links_in) == 0 and len(cur_inst.links_out) == 0:
             return
 
-        parents, index = self.get_inst_grouped_parents_and_index(inst, cur_sect.instruction_ids_grouped)
-        cur_group = cur_sect.instruction_ids_grouped
+        parents, index = self.get_inst_grouped_parents_and_index(inst, cur_sect.inst_tree)
+        cur_group = cur_sect.inst_tree
         for parent in parents:
             cur_group = cur_group[parent]
 
@@ -1136,7 +1137,7 @@ class SCTProjectFacade:
             for link in cur_inst.links_in:
                 ori_sect = link.origin_trace[0]
                 ori_inst_uuid = link.origin_trace[1]
-                ori_inst = self.project.scripts[script].sections[ori_sect].instructions[ori_inst_uuid]
+                ori_inst = self.project.scts[script].sects[ori_sect].insts[ori_inst_uuid]
                 if new_tgt_inst_uuid is None or remove_link:
                     ori_inst.links_out.pop(ori_inst.links_out.index(link))
                 else:
@@ -1148,7 +1149,7 @@ class SCTProjectFacade:
             for link in cur_inst.links_out:
                 tgt_sect = link.target_trace[0]
                 tgt_inst_uuid = link.target_trace[1]
-                self.project.scripts[script].sections[tgt_sect].instructions[tgt_inst_uuid].links_in.remove(link)
+                self.project.scts[script].sects[tgt_sect].insts[tgt_inst_uuid].links_in.remove(link)
 
             cur_inst.links_out = []
 
@@ -1156,6 +1157,6 @@ class SCTProjectFacade:
     def change_link_tgt(tgt_sect: SCTSection, link: SCTLink, new_tgt_uuid: str, remove_from_tgt=True):
         prev_tgt_uuid = link.target_trace[1]
         if remove_from_tgt:
-            tgt_sect.instructions[prev_tgt_uuid].links_in.remove(link)
-        tgt_sect.instructions[new_tgt_uuid].links_in.append(link)
+            tgt_sect.insts[prev_tgt_uuid].links_in.remove(link)
+        tgt_sect.insts[new_tgt_uuid].links_in.append(link)
         link.target_trace[1] = new_tgt_uuid

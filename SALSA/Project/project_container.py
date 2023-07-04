@@ -1,4 +1,5 @@
 import uuid
+from copy import copy
 from itertools import count
 from dataclasses import dataclass, field as dc_field
 from typing import List, Union, Dict, Tuple, Literal
@@ -12,16 +13,16 @@ footer_str_id_prefix = 'FOOTER'
 
 
 @dataclass
-class Trace:
-    sct: str
+class SCTTrace:
     sect: str
     inst: str
     param: Union[None, int]
 
-    def __getitem__(self, item: Literal[0, 1, 2, 3]):
-        if item > 3:
-            raise IndexError('Index out of bounds: Trace has 4 attributes')
-        return [self.sct, self.sect, self.inst, self.param][item]
+    def __getitem__(self, item: Literal[0, 1, 2, ]):
+        if -1 < item < 3:
+            return [self.sect, self.inst, self.param][item]
+        else:
+            raise IndexError('Index out of bounds: Trace has only 4 attributes')
 
 
 @dataclass
@@ -121,20 +122,20 @@ class SCTInstruction:
     errors: List[Tuple[str, Union[int, str, bytearray]]]
     links_out: List[SCTLink]
     links_in: List[SCTLink]
-    parameters: Dict[int, SCTParameter]
-    loop_parameters: List[Dict[int, SCTParameter]]
+    params: Dict[int, SCTParameter]
+    l_params: List[Dict[int, SCTParameter]]
 
     def __init__(self):
         self.ID: str = str(uuid.uuid4()).replace('-', uuid_sep)
-        self.instruction_id = None
+        self.base_id = None
         self.absolute_offset = None
         self.skip_refresh = False
-        self.frame_delay_param = None
+        self.delay_param = None
         self.errors = []
         self.links_out = []
         self.links_in = []
-        self.parameters = {}
-        self.loop_parameters = []
+        self.params = {}
+        self.l_params = []
         self.condition = ''
         self.synopsis = ''
         self.ungrouped_position: int = -1
@@ -142,7 +143,7 @@ class SCTInstruction:
         self.my_master_uuids = []
 
     def set_inst_id(self, inst_id):
-        self.instruction_id = inst_id
+        self.base_id = inst_id
 
     def set_pos(self, inst_pos: int):
         self.absolute_offset = inst_pos
@@ -151,38 +152,38 @@ class SCTInstruction:
         self.errors.append(value)
 
     def add_parameter(self, param_id, param: SCTParameter):
-        self.parameters[param_id] = param
+        self.params[param_id] = param
         if len(param.errors) > 0:
             self.errors.append(('param', param_id))
 
     def add_loop_parameter(self, loop_param: Dict[int, SCTParameter]):
-        self.loop_parameters.append(loop_param)
+        self.l_params.append(loop_param)
         for p_id, param in loop_param.items():
             if len(param.errors) > 0:
-                self.errors.append((f'loop{sep}{len(self.loop_parameters)-1}{sep}param', p_id))
+                self.errors.append((f'loop{sep}{len(self.l_params) - 1}{sep}param', p_id))
 
     def get_links(self):
         return self.links_out if len(self.links_out) > 0 else None
 
     def generate_condition(self, var_aliases):
         # Only generate conditions for ifs and switches
-        if self.instruction_id not in (0, 3):
+        if self.base_id not in (0, 3):
             self.condition = ''
             return
 
         # if the instruction is a switch, just put the value of the choice address
-        if self.instruction_id == 3:
-            if self.parameters[0].value is None:
+        if self.base_id == 3:
+            if self.params[0].value is None:
                 self.condition = '???'
-            cond = self.parameters[0].value
+            cond = self.params[0].value
             self.condition = cond if isinstance(cond, str) else str(cond)
             return
 
         # if the instruction is a jmpif, work out a shorthand of the condition
-        if self.parameters[0].value is None:
+        if self.params[0].value is None:
             self.condition = '???'
             return
-        condition, cond_type = self._get_subconditions(self.parameters[0].value)
+        condition, cond_type = self._get_subconditions(self.params[0].value)
         condition = self.replace_vars_with_aliases(condition, var_aliases)
         self.condition = condition
 
@@ -233,30 +234,30 @@ class SCTInstruction:
         return cond_out
 
     def __repr__(self):
-        return f'{self.instruction_id}'
+        return f'{self.base_id}'
 
 
 class SCTSection:
 
-    instruction_ids_grouped: List[Union[str, Dict[str, Union[list, dict, str]]]]
+    inst_tree: List[Union[str, Dict[str, Union[list, dict, str]]]]
     type: str
     inst_errors: List[int]
     errors: List[str]
     strings: Dict[int, str]
-    instructions_used: Dict[int, int]
+    insts_used: Dict[int, int]
     garbage: Dict[str, bytearray]
 
     def __init__(self):
-        self.instruction_ids_ungrouped = []
         self.name = None
         self.length = None
         self.absolute_offset = None
-        self.instructions: Dict[str, SCTInstruction] = {}
-        self.instruction_ids_grouped = []
+        self.insts: Dict[str, SCTInstruction] = {}
+        self.inst_tree = []
+        self.inst_list = []
         self.inst_errors = []
         self.errors = []
         self.strings = {}
-        self.instructions_used = {}
+        self.insts_used = {}
         self.garbage = {}
         self.string = ''
         self.jump_loops = []
@@ -275,11 +276,11 @@ class SCTSection:
         self.string = string
 
     def add_instruction(self, instruction: SCTInstruction):
-        self.instructions[instruction.ID] = instruction
-        self.instruction_ids_ungrouped.append(instruction.ID)
-        if instruction.instruction_id not in self.instructions_used.keys():
-            self.instructions_used[instruction.instruction_id] = 0
-        self.instructions_used[instruction.instruction_id] += 1
+        self.insts[instruction.ID] = instruction
+        self.inst_list.append(instruction.ID)
+        if instruction.base_id not in self.insts_used.keys():
+            self.insts_used[instruction.base_id] = 0
+        self.insts_used[instruction.base_id] += 1
 
     def set_type(self, t: str):
         self.type = t
@@ -294,10 +295,10 @@ class SCTSection:
         self.jump_loops.append(loop_id)
 
     def get_inst_list(self, style):
-        return self.instruction_ids_grouped if style == 'grouped' else self.instruction_ids_ungrouped
+        return self.inst_tree if style == 'grouped' else self.inst_list
 
     def get_instruction_by_index(self, pos):
-        return self.instructions[self.instruction_ids_ungrouped[pos]]
+        return self.insts[self.inst_list[pos]]
 
 
 class SCTScript:
@@ -308,7 +309,7 @@ class SCTScript:
         'byte': '0x80310a1c'
     }
 
-    sections: Dict[str, SCTSection]
+    sects: Dict[str, SCTSection]
     section_groups: Dict[str, List[str]]
     section_group_keys: Dict[str, str]
     inst_locations: List[List[str]]
@@ -321,15 +322,15 @@ class SCTScript:
 
     def __init__(self, name: str, index: Union[None, Dict[str, Tuple[int, int]]] = None,
                  header: Union[None, bytearray] = None):
-        self.folded_sections = {}
+        self.folded_sects = {}
         self.name = name
         self.index = {k: v[0] for k, v in index.items()} if index is not None else {}
         self.header = header
-        self.sections = {}
+        self.sects = {}
         self.section_groups = {}
         self.section_group_keys = {}
-        self.sections_grouped = []
-        self.sections_ungrouped = []
+        self.sect_tree = []
+        self.sect_list = []
         self.inst_locations = [[] for _ in range(266)]
         self.links = []
         self.links_to_sections = {}
@@ -346,9 +347,9 @@ class SCTScript:
 
     def add_section(self, section: SCTSection):
         name = section.name
-        self.sections[name] = section
-        self.sections_ungrouped.append(name)
-        inst_list = self.sections[name].instructions_used.keys()
+        self.sects[name] = section
+        self.sect_list.append(name)
+        inst_list = self.sects[name].insts_used.keys()
         for inst in inst_list:
             self.inst_locations[inst].append(name)
         if len(section.errors) > 0:
@@ -365,21 +366,24 @@ class SCTScript:
 
     def get_sect_list(self, style):
         if style == 'grouped':
-            return self.sections_grouped
-        return [section.name for section in self.sections.values() if section.type != 'String']
+            return self.sect_tree
+        return [sect.name for sect in self.sects.values() if sect.type != 'String']
 
 
 class SCTProject:
 
     file_name: str
-    scripts: Dict[str, SCTScript]
-    version = 1
+    scts: Dict[str, SCTScript]
+
+    # NOTE: version numbers should change only when the master branch is updated.
+    cur_version = 2
 
     def __init__(self):
-        self.scripts = {}
+        self.scts = {}
         self.file_name = 'Untitled.prj'
         self.filepath = None
         self.global_variables = {'BitVar': {}, 'IntVar': {}, 'ByteVar': {}, 'FloatVar': {}}
+        self.version = copy(self.cur_version)
 
     def add_script(self, filename: str, script: SCTScript):
-        self.scripts[filename] = script
+        self.scts[filename] = script

@@ -13,14 +13,14 @@ from SALSA.BaseInstructions.bi_defaults import loop_count_name
 default_headers = {
     'script': ['name'],
     'section': ['name'],
-    'instruction': ['ungrouped_position', 'name', 'condition', 'frame_delay_param', 'skip_refresh', 'instruction_id'],
+    'instruction': ['ungrouped_position', 'name', 'condition', 'delay_param', 'skip_refresh', 'base_id'],
     'parameter': ['ID', 'name', 'type', 'value']
 }
 
 default_header_order = {
     'script': ['name', 'section_num'],
     'section': ['name', 'absolute_offset'],
-    'instruction': ['ungrouped_position', 'name', 'condition', 'instruction_id', 'frame_delay_param',
+    'instruction': ['ungrouped_position', 'name', 'condition', 'base_id', 'delay_param',
                     'skip_refresh', 'synopsis', 'absolute_offset'],
     'parameter': ['ID', 'name', 'type', 'value', 'formatted_value'],
 }
@@ -38,8 +38,8 @@ header_settings = {
         'ungrouped_position': {'label': 'Pos', 'width': 180, 'stretch': True},
         'name': {'label': 'Name', 'width': 180, 'stretch': True},
         'condition': {'label': 'Condition', 'width': 300, 'stretch': True},
-        'instruction_id': {'label': 'ID', 'width': 40, 'stretch': False},
-        'frame_delay_param': {'label': 'Delay', 'width': 50, 'stretch': False},
+        'base_id': {'label': 'ID', 'width': 40, 'stretch': False},
+        'delay_param': {'label': 'Delay', 'width': 50, 'stretch': False},
         'skip_refresh': {'label': 'SR', 'width': 50, 'stretch': False},
         'synopsis': {'label': 'Synopsis', 'width': 50, 'stretch': True},
         'absolute_offset': {'label': 'Offset', 'width': 100, 'stretch': True}
