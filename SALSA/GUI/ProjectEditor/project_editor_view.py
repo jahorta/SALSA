@@ -59,6 +59,7 @@ default_tree_anchor = tk.W
 default_tree_stretch = False
 default_tree_label = ''
 
+
 class ProjectEditorView(ttk.Frame):
 
     log_name = 'PrjEditorView'
