@@ -28,9 +28,22 @@ class SCTProjectFacade:
         self.cur_script = None
 
     def load_project(self, prj: SCTProject):
-        if prj.version != SCTProject.version:
-            return
+        # version numbers were not given for the first version
+        if getattr(prj, 'version', None) is None:
+            prj.version = 1
+
+        # Check that the loaded project is the current version and update if possible
+        if prj.version != SCTProject.cur_version:
+            if prj.version < SCTProject.cur_version:
+                prj = ProjectUpdater.update_project(prj)
+            else:
+                print(f'{self.log_key}: This project was created in a newer version of SALSA. '
+                      f'Please update SALSA to read this project.'
+                      f'\n(project version: {prj.version}, SALSA project version: {SCTProject.cur_version})')
+                return False
+
         self.project = prj
+        return True
 
     def create_new_project(self):
         self.project = SCTProject()
