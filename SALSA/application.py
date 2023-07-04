@@ -193,10 +193,13 @@ class Application(tk.Tk):
     def _continue_load_project(self, filepath):
         prj = self.proj_model.load_project(filepath=filepath)
         self.proj_model.add_recent_file(filepath=filepath)
+        success = self.project.load_project(prj)
+        if not success:
+            self.gui.show_status_popup(title='Loading Project', msg=f'Project load failed :(')
+            self.gui.scpt_view.after(1000, self.gui.stop_status_popup)
+            return
         self.menu.update_recents(self.proj_model.get_recent_filenames())
-        self.project.load_project(prj)
         self.project_edit_controller.load_project()
-        self.gui.stop_status_popup()
 
         self.gui.enable_script_view()
         self.gui.toggle_frame_state(self.project_edit_view.inst_frame, 'disabled')
