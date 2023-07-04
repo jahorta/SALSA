@@ -208,7 +208,7 @@ class SCTEncoder:
         inst_pos = -1
         if instruction.delay_param is not None or instruction.delay_param == 0:
             self.sct_body.extend(self._make_word(129))
-            base_param = self.bi.get_inst(129).parameters[0]
+            base_param = self.bi.get_inst(129).params[0]
             self._encode_param(param=instruction.delay_param, base_param=base_param, trace=[*trace, str(-1)])
             delay_pos = len(self.sct_body)
             self.sct_body.extend(b'0000')
@@ -225,7 +225,7 @@ class SCTEncoder:
                 if p_id == base_inst.loop_iter:
                     loop_iter_param_location = len(self.sct_body)
                     loop_iter_param_value = instruction.params[p_id].value
-            self._encode_param(param=instruction.params[p_id], base_param=base_inst.parameters[p_id],
+            self._encode_param(param=instruction.params[p_id], base_param=base_inst.params[p_id],
                                trace=[*trace, str(p_id)])
 
         do_loop = True
@@ -249,7 +249,7 @@ class SCTEncoder:
         if do_loop:
             for i, loop in enumerate(instruction.l_params):
                 for p_id, param in loop.items():
-                    self._encode_param(param=loop[p_id], base_param=base_inst.parameters[p_id],
+                    self._encode_param(param=loop[p_id], base_param=base_inst.params[p_id],
                                        trace=[*trace, f'{i}|{p_id}'])
 
                     # Check internal loop conditions
@@ -283,7 +283,7 @@ class SCTEncoder:
                 self._sct_body_insert_hex(location=loop_iter_param_location, value=self._make_word(loop_iters_performed))
 
         for p_id in base_inst.params_after:
-            self._encode_param(param=instruction.params[p_id], base_param=base_inst.parameters[p_id],
+            self._encode_param(param=instruction.params[p_id], base_param=base_inst.params[p_id],
                                trace=[*trace, str(p_id)])
 
         # add garbage at then of instruction if needed

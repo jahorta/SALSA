@@ -412,7 +412,7 @@ class SCTDecoder:
         self._cursor += 1
 
         # decode parameters
-        parameters = copy.deepcopy(base_inst.parameters)
+        parameters = copy.deepcopy(base_inst.params)
         loop_parameters = []
         hasLoop = base_inst.loop is not None
         if hasLoop:

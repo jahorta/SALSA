@@ -17,7 +17,7 @@ def description_insert_param_values(inst: SCTInstruction, base_inst: BaseInst):
         desc = desc.replace('<loop>', get_loop_desc(inst, base_inst))
     paramSets = {}
     for key, param in inst.params.items():
-        paramSets[base_inst.parameters[key].name] = param.formatted_value
+        paramSets[base_inst.params[key].name] = param.formatted_value
     for key, value in paramSets.items():
         keyword = f'<{key}>'
         result = str(value)
@@ -221,7 +221,7 @@ def replace_vars_with_locs(param1: str, **kwargs):
 def get_parameter_string(param_name, inst: SCTInstruction, base_inst: BaseInst, callbacks):
     string_id = None
     for param in inst.params.values():
-        if base_inst.parameters[param.ID].name == param_name:
+        if base_inst.params[param.ID].name == param_name:
             string_id = param.linked_string
     if string_id is None:
         return f'No string found for parameter {param_name}'

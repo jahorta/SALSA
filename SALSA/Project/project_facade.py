@@ -161,7 +161,7 @@ class SCTProjectFacade:
         inst = self.project.scts[script].sects[section].insts[instruction]
         base_inst = self.base_insts.get_inst(inst.base_id)
 
-        tree = self._create_tree(inst.params, base_inst.params_before, headings, base=base_inst.parameters,
+        tree = self._create_tree(inst.params, base_inst.params_before, headings, base=base_inst.params,
                                  base_key='ID')
 
         for param in base_inst.params_before:
@@ -188,7 +188,7 @@ class SCTProjectFacade:
         for loop, params in enumerate(inst.l_params):
             temp_tree = self._create_tree(params, [f'loop{loop}'], headings, key_only=True)
             temp_tree += ['group']
-            loop_items = self._create_tree(params, base_inst.loop, headings, base=base_inst.parameters, base_key='ID')
+            loop_items = self._create_tree(params, base_inst.loop, headings, base=base_inst.params, base_key='ID')
             for item in loop_items:
                 if 'row_data' not in item:
                     continue
@@ -197,7 +197,7 @@ class SCTProjectFacade:
             temp_tree += ['ungroup']
             tree += temp_tree
 
-        tree += self._create_tree(inst.params, base_inst.params_after, headings, base=base_inst.parameters,
+        tree += self._create_tree(inst.params, base_inst.params_after, headings, base=base_inst.params,
                                   base_key='ID')
 
         return tree
@@ -424,10 +424,10 @@ class SCTProjectFacade:
 
     def get_base_parameter(self, inst_id, param_str):
         if param_str == 'delay':
-            return self.base_insts.get_inst(129).parameters[0]
+            return self.base_insts.get_inst(129).params[0]
         param_parts = param_str.split(sep)
         b_param_id = param_parts[-1]
-        return self.base_insts.get_inst(inst_id).parameters[int(b_param_id)]
+        return self.base_insts.get_inst(inst_id).params[int(b_param_id)]
 
     def get_inst_is_removable(self, script, section, instruction, **kwargs):
         cur_sect = self.project.scts[script].sects[section]
@@ -474,7 +474,7 @@ class SCTProjectFacade:
         inst = self.project.scts[script].sects[section].insts[instruction]
         loop = {}
         for param_id in self.base_insts.get_inst(inst.base_id).loop:
-            base_param = self.base_insts.get_inst(inst.base_id).parameters[param_id]
+            base_param = self.base_insts.get_inst(inst.base_id).params[param_id]
             loop_param = SCTParameter(param_id, base_param.type)
             loop_param.set_value(base_param.default_value)
             loop[int(param_id)] = loop_param
@@ -491,7 +491,7 @@ class SCTProjectFacade:
         return True
 
     def update_loop_param_num(self, inst):
-        for key, param in self.base_insts.get_inst(inst.base_id).parameters.items():
+        for key, param in self.base_insts.get_inst(inst.base_id).params.items():
             if loop_count_name in param.type:
                 inst.params[int(key)].set_value(len(inst.l_params))
 
@@ -661,7 +661,7 @@ class SCTProjectFacade:
         base_inst = self.base_insts.get_inst(int(new_id))
 
         for i in [*base_inst.params_before, *base_inst.params_after]:
-            base_param = base_inst.parameters[i]
+            base_param = base_inst.params[i]
             new_param = SCTParameter(base_param.param_ID, base_param.type)
             if base_param.default_value == 'override':
                 new_param.set_value('override', get_scpt_override(base_param.type))

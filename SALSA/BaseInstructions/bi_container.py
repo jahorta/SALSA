@@ -101,23 +101,23 @@ class BaseInst:
         self.param2 = inst_values['Hard parameter two']
         self.default_notes = ''
         self.user_notes = None
-        self.parameters = {}
+        self.params = {}
         for key, param in inst_values['Parameters'].items():
             link_type = None
             if self.link is not None:
                 if self.link == key:
                     link_type = self.link_type
-            self.parameters[key] = BaseParam(param_id=key, param_dict=param, default_name=f'Unknown{key}', link_type=link_type)
+            self.params[key] = BaseParam(param_id=key, param_dict=param, default_name=f'Unknown{key}', link_type=link_type)
 
         self.loop = inst_values.get('Loop', None)
         self.loop_iter = inst_values.get('Loop Iterations', None)
         self.loop_cond = inst_values.get('Loop Break Condition', None)
 
-        self.params_before = list(self.parameters.keys()) if self.loop is None else []
+        self.params_before = list(self.params.keys()) if self.loop is None else []
         self.params_after = []
         hit_loop = False
         if self.loop is not None:
-            for p in list(self.parameters.keys()):
+            for p in list(self.params.keys()):
                 if p in self.loop:
                     hit_loop = True
                     continue
@@ -137,7 +137,7 @@ class BaseInst:
             for key, param_details in updated_details['Parameters'].items():
                 if isinstance(key, str):
                     key = int(key)
-                self.parameters[key].set_parameter_details(param_details=param_details)
+                self.params[key].set_parameter_details(param_details=param_details)
 
         if user_id == 'default':
             self.default_notes = updated_details.get('Notes', '')
@@ -148,7 +148,7 @@ class BaseInst:
 
     def set_inst_field(self, field, value, param_id=None):
         if param_id is not None:
-            return self.parameters[int(param_id)].set_parameter_detail(field, value)
+            return self.params[int(param_id)].set_parameter_detail(field, value)
         if locked_conversions['instruction'][field] not in self.locked_fields:
             self.__setattr__(field, value)
 
@@ -160,7 +160,7 @@ class BaseInst:
             fields['Description'] = self.description
         fields['Notes'] = self.default_notes
         params = {}
-        for key, param in self.parameters.items():
+        for key, param in self.params.items():
             p_dict = param.get_fields()
             if len(p_dict) > 0:
                 params[key] = p_dict
@@ -170,7 +170,7 @@ class BaseInst:
 
     def get_param_names(self, param_list):
         names = {}
-        for param in self.parameters.values():
+        for param in self.params.values():
             if int(param.param_ID) in param_list:
                 names[int(param.param_ID)] = param.name
         return names
@@ -186,7 +186,7 @@ class BaseInst:
             return_diffs['Description'] = self.description
         return_diffs['Notes'] = self.user_notes
         parameter_diffs = {}
-        for key, param in self.parameters.items():
+        for key, param in self.params.items():
             diffs = param.get_differences(other_inst.params[key])
             if len(diffs) > 0:
                 parameter_diffs[key] = diffs
@@ -201,9 +201,9 @@ class BaseInstLib:
 
     def __init__(self):
         self.insts = [BaseInst(k, v) for k, v in inst_defaults.items()]
-        insts_with_a_parameter = [_ for _ in self.insts if len(_.parameters) > 0]
-        self.p1_scpt = [_.instruction_id for _ in insts_with_a_parameter if 'scpt' in _.parameters[0].type]
-        self.p1_int = [_.instruction_id for _ in insts_with_a_parameter if 'int' in _.parameters[0].type]
+        insts_with_a_parameter = [_ for _ in self.insts if len(_.params) > 0]
+        self.p1_scpt = [_.instruction_id for _ in insts_with_a_parameter if 'scpt' in _.params[0].type]
+        self.p1_int = [_.instruction_id for _ in insts_with_a_parameter if 'int' in _.params[0].type]
 
     def get_differences(self, other_lib):
         other_lib: BaseInstLib

@@ -181,7 +181,7 @@ class InstructionEditorController:
                 if sep in field:
                     field_parts = field.split(sep)
                     param_id = int(field_parts[0])
-                    if value != getattr(base_details.parameters[param_id], field_parts[1], None):
+                    if value != getattr(base_details.params[param_id], field_parts[1], None):
                         add = True
                 else:
                     if value != getattr(base_details, field, None):
@@ -196,7 +196,7 @@ class InstructionEditorController:
         return self.inst_lib.get_user_type()
 
     def show_param_editor(self, param_id, column_id):
-        self.param_editor.show_param_editor(None, self.inst_lib.get_inst(self.cur_inst).parameters[int(param_id)], param_id, column_id)
+        self.param_editor.show_param_editor(None, self.inst_lib.get_inst(self.cur_inst).params[int(param_id)], param_id, column_id)
 
     def add_param_editor_change(self, param_id, column_id, value):
         self.view.set_value(param_id, column_id, value)
