@@ -82,7 +82,7 @@ class GUIController:
 
             # tk containers and tk fields with no state
             elif child_type in (
-            tk.Frame, tk.LabelFrame, tk.Message, tk.Menu, tk.Menubutton, w.ScrollFrame, w.ScrollLabelFrame):
+            tk.Frame, tk.LabelFrame, tk.Message, tk.Menu, tk.Menubutton, w.ScrollFrame, w.ScrollLabelFrame, tk.Toplevel):
                 self.recursive_toggle(child, state)
 
             # ttk widgets
