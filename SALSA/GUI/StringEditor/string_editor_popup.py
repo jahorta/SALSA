@@ -1,8 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from SALSA.Common.setting_class import settings
-from SALSA.GUI.widgets import DataTreeview
+from SALSA.GUI.Widgets.data_treeview import DataTreeview
 from SALSA.GUI.themes import dark_theme, light_theme
 
 tree_settings = {

@@ -4,8 +4,9 @@ from tkinter import ttk
 from typing import Union, TypedDict, Literal
 import webbrowser
 
+from SALSA.GUI.Widgets.data_treeview import DataTreeview
 from SALSA.GUI.themes import light_theme, dark_theme
-from SALSA.GUI import widgets as w
+from SALSA.GUI.Widgets import widgets as w
 from SALSA.GUI.AnalysisPopup.analysis_controller import AnalysisController
 from SALSA.GUI.InstructionEditor.instruction_editor_controller import InstructionEditorController
 from SALSA.GUI.other_popups import AboutView
@@ -87,7 +88,7 @@ class GUIController:
 
             # ttk widgets
             elif type(child) in (
-            ttk.Button, ttk.Checkbutton, w.DataTreeview, ttk.Treeview, ttk.Scrollbar, ttk.Label, ttk.Separator):
+            ttk.Button, ttk.Checkbutton, DataTreeview, ttk.Treeview, ttk.Scrollbar, ttk.Label, ttk.Separator):
                 ttk_state = state
                 ttk_state = ttk_state if ttk_state != 'normal' else '!disabled'
                 child.state([ttk_state])

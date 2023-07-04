@@ -1,4 +1,4 @@
-from Project.Updater.pu_constants import PP, UP
+from SALSA.Project.Updater.pu_constants import PP, UP
 
 v2 = {
     PP.project: {

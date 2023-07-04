@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from SALSA.GUI import widgets as w
+from SALSA.GUI.Widgets import widgets as w
 
 
 class AnalysisView(tk.Toplevel):

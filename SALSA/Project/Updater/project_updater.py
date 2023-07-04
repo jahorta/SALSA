@@ -1,8 +1,8 @@
 import copy
 from typing import Union
 
-from Project.Updater.pu_constants import p_attrs, p_levels, UP, PP, loop_attrs, nd_index
-from Project.Updater.pu_definitions import update_tasks, p_max_depth
+from SALSA.Project.Updater.pu_constants import p_attrs, p_levels, UP, PP, loop_attrs, nd_index
+from SALSA.Project.Updater.pu_definitions import update_tasks, p_max_depth
 from SALSA.Project.project_container import SCTProject, SCTScript, SCTSection, SCTParameter, SCTInstruction, SCTLink
 
 

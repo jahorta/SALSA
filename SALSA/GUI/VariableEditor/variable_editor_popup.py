@@ -4,8 +4,7 @@ from typing import Tuple, List
 
 from SALSA.GUI.themes import dark_theme, light_theme
 from SALSA.Common.setting_class import settings
-from SALSA.GUI import widgets as w
-
+from SALSA.GUI.Widgets import widgets as w
 
 no_alias = '               '
 
@@ -58,7 +57,7 @@ class VariablePopup(tk.Toplevel):
 
         tree_callbacks = {'select': self.script_select}
 
-        self.script_tree = w.DataTreeview(script_frame, 'script', tree_callbacks, return_none=True)
+        self.script_tree = DataTreeview(script_frame, 'script', tree_callbacks, return_none=True)
         anchor = tk.CENTER
         self.script_tree.heading('#0', text='Script', anchor=anchor)
         self.script_tree.column('#0', anchor=anchor, minwidth=10, width=100, stretch=True)
@@ -87,7 +86,7 @@ class VariablePopup(tk.Toplevel):
             tree_frame.rowconfigure(0, weight=1)
             tree_frame.columnconfigure(0, weight=1)
             columns = list(header_settings.keys())[1:]
-            self.var_trees[tree_name] = w.DataTreeview(tree_frame, name=tree_name, columns=columns, can_open=False,
+            self.var_trees[tree_name] = DataTreeview(tree_frame, name=tree_name, columns=columns, can_open=False,
                                                        selectmode='extended')
             self.var_trees[tree_name].grid(row=0, column=0, sticky='NSEW')
             first = True

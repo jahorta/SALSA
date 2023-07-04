@@ -2,7 +2,8 @@ import json
 import tkinter as tk
 from tkinter import ttk
 
-import SALSA.GUI.widgets as w
+import SALSA.GUI.Widgets.widgets as w
+from SALSA.GUI.Widgets.data_treeview import DataTreeview
 from SALSA.Common.setting_class import settings
 
 
@@ -66,7 +67,7 @@ class InstructionSelectorWidget(ttk.Frame):
         r_callbacks = {
             'select': self.select_inst
         }
-        self.result_dropdown = w.DataTreeview(parent, name='result', callbacks=r_callbacks)
+        self.result_dropdown = DataTreeview(parent, name='result', callbacks=r_callbacks)
         self.result_dropdown.place(x=x, y=y, anchor='nw')
         self.result_dropdown.heading('#0', text='Relevant Instructions')
         self.result_dropdown.configure(show='tree')

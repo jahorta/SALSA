@@ -2,13 +2,13 @@ from typing import Union, Dict, Literal
 import tkinter as tk
 from tkinter import messagebox, ttk
 
+from SALSA.GUI.Widgets.data_treeview import DataTreeview
 from SALSA.Common.constants import sep
 from SALSA.GUI.fonts_used import SALSAFont
 from SALSA.GUI.ProjectEditor.instruction_selector import InstructionSelectorWidget
 from SALSA.GUI.ParamEditorPopups.param_editor_controller import ParamEditController
 from SALSA.Common.setting_class import settings
 from SALSA.GUI.ProjectEditor.project_editor_view import ProjectEditorView
-from SALSA.GUI.widgets import DataTreeview
 from SALSA.Project.project_facade import SCTProjectFacade
 from SALSA.Project.project_container import SCTLink
 

@@ -1,7 +1,7 @@
 import copy
 from typing import Union, Tuple, Literal
 
-from Project.Updater.project_updater import ProjectUpdater
+from SALSA.Project.Updater.project_updater import ProjectUpdater
 from SALSA.BaseInstructions.bi_defaults import loop_count_name
 from SALSA.Common.script_string_utils import SAstr_to_head_and_body, head_and_body_to_SAstr
 from SALSA.Project.description_formatting import format_description

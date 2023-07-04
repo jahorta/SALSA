@@ -1,13 +1,12 @@
 import tkinter as tk
-from tkinter.scrolledtext import ScrolledText
 from tkinter import ttk
 import json
 
 from SALSA.GUI.themes import dark_theme, light_theme
-from SALSA.GUI.widgets import ScrollLabelFrame
+from SALSA.GUI.Widgets.widgets import ScrollLabelFrame
 from SALSA.Common.setting_class import settings
 from SALSA.Common.constants import sep
-from SALSA.GUI import widgets as w
+from SALSA.GUI.Widgets import widgets as w
 
 default_headers = {
     'instruction': ['inst_ID', 'name'],
