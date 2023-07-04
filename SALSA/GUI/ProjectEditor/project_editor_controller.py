@@ -143,7 +143,7 @@ class ProjectEditorController:
             for entry in entries:
                 if not isinstance(entry, dict):
                     continue
-                entry['frame_delay_param'] = '*' if entry['frame_delay_param'] != 'None' else ''
+                entry['delay_param'] = '*' if entry['delay_param'] != 'None' else ''
                 entry['skip_refresh'] = '*' if entry['skip_refresh'] == 'True' else ''
 
         return entries
