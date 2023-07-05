@@ -1,6 +1,7 @@
 import copy
 from typing import Union
 
+from SALSA.Common.constants import sep
 from SALSA.Project.Updater.pu_constants import p_attrs, p_levels, UP, PP, loop_attrs, nd_index
 from SALSA.Project.Updater.pu_definitions import update_tasks, p_max_depth
 from SALSA.Project.project_container import SCTProject, SCTScript, SCTSection, SCTParameter, SCTInstruction, SCTLink
@@ -110,6 +111,26 @@ class ProjectUpdater:
                 new_attr = change[1]
                 setattr(cur_piece, new_attr, getattr(cur_piece, old_attr))
                 cur_piece.__delattr__(old_attr)
+        return cur_piece
+
+    # -------------------------- #
+    # Section specific functions #
+    # -------------------------- #
+
+    @staticmethod
+    def _modify_section_groups_v1(cur_piece: SCTScript):
+        changes = {}
+        for i, entry in enumerate(cur_piece.sect_tree):
+            if not isinstance(entry, dict):
+                continue
+            new_entry = {}
+            for k, v in entry.items():
+                if k == v[0]:
+                    new_entry[f'{k}{sep}group'] = v[1:]
+            changes[i] = new_entry
+        for pos, entry in changes.items():
+            cur_piece.sect_tree.pop(pos)
+            cur_piece.sect_tree.insert(pos, entry)
         return cur_piece
 
 

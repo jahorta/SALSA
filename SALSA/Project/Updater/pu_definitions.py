@@ -19,6 +19,9 @@ v2 = {
                 ('folded_sections', 'folded_sects')
             ]
         },
+        2: {
+            UP.callable: '_modify_section_groups_v1',
+        },
     },
     PP.section: {
         1: {
