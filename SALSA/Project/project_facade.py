@@ -535,6 +535,8 @@ class SCTProjectFacade:
         self.add_inst_sub_group(script, section, instruction, parent_list, index, str(next_case))
         self.update_loop_param_num(cur_sect.insts[instruction])
 
+        self.callbacks['set_change']()
+
     def remove_switch_case(self, script, section, instruction, case, result, **kwargs):
         return self.change_inst(script, section, instruction, case=case, change_type=result)
 
@@ -821,6 +823,8 @@ class SCTProjectFacade:
 
         cur_inst.generate_condition(self.get_script_variables_with_aliases(script))
         self._refresh_inst_positions(script, section)
+
+        self.callbacks['set_change']()
 
         return True
 
