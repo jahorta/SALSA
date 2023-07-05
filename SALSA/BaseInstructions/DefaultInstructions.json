@@ -2543,8 +2543,8 @@
     }
   },
   "153": {
-    "Name": "??noname",
-    "Description": "iterations: <iter>\nloop:\n<loop>",
+    "Name": "Set Vibration",
+    "Description": "Appears to set the vibration to a values based on the loops below\n\niterations: <iter>\n\nloop:\n<loop>\n",
     "Notes": "Only runs if param1 & 1 == 1:\n\n1: int\n\nloop ((1) iterations):\n  params:\n  2: scpt-byte\n  3: scpt-byte\n  4: scpt-short\n  (May break early if (4) == 0)",
     "Parameters": {
       "1": {
