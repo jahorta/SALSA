@@ -213,6 +213,24 @@ def theme_generator(colors: Colors):
                 "highlightthickness": 2,
             }
         },
+        "drag.Ttoplevel": {
+            "configure": {
+                "background": colors.bg,
+                "highlightbackground": colors.bg,
+                "highlightcolor": colors.bg,
+                "highlightthickness": 0,
+            }
+        },
+        # Treeview configuration for the next three items
+        "drag.Treeview": {
+            "configure": {
+                "background": colors.bg_internal,
+                "foreground": colors.text,
+                "fieldbackground": colors.bg_internal,
+                "lightcolor": colors.bg_internal,
+                "darkcolor": colors.bg_internal
+            },
+        },
     }
 
 
