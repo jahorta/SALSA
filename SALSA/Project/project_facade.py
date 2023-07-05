@@ -375,7 +375,7 @@ class SCTProjectFacade:
     # ----------------------------- #
 
     def get_section_list(self, script):
-        return list(self.project.scts[script].sects.keys())
+        return self.project.scts[script].sect_list
 
     def get_inst_list(self, script, section, goto_uuid=None):
         cur_sect = self.project.scts[script].sects[section]
@@ -442,10 +442,10 @@ class SCTProjectFacade:
         cur_inst_id = self.project.scts[script].sects[section].insts[instruction].base_id
         return self.base_insts.get_inst(cur_inst_id).loop is not None
 
-    def is_switch(self, script, section, instruction, **kwargs):
+    def inst_is_switch(self, script, section, instruction, **kwargs):
         return self.project.scts[script].sects[section].insts[instruction].base_id == 3
 
-    def is_group(self, script, section, instruction, **kwargs):
+    def inst_is_group(self, script, section, instruction, **kwargs):
         return self.project.scts[script].sects[section].insts[instruction].base_id in (0, 3)
 
     # ------------------------ #
@@ -527,7 +527,7 @@ class SCTProjectFacade:
 
     def add_switch_case(self, script, section, instruction, **kwargs):
         cur_sect = self.project.scts[script].sects[section]
-        parent_list, index = self.get_inst_grouped_parents_and_index(grouped_region=cur_sect.inst_tree, inst=instruction)
+        parent_list, index = self.get_grouped_parents_and_index(grouped_region=cur_sect.inst_tree, inst=instruction)
         cases = [int(loop[2].value) for loop in cur_sect.insts[instruction].l_params]
         next_case = -1
         while next_case in cases:
@@ -579,7 +579,7 @@ class SCTProjectFacade:
         inst_sect = self.project.scts[script].sects[section]
         inst_sect.insts[new_inst.ID] = new_inst
 
-        inst_parents, index = self.get_inst_grouped_parents_and_index(ref_inst_uuid, inst_sect.inst_tree)
+        inst_parents, index = self.get_grouped_parents_and_index(ref_inst_uuid, inst_sect.inst_tree)
 
         cur_group = inst_sect.inst_tree
         for key in inst_parents:
@@ -648,7 +648,7 @@ class SCTProjectFacade:
             custom_link_tgt = self.get_next_grouped_uuid(script, section, inst)
             for goto in cur_inst.my_goto_uuids:
                 if case is not None:
-                    parents, index = self.get_inst_grouped_parents_and_index(goto, cur_section.inst_tree)
+                    parents, index = self.get_grouped_parents_and_index(goto, cur_section.inst_tree)
                     if parents[-1] != case:
                         continue
 
@@ -698,7 +698,7 @@ class SCTProjectFacade:
             for i in reversed(finished_change_indexes):
                 changes.pop(i)
 
-        parent_list, index = self.get_inst_grouped_parents_and_index(inst, cur_section.inst_tree)
+        parent_list, index = self.get_grouped_parents_and_index(inst, cur_section.inst_tree)
 
         if index is None:
             print(f'{self.log_key}: instruction not found in grouped instructions...')
@@ -901,7 +901,7 @@ class SCTProjectFacade:
             cur_sect.inst_list) - 1 else []
 
         # Remove instructions from current place in grouped in new temp grouped
-        parents, grouped_ind = self.get_inst_grouped_parents_and_index(inst, cur_sect.inst_tree)
+        parents, grouped_ind = self.get_grouped_parents_and_index(inst, cur_sect.inst_tree)
 
         cur_temp_group = cur_sect.inst_tree
         for parent in parents:
@@ -1040,7 +1040,7 @@ class SCTProjectFacade:
 
     def get_inst_group(self, script, section, inst_uuid) -> Union[None, dict]:
         cur_sect = self.project.scts[script].sects[section]
-        parents, index = self.get_inst_grouped_parents_and_index(inst_uuid, cur_sect.inst_tree)
+        parents, index = self.get_grouped_parents_and_index(inst_uuid, cur_sect.inst_tree)
 
         cur_level = cur_sect.inst_tree
         for parent in parents:
@@ -1058,7 +1058,7 @@ class SCTProjectFacade:
 
         return group
 
-    def get_inst_grouped_parents_and_index(self, inst, grouped_region, parents=None) -> (list, int):
+    def get_grouped_parents_and_index(self, inst, grouped_region, parents=None) -> (list, int):
         if parents is None:
             parents = []
 
@@ -1067,7 +1067,7 @@ class SCTProjectFacade:
 
         if isinstance(grouped_region, dict):
             for key, value in grouped_region.items():
-                out_parents, index = self.get_inst_grouped_parents_and_index(inst, value, parents=parents + [key])
+                out_parents, index = self.get_grouped_parents_and_index(inst, value, parents=parents + [key])
                 if out_parents is not None:
                     return out_parents, index
         else:
@@ -1079,7 +1079,7 @@ class SCTProjectFacade:
                     if inst in key:
                         return parents, i
 
-                    out_parents, index = self.get_inst_grouped_parents_and_index(inst, value, parents=parents + [i] + [key])
+                    out_parents, index = self.get_grouped_parents_and_index(inst, value, parents=parents + [i] + [key])
                     if out_parents is not None:
                         return out_parents, index
 
@@ -1149,7 +1149,7 @@ class SCTProjectFacade:
     def get_next_grouped_uuid(self, script, section, inst):
         cur_sect = self.project.scts[script].sects[section]
         cur_inst = cur_sect.insts[inst]
-        parents, index = self.get_inst_grouped_parents_and_index(inst, cur_sect.inst_tree)
+        parents, index = self.get_grouped_parents_and_index(inst, cur_sect.inst_tree)
         cur_group = cur_sect.inst_tree
         for parent in parents:
             cur_group = cur_group[parent]
@@ -1194,7 +1194,7 @@ class SCTProjectFacade:
         if len(cur_inst.links_in) == 0 and len(cur_inst.links_out) == 0:
             return
 
-        parents, index = self.get_inst_grouped_parents_and_index(inst, cur_sect.inst_tree)
+        parents, index = self.get_grouped_parents_and_index(inst, cur_sect.inst_tree)
         cur_group = cur_sect.inst_tree
         for parent in parents:
             cur_group = cur_group[parent]
