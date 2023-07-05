@@ -1415,6 +1415,8 @@ class SCTDecoder:
 
             if in_group and suffix in sect_name.lower():
                 decoded_sct.section_groups[cur_group].append(sect_name)
+            else:
+                in_group = False
 
             if script_filename in sect_name and not in_group:
                 in_group = True
@@ -1425,13 +1427,21 @@ class SCTDecoder:
             if section.type == 'Label':
                 in_group = False
 
+        empty_sections = []
+        for name, group in decoded_sct.section_groups.items():
+            if len(group) == 0:
+                empty_sections.append(name)
+
+        for name in empty_sections:
+            decoded_sct.section_groups.pop(name)
+
     def _create_group_heirarchies(self, decoded_sct):
 
         # Create grouped section heirarchy
         groups = decoded_sct.section_groups
 
         if len(groups) > 0:
-            # sort groups by size with smallest first
+            # sort groups by size with the smallest first
             groups = {k: groups[k] for k in sorted(groups.keys(), key=lambda k: len(groups[k]))}
 
             new_groups = self._nest_groups(groups)
@@ -1475,10 +1485,7 @@ class SCTDecoder:
                     insert_keys.append(n_group_name)
 
             for key in insert_keys:
-                if is_sections:
-                    insert_index = new_groups[key].index(group_name)
-                else:
-                    insert_index = new_groups[key].index(new_groups[group_name][0])
+                insert_index = new_groups[key].index(new_groups[group_name][0])
                 for entry in group:
                     new_groups[key].remove(entry)
                 new_groups[key].insert(insert_index, group_name)
