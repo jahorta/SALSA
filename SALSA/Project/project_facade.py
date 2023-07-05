@@ -214,7 +214,7 @@ class SCTProjectFacade:
             return None
         base_inst = self.base_insts.get_inst(instruction.base_id)
         instruction_details = copy.deepcopy(base_inst.__dict__)
-        instruction_details['base_parameters'] = instruction_details['parameters']
+        instruction_details['base_parameters'] = instruction_details['params']
         for key, value in instruction.__dict__.items():
             instruction_details[key] = value
         instruction_details['description'] = format_description(inst=instruction, base_inst=base_inst, callbacks=self.desc_callbacks)
@@ -246,13 +246,6 @@ class SCTProjectFacade:
     def update_inst_field(self, field, value, script, section, instruction, **kwargs):
         inst = self.project.scts[script].sects[section].insts[instruction]
         inst.__setattr__(field, value)
-
-    # def get_project_script_by_index(self, index):
-    #     if index >= len(self.project.scripts.keys()):
-    #         print(f'{self.log_key}: Script index out of range: {index} : {len(self.project.scripts.keys()) - 1}')
-    #         return None
-    #     name = list(self.project.scripts.keys())[index]
-    #     return name, self.project.scripts[name]
 
     # ---------------------------- #
     # Instruction position methods #
