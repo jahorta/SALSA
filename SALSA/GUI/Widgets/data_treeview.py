@@ -1,13 +1,72 @@
+import tkinter as tk
 from tkinter import ttk
+from typing import List, Tuple, Union
 
+from SALSA.GUI.themes import dark_theme, light_theme
 from SALSA.Common.constants import sep
 
+drag_tree_info = {
+    'headers': {
+        'id': {'label': 'ID', 'width': 50, 'stretch': False},
+        'name': {'label': 'Name', 'width': 50, 'stretch': False}
+    },
+    'final_item': {'parent': '', 'index': tk.END, 'text': '...', 'values': ['']}
+}
+
+default_tree_width = 100
+default_tree_minwidth = 10
+default_tree_anchor = tk.W
+default_tree_stretch = False
+default_tree_label = ''
+
+
+class DragWindow(tk.Toplevel):
+
+    def __init__(self, master, tree_dict, is_darkmode, bbox, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
+
+        self.attributes('-alpha', 0.5)
+        self.overrideredirect(True)
+
+        theme = dark_theme if is_darkmode else light_theme
+        self.configure(**theme['drag.Ttoplevel']['configure'], bd=0)
+
+        tree = ttk.Treeview(self, columns=list(tree_dict['headers'].keys())[1:], style='drag.Treeview', show='tree')
+        tree.grid(row=0, column=0, sticky='NSEW')
+        first = True
+        for name, d in tree_dict['headers'].items():
+            label = d.get('label', default_tree_label)
+            anchor = d.get('anchor', default_tree_anchor)
+            minwidth = d.get('minwidth', default_tree_minwidth)
+            width = d.get('width', default_tree_width)
+            stretch = d.get('stretch', default_tree_stretch)
+            if first:
+                name = '#0'
+                first = False
+            tree.heading(name, text=label, anchor=anchor)
+            tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
+
+        for item in tree_dict['items']:
+            tree.insert(**item)
+        tree.insert(**drag_tree_info['final_item'])
+
+        tree.configure(height=len(tree_dict['items'])+1)
+
+        self.mouse_box = (bbox[0], bbox[1], bbox[0]+bbox[2], bbox[1]+ bbox[3])
+
+    def update_pos(self, x, y):
+        x += 2
+        y += 2
+        if self.mouse_box[0] < x < self.mouse_box[2] and self.mouse_box[1] < y < self.mouse_box[3]:
+            self.geometry(f'+{x}+{y}')
+
+
+placeholder_text = 'PLACEHOLDER'
 
 class DataTreeview(ttk.Treeview):
 
-    def __init__(self, parent, name, callbacks=None, can_open=True, return_none=False, selectmode='browse', **kwargs):
+    def __init__(self, parent, name, is_darkmode=True, callbacks=None, can_open=True, can_move=False, return_none=False, selectmode='browse', **kwargs):
         super().__init__(parent, selectmode=selectmode, **kwargs)
-
         self._parent = parent
         self.name = name
         self.callbacks = callbacks if callbacks is not None else {}
@@ -16,22 +75,49 @@ class DataTreeview(ttk.Treeview):
         self.cur_selection = []
         self.selection_order = []
         self.return_none = return_none
+        self.is_darkmode = is_darkmode
 
         self.can_open = can_open
 
+        if can_move:
+            self.unbind_all("<ButtonPress-1>")
+            self.bind("<ButtonPress-1>", self.bDown_move)
+            self.bind("<ButtonRelease-1>", self.bUp_move, add='+')
+            self.bind("<B1-Motion>", self.bMove, add='+')
+            self.bind("<Shift-ButtonPress-1>", self.bDown_Shift, add='')
+            self.bind("<Shift-ButtonRelease-1>", self.bUp_Shift, add='')
+
         if can_open:
             self.bind("<ButtonRelease-1>", self.select_entry, add='+')
+            # self.bind("<ButtonRelease-1>", self.print_parent_and_index, add='+')
+
+        self.in_motion = False
+        self.has_shift = False
+        self.first_selected = None
+        self.drag_widget: Union[None, DragWindow] = None
+        self.placeholder = None
+        self.selection_bounds = None
+        self.selected = None
 
     def add_callback(self, key, callback):
         self.callbacks[key] = callback
 
+    def set_darkmode(self, is_darkmode):
+        self.is_darkmode = is_darkmode
+
     def select_entry(self, event):
+        if self.in_motion:
+            return
         if 'select' not in self.callbacks:
             raise RuntimeError(f'{type(self)}-{self.name}: no "select" callback given')
-        widget = self.identify_row(event.y)
-        if widget == '':
+        row = self.identify_row(event.y)
+        if row == '':
             return
-        row_data = self.row_data[widget]
+        if len(self.selection()) > 1:
+            return
+        if self.item(row)['text'] == placeholder_text:
+            return
+        row_data = self.row_data[row]
         if row_data is not None:
             self.callbacks['select'](self.name, row_data)
         elif self.return_none:
@@ -93,3 +179,134 @@ class DataTreeview(ttk.Treeview):
                 continue
             self.see(row_id)
             self.item(row_id, open=True)
+
+    def bDown_Shift(self, event):
+        self.has_shift = True
+        clicked_row = self.index(self.identify_row(event.y))
+        first_row = self.index(self.first_selected)
+        if clicked_row == first_row:
+            self.after(10, self.selection_set, self.first_selected)
+            return
+        select = [i for i in range(min(clicked_row, first_row), max(clicked_row, first_row)+1)]
+        self.selected = []
+        for i in select:
+            sel_iid = self.get_children()[i]
+            self.selection_add(sel_iid)
+            self.selected.append(sel_iid)
+
+    def bUp_Shift(self, event):
+        self.has_shift = False
+
+    def bDown_move(self, event):
+        if self.identify_row(event.y) not in self.selection():
+            sel = self.identify_row(event.y)
+            self.selection_set(sel)
+            self.first_selected = sel
+            self.selected = sel
+
+    def bUp_move(self, event):
+        if not self.in_motion:
+            return
+        final_index = self.index(self.placeholder)
+        insert_after_index = 0 if final_index == 0 else final_index - 1
+        insert_after_iid = self.get_children(self.parent(self.placeholder))[insert_after_index]
+        if final_index == 0:
+            insert_after_iid = self.parent(insert_after_iid)
+        insert_after_data: Union[None, str] = self.row_data.get(insert_after_iid, None)
+        if insert_after_data is None:
+            case = self.item(insert_after_iid)['values'][0].split(' ')[0]
+            insert_after_data = f'{self.row_data[(self.parent(insert_after_iid))]}{sep}{case}'
+
+        # Assorted cleanup
+        self.in_motion = False
+        self.placeholder = None
+        self.drag_widget.destroy()
+        self.drag_widget = None
+
+        # Callback to have the items moved and tree refreshed
+        self.callbacks['move_items'](self.name, self.selection_bounds, insert_after_data)
+        self.selection_bounds = None
+
+    def bMove(self, event):
+        if self.has_shift:
+            return
+        if not self.in_motion:
+            self.selection_set(self.selected)
+            self.in_motion = True
+            self.start_motion()
+        self.drag_widget.update_pos(event.x_root, event.y_root)
+        moveto = self.index(self.identify_row(event.y))
+        for s in self.selection():
+            parent = self.parent(self.identify_row(event.y))
+            self.move(s, parent, moveto)
+
+    def start_motion(self):
+        selection = self.selection()
+        base_parent, parent_list = self.motion_get_parent_base_and_list(selection)
+        selection = self.motion_select_all_children(base_parent, parent_list, selection)
+        selection = self.sort_sel_iids(selection)
+        bounds = (selection[0], selection[-1])
+        new_bounds = []
+        for entry in bounds:
+            data = self.row_data.get(entry, None)
+            if data is None:
+                data = f'{self.row_data[self.parent(entry)]}{sep}{self.item(entry)["values"][0].split(" ")[0]}'
+            new_bounds.append(data)
+        self.selection_bounds = tuple(new_bounds)
+        index = self.index(bounds[0])
+        values = [''] * (len(self['columns']) - 1)
+        self.placeholder = self.insert(parent=base_parent, index=index, iid='placeholder', text=placeholder_text, values=values)
+        self.selection_set(self.placeholder)
+
+        item_iids = selection[:5] if len(selection) > 5 else selection
+
+        items = [{'parent': '', 'index': tk.END, 'text': self.item(i)['text'], 'values': self.item(i)['values'][0]} for i in item_iids]
+        tree_dict = {**drag_tree_info, 'items': items}
+
+        bbox = self.winfo_rootx(), self.winfo_rooty(), self.winfo_rootx()+self.winfo_width(), self.winfo_rooty()+self.winfo_height()
+
+        self.drag_widget = DragWindow(self, is_darkmode=self.is_darkmode, bbox=bbox, tree_dict=tree_dict)
+
+        for s in selection:
+            self.delete(s)
+
+    def motion_get_parent_base_and_list(self, selection) -> Tuple[str, List[str]]:
+        base_parent = None
+        parent_list = []
+        for s in selection:
+            cur_parent = self.parent(s)
+            if base_parent is None:
+                base_parent = cur_parent
+            if cur_parent == '':
+                base_parent = cur_parent
+            if base_parent != '':
+                base_parent = str(min(int(base_parent), int(cur_parent)))
+            if cur_parent not in parent_list:
+                parent_list.append(cur_parent)
+        return base_parent, parent_list
+
+    def motion_select_all_children(self, base_parent, parent_list, selection):
+        i = 0
+        while i < len(parent_list):
+            p = parent_list[i]
+            if p == base_parent:
+                i += 1
+                continue
+            children = self.get_children(p)
+            for c in children:
+                if c not in selection:
+                    selection.append(c)
+                    if len(self.get_children(c)) > 0:
+                        parent_list.append(c)
+            i += 1
+        return selection
+
+    def sort_sel_iids(self, selection: List[str]):
+        int_sel = list({int(s) for s in selection})
+        int_sel.sort()
+        return [str(s) for s in int_sel]
+
+    def print_parent_and_index(self, event):
+        iid = self.identify_row(event.y)
+        print(f'parent: {self.parent(iid)}, index: {self.index(iid)}')
+
