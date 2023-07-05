@@ -453,6 +453,79 @@ class SCTProjectFacade:
     def is_group(self, script, section, instruction, **kwargs):
         return self.project.scts[script].sects[section].insts[instruction].base_id in (0, 3)
 
+    # ------------------------ #
+    # Group based manipulation #
+    # ------------------------ #
+
+    def move_items(self, sel_bounds, insert_after, script, section=None):
+        if section is None:
+            base_group = self.project.scts[script].sect_tree
+            cur_list = self.project.scts[script].sect_list
+        else:
+            base_group = self.project.scts[script].sects[section].inst_tree
+            cur_list = self.project.scts[script].sects[section].inst_list
+
+        first_uuid, last_uuid = sel_bounds
+        first_case = None
+        if sep in first_uuid:
+            first_uuid, first_case = first_uuid.split(sep)
+
+        f_parents, f_index = self.get_grouped_parents_and_index(first_uuid, base_group)
+        l_parents, l_index = self.get_grouped_parents_and_index(last_uuid, base_group)
+
+        if len(f_parents) > len(l_parents):
+            print(f'{self.log_key}: Unable to move group, first parent list is larger than last')
+            return
+
+        for i in range(len(f_parents)):
+            if f_parents[i] != l_parents[i]:
+                print(f'{self.log_key}: Unable to move group, parent lists are different')
+                return
+
+        if len(l_parents) > len(f_parents):
+            test_uuid = None
+            while len(l_parents) > len(f_parents):
+                test_uuid = l_parents.pop(-1)
+            _, l_index = self.get_grouped_parents_and_index(test_uuid, base_group)
+
+        f_inst_list_ind = cur_list.index(first_uuid)
+        l_inst_list_ind = cur_list.index(last_uuid)
+        sel_insts = cur_list[f_inst_list_ind: l_inst_list_ind + 1]
+        temp_after = cur_list[l_inst_list_ind+1:] if l_inst_list_ind + 1 != len(cur_list) else []
+        temp__list = cur_list[:f_inst_list_ind] + temp_after
+        insert_ind = temp__list.index(insert_after) + 1
+        temp__list = temp__list[:insert_ind] + sel_insts + temp__list[insert_ind:]
+
+        if section is None:
+            self.project.scts[script].sect_list = temp__list
+        else:
+            self.project.scts[script].sects[section].inst_list = temp__list
+
+        cur_group = base_group
+        for p in f_parents:
+            cur_group = cur_group[p]
+        moved_group = cur_group[f_index: l_index+1]
+        for i in reversed(range(f_index, l_index+1)):
+            cur_group.pop(i)
+
+        i_parents, i_index = self.get_grouped_parents_and_index(insert_after, base_group)
+
+        for p in i_parents:
+            base_group = base_group[p]
+
+        for g in reversed(moved_group):
+            base_group.insert(i_index+1, g)
+
+        if section is None:
+            return self.callbacks['set_change']()
+
+        # if the group moved is an instruction group...
+        self._refresh_inst_positions(script=script, section=section)
+
+
+
+
+
     # ---------------------------------------------- #
     # Instruction and parameter manipulation methods #
     # ---------------------------------------------- #
