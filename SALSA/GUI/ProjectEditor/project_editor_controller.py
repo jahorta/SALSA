@@ -239,7 +239,7 @@ class ProjectEditorController:
         else:
             self.view.skip_error_label.config(text='')
 
-        self.view.delay_label.config(text=str(details['frame_delay_param']))
+        self.view.delay_label.config(text=str(details['delay_param']))
 
         for i, link in enumerate(details['links_out']):
             link: SCTLink
@@ -450,7 +450,7 @@ class ProjectEditorController:
 
     def show_inst_selector(self, inst_trace, sel_iid):
         callbacks = {
-            'is_group': self.project.is_group,
+            'is_group': self.project.inst_is_group,
             'get_children': self.project.get_inst_group,
             'group_inst_handler': self.confirm_change_inst_group,
             'set_inst_id': self.project.change_inst,
@@ -469,7 +469,7 @@ class ProjectEditorController:
         sel_iid = self.trees['instruction'].focus()
         cur_inst_uuid = self.trees['instruction'].row_data[sel_iid]
         end_kwargs = {'result': None, 'cur_inst_uuid': cur_inst_uuid}
-        if self.project.is_group(**self.current):
+        if self.project.inst_is_group(**self.current):
             children = self.project.get_inst_group(self.current['script'], self.current['section'], cur_inst_uuid)
             return self.confirm_change_inst_group(children=children, end_callback=self.finish_remove_inst, end_kwargs=end_kwargs)
         self.finish_remove_inst(**end_kwargs)
@@ -592,7 +592,7 @@ class ProjectEditorController:
             loop_num = int(e.widget.item(row)['text'][4:])
             m.add_command(label='Remove Loop Parameter', command=lambda: self.handle_loop_param_change('remove', loop_num=loop_num))
 
-        if self.project.is_switch(**self.current):
+        if self.project.inst_is_switch(**self.current):
             m.entryconfigure('Add a Loop Parameter', state='disabled')
             m.entryconfigure('Remove this Loop Parameter', state='disabled')
 
