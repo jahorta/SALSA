@@ -90,7 +90,9 @@ class ProjectEditorController:
 
         self.trees['script'].add_callback('select', self.on_select_tree_entry)
         self.trees['section'].add_callback('select', self.on_select_tree_entry)
+        self.trees['section'].add_callback('move_items', self.on_move_items)
         self.trees['instruction'].add_callback('select', self.on_select_tree_entry)
+        self.trees['instruction'].add_callback('move_items', self.on_move_items)
 
         self.has_changes = False
 
@@ -616,3 +618,10 @@ class ProjectEditorController:
 
     def add_callback(self, key: str, callback: callable):
         self.callbacks[key] = callback
+
+    def on_move_items(self, tree_key, sel_bounds, insert_after):
+        section = self.current['section'] if tree_key == 'instruction' else None
+        self.project.move_items(sel_bounds, insert_after, self.current['script'], section)
+        if tree_key == 'section':
+            self.trees['instruction'].clear_all_entries()
+        self.refresh_tree(tree_key)
