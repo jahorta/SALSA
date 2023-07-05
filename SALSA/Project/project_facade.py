@@ -87,20 +87,22 @@ class SCTProjectFacade:
 
         return tree_list
 
-    def _create_tree(self, group, key_list, headers, base=None, base_key=None, key_only=False, key_only_key='', prev_group_type=None):
+    def _create_tree(self, group, key_list, headers, base=None, base_key=None, prev_group_type=None,
+                     key_only=False, key_only_key=''):
+
         tree_list = []
         for key in key_list:
             if isinstance(key, dict):
                 for ele_key, ele_value in key.items():
+
+                    # This detects switch cases
                     if sep not in ele_key:
-                        kok = 'name' if prev_group_type == 'switch' else ''
+                        kok = 'name'
                         tree_list.extend(self._create_tree(group=group, key_list=[ele_key], headers=headers, base=base,
                                                            base_key=base_key, key_only=True, key_only_key=kok))
-                        cur_group_type = 'case' if prev_group_type == 'switch' else 'element'
-                        tree_list[-1]['group_type'] = cur_group_type
-                        if prev_group_type == 'switch':
-                            tree_list[-1][headers[0]] = group[self.get_inst_uuid_from_group_entry(ele_value)].ungrouped_position
-                            tree_list[-1]['absolute_offset'] = group[self.get_inst_uuid_from_group_entry(ele_value)].absolute_offset
+                        tree_list[-1]['group_type'] = 'case'
+                        tree_list[-1][headers[0]] = group[self.get_inst_uuid_from_group_entry(ele_value)].ungrouped_position
+                        tree_list[-1]['absolute_offset'] = group[self.get_inst_uuid_from_group_entry(ele_value)].absolute_offset
                     else:
                         ele_key = ele_key.split(sep)
                         tree_list.extend(

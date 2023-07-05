@@ -1418,9 +1418,9 @@ class SCTDecoder:
 
             if script_filename in sect_name and not in_group:
                 in_group = True
-                cur_group = sect_name
+                cur_group = f'{sect_name}{sep}group'
                 suffix = sect_name[len(script_filename):].lower()
-                decoded_sct.section_groups[cur_group] = [cur_group]
+                decoded_sct.section_groups[cur_group] = []
 
             if section.type == 'Label':
                 in_group = False
@@ -1435,7 +1435,7 @@ class SCTDecoder:
             groups = {k: groups[k] for k in sorted(groups.keys(), key=lambda k: len(groups[k]))}
 
             new_groups = self._nest_groups(groups)
-            new_groups = self._complete_heirarchy_sections(list(decoded_sct.sects.keys()), new_groups)
+            new_groups = self._complete_heirarchy(list(decoded_sct.sects.keys()), new_groups)
             decoded_sct.sect_tree = new_groups
         else:
             decoded_sct.sect_tree = copy.deepcopy(decoded_sct.sect_list)
@@ -1450,7 +1450,7 @@ class SCTDecoder:
             inst_groups = {k: [*range(int(v[0].split(sep)[1]), int(v[1].split(sep)[1]) + 1)]
                            for k, v in inst_groups.items()}
             new_groups = self._nest_groups(inst_groups, is_sections=False)
-            new_groups = self._complete_heirarchy_instructions(list(range(len(section.insts))), new_groups)
+            new_groups = self._complete_heirarchy(list(range(len(section.insts))), new_groups)
             new_groups = self._remove_duplicate_inst_locations(new_groups)
             new_groups = self._resolve_switches(new_groups)
             new_groups = self._replace_pos_with_ids(new_groups, section.inst_list)
@@ -1546,21 +1546,7 @@ class SCTDecoder:
 
         return entry in group
 
-    def _complete_heirarchy_sections(self, full_list, groups):
-        heirarchy = []
-        skips = []
-        for entry in full_list:
-            if entry in skips:
-                continue
-            if entry not in groups.keys():
-                heirarchy.append(entry)
-                continue
-            group = groups[entry]
-            heirarchy.append({entry: group})
-            skips.extend(self._get_heirarchy_skips(group))
-        return heirarchy
-
-    def _complete_heirarchy_instructions(self, full_list, groups):
+    def _complete_heirarchy(self, full_list, groups):
         heirarchy = []
         skips = []
         for entry in full_list:
