@@ -61,7 +61,6 @@ default_tree_label = ''
 
 
 class ProjectEditorView(ttk.Frame):
-
     log_name = 'PrjEditorView'
 
     def __init__(self, parent, is_darkmode, *args, **kwargs):
@@ -88,7 +87,8 @@ class ProjectEditorView(ttk.Frame):
         mem_offset_label = ttk.Label(header_frame, text='Memory Offset: 0x')
         mem_offset_label.grid(row=0, column=1, sticky=tk.W, padx='30 0')
         self.mem_offset_var = tk.StringVar(header_frame, '')
-        mem_offset_entry = w.HexEntry(master=header_frame, textvariable=self.mem_offset_var, hex_max_length=8, hex_min_length=0, width=10)
+        mem_offset_entry = w.HexEntry(master=header_frame, textvariable=self.mem_offset_var, hex_max_length=8,
+                                      hex_min_length=0, width=10)
         mem_offset_entry.grid(row=0, column=2, sticky=tk.W)
         mem_offset_button = ttk.Button(header_frame, text='Set', command=self.set_mem_offset)
         mem_offset_button.grid(row=0, column=3)
@@ -123,7 +123,7 @@ class ProjectEditorView(ttk.Frame):
             self.scripts_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
         self.scripts_tree['displaycolumns'] = self.visible_headers['script'][1:]
         script_tree_scrollbar = ttk.Scrollbar(script_tree_frame, orient='vertical', command=self.scripts_tree.yview)
-        script_tree_scrollbar.grid(row=1, column=1, sticky=tk.N+tk.S)
+        script_tree_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.S)
         self.scripts_tree.config(yscrollcommand=script_tree_scrollbar.set)
 
         section_tree_frame = ttk.Frame(self.pane_frame, width=400)
@@ -136,7 +136,8 @@ class ProjectEditorView(ttk.Frame):
         self.pane_frame.add(section_tree_frame, weight=1)
 
         columns = list(header_settings['section'].keys())[1:]
-        self.sections_tree = DataTreeview(section_tree_frame, name='section', columns=columns)
+        self.sections_tree = DataTreeview(section_tree_frame, name='section', columns=columns,
+                                          can_move=True, selectmode='extended', is_darkmode=self.is_darkmode)
         self.sections_tree.configure('columns')
         self.sections_tree.grid(row=1, column=0, sticky='NSEW')
         first = True
@@ -153,7 +154,7 @@ class ProjectEditorView(ttk.Frame):
             self.sections_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
         self.sections_tree['displaycolumns'] = self.visible_headers['section'][1:]
         section_tree_scrollbar = ttk.Scrollbar(section_tree_frame, orient='vertical', command=self.sections_tree.yview)
-        section_tree_scrollbar.grid(row=1, column=1, sticky=tk.N+tk.S)
+        section_tree_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.S)
         self.sections_tree.config(yscrollcommand=section_tree_scrollbar.set)
 
         self.inst_tree_frame = ttk.Frame(self.pane_frame, width=400)
@@ -166,7 +167,8 @@ class ProjectEditorView(ttk.Frame):
         self.pane_frame.add(self.inst_tree_frame, weight=1)
 
         columns = list(header_settings['instruction'].keys())[1:]
-        self.insts_tree = DataTreeview(self.inst_tree_frame, name='instruction', columns=columns)
+        self.insts_tree = DataTreeview(self.inst_tree_frame, name='instruction', columns=columns,
+                                       can_move=True, selectmode='extended', is_darkmode=self.is_darkmode)
         self.insts_tree.grid(row=1, column=0, sticky='NSEW')
         first = True
         for name, d in header_settings['instruction'].items():
@@ -182,7 +184,7 @@ class ProjectEditorView(ttk.Frame):
             self.insts_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
         self.insts_tree['displaycolumns'] = self.visible_headers['instruction'][1:]
         inst_tree_scrollbar = ttk.Scrollbar(self.inst_tree_frame, orient='vertical', command=self.insts_tree.yview)
-        inst_tree_scrollbar.grid(row=1, column=1, sticky=tk.N+tk.S)
+        inst_tree_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.S)
         self.insts_tree.config(yscrollcommand=inst_tree_scrollbar.set)
 
         # Instruction details frame setup
@@ -197,11 +199,11 @@ class ProjectEditorView(ttk.Frame):
         inst_frame_label.grid(row=0, column=0, sticky=tk.W)
 
         inst_top_frame = ttk.Frame(self.inst_frame)
-        inst_top_frame.grid(row=1, column=0, sticky=tk.E+tk.W)
+        inst_top_frame.grid(row=1, column=0, sticky=tk.E + tk.W)
         inst_top_frame.columnconfigure(0, weight=1)
 
         self.inst_label = ttk.Label(inst_top_frame, text='ID - Name')
-        self.inst_label.grid(row=0, column=0, sticky=tk.W+tk.N)
+        self.inst_label.grid(row=0, column=0, sticky=tk.W + tk.N)
 
         skip_frame = ttk.Frame(inst_top_frame)
         skip_frame.grid(row=0, column=1, sticky=tk.E)
@@ -223,13 +225,15 @@ class ProjectEditorView(ttk.Frame):
         self.delay_label.grid(row=0, column=0, sticky='NSEW')
         self.delay_label.bind('<Double-1>', lambda e: self.on_param_double_click('delay', e))
 
-        self.inst_desc_frame = w.ScrollLabelFrame(self.inst_frame, text='Description', size={'width': 100, 'height': 200})
+        self.inst_desc_frame = w.ScrollLabelFrame(self.inst_frame, text='Description',
+                                                  size={'width': 100, 'height': 200})
         self.inst_desc_frame.grid(row=2, column=0, sticky='NSEW')
         self.inst_desc_frame.columnconfigure(0, weight=1)
         self.inst_desc_frame.rowconfigure(0, weight=1)
 
         self.inst_description = tk.Message(self.inst_desc_frame.scroll_frame)
-        self.inst_desc_frame.canvas.bind("<Configure>", lambda e: self.inst_description.configure(width=e.width - 10), add='+')
+        self.inst_desc_frame.canvas.bind("<Configure>", lambda e: self.inst_description.configure(width=e.width - 10),
+                                         add='+')
         self.inst_description.grid(row=0, column=0, sticky='NSEW')
 
         param_frame = ttk.LabelFrame(self.inst_frame, text='Parameters')
@@ -254,7 +258,7 @@ class ProjectEditorView(ttk.Frame):
             self.param_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
         self.param_tree['displaycolumns'] = self.visible_headers['parameter'][1:]
         param_tree_scrollbar = ttk.Scrollbar(param_frame, orient='vertical', command=self.param_tree.yview)
-        param_tree_scrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
+        param_tree_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
         self.param_tree.config(yscrollcommand=param_tree_scrollbar.set)
         self.param_tree.bind('<Double-1>', lambda e: self.on_param_double_click('param', e))
         self.param_tree.bind('<Button-3>', self.param_right_click)
@@ -267,14 +271,14 @@ class ProjectEditorView(ttk.Frame):
         link_in_label = ttk.Label(link_frame, text='Incoming Links')
         link_in_label.grid(row=0, column=0, sticky=tk.W)
         self.link_in = w.ScrollFrame(link_frame, size={'width': 100, 'height': 100})
-        self.link_in.grid(row=1, column=0, sticky=tk.W+tk.E, padx='0 5')
+        self.link_in.grid(row=1, column=0, sticky=tk.W + tk.E, padx='0 5')
         self.link_in.columnconfigure(0, weight=1)
         self.link_in.rowconfigure(0, weight=1)
 
         link_out_label = ttk.Label(link_frame, text='Outgoing Links')
         link_out_label.grid(row=0, column=2, sticky=tk.W)
         self.link_out = w.ScrollFrame(link_frame, size={'width': 100, 'height': 100})
-        self.link_out.grid(row=1, column=2, sticky=tk.W+tk.E, padx='5 0')
+        self.link_out.grid(row=1, column=2, sticky=tk.W + tk.E, padx='5 0')
         self.link_out.columnconfigure(0, weight=1)
         self.link_out.rowconfigure(0, weight=1)
 
@@ -352,7 +356,7 @@ class ProjectEditorView(ttk.Frame):
             width_ratios[k] = v / width_sum
 
         for k, v in width_ratios.items():
-            cur_tree.column(k, width=int(v*widget_width))
+            cur_tree.column(k, width=int(v * widget_width))
 
     def inst_group_handling(self, cur_inst_id, new_id, children, end_callback, end_kwargs):
         # create message to decide how to handle group entries
@@ -394,4 +398,5 @@ class ProjectEditorView(ttk.Frame):
         self.inst_desc_frame.change_theme(dark_mode)
         self.link_in.change_theme(dark_mode)
         self.link_out.change_theme(dark_mode)
-
+        self.insts_tree.set_darkmode(dark_mode)
+        self.sections_tree.set_darkmode(dark_mode)
