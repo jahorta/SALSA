@@ -70,7 +70,7 @@ move_ignore_event_delay = 20
 class DataTreeview(ttk.Treeview):
 
     def __init__(self, parent, name, is_darkmode=True, callbacks=None, can_open=True, can_move=False, return_none=False,
-                 selectmode='browse', prevent_extreme_selection=False, **kwargs):
+                 selectmode='browse', prevent_extreme_selection=False, keep_group_ends=False, **kwargs):
         super().__init__(parent, selectmode=selectmode, **kwargs)
         self._parent = parent
         self.name = name
@@ -109,6 +109,7 @@ class DataTreeview(ttk.Treeview):
         self.prevent_extreme_selection = prevent_extreme_selection
         self.first_entry = None
         self.last_entry = None
+        self.keep_group_ends = keep_group_ends
 
     def add_callback(self, key, callback):
         self.callbacks[key] = callback
@@ -301,9 +302,17 @@ class DataTreeview(ttk.Treeview):
                         return
         self.group_waiting = ''
         moveto = self.index(sel_iid)
-        for s in self.selection():
-            parent = self.parent(self.identify_row(event.y))
-            self.move(s, parent, moveto)
+        parent = self.parent(sel_iid)
+        if (self.index(sel_iid) + 1 == len(self.get_children(parent))
+                and parent != ''
+                and self.parent_restriction is None
+                and self.keep_group_ends):
+            if self.row_data.get(parent, None) is None:
+                parent = self.parent(parent)
+            moveto = self.index(parent) + 1
+            parent = self.parent(parent)
+
+        self.move(self.placeholder, parent, moveto)
 
     def start_motion(self):
         selection = list(self.selection())
