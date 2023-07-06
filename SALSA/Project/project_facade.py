@@ -398,6 +398,20 @@ class SCTProjectFacade:
                 f'{self.base_insts.get_inst(cur_sect.insts[i].base_id).name}'
                 f'{sep}{cur_sect.insts[i].ID}' for i in inst_list]
 
+    # ------------------------ #
+    # Section analysis methods #
+    # ------------------------ #
+
+    def sect_is_group(self, script, section):
+        cur_group = self.project.scts[script].sect_tree
+
+        parents, index = self.get_grouped_parents_and_index(section, cur_group)
+
+        for p in parents:
+            cur_group = cur_group[p]
+
+        return isinstance(cur_group[index], dict)
+
     # ------------------------------------------ #
     # Instruction and parameter analysis methods #
     # ------------------------------------------ #
