@@ -306,8 +306,9 @@ class DataTreeview(ttk.Treeview):
             self.move(s, parent, moveto)
 
     def start_motion(self):
-        selection = self.selection()
+        selection = list(self.selection())
         base_parent, parent_list = self.motion_get_parent_base_and_list(selection)
+        selection = list(set(selection))
         selection = self.motion_select_all_children(base_parent, parent_list, selection)
         selection = self.sort_sel_iids(selection)
         bounds = (selection[0], selection[-1])
@@ -346,6 +347,8 @@ class DataTreeview(ttk.Treeview):
                 base_parent = cur_parent
             if base_parent != '':
                 base_parent = str(min(int(base_parent), int(cur_parent)))
+            if len(self.get_children(s)) > 0:
+                parent_list.append(s)
             if cur_parent not in parent_list:
                 parent_list.append(cur_parent)
         return base_parent, parent_list
@@ -361,7 +364,7 @@ class DataTreeview(ttk.Treeview):
             for c in children:
                 if c not in selection:
                     selection.append(c)
-                    if len(self.get_children(c)) > 0:
+                    if len(self.get_children(c)) > 0 and c not in parent_list:
                         parent_list.append(c)
             i += 1
         return selection
