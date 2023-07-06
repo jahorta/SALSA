@@ -479,7 +479,7 @@ class SCTProjectFacade:
 
         if len(l_parents) > len(f_parents):
             test_uuid = None
-            while len(l_parents) > len(f_parents):
+            while len(l_parents) > len(f_parents) + 1:
                 test_uuid = l_parents.pop(-1)
             _, l_index = self.get_grouped_parents_and_index(test_uuid, base_group)
 
