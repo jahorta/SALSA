@@ -311,6 +311,7 @@ class DataTreeview(ttk.Treeview):
         selection = list(set(selection))
         selection = self.motion_select_all_children(base_parent, parent_list, selection)
         selection = self.sort_sel_iids(selection)
+        base_select = list(set(selection) & set(self.get_children(base_parent)))
         bounds = (selection[0], selection[-1])
         new_bounds = []
         for entry in bounds:
@@ -333,7 +334,7 @@ class DataTreeview(ttk.Treeview):
 
         self.drag_widget = DragWindow(self, is_darkmode=self.is_darkmode, bbox=bbox, tree_dict=tree_dict)
 
-        for s in selection:
+        for s in base_select:
             self.delete(s)
 
     def motion_get_parent_base_and_list(self, selection) -> Tuple[str, List[str]]:
