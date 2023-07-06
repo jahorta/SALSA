@@ -263,7 +263,7 @@ class DataTreeview(ttk.Treeview):
                 self.move_ignore_counter += 1
                 return
             # should prevent moving the first and last entries alone if prevent extreme selection is on
-            if (self.prevent_extreme_selection and len(self.selected) == 1 and
+            if (self.prevent_extreme_selection and not isinstance(self.selected, list) and
                     self.first_selected in (self.first_entry, self.last_entry)):
                 return
             self.selection_set(self.selected)
