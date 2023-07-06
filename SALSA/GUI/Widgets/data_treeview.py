@@ -291,12 +291,14 @@ class DataTreeview(ttk.Treeview):
         if len(self.get_children(sel_iid)) > 0:
             if not self.item(sel_iid)['open'] in (True, 1):
                 if self.group_waiting != '':
-                    return
-                bbox = self.bbox(sel_iid)
-                if event.y < bbox[1] + int(bbox[3] * group_open_y_percent):
-                    self.group_waiting = sel_iid
-                    self.after(15, self.delayed_open_group, sel_iid, 0, group_open_delay)
-                    return
+                    if sel_iid == self.group_waiting:
+                        return
+                else:
+                    bbox = self.bbox(sel_iid)
+                    if event.y < bbox[1] + int(bbox[3] * group_open_y_percent):
+                        self.group_waiting = sel_iid
+                        self.after(15, self.delayed_open_group, sel_iid, 0, group_open_delay)
+                        return
         self.group_waiting = ''
         moveto = self.index(sel_iid)
         for s in self.selection():
