@@ -452,7 +452,7 @@ class SCTProjectFacade:
     # Group based manipulation #
     # ------------------------ #
 
-    def move_items(self, sel_bounds, insert_after, script, section=None):
+    def move_items(self, sel_bounds, insert_after, insert_in_group, script, section=None):
         if section is None:
             base_group = self.project.scts[script].sect_tree
             cur_list = self.project.scts[script].sect_list
