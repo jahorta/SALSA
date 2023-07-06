@@ -512,9 +512,10 @@ class SCTProjectFacade:
         for g in reversed(moved_group):
             base_group.insert(i_index+1, g)
 
-        if section is None:
-            return self.callbacks['set_change']()
+        self.callbacks['set_change']()
 
+        if section is None:
+            return
         # if the group moved is an instruction group...
         self._refresh_inst_positions(script=script, section=section)
 
