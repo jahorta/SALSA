@@ -515,9 +515,15 @@ class SCTProjectFacade:
             base_group = base_group[p]
 
         # Modify the correct insertion point depending on whether to insert in group or not
-        if self.inst_is_group(script, section, insert_after):
+        if section is None:
+            is_group = self.sect_is_group(script, insert_after)
+        else:
+            is_group = self.inst_is_group(script, section, insert_after)
+
+        if is_group:
             if insert_in_group:
                 base_group = base_group[i_index]
+                base_group = base_group[list(base_group.keys())[0]]
                 if insert_case is not None:
                     base_group = base_group[insert_case]
                 i_index = 0
