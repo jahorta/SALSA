@@ -69,7 +69,8 @@ move_ignore_event_delay = 10
 
 class DataTreeview(ttk.Treeview):
 
-    def __init__(self, parent, name, is_darkmode=True, callbacks=None, can_open=True, can_move=False, return_none=False, selectmode='browse', **kwargs):
+    def __init__(self, parent, name, is_darkmode=True, callbacks=None, can_open=True, can_move=False, return_none=False,
+                 selectmode='browse', prevent_extreme_selection=False, **kwargs):
         super().__init__(parent, selectmode=selectmode, **kwargs)
         self._parent = parent
         self.name = name
@@ -105,6 +106,9 @@ class DataTreeview(ttk.Treeview):
         self.group_waiting = ''
         self.parent_restriction = None
         self.move_ignore_counter = 0
+        self.prevent_extreme_selection = prevent_extreme_selection
+        self.first_entry = None
+        self.last_entry = None
 
     def add_callback(self, key, callback):
         self.callbacks[key] = callback
@@ -135,6 +139,8 @@ class DataTreeview(ttk.Treeview):
         self.row_data[iid] = row_data
         self.group_types[iid] = group_type
         super().insert(parent=parent, iid=iid, text=text, values=values, **kwargs)
+        self.last_entry = iid
+        self.first_entry = '0'
         return iid
 
     def get_row_by_rowdata(self, row_data):
@@ -151,6 +157,8 @@ class DataTreeview(ttk.Treeview):
         for row in self.get_children():
             self.delete(row)
         self.row_data = {}
+        self.first_entry = None
+        self.last_entry = None
 
     def get_selection(self):
         return [self.row_data[self.get_children()[int(s)]] for s in self.cur_selection]
@@ -189,17 +197,24 @@ class DataTreeview(ttk.Treeview):
 
     def bDown_Shift(self, event):
         self.has_shift = True
-        clicked_row = self.index(self.identify_row(event.y))
-        first_row = self.index(self.first_selected)
+        clicked_row = int(self.identify_row(event.y))
+        first_row = int(self.first_selected)
         if clicked_row == first_row:
             self.after(10, self.selection_set, self.first_selected)
             return
-        select = [i for i in range(min(clicked_row, first_row), max(clicked_row, first_row)+1)]
-        self.selected = []
-        for i in select:
-            sel_iid = self.get_children()[i]
-            self.selection_add(sel_iid)
-            self.selected.append(sel_iid)
+        select = [str(i) for i in range(min(clicked_row, first_row), max(clicked_row, first_row)+1)]
+
+        # Make sure that the first and last entries cannot be selected (label and return)
+        if self.prevent_extreme_selection:
+            root_children = self.get_children('')
+            first = root_children[0]
+            if first in select:
+                select.remove(first)
+            last = root_children[-1]
+            if last in select:
+                select.remove(last)
+        self.selected = select
+        self.selection_set(select)
 
     def bUp_Shift(self, event):
         self.has_shift = False
@@ -246,6 +261,10 @@ class DataTreeview(ttk.Treeview):
         if not self.in_motion:
             if self.move_ignore_counter < move_ignore_event_delay:
                 self.move_ignore_counter += 1
+                return
+            # should prevent moving the first and last entries alone if prevent extreme selection is on
+            if (self.prevent_extreme_selection and len(self.selected) == 1 and
+                    self.first_selected in (self.first_entry, self.last_entry)):
                 return
             self.selection_set(self.selected)
             self.in_motion = True

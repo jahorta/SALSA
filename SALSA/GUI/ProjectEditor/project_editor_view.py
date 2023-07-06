@@ -168,7 +168,8 @@ class ProjectEditorView(ttk.Frame):
 
         columns = list(header_settings['instruction'].keys())[1:]
         self.insts_tree = DataTreeview(self.inst_tree_frame, name='instruction', columns=columns,
-                                       can_move=True, selectmode='extended', is_darkmode=self.is_darkmode)
+                                       can_move=True, selectmode='extended', is_darkmode=self.is_darkmode,
+                                       prevent_extreme_selection=True)
         self.insts_tree.grid(row=1, column=0, sticky='NSEW')
         first = True
         for name, d in header_settings['instruction'].items():
