@@ -461,7 +461,6 @@ class SCTProjectFacade:
             cur_list = self.project.scts[script].sects[section].inst_list
 
         first_uuid, last_uuid = sel_bounds
-        first_case = None
         if sep in first_uuid:
             first_uuid, first_case = first_uuid.split(sep)
             return self.move_switch_case(script, section, first_uuid, first_case, insert_after)
@@ -484,19 +483,7 @@ class SCTProjectFacade:
                 test_uuid = l_parents.pop(-1)
             _, l_index = self.get_grouped_parents_and_index(test_uuid, base_group)
 
-        f_inst_list_ind = cur_list.index(first_uuid)
-        l_inst_list_ind = cur_list.index(last_uuid)
-        sel_insts = cur_list[f_inst_list_ind: l_inst_list_ind + 1]
-        temp_after = cur_list[l_inst_list_ind+1:] if l_inst_list_ind + 1 != len(cur_list) else []
-        temp__list = cur_list[:f_inst_list_ind] + temp_after
-        insert_ind = temp__list.index(insert_after) + 1
-        temp__list = temp__list[:insert_ind] + sel_insts + temp__list[insert_ind:]
-
-        if section is None:
-            self.project.scts[script].sect_list = temp__list
-        else:
-            self.project.scts[script].sects[section].inst_list = temp__list
-
+        # Handle tree first
         cur_group = base_group
         for p in f_parents:
             cur_group = cur_group[p]
@@ -504,13 +491,41 @@ class SCTProjectFacade:
         for i in reversed(range(f_index, l_index+1)):
             cur_group.pop(i)
 
+        insert_case = None
+        if sep in insert_after:
+            insert_after, insert_case = insert_after.split(sep)
+
         i_parents, i_index = self.get_grouped_parents_and_index(insert_after, base_group)
 
         for p in i_parents:
             base_group = base_group[p]
 
+        # Modify the correct insertion point depending on whether to insert in group or not
+        if self.inst_is_group(script, section, insert_after):
+            if insert_in_group:
+                base_group = base_group[i_index]
+                if insert_case is not None:
+                    base_group = base_group[insert_case]
+                i_index = 0
+            else:
+                insert_after = self.get_inst_uuid_from_group_entry(base_group[i_index], last=True)
+
         for g in reversed(moved_group):
             base_group.insert(i_index+1, g)
+
+        # Handle list version
+        f_inst_list_ind = cur_list.index(first_uuid)
+        l_inst_list_ind = cur_list.index(last_uuid)
+        sel_insts = cur_list[f_inst_list_ind: l_inst_list_ind + 1]
+        temp_after = cur_list[l_inst_list_ind+1:] if l_inst_list_ind + 1 != len(cur_list) else []
+        temp_list = cur_list[:f_inst_list_ind] + temp_after
+        insert_ind = temp_list.index(insert_after) + 1
+        temp_list = temp_list[:insert_ind] + sel_insts + temp_list[insert_ind:]
+
+        if section is None:
+            self.project.scts[script].sect_list = temp_list
+        else:
+            self.project.scts[script].sects[section].inst_list = temp_list
 
         self.callbacks['set_change']()
 
