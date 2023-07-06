@@ -534,6 +534,12 @@ class SCTProjectFacade:
         # if the group moved is an instruction group...
         self._refresh_inst_positions(script=script, section=section)
 
+        cur_sect = self.project.scts[script].sects[section]
+        # break prev links:
+        if len(cur_sect.insts[first_uuid].links_in) > 0:
+            self.remove_inst_links(script, section, first_uuid, direction='in')
+
+
     def move_switch_case(self, script, section, switch_uuid, case, insert_after):
         cur_sect = self.project.scts[script].sects[section]
         cur_group = cur_sect.inst_tree
