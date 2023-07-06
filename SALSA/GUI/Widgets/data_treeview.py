@@ -220,6 +220,9 @@ class DataTreeview(ttk.Treeview):
         if insert_after_data is None:
             case = self.item(insert_after_iid)['values'][0].split(' ')[0]
             insert_after_data = f'{self.row_data[(self.parent(insert_after_iid))]}{sep}{case}'
+        insert_in_group = False
+        if insert_after_iid == self.parent(self.placeholder):
+            insert_in_group = True
 
         # Assorted cleanup
         self.in_motion = False
@@ -228,7 +231,7 @@ class DataTreeview(ttk.Treeview):
         self.drag_widget = None
 
         # Callback to have the items moved and tree refreshed
-        self.callbacks['move_items'](self.name, self.selection_bounds, insert_after_data)
+        self.callbacks['move_items'](self.name, self.selection_bounds, insert_after_data, insert_in_group)
         self.selection_bounds = None
 
     def bMove(self, event):
