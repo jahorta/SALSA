@@ -102,6 +102,7 @@ class DataTreeview(ttk.Treeview):
         self.selection_bounds = None
         self.selected = None
         self.group_waiting = ''
+        self.parent_restriction = None
 
     def add_callback(self, key, callback):
         self.callbacks[key] = callback
@@ -229,6 +230,7 @@ class DataTreeview(ttk.Treeview):
         self.placeholder = None
         self.drag_widget.destroy()
         self.drag_widget = None
+        self.parent_restriction = None
 
         # Callback to have the items moved and tree refreshed
         self.callbacks['move_items'](self.name, self.selection_bounds, insert_after_data, insert_in_group)
@@ -241,10 +243,22 @@ class DataTreeview(ttk.Treeview):
             self.selection_set(self.selected)
             self.in_motion = True
             self.start_motion()
-        self.drag_widget.update_pos(event.x_root, event.y_root)
+            if sep in self.selection_bounds[0]:
+                self.parent_restriction = self.parent(self.placeholder)
+
         sel_iid = self.identify_row(event.y)
+        # No need to update position bc
         if sel_iid == '':
             return
+
+        if self.parent_restriction is not None:
+            if self.parent_restriction != self.parent(sel_iid):
+                return
+
+        self.drag_widget.update_pos(event.x_root, event.y_root)
+        if sel_iid == self.placeholder:
+            return
+
         if len(self.get_children(sel_iid)) > 0:
             if not self.item(sel_iid)['open'] in (True, 1):
                 if self.group_waiting != '':
