@@ -281,6 +281,9 @@ class DataTreeview(ttk.Treeview):
             if self.parent_restriction != self.parent(sel_iid):
                 return
 
+        if sel_iid in (self.first_entry, self.last_entry):
+            return
+
         self.drag_widget.update_pos(event.x_root, event.y_root)
         if sel_iid == self.placeholder:
             return
