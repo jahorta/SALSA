@@ -217,15 +217,16 @@ class DataTreeview(ttk.Treeview):
         final_index = self.index(self.placeholder)
         insert_after_index = 0 if final_index == 0 else final_index - 1
         insert_after_iid = self.get_children(self.parent(self.placeholder))[insert_after_index]
+
+        insert_in_group = False
         if final_index == 0:
             insert_after_iid = self.parent(insert_after_iid)
+            insert_in_group = True
+
         insert_after_data: Union[None, str] = self.row_data.get(insert_after_iid, None)
         if insert_after_data is None:
             case = self.item(insert_after_iid)['values'][0].split(' ')[0]
             insert_after_data = f'{self.row_data[(self.parent(insert_after_iid))]}{sep}{case}'
-        insert_in_group = False
-        if insert_after_iid == self.parent(self.placeholder):
-            insert_in_group = True
 
         # Assorted cleanup
         self.in_motion = False
