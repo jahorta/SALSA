@@ -64,6 +64,7 @@ class DragWindow(tk.Toplevel):
 placeholder_text = 'PLACEHOLDER'
 group_open_y_percent = 2/3  # proportion of a cell
 group_open_delay = 800  # delay to open a group by hovering (milliseconds)
+move_ignore_event_delay = 10
 
 
 class DataTreeview(ttk.Treeview):
@@ -103,6 +104,7 @@ class DataTreeview(ttk.Treeview):
         self.selected = None
         self.group_waiting = ''
         self.parent_restriction = None
+        self.move_ignore_counter = 0
 
     def add_callback(self, key, callback):
         self.callbacks[key] = callback
@@ -231,6 +233,7 @@ class DataTreeview(ttk.Treeview):
         self.drag_widget.destroy()
         self.drag_widget = None
         self.parent_restriction = None
+        self.move_ignore_counter = 0
 
         # Callback to have the items moved and tree refreshed
         self.callbacks['move_items'](self.name, self.selection_bounds, insert_after_data, insert_in_group)
@@ -240,6 +243,9 @@ class DataTreeview(ttk.Treeview):
         if self.has_shift:
             return
         if not self.in_motion:
+            if self.move_ignore_counter < move_ignore_event_delay:
+                self.move_ignore_counter += 1
+                return
             self.selection_set(self.selected)
             self.in_motion = True
             self.start_motion()
