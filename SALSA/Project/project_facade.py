@@ -558,13 +558,21 @@ class SCTProjectFacade:
         temp_list = temp_list[:list_insert_ind + 1] + case_list + temp_list_after
         cur_sect.inst_list = temp_list
 
-        # handle inst tree move
+        # handle inst tree move and switch param move
+        switch_inst = cur_sect.insts[switch_uuid]
         case_entry = {case: switch_group.pop(case)}
         new_cases = {}
-        for i, k in enumerate(switch_group.keys()):
+
+        switch_loops = switch_inst.l_params
+        case_loop = switch_loops.pop(case_ind)
+        new_l_params = []
+        for i, l in enumerate(switch_loops):
             if i == insert_ind:
                 new_cases |= case_entry
+                new_l_params.append(case_loop)
+            k = str(l[2].value)
             new_cases |= {k: switch_group[k]}
+            new_l_params.append(l)
         cur_group[index] = {f'{switch_uuid}{sep}switch': new_cases}
 
         self.callbacks['set_change']()
