@@ -526,7 +526,7 @@ class SCTProjectFacade:
                 base_group = base_group[list(base_group.keys())[0]]
                 if insert_case is not None:
                     base_group = base_group[insert_case]
-                i_index = 0
+                i_index = -1
             else:
                 insert_after = self.get_inst_uuid_from_group_entry(base_group[i_index], last=True)
 
