@@ -62,6 +62,9 @@ class DragWindow(tk.Toplevel):
 
 
 placeholder_text = 'PLACEHOLDER'
+group_open_y_percent = 2/3  # proportion of a cell
+group_open_delay = 800  # delay to open a group by hovering (milliseconds)
+
 
 class DataTreeview(ttk.Treeview):
 
@@ -98,6 +101,7 @@ class DataTreeview(ttk.Treeview):
         self.placeholder = None
         self.selection_bounds = None
         self.selected = None
+        self.group_waiting = ''
 
     def add_callback(self, key, callback):
         self.callbacks[key] = callback
@@ -235,7 +239,20 @@ class DataTreeview(ttk.Treeview):
             self.in_motion = True
             self.start_motion()
         self.drag_widget.update_pos(event.x_root, event.y_root)
-        moveto = self.index(self.identify_row(event.y))
+        sel_iid = self.identify_row(event.y)
+        if sel_iid == '':
+            return
+        if len(self.get_children(sel_iid)) > 0:
+            if not self.item(sel_iid)['open'] in (True, 1):
+                if self.group_waiting != '':
+                    return
+                bbox = self.bbox(sel_iid)
+                if event.y < bbox[1] + int(bbox[3] * group_open_y_percent):
+                    self.group_waiting = sel_iid
+                    self.after(15, self.delayed_open_group, sel_iid, 0, group_open_delay)
+                    return
+        self.group_waiting = ''
+        moveto = self.index(sel_iid)
         for s in self.selection():
             parent = self.parent(self.identify_row(event.y))
             self.move(s, parent, moveto)
@@ -305,6 +322,15 @@ class DataTreeview(ttk.Treeview):
         int_sel = list({int(s) for s in selection})
         int_sel.sort()
         return [str(s) for s in int_sel]
+
+    def delayed_open_group(self, group_iid, time_elapsed, time_finished):
+        if self.group_waiting != group_iid:
+            return
+        if time_elapsed > time_finished:
+            self.item(group_iid, open=True)
+        else:
+            self.after(100, self.delayed_open_group, group_iid, time_elapsed + 100, time_finished)
+
 
     def print_parent_and_index(self, event):
         iid = self.identify_row(event.y)
