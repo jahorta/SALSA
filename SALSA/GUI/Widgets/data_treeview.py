@@ -335,7 +335,8 @@ class DataTreeview(ttk.Treeview):
             i += 1
         return selection
 
-    def sort_sel_iids(self, selection: List[str]):
+    @staticmethod
+    def sort_sel_iids(selection: List[str]):
         int_sel = list({int(s) for s in selection})
         int_sel.sort()
         return [str(s) for s in int_sel]
@@ -347,7 +348,6 @@ class DataTreeview(ttk.Treeview):
             self.item(group_iid, open=True)
         else:
             self.after(100, self.delayed_open_group, group_iid, time_elapsed + 100, time_finished)
-
 
     def print_parent_and_index(self, event):
         iid = self.identify_row(event.y)
