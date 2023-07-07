@@ -319,7 +319,7 @@ class DataTreeview(ttk.Treeview):
         if sel_iid == self.placeholder:
             return
 
-        if len(self.get_children(sel_iid)) > 0:
+        if len(self.get_children(sel_iid)) > 0 and self.parent_restriction is None:
             if not self.item(sel_iid)['open'] in (True, 1):
                 if self.group_waiting != '':
                     if sel_iid == self.group_waiting:
