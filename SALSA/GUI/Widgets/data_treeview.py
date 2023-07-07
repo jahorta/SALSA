@@ -110,6 +110,8 @@ class DataTreeview(ttk.Treeview):
         self.first_entry = None
         self.last_entry = None
         self.keep_group_ends = keep_group_ends
+        self.start_index = None
+        self.start_parent = None
 
     def add_callback(self, key, callback):
         self.callbacks[key] = callback
@@ -231,6 +233,10 @@ class DataTreeview(ttk.Treeview):
         if not self.in_motion:
             return
         final_index = self.index(self.placeholder)
+        final_parent = self.parent(self.placeholder)
+        kwargs = {}
+        if final_parent == self.start_parent and final_index == self.start_index:
+            kwargs |= {'refresh_only': True}
         insert_after_index = 0 if final_index == 0 else final_index - 1
         insert_after_iid = self.get_children(self.parent(self.placeholder))[insert_after_index]
 
@@ -253,7 +259,9 @@ class DataTreeview(ttk.Treeview):
         self.move_ignore_counter = 0
 
         # Callback to have the items moved and tree refreshed
-        self.callbacks['move_items'](self.name, self.selection_bounds, insert_after_data, insert_in_group)
+        kwargs |= {'tree_key': self.name, 'sel_bounds': self.selection_bounds,
+                   'insert_after': insert_after_data, 'insert_in_group': insert_in_group}
+        self.callbacks['move_items'](**kwargs)
         self.selection_bounds = None
 
     def bMove(self, event):
@@ -322,13 +330,15 @@ class DataTreeview(ttk.Treeview):
         selection = self.sort_sel_iids(selection)
         base_select = list(set(selection) & set(self.get_children(base_parent)))
         bounds = (selection[0], selection[-1])
-        new_bounds = []
+        uuid_bounds = []
         for entry in bounds:
             data = self.row_data.get(entry, None)
             if data is None:
                 data = f'{self.row_data[self.parent(entry)]}{sep}{self.item(entry)["values"][0].split(" ")[0]}'
-            new_bounds.append(data)
-        self.selection_bounds = tuple(new_bounds)
+            uuid_bounds.append(data)
+        self.selection_bounds = tuple(uuid_bounds)
+        self.start_parent = self.parent(bounds[0])
+        self.start_index = self.index(bounds[0])
         index = self.index(bounds[0])
         values = [''] * (len(self['columns']) - 1)
         self.placeholder = self.insert(parent=base_parent, index=index, iid='placeholder', text=placeholder_text, values=values)
