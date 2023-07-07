@@ -99,10 +99,10 @@ class ProjectEditorController:
 
         self.link_font = SALSAFont()
 
-    def set_change_flag(self, offset=None):
-        if offset is not None:
-            if offset not in self.script_refresh_offset_queue:
-                self.script_refresh_offset_queue.append(offset)
+    def set_change_flag(self):
+        if self.current['script'] is not None:
+            if self.current['script'] not in self.script_refresh_offset_queue:
+                self.script_refresh_offset_queue.append(self.current['script'])
         self.has_changes = True
         self.view.save_button.configure(state='normal')
 
