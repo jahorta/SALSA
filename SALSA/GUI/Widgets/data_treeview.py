@@ -200,11 +200,18 @@ class DataTreeview(ttk.Treeview):
 
     def bDown_Shift(self, event):
         self.has_shift = True
-        clicked_row = int(self.identify_row(event.y))
-        first_row = int(self.first_selected)
-        if clicked_row == first_row:
+
+        clicked_iid = self.identify_row(event.y)
+        if clicked_iid in self.first_selected:
             self.after(10, self.selection_set, self.first_selected)
             return
+
+        clicked_row = int(clicked_iid)
+        if isinstance(self.first_selected, list):
+            first_row = int(self.first_selected[0]) if int(self.first_selected[0]) < clicked_row else int(self.first_selected[1])
+        else:
+            first_row = int(self.first_selected)
+
         select = [str(i) for i in range(min(clicked_row, first_row), max(clicked_row, first_row)+1)]
 
         # Make sure that the first and last entries cannot be selected (label and return)
@@ -225,13 +232,27 @@ class DataTreeview(ttk.Treeview):
     def bDown_move(self, event):
         if self.identify_row(event.y) not in self.selection():
             sel = self.identify_row(event.y)
-            self.selection_set(sel)
+            sel_uuid = self.row_data[sel]
+            sel_ind = self.index(sel)
+            sel_siblings = self.get_children(self.parent(sel))
+            if self.index(sel) > 0 and self.row_data[sel] is not None:
+                prev_sel = sel_siblings[sel_ind - 1]
+                prev_uuid = self.row_data[prev_sel]
+                if sel_uuid == prev_uuid:
+                    sel = [prev_sel, sel]
+            if not isinstance(sel, list):
+                if self.index(sel) + 1 < len(sel_siblings) and self.row_data[sel] is not None:
+                    next_sel = sel_siblings[sel_ind + 1]
+                    next_uuid = self.row_data[next_sel]
+                    if sel_uuid == next_uuid:
+                        sel = [sel, next_sel]
             self.first_selected = sel
             self.selected = sel
+            self.after(10, self.selection_set, sel)
 
     def bUp_move(self, event):
         if not self.in_motion:
-            return
+                return
         final_index = self.index(self.placeholder)
         final_parent = self.parent(self.placeholder)
         kwargs = {}
@@ -272,9 +293,10 @@ class DataTreeview(ttk.Treeview):
                 self.move_ignore_counter += 1
                 return
             # should prevent moving the first and last entries alone if prevent extreme selection is on
-            if (self.prevent_extreme_selection and not isinstance(self.selected, list) and
-                    self.first_selected in (self.first_entry, self.last_entry)):
-                return
+            if self.prevent_extreme_selection and not isinstance(self.selected, list):
+                if isinstance(self.first_selected, str):
+                    if self.first_selected in (self.first_entry, self.last_entry):
+                        return
             self.selection_set(self.selected)
             self.in_motion = True
             self.start_motion()
