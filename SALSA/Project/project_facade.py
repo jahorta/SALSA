@@ -539,9 +539,14 @@ class SCTProjectFacade:
         l_inst_list_ind = cur_list.index(last_uuid)
         sel_elements = cur_list[f_inst_list_ind: l_inst_list_ind + 1]
         temp_after = cur_list[l_inst_list_ind+1:] if l_inst_list_ind + 1 != len(cur_list) else []
+
+        old_tgt_uuid = temp_after[0] if len(temp_after) > 0 else None
         temp_list = cur_list[:f_inst_list_ind] + temp_after
         insert_ind = temp_list.index(insert_after) + 1
-        temp_list = temp_list[:insert_ind] + sel_elements + temp_list[insert_ind:]
+        insert_after = temp_list[insert_ind:]
+
+        new_tgt_uuid = insert_after[0] if len(insert_after) > 0 else None
+        temp_list = temp_list[:insert_ind] + sel_elements + insert_after
 
         if section is None:
             self.project.scts[script].sect_list = temp_list
@@ -556,9 +561,22 @@ class SCTProjectFacade:
         self._refresh_inst_positions(script=script, section=section)
 
         cur_sect = self.project.scts[script].sects[section]
+
         # break prev links:
-        if len(cur_sect.insts[first_uuid].links_in) > 0:
-            self.remove_inst_links(script, section, first_uuid, direction='in')
+        in_links = copy.deepcopy(cur_sect.insts[first_uuid].links_in)
+        for link in in_links:
+            self.change_link_tgt(cur_sect, link, old_tgt_uuid)
+
+        # Jump links to inst after group
+        in_links = copy.deepcopy(cur_sect.insts[new_tgt_uuid].links_in)
+        for link in in_links:
+            self.change_link_tgt(cur_sect, link, first_uuid)
+
+        in_links = copy.deepcopy(cur_sect.insts[old_tgt_uuid].links_in)
+        for link in in_links:
+            if link.origin_trace[1] in sel_elements:
+                self.change_link_tgt(cur_sect, link, new_tgt_uuid)
+
 
 
     def move_switch_case(self, script, section, switch_uuid, case, insert_after):
