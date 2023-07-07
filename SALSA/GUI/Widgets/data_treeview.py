@@ -64,7 +64,7 @@ class DragWindow(tk.Toplevel):
 placeholder_text = 'PLACEHOLDER'
 group_open_y_percent = 2/3  # proportion of a cell
 group_open_delay = 800  # delay to open a group by hovering (milliseconds)
-move_ignore_event_delay = 20
+move_ignore_event_delay = 5
 
 
 class DataTreeview(ttk.Treeview):
