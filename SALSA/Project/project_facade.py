@@ -1329,7 +1329,7 @@ class SCTProjectFacade:
                 if new_tgt_inst_uuid is None or remove_link:
                     ori_inst.links_out.pop(ori_inst.links_out.index(link))
                 else:
-                    self.change_link_tgt(tgt_sect=cur_sect, link=link, new_tgt_uuid=new_tgt_inst_uuid, remove_from_tgt=False)
+                    self.change_link_tgt(tgt_sect=cur_sect, link=link, new_tgt_uuid=new_tgt_inst_uuid, remove_from_old_tgt=False)
 
             cur_inst.links_in = []
 
@@ -1342,9 +1342,9 @@ class SCTProjectFacade:
             cur_inst.links_out = []
 
     @staticmethod
-    def change_link_tgt(tgt_sect: SCTSection, link: SCTLink, new_tgt_uuid: str, remove_from_tgt=True):
+    def change_link_tgt(tgt_sect: SCTSection, link: SCTLink, new_tgt_uuid: str, remove_from_old_tgt=True):
         prev_tgt_uuid = link.target_trace[1]
-        if remove_from_tgt:
+        if remove_from_old_tgt:
             tgt_sect.insts[prev_tgt_uuid].links_in.remove(link)
         tgt_sect.insts[new_tgt_uuid].links_in.append(link)
         link.target_trace[1] = new_tgt_uuid
