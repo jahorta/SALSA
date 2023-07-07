@@ -578,14 +578,13 @@ class SCTProjectFacade:
                 self.change_link_tgt(cur_sect, link, new_tgt_uuid)
 
 
-
     def move_switch_case(self, script, section, switch_uuid, case, insert_after):
         cur_sect = self.project.scts[script].sects[section]
         cur_group = cur_sect.inst_tree
         cur_inst = cur_sect.insts[switch_uuid]
         inst_gotos = [goto for goto in cur_inst.my_goto_uuids]
         goto_poses = [cur_sect.inst_list.index(goto) for goto in inst_gotos]
-        inst_gotos = zip(*sorted(zip(goto_poses, inst_gotos)))
+        goto_poses, inst_gotos = zip(*sorted(zip(goto_poses, inst_gotos)))
 
         parents, index = self.get_grouped_parents_and_index(switch_uuid, cur_group)
 
@@ -599,41 +598,49 @@ class SCTProjectFacade:
 
         if insert_after == switch_uuid:
             insert_ind = 0
-        elif insert_after not in inst_gotos:
-            insert_ind = len(inst_gotos) - 1
         else:
-            insert_ind = inst_gotos.index(insert_after) + 1
+            insert_after_case = insert_after.split(sep)[1]
+            insert_after_goto = self.get_inst_uuid_from_group_entry(switch_group[insert_after_case], last=True)
+            if insert_after_goto not in inst_gotos:
+                insert_ind = len(inst_gotos) - 1
+                insert_after = inst_gotos[-1]
+            else:
+                insert_ind = inst_gotos.index(insert_after_goto) + 1
+                insert_after = insert_after_goto
 
         if insert_ind == case_ind:
             return
 
         # handle inst list move
-        case_first_uuid = case_group[0]
+        case_first_uuid = self.get_inst_uuid_from_group_entry(case_group[0])
         first_ind = cur_sect.inst_list.index(case_first_uuid)
         last_ind = cur_sect.inst_list.index(case_goto.ID)
         case_list = cur_sect.inst_list[first_ind:last_ind + 1]
-        temp_list = cur_sect.inst_list[:first_ind] + cur_sect.inst_list[last_ind + 1]
-        list_insert_ind = cur_sect.inst_list.index(insert_after) + 1
+        temp_list = cur_sect.inst_list[:first_ind] + cur_sect.inst_list[last_ind + 1:]
+        list_insert_ind = temp_list.index(insert_after) + 1
         temp_list_after = temp_list[list_insert_ind + 1:] if list_insert_ind + 1 != len(temp_list) else []
         temp_list = temp_list[:list_insert_ind + 1] + case_list + temp_list_after
         cur_sect.inst_list = temp_list
 
         # handle inst tree move and switch param move
         switch_inst = cur_sect.insts[switch_uuid]
-        case_entry = {case: switch_group.pop(case)}
+        case_entry = {case: switch_group[case]}
         new_cases = {}
 
         switch_loops = switch_inst.l_params
-        case_loop = switch_loops.pop(case_ind)
+        case_loop = switch_loops[case_ind]
         new_l_params = []
         for i, l in enumerate(switch_loops):
             if i == insert_ind:
                 new_cases |= case_entry
                 new_l_params.append(case_loop)
             k = str(l[2].value)
+            if k == case:
+                continue
             new_cases |= {k: switch_group[k]}
             new_l_params.append(l)
         cur_group[index] = {f'{switch_uuid}{sep}switch': new_cases}
+        switch_inst.l_params = new_l_params
 
         self.callbacks['set_change']()
 
