@@ -75,6 +75,7 @@ class ProjectEditorController:
         }
 
         self.cur_mem_offset = 0
+        self.script_refresh_offset_queue = []
 
         self.trees: Dict[str, DataTreeview] = {
             'script': self.view.scripts_tree,
@@ -98,7 +99,10 @@ class ProjectEditorController:
 
         self.link_font = SALSAFont()
 
-    def set_change_flag(self):
+    def set_change_flag(self, offset=None):
+        if offset is not None:
+            if offset not in self.script_refresh_offset_queue:
+                self.script_refresh_offset_queue.append(offset)
         self.has_changes = True
         self.view.save_button.configure(state='normal')
 
@@ -213,6 +217,10 @@ class ProjectEditorController:
                         entry[col] = ''
                     else:
                         entry[col] = hex(int(entry[col])+self.cur_mem_offset)
+
+                    if self.current['script'] is not None:
+                        if self.current['script'] in self.script_refresh_offset_queue:
+                            entry[col] = '??RefreshPls'
                 if first:
                     kwargs['text'] = entry[col]
                     first = False
