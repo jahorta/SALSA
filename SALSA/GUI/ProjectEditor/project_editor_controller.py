@@ -627,9 +627,13 @@ class ProjectEditorController:
     def add_callback(self, key: str, callback: callable):
         self.callbacks[key] = callback
 
-    def on_move_items(self, tree_key, sel_bounds, insert_after, insert_in_group):
+    def on_move_items(self, tree_key, sel_bounds, insert_after, insert_in_group, refresh_only=False):
         section = self.current['section'] if tree_key == 'instruction' else None
-        self.project.move_items(sel_bounds, insert_after, insert_in_group, self.current['script'], section)
+
+        if not refresh_only:
+            self.project.move_items(sel_bounds, insert_after, insert_in_group, self.current['script'], section)
+
         if tree_key == 'section':
             self.trees['instruction'].clear_all_entries()
+
         self.refresh_tree(tree_key)
