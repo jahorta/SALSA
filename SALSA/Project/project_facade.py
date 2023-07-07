@@ -563,19 +563,23 @@ class SCTProjectFacade:
         cur_sect = self.project.scts[script].sects[section]
 
         # break prev links:
-        in_links = copy.deepcopy(cur_sect.insts[first_uuid].links_in)
-        for link in in_links:
-            self.change_link_tgt(cur_sect, link, old_tgt_uuid)
+        for link in cur_sect.insts[first_uuid].links_in:
+            self.change_link_tgt(cur_sect, link, old_tgt_uuid, remove_from_old_tgt=False)
+        cur_sect.insts[first_uuid].links_in = []
 
         # Jump links to inst after group
-        in_links = copy.deepcopy(cur_sect.insts[new_tgt_uuid].links_in)
-        for link in in_links:
-            self.change_link_tgt(cur_sect, link, first_uuid)
+        for link in cur_sect.insts[new_tgt_uuid].links_in:
+            self.change_link_tgt(cur_sect, link, first_uuid, remove_from_old_tgt=False)
+        cur_sect.insts[new_tgt_uuid].links_in = []
 
-        in_links = copy.deepcopy(cur_sect.insts[old_tgt_uuid].links_in)
-        for link in in_links:
+        changed_links = []
+        for link in cur_sect.insts[old_tgt_uuid].links_in:
             if link.origin_trace[1] in sel_elements:
-                self.change_link_tgt(cur_sect, link, new_tgt_uuid)
+                changed_links.append(link)
+                self.change_link_tgt(cur_sect, link, new_tgt_uuid, remove_from_old_tgt=False)
+        for link in changed_links:
+            cur_sect.insts[old_tgt_uuid].links_in.remove(link)
+
 
 
     def move_switch_case(self, script, section, switch_uuid, case, insert_after):
