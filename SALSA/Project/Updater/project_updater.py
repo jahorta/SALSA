@@ -113,9 +113,9 @@ class ProjectUpdater:
                 cur_piece.__delattr__(old_attr)
         return cur_piece
 
-    # -------------------------- #
-    # Section specific functions #
-    # -------------------------- #
+    # ------------------------- #
+    # Script specific functions #
+    # ------------------------- #
 
     @staticmethod
     def _modify_section_groups_v1(cur_piece: SCTScript):
@@ -131,6 +131,31 @@ class ProjectUpdater:
         for pos, entry in changes.items():
             cur_piece.sect_tree.pop(pos)
             cur_piece.sect_tree.insert(pos, entry)
+        return cur_piece
+
+    @staticmethod
+    def _move_string_garbage_v1(cur_piece: SCTScript):
+        cur_piece.string_garbage = {}
+        for name, sect in cur_piece.string_sections.items():
+            if 'end' in sect.garbage:
+                cur_piece.string_garbage[name] = sect.garbage
+        cur_piece.__delattr__('string_sections')
+        return cur_piece
+
+    @staticmethod
+    def _move_sect_labels_v1(cur_piece: SCTSection):
+        if len(cur_piece.internal_sections_inst) == 0:
+            labels = [cur_piece.name]
+        else:
+            labels, poses = [k for k in cur_piece.internal_sections_inst.keys()], [v for v in cur_piece.internal_sections_inst.values()]
+            poses, labels = zip(*sorted(zip(poses, labels)))
+            labels = list(labels)
+        for inst in cur_piece.insts.values():
+            if inst.base_id == 9:
+                if len(labels) == 0:
+                    inst.label = '??Unknown??'
+                else:
+                    inst.label = labels.pop(0)
         return cur_piece
 
 

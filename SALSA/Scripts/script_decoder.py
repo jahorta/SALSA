@@ -238,6 +238,9 @@ class SCTDecoder:
 
                 instResult = self._decode_instruction(currWord_int, inst_pos, [sect_name, inst_list_id])
 
+                if instResult.base_id == 9:
+                    instResult.label = sect_name
+
                 if try_no_refresh:
                     instResult.skip_refresh = True
 
@@ -1182,7 +1185,7 @@ class SCTDecoder:
         for name in new_section_order:
             if name in decoded_sct.sects.keys():
                 if decoded_sct.sects[name].type == 'String':
-                    decoded_sct.string_sections[name] = decoded_sct.sects[name]
+                    decoded_sct.string_garbage[name] = decoded_sct.sects[name].garbage
                     continue
                 new_sections_dict[name] = decoded_sct.sects[name]
                 new_sections_ungrouped.append(name)

@@ -22,6 +22,9 @@ v2 = {
         2: {
             UP.callable: '_modify_section_groups_v1',
         },
+        3: {
+            UP.callable: '_move_string_garbage_v1',
+        },
     },
     PP.section: {
         1: {
@@ -32,6 +35,9 @@ v2 = {
                 ('instruction_ids_grouped', 'inst_tree'),
                 ('instructions_used', 'insts_used')
             ]
+        },
+        2: {
+            UP.callable: '_move_sect_labels_v1',
         },
     },
     PP.instruction: {

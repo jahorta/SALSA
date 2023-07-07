@@ -169,22 +169,19 @@ class SCTEncoder:
             # Add String using encode string
             self.sct_body.extend(self._encode_string(string=string, align=True))
 
-            string_sect: SCTSection = self.script.string_sections[name]
-            if 'end' in string_sect.garbage:
-                self.sct_body.extend(string_sect.garbage['end'])
+            if name in self.script.string_garbage:
+                garbage = self.script.string_garbage[name]
+                if 'end' in garbage:
+                    self.sct_body.extend(garbage['end'])
 
     def _encode_section(self, name, section):
-        # If the section is a label, just add the entry to the header and add a string label
-        sect_list = [name]
-        if len(section.internal_sections_inst.keys()) > 0:
-            sect_list = list(section.internal_sections_inst)
+        # If the inst is a label, just add the entry to the header and add a string label
         sect_name = name
         for inst_id in section.inst_list:
             inst = section.insts[inst_id]
             if inst.base_id == 9:
-                sect_name = sect_list[0]
+                sect_name = inst.label
                 self.header_dict[sect_name] = len(self.sct_body)
-                sect_list.pop(0)
             self._encode_instruction(inst, trace=[sect_name])
 
         # add garbage at end of section if needed
