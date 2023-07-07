@@ -499,18 +499,18 @@ class SCTProjectFacade:
 
         # Handle tree first
 
-        insert_case = None
-        if sep in insert_after:
-            insert_after, insert_case = insert_after.split(sep)
-
-        i_parents, i_index = self.get_grouped_parents_and_index(insert_after, base_group)
-
         cur_group = base_group
         for p in f_parents:
             cur_group = cur_group[p]
         moved_group = cur_group[f_index: l_index+1]
         for i in reversed(range(f_index, l_index+1)):
             cur_group.pop(i)
+
+        insert_case = None
+        if sep in insert_after:
+            insert_after, insert_case = insert_after.split(sep)
+
+        i_parents, i_index = self.get_grouped_parents_and_index(insert_after, base_group)
 
         for p in i_parents:
             base_group = base_group[p]
