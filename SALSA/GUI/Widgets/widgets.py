@@ -110,6 +110,21 @@ class RequiredEntryMixin:
 # Widget Classes #
 # -------------- #
 
+class LabelNameEntry(ValidatedMixin, ttk.Entry):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def _key_validate(self, char, index, current, proposed, action, **kwargs):
+        valid = True
+
+        if len(proposed) > 16:
+            return False
+
+        if not re.search('^[a-zA-Z0-9_]+$', proposed):
+            valid = False
+
+        return valid
+
 
 class RequiredEntry(ValidatedMixin, RequiredEntryMixin, ttk.Entry):
 
