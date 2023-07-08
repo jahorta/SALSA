@@ -661,7 +661,7 @@ class SCTProjectFacade:
 
     def add_switch_case(self, script, section, instruction, **kwargs):
         cur_sect = self.project.scts[script].sects[section]
-        parent_list, index = self.get_grouped_parents_and_index(grouped_region=cur_sect.inst_tree, inst=instruction)
+        parent_list, index = self.get_grouped_parents_and_index(grouped_region=cur_sect.inst_tree, element=instruction)
         cases = [int(loop[2].value) for loop in cur_sect.insts[instruction].l_params]
         next_case = -1
         while next_case in cases:
@@ -1196,16 +1196,16 @@ class SCTProjectFacade:
 
         return group
 
-    def get_grouped_parents_and_index(self, inst, grouped_region, parents=None) -> (list, int):
+    def get_grouped_parents_and_index(self, element, grouped_region, parents=None) -> (list, int):
         if parents is None:
             parents = []
 
-        if inst in grouped_region:
-            return parents, grouped_region.index(inst)
+        if element in grouped_region:
+            return parents, grouped_region.index(element)
 
         if isinstance(grouped_region, dict):
             for key, value in grouped_region.items():
-                out_parents, index = self.get_grouped_parents_and_index(inst, value, parents=parents + [key])
+                out_parents, index = self.get_grouped_parents_and_index(element, value, parents=parents + [key])
                 if out_parents is not None:
                     return out_parents, index
         else:
@@ -1214,10 +1214,10 @@ class SCTProjectFacade:
                     continue
 
                 for key, value in entry.items():
-                    if inst in key:
+                    if element in key:
                         return parents, i
 
-                    out_parents, index = self.get_grouped_parents_and_index(inst, value, parents=parents + [i] + [key])
+                    out_parents, index = self.get_grouped_parents_and_index(element, value, parents=parents + [i] + [key])
                     if out_parents is not None:
                         return out_parents, index
 
