@@ -64,6 +64,7 @@ class ReservedVars:
     }
 
 
+logical_sect_suffix = '(0)'
 sep = '|'
 
 
@@ -77,3 +78,4 @@ uuid_sep = ','
 
 
 LOCK = '🔒'
+label_name_sep = '  -  '

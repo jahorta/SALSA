@@ -8,7 +8,7 @@ from SALSA.Project.description_formatting import format_description
 from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter, SCTInstruction, SCTLink
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
-from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep
+from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep, label_name_sep
 from SALSA.Scripts.scpt_param_codes import get_scpt_override
 
 
@@ -462,6 +462,9 @@ class SCTProjectFacade:
 
     def inst_is_group(self, script, section, instruction, **kwargs):
         return self.project.scts[script].sects[section].insts[instruction].base_id in (0, 3)
+
+    def inst_is_label(self, script, section, instruction):
+        return self.project.scts[script].sects[section].insts[instruction].base_id == 9
 
     # ------------------------ #
     # Group based manipulation #
@@ -1360,3 +1363,36 @@ class SCTProjectFacade:
             tgt_sect.insts[prev_tgt_uuid].links_in.remove(link)
         tgt_sect.insts[new_tgt_uuid].links_in.append(link)
         link.target_trace[1] = new_tgt_uuid
+
+    def change_section_name(self, script, section, instruction, new_name):
+        cur_script = self.project.scts[script]
+        cur_section = cur_script.sects[section]
+        if instruction is None:
+            instruction = cur_section.inst_list[0]
+        cur_label = cur_section.insts[instruction]
+
+        old_name = cur_label.label
+
+        cur_label.label = new_name
+
+        if old_name not in cur_section.name:
+            return
+
+        old_sect_name = cur_section.name
+        new_sect_name = new_name
+        if not old_sect_name == old_sect_name:
+            new_sect_name += old_sect_name[len(old_name):]
+
+        cur_section.name = new_sect_name
+        cur_script.sects[new_sect_name] = cur_script.sects.pop(old_sect_name)
+        cur_script.sect_list[cur_script.sect_list.index(old_sect_name)] = new_sect_name
+
+        cur_group = cur_script.sect_tree
+        parents, index = self.get_grouped_parents_and_index(old_sect_name, cur_group)
+
+        for p in parents:
+            cur_group = cur_group[p]
+
+        cur_group[index] = new_sect_name
+
+

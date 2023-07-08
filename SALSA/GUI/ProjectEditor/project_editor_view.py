@@ -4,6 +4,7 @@ import json
 from typing import List, Dict
 
 import SALSA.GUI.Widgets.widgets as w
+from SALSA.Common.constants import label_name_sep
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
 from SALSA.GUI.themes import light_theme, dark_theme
 from SALSA.GUI.ProjectEditor.inst_group_handler import InstGroupHandlerDialog
@@ -187,6 +188,7 @@ class ProjectEditorView(ttk.Frame):
         inst_tree_scrollbar = ttk.Scrollbar(self.inst_tree_frame, orient='vertical', command=self.insts_tree.yview)
         inst_tree_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.S)
         self.insts_tree.config(yscrollcommand=inst_tree_scrollbar.set)
+        self.insts_tree.bind('<Double-1>', lambda e: self.on_inst_double_click(e))
 
         # Instruction details frame setup
         self.inst_frame = ttk.Frame(self.pane_frame, width=400)
@@ -311,6 +313,12 @@ class ProjectEditorView(ttk.Frame):
         self.insts_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
         self.insts_tree.bind('<Button-3>', self.callbacks['show_inst_menu'], add='+')
 
+    def on_inst_double_click(self, e):
+        sel_iid = self.insts_tree.identify_row(e.y)
+        row_data = self.insts_tree.row_data[sel_iid]
+        if self.callbacks['inst_is_label'](row_data):
+            self.show_label_edit_widget(e)
+
     def on_param_double_click(self, param, e):
         if param != 'delay':
             # get item id and values associated with the item
@@ -389,6 +397,31 @@ class ProjectEditorView(ttk.Frame):
                                head_labels=labels, row_labels=row_labels, inst_id=cur_inst_id, new_inst_id=new_id,
                                is_darkmode=self.is_darkmode, end_callback=end_callback,
                                end_kwargs=end_kwargs)
+
+    def show_label_edit_widget(self, e):
+        column = self.insts_tree.identify_column(e.x)
+        sel_iid = self.insts_tree.identify_row(e.y)
+
+        label_label = self.insts_tree.item(sel_iid)['values'][0]
+        if label_name_sep not in label_label:
+            return
+        label_parts = label_label.split(label_name_sep)
+        label_name = label_parts[1]
+
+        bbox = self.insts_tree.bbox(sel_iid, column)
+        widget = ttk.Frame(self.insts_tree)
+        widget.place(x=bbox[0], y=bbox[1], width=bbox[2], height=bbox[3])
+        widget.columnconfigure(1, weight=1)
+
+        label = ttk.Label(widget, text=label_parts[0])
+        label.grid(row=0, column=0, padx=10)
+        widget.entry_widget = w.LabelNameEntry(widget)
+        widget.entry_widget.insert(0, label_name)
+        widget.entry_widget.grid(row=0, column=1, sticky=tk.W + tk.E)
+        self.after(10, widget.entry_widget.focus_set)
+
+        widget.entry_widget.bind('<Return>', lambda event: self.callbacks['change_label_name'](widget, sel_iid, event))
+        widget.entry_widget.bind('<Escape>', lambda event: widget.destroy())
 
     def change_theme(self, dark_mode):
         self.is_darkmode = dark_mode

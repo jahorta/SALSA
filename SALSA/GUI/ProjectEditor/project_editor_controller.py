@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
-from SALSA.Common.constants import sep
+from SALSA.Common.constants import sep, label_name_sep
 from SALSA.GUI.fonts_used import SALSAFont
 from SALSA.GUI.ProjectEditor.instruction_selector import InstructionSelectorWidget
 from SALSA.GUI.ParamEditorPopups.param_editor_controller import ParamEditController
@@ -44,7 +44,9 @@ class ProjectEditorController:
             'show_inst_menu': self.show_instruction_right_click_menu,
             'save_project': self.save_project,
             'set_mem_offset': self.set_mem_offset,
-            'param_rcm': self.param_right_click_menu
+            'param_rcm': self.param_right_click_menu,
+            'inst_is_label': self.check_is_label,
+            'change_label_name': self.change_label_name
         }
         self.view.add_and_bind_callbacks(view_callbacks)
 
@@ -336,6 +338,23 @@ class ProjectEditorController:
         self.update_tree(tree_key, self.project.get_tree(self.view.get_headers(tree_key), **kwargs))
         self.trees[tree_key].open_tree_elements(open_items)
         self.trees[tree_key].yview_moveto(cur_y_view)
+        if keep_selection:
+            self.trees[tree_key].selection_set(cur_sel)
+
+    def check_is_label(self, inst_uuid):
+        return self.project.inst_is_label(self.current['script'], self.current['section'], inst_uuid)
+
+    def change_label_name(self, widget, sel_iid, e):
+        label_uuid = self.trees['instruction'].row_data.get(sel_iid, None)
+        if label_uuid is None:
+            return
+        new_name = e.widget.entry_widget.get()
+        widget.destroy()
+        if new_name == self.trees['instruction'].item(sel_iid)['values'][0].split(label_name_sep)[0]:
+            return
+        self.project.change_section_name(self.current['script'], self.current['section'], label_uuid, new_name)
+        self.refresh_tree('section', keep_selection=True)
+        self.refresh_tree('instruction', keep_selection=True)
 
     # ----------------- #
     # Right Click Menus #
@@ -426,6 +445,9 @@ class ProjectEditorController:
             m.add_command(label='Change Instruction', command=self.rcm_change_inst)
         else:
             m.add_command(label='Remove Case', command=self.rcm_remove_switch_case)
+
+        if self.project.inst_is_label(self.current['script'], self.current['section'], self.current['instruction']):
+            m.add_command(label='Change Label Section Name', command=lambda: self.view.show_label_edit_widget(e))
 
         m.bind('<Escape>', m.destroy)
         try:
