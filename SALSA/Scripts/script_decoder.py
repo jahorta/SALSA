@@ -43,6 +43,8 @@ class SCTDecoder:
     _switches: Dict[str, List[int]]
     _last_sect_pos: int
     _cur_endian: Literal['big', 'little'] = endian['gc']
+    _strings_only: bool
+    _is_validation: bool
 
     _scpt_arithmetic_fxns: Dict[str, Callable] = {
         '*': scpt_arithmetic.mult,
@@ -59,15 +61,7 @@ class SCTDecoder:
 
     _debug_log: List[str] = []
 
-    @classmethod
-    def decode_sct_from_file(cls, name, sct, inst_lib: BaseInstLibFacade):
-        sct_decoder = cls()
-        decoded_sct = sct_decoder._decode_sct(name, sct, inst_lib)
-        decoded_sct = sct_decoder._organize_sct(decoded_sct)
-        sct_decoder._finalize_sct(decoded_sct)
-        return decoded_sct
-
-    def _init(self):
+    def _init(self, strings_only=False, is_validation=False):
         self._str_sect_links = []
         self._str_foot_links = []
         self._scpt_links = []
@@ -78,9 +72,21 @@ class SCTDecoder:
         self._instruction_groups = {}
         self._footer_dialog_locs = []
 
-    def _decode_sct(self, script_name: str, sct: bytearray, inst_lib: BaseInstLibFacade) -> SCTScript:
-        print(f'{self.log_key}: Decoding {script_name}')
+    @classmethod
+    def decode_sct_from_file(cls, name, sct, inst_lib: BaseInstLibFacade, strings_only=False, is_validation=False):
+        sct_decoder = cls()
+        decoded_sct = sct_decoder._decode_sct(name, sct, inst_lib, strings_only=strings_only, is_validation=is_validation)
+        if strings_only:
+            return decoded_sct
+        decoded_sct = sct_decoder._organize_sct(decoded_sct)
+        sct_decoder._finalize_sct(decoded_sct)
+        return decoded_sct
 
+    def _decode_sct(self, script_name: str, sct: bytearray, inst_lib: BaseInstLibFacade,
+                    strings_only=False, is_validation=False) -> SCTScript:
+        print(f'{self.log_key}: Decoding {script_name}')
+        self._strings_only = strings_only
+        self._is_validation = is_validation
         self._init()
         self._name = script_name
         self._sct = sct
@@ -138,6 +144,9 @@ class SCTDecoder:
                 bounds = (bounds[0], footer_start + 4)
 
             new_section = self._decode_sct_section(sect_name, bounds)
+
+            if new_section is None and self._strings_only:
+                continue
 
             # Create or add to a logical section group if needed
             if not in_sect_group:
@@ -197,6 +206,9 @@ class SCTDecoder:
 
         else:
             section.set_type('Script')
+
+        if self._strings_only:
+            return None
 
         section = self._create_insts_from_region(bounds, section, 0)
 
