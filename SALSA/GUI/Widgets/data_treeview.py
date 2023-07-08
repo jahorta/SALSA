@@ -223,6 +223,11 @@ class DataTreeview(ttk.Treeview):
             last = root_children[-1]
             if last in select:
                 select.remove(last)
+
+        if self.keep_group_ends and len(select) > 1:
+            if select[-1] == self.get_children(self.parent(select[-1]))[-1]:
+                select.pop(-1)
+
         self.selected = select
         self.selection_set(select)
 
@@ -294,9 +299,11 @@ class DataTreeview(ttk.Treeview):
                 return
             # should prevent moving the first and last entries alone if prevent extreme selection is on
             if self.prevent_extreme_selection and not isinstance(self.selected, list):
-                if isinstance(self.first_selected, str):
-                    if self.first_selected in (self.first_entry, self.last_entry):
-                        return
+                if self.first_selected in (self.first_entry, self.last_entry):
+                    return
+            if self.keep_group_ends and not isinstance(self.selected, list):
+                if self.first_selected == self.get_children(self.parent(self.first_selected))[-1]:
+                    return
             self.selection_set(self.selected)
             self.in_motion = True
             self.start_motion()
