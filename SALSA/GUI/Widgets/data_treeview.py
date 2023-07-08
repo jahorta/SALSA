@@ -343,7 +343,8 @@ class DataTreeview(ttk.Treeview):
         if (self.index(sel_iid) + 1 == len(self.get_children(parent))
                 and parent != ''
                 and self.parent_restriction is None
-                and self.keep_group_ends):
+                and self.keep_group_ends
+                and self.index(self.placeholder) < self.index(sel_iid)):
             if self.row_data.get(parent, None) is None:
                 parent = self.parent(parent)
             moveto = self.index(parent) + 1
