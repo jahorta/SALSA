@@ -141,6 +141,7 @@ class SCTInstruction:
         self.ungrouped_position: int = -1
         self.my_goto_uuids = []
         self.my_master_uuids = []
+        self.label = ''
 
     def set_inst_id(self, inst_id):
         self.base_id = inst_id
