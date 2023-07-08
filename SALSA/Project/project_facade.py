@@ -442,19 +442,22 @@ class SCTProjectFacade:
         b_param_id = param_parts[-1]
         return self.base_insts.get_inst(inst_id).params[int(b_param_id)]
 
-    def get_inst_is_removable(self, script, section, instruction, **kwargs):
+    def get_inst_rcm_restrictions(self, script, section, instruction, **kwargs):
         cur_sect = self.project.scts[script].sects[section]
         inst_ind = cur_sect.inst_list.index(instruction)
 
         # Checks for initial label and return of a function
-        if inst_ind == 0 or inst_ind + 1 == len(cur_sect.inst_list):
-            return False
+        if inst_ind == 0:
+            return 'first'
+
+        if inst_ind + 1 == len(cur_sect.inst_list):
+            return 'last'
 
         # Checks if the instruction is a goto with a master
         if len(cur_sect.insts[instruction].my_master_uuids) > 0:
-            return False
+            return 'goto'
 
-        return True
+        return ''
 
     def has_loops(self, script, section, instruction, **kwargs):
         cur_inst_id = self.project.scts[script].sects[section].insts[instruction].base_id

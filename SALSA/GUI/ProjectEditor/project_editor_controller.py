@@ -417,7 +417,7 @@ class ProjectEditorController:
             sel_iid = self.trees['instruction'].parent(sel_iid)
         inst_uuid = self.trees['instruction'].row_data[sel_iid]
         self.current['instruction'] = inst_uuid
-        is_removable = self.project.get_inst_is_removable(**self.current)
+        restrictions = self.project.get_inst_rcm_restrictions(**self.current)
         m = tk.Menu(self.view, tearoff=0)
 
         # if rightclicked row is group, add option for "Add Instruction in group"
@@ -431,18 +431,21 @@ class ProjectEditorController:
         # if rightclicked row is a case, add option for delete case
         if group_type != 'case':
             if group_type != 'else':
-                m.add_command(label='Add Instruction Above', command=lambda: self.rcm_add_inst('above'))
+                if 'first' not in restrictions:
+                    m.add_command(label='Add Instruction Above', command=lambda: self.rcm_add_inst('above'))
 
             if group_type == 'if':
-                next_sel_iid = self.trees['instruction'].next(sel_iid)
-                if next_sel_iid != '' and 'else' not in self.trees['instruction'].item(next_sel_iid)['values'][0]:
-                    m.add_command(label='Add Instruction Below', command=lambda: self.rcm_add_inst('below'))
+                if 'last' in restrictions:
+                    next_sel_iid = self.trees['instruction'].next(sel_iid)
+                    if 'else' not in self.trees['instruction'].item(next_sel_iid)['values'][0]:
+                        m.add_command(label='Add Instruction Below', command=lambda: self.rcm_add_inst('below'))
 
             m.add_command(label='Remove Instruction', command=self.rcm_remove_inst)
-            if not is_removable:
+            if restrictions != '':
                 m.entryconfig('Remove Instruction', state='disabled')
 
-            m.add_command(label='Change Instruction', command=self.rcm_change_inst)
+            if restrictions == '':
+                m.add_command(label='Change Instruction', command=self.rcm_change_inst)
         else:
             m.add_command(label='Remove Case', command=self.rcm_remove_switch_case)
 
