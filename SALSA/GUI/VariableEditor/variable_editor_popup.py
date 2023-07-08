@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Tuple, List
 
+from SALSA.GUI.Widgets.data_treeview import DataTreeview
 from SALSA.GUI.themes import dark_theme, light_theme
 from SALSA.Common.setting_class import settings
 from SALSA.GUI.Widgets import widgets as w
