@@ -56,6 +56,7 @@ class ProjectEditorController:
                         'refresh_inst': self.on_refresh_inst,
                         'update_variables': self.update_var_usage,
                         'get_subscript_list': lambda: self.project.get_section_list(self.current['script']),
+                        'delay_set_change': self.delay_set_change_flag,
                         'set_change': self.set_change_flag,
                         'get_instruction_list': lambda: self.project.get_inst_list(self.current['script'], self.current['section'], self.current['instruction'])}
         self.param_editor = ParamEditController(self.view, callbacks=pe_callbacks, is_darkmode=is_darkmode)
@@ -98,6 +99,9 @@ class ProjectEditorController:
         self.has_changes = False
 
         self.link_font = SALSAFont()
+
+    def delay_set_change_flag(self, delay):
+        self.view.after(delay, self.set_change_flag)
 
     def set_change_flag(self):
         if self.current['script'] is not None:
