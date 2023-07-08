@@ -51,12 +51,12 @@ class ProjectEditorController:
         self.project: SCTProjectFacade = facade
         self.project.set_callback('confirm_remove_inst_group', self.confirm_change_inst_group)
         self.project.set_callback('set_change', self.set_change_flag)
+        self.project.set_callback('delay_set_change', self.delay_set_change_flag)
 
         pe_callbacks = {'get_var_alias': self.get_var_alias,
                         'refresh_inst': self.on_refresh_inst,
                         'update_variables': self.update_var_usage,
                         'get_subscript_list': lambda: self.project.get_section_list(self.current['script']),
-                        'delay_set_change': self.delay_set_change_flag,
                         'set_change': self.set_change_flag,
                         'get_instruction_list': lambda: self.project.get_inst_list(self.current['script'], self.current['section'], self.current['instruction'])}
         self.param_editor = ParamEditController(self.view, callbacks=pe_callbacks, is_darkmode=is_darkmode)
