@@ -109,7 +109,7 @@ if __name__ == '__main__':
         name = name.split(os.sep)[-1]
 
         print(f'Starting decode for {f.split(".")[0]}')
-        script = SCTDecoder.decode_sct_from_file(f.split('.')[0], sct=original_ba, inst_lib=baseinsts)
+        script = SCTDecoder.decode_sct_from_file(f.split('.')[0], sct=original_ba, inst_lib=baseinsts, is_validation=True)
 
         print(f'Starting re-encode for {f.split(".")[0]}')
         encoded_ba = SCTEncoder.encode_sct_file_from_project_script(project_script=script, base_insts=baseinsts,
