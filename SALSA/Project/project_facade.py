@@ -37,6 +37,7 @@ class SCTProjectFacade:
         if prj.version != SCTProject.cur_version:
             if prj.version < SCTProject.cur_version:
                 prj = ProjectUpdater.update_project(prj)
+                self.callbacks['delay_set_change'](100)
             else:
                 print(f'{self.log_key}: This project was created in a newer version of SALSA. '
                       f'Please update SALSA to read this project.'
