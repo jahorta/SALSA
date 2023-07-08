@@ -66,16 +66,8 @@ class ReservedVars:
 
 logical_sect_suffix = '(0)'
 sep = '|'
-
-
 alt_sep = ':'
-
-
 alt_alt_sep = ';'
-
-
 uuid_sep = ','
-
-
 LOCK = '🔒'
 label_name_sep = '  -  '
