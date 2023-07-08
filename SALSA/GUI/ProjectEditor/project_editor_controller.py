@@ -330,11 +330,14 @@ class ProjectEditorController:
         for child in self.view.link_in.scroll_frame.winfo_children():
             child.destroy()
 
-    def refresh_tree(self, tree_key):
+    def refresh_tree(self, tree_key, keep_selection=False):
         open_items = self.trees[tree_key].get_open_elements()
         cur_y_view, _ = self.trees[tree_key].yview()
         kwargs = {'script': self.current['script']} if tree_key != 'script' else {}
         kwargs |= {'section': self.current['section']} if tree_key not in ('script', 'section') else {}
+        cur_sel = []
+        if keep_selection:
+            cur_sel = self.trees[tree_key].selection()
         self.update_tree(tree_key, self.project.get_tree(self.view.get_headers(tree_key), **kwargs))
         self.trees[tree_key].open_tree_elements(open_items)
         self.trees[tree_key].yview_moveto(cur_y_view)
