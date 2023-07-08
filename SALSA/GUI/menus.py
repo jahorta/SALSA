@@ -38,6 +38,9 @@ class MainMenu(tk.Menu):
         self.project_menu.add_separator()
         self.project_menu.add_command(label='Variable alias editor', command=callbacks['prj->variable'])
         self.project_menu.add_command(label='String editor', command=callbacks['prj->string'])
+        self.p_repair_menu = tk.Menu(self.project_menu, tearoff=False)
+        self.p_repair_menu.add_command(label='Repair Textbox Fadeout', command=callbacks['prj->repair->textbox'])
+        self.project_menu.add_cascade(label='Repair', menu=self.p_repair_menu)
         self.add_cascade(label='Project', menu=self.project_menu)
 
         analysis_menu = tk.Menu(self, tearoff=False)
@@ -67,6 +70,7 @@ class MainMenu(tk.Menu):
         self.project_menu.entryconfig('String editor', state='disabled')
         self.project_menu.entryconfig('Import SCT file(s)', state='disabled')
         self.project_menu.entryconfig('Export SCT file(s)', state='disabled')
+        self.project_menu.entryconfig('Repair', state='disabled')
         self.file_menu.entryconfig('Save Project', state='disabled')
         self.file_menu.entryconfig('Save Project as', state='disabled')
 
@@ -75,6 +79,7 @@ class MainMenu(tk.Menu):
         self.project_menu.entryconfig('String editor', state='normal')
         self.project_menu.entryconfig('Import SCT file(s)', state='normal')
         self.project_menu.entryconfig('Export SCT file(s)', state='normal')
+        self.project_menu.entryconfig('Repair', state='normal')
         self.file_menu.entryconfig('Save Project', state='normal')
         self.file_menu.entryconfig('Save Project as', state='normal')
 

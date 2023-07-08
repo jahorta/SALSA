@@ -3,6 +3,7 @@ import random
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
+from SALSA.Project.RepairTools.texbox_disappear_repair import TBStringToParamRepair
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
 from SALSA.FileModels.project_model import ProjectModel
@@ -109,6 +110,7 @@ class Application(tk.Tk):
             'prj->export_script': self.gui.show_sct_export_popup,
             'prj->variable': self.gui.show_variables_popup,
             'prj->string': self.gui.show_strings_popup,
+            'prj->repair->textbox': self.repair_text_box_fade,
             'analysis->export': self.gui.show_analysis_view,
             'view->inst': self.gui.show_instruction_view,
             'view->theme': self.change_theme,
@@ -289,3 +291,9 @@ class Application(tk.Tk):
             if 'map' not in arg_dict:
                 continue
             self.style.map(item_key, **arg_dict['map'])
+
+    def repair_text_box_fade(self):
+        project = TBStringToParamRepair.repair_project(project=self.project.project, inst_lib=self.base_insts, sct_model=self.sct_model)
+        if project is None:
+            return
+        self.project.project = project
