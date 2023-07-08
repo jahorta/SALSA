@@ -157,6 +157,9 @@ class SCTProjectFacade:
                         value_dict = base_dict
                     values[header_key] = value_dict[header_key] if isinstance(value_dict[header_key], str) else str(
                         value_dict[header_key])
+                if isinstance(element, SCTInstruction):
+                    if element.base_id == 9:
+                        values['name'] += f'{label_name_sep}{element.label}'
                 tree_list.append(values)
         return tree_list
 
