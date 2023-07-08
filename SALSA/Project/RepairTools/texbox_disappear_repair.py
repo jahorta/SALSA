@@ -1,10 +1,10 @@
 import os.path
-from tkinter.filedialog import askdirectory, askopenfile
+from tkinter.filedialog import askdirectory
 
-from BaseInstructions.bi_facade import BaseInstLibFacade
-from FileModels.sct_model import SCTModel
-from Project.project_container import SCTProject
-from Scripts.script_decoder import SCTDecoder
+from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
+from SALSA.FileModels.sct_model import SCTModel
+from SALSA.Project.project_container import SCTProject
+from SALSA.Scripts.script_decoder import SCTDecoder
 
 
 class TBStringToParamRepair:
@@ -12,15 +12,21 @@ class TBStringToParamRepair:
     @classmethod
     def repair_project(cls, project: SCTProject, inst_lib: BaseInstLibFacade, sct_model: SCTModel):
 
-        directory = askdirectory(title='Where are the scripts located?', initialdir=sct_model.get_default_directory())
-
+        directory = sct_model.get_default_directory()
         prj_repair = cls()
         missing_files = prj_repair.check_sct_files_exist(directory, list(project.scts.keys()))
-
         if len(missing_files) > 0:
-            print('Some script files were missing from the chosen directory:')
-            for file in missing_files:
-                print(f'\t{file}')
+            directory = askdirectory(title='Where are the scripts located?',
+                                     initialdir=sct_model.get_default_directory())
+
+            missing_files = prj_repair.check_sct_files_exist(directory, list(project.scts.keys()))
+
+            if len(missing_files) > 0:
+                print('Some script files were missing from the chosen directory:')
+                for file in missing_files:
+                    print(f'\t{file}')
+                print('Please add them or select a different directory')
+                return None
 
         sct_model.set_default_directory(directory)
 
@@ -38,8 +44,12 @@ class TBStringToParamRepair:
                         linked_str = inst.params[1].linked_string
                     if linked_str in dec_script.sects:
                         if '\\c' in dec_script.sects[linked_str].string:
-                            if inst.params[1].value != 'decimal: 1+0/256':
-                                inst.params[1].set_value('decimal: 1+0/256')
+                            if inst.base_id == 144:
+                                if inst.params[1].value != 'decimal: 1+0/256':
+                                    inst.params[1].set_value('decimal: 1+0/256')
+                            if inst.base_id == 155:
+                                if inst.params[2].value != 'decimal: 1+0/256':
+                                    inst.params[2].set_value('decimal: 1+0/256')
 
         return project
 
