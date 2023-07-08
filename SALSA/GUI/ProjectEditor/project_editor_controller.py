@@ -36,6 +36,11 @@ class ProjectEditorController:
         self.parent: tk.Tk = parent
         self.callbacks = callbacks
 
+        self.project: SCTProjectFacade = facade
+        self.project.set_callback('confirm_remove_inst_group', self.confirm_change_inst_group)
+        self.project.set_callback('set_change', self.set_change_flag)
+        self.project.set_callback('delay_set_change', self.delay_set_change_flag)
+
         self.view: ProjectEditorView = view
         view_callbacks = {
             'update_field': self.update_field,
@@ -49,11 +54,6 @@ class ProjectEditorController:
             'change_label_name': self.change_label_name
         }
         self.view.add_and_bind_callbacks(view_callbacks)
-
-        self.project: SCTProjectFacade = facade
-        self.project.set_callback('confirm_remove_inst_group', self.confirm_change_inst_group)
-        self.project.set_callback('set_change', self.set_change_flag)
-        self.project.set_callback('delay_set_change', self.delay_set_change_flag)
 
         pe_callbacks = {'get_var_alias': self.get_var_alias,
                         'refresh_inst': self.on_refresh_inst,
