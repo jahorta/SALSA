@@ -1130,6 +1130,9 @@ class SCTDecoder:
             origin_inst = decoded_sct.sects[link.origin_trace[0]].get_instruction_by_index(link.origin_trace[1])
             param: SCTParameter = origin_inst.params[int(link.origin_trace[2])]
             param.linked_string = target_sct_str
+            if '\\c' in decoded_sct.sects[target_sct_str].string and not self._is_validation:
+                if origin_inst.params[1].value != 'decimal: 1+0/256':
+                    origin_inst.params[1].set_value('decimal: 1+0/256')
 
         # setup footer links
         for link in self._str_foot_links:
