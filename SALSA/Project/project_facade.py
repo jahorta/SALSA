@@ -416,18 +416,18 @@ class SCTProjectFacade:
 
         return isinstance(cur_group[index], dict)
 
-    def is_sect_name_unused(self, script, new_name):
+    def is_sect_name_used(self, script, new_name):
         cur_script = self.project.scts[script]
         for sect in cur_script.sects.values():
             if logical_sect_suffix in sect.name:
                 for inst in sect.insts.values():
                     if inst.base_id == 9:
                         if inst.label == new_name:
-                            return False
+                            return True
             else:
                 if sect.name == new_name:
-                    return False
-        return True
+                    return True
+        return False
 
     # ------------------------------------------ #
     # Instruction and parameter analysis methods #
