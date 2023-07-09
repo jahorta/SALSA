@@ -8,7 +8,7 @@ from SALSA.Project.description_formatting import format_description
 from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter, SCTInstruction, SCTLink
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
-from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep, label_name_sep
+from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep, label_name_sep, logical_sect_suffix
 from SALSA.Scripts.scpt_param_codes import get_scpt_override
 
 
@@ -415,6 +415,19 @@ class SCTProjectFacade:
             cur_group = cur_group[p]
 
         return isinstance(cur_group[index], dict)
+
+    def is_sect_name_unused(self, script, new_name):
+        cur_script = self.project.scts[script]
+        for sect in cur_script.sects.values():
+            if logical_sect_suffix in sect.name:
+                for inst in sect.insts.values():
+                    if inst.base_id == 9:
+                        if inst.label == new_name:
+                            return False
+            else:
+                if sect.name == new_name:
+                    return False
+        return True
 
     # ------------------------------------------ #
     # Instruction and parameter analysis methods #
