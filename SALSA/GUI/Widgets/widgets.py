@@ -120,7 +120,7 @@ class LabelNameEntry(ValidatedMixin, ttk.Entry):
         if len(proposed) > 16:
             return False
 
-        if not re.search('^[a-zA-Z0-9_]+$', proposed):
+        if not re.search('^[a-zA-Z0-9_]*$', proposed):
             valid = False
 
         return valid
