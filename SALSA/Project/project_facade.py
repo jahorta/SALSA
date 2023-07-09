@@ -1390,8 +1390,6 @@ class SCTProjectFacade:
             instruction = cur_section.inst_list[0]
         cur_label = cur_section.insts[instruction]
 
-        old_name = cur_label.label
-
         cur_label.label = new_name
 
         if old_name not in cur_section.name:
