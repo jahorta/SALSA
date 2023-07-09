@@ -235,8 +235,10 @@ class DataTreeview(ttk.Treeview):
         self.has_shift = False
 
     def bDown_move(self, event):
-        if self.identify_row(event.y) not in self.selection():
-            sel = self.identify_row(event.y)
+        sel = self.identify_row(event.y)
+        if sel == '':
+            return
+        if sel not in self.selection():
             sel_uuid = self.row_data[sel]
             sel_ind = self.index(sel)
             sel_siblings = self.get_children(self.parent(sel))
