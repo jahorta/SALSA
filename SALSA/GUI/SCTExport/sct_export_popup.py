@@ -76,7 +76,7 @@ class SCTExportPopup(tk.Toplevel):
         for o_name, o_settings in self.option_settings.items():
             self.option_vars[o_name] = tk.StringVar()
             garbage = ttk.Checkbutton(options_frame, text=o_settings['text'], variable=self.option_vars[o_name],
-                                     onvalue='True', offvalue='False', command=lambda x=o_name: self.change_setting(x))
+                                      onvalue='True', offvalue='False', command=lambda x=o_name: self.change_setting(x))
             garbage.grid(row=row, column=0, sticky=tk.W)
             self.option_vars[o_name].set(settings[self.log_key][o_name])
             row += 1
