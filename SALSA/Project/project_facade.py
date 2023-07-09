@@ -754,6 +754,8 @@ class SCTProjectFacade:
 
         ungroup_ref_inst_uuid = ref_inst_uuid
 
+        self.inst_specific_setup(script, new_inst)
+
         if direction == 'below' and isinstance(cur_group[index], dict):
             # The ref inst for below is the last instruction of the group this should almost always be a goto
             ungroup_ref_inst_uuid = self.get_inst_uuid_from_group_entry(cur_group[index], last=True)
@@ -879,6 +881,8 @@ class SCTProjectFacade:
 
         # Add in default parameter values with no loops
         base_inst = self.base_insts.get_inst(int(new_id))
+
+        self.inst_specific_setup(script, cur_inst)
 
         for i in [*base_inst.params_before, *base_inst.params_after]:
             base_param = base_inst.params[i]
@@ -1418,3 +1422,11 @@ class SCTProjectFacade:
             for link in inst.links_out:
                 link.origin_trace[0] = new_sect_name
 
+    def inst_specific_setup(self, script, new_inst: SCTInstruction):
+        if new_inst.base_id == 9:
+            i = 0
+            new_label = f'Untitiled({i})'
+            while self.is_sect_name_used(script, new_label):
+                i += 1
+                new_label = f'Untitiled({i})'
+            new_inst.label = new_label
