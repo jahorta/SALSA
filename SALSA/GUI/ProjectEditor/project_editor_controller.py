@@ -330,11 +330,13 @@ class ProjectEditorController:
         for child in self.view.link_in.scroll_frame.winfo_children():
             child.destroy()
 
-    def refresh_tree(self, tree_key, keep_selection=False):
+    def refresh_tree(self, tree_key, new_section_name=None, keep_selection=False):
         open_items = self.trees[tree_key].get_open_elements()
         cur_y_view, _ = self.trees[tree_key].yview()
         kwargs = {'script': self.current['script']} if tree_key != 'script' else {}
         kwargs |= {'section': self.current['section']} if tree_key not in ('script', 'section') else {}
+        if new_section_name is not None:
+            kwargs['section'] = new_section_name
         cur_sel = []
         if keep_selection:
             cur_sel = self.trees[tree_key].selection()
@@ -360,7 +362,18 @@ class ProjectEditorController:
             return
         self.project.change_section_name(self.current['script'], self.current['section'], label_uuid, new_name)
         self.refresh_tree('section', keep_selection=True)
-        self.refresh_tree('instruction', keep_selection=True)
+        self.refresh_tree('instruction', new_section_name=new_name, keep_selection=True)
+
+    def shake_widget(self, widget):
+        shake_speed = 70
+        shake_intensity = 2
+        widget_x = widget.winfo_x()
+        self.view.after(shake_speed*1, lambda: widget.place_configure(x=widget_x + shake_intensity))
+        self.view.after(shake_speed*2, lambda: widget.place_configure(x=widget_x - shake_intensity))
+        self.view.after(shake_speed*3, lambda: widget.place_configure(x=widget_x + shake_intensity))
+        self.view.after(shake_speed*4, lambda: widget.place_configure(x=widget_x - shake_intensity))
+        self.view.after(shake_speed*5, lambda: widget.place_configure(x=widget_x))
+
 
     # ----------------- #
     # Right Click Menus #
