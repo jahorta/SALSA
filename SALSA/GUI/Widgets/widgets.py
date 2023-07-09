@@ -111,8 +111,8 @@ class RequiredEntryMixin:
 # -------------- #
 
 class LabelNameEntry(ValidatedMixin, ttk.Entry):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, master, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
 
     def _key_validate(self, char, index, current, proposed, action, **kwargs):
         valid = True
