@@ -408,7 +408,10 @@ class SCTEncoder:
         return bytearray(i.to_bytes(length=4, byteorder=self.endian, signed=signed))
 
     def _encode_string(self, string, encoding='shiftjis', align=True, size=-1):
-        str_bytes = bytearray(string.encode(encoding=encoding, errors='backslashreplace'))
+        if '«' in string:
+            str_bytes = bytearray([ord(c) for c in string])
+        else:
+            str_bytes = bytearray(string.encode(encoding=encoding, errors='backslashreplace'))
 
         if size > 0:
             if len(str_bytes) > size:
