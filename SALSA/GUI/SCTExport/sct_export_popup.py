@@ -145,4 +145,3 @@ class SCTExportPopup(tk.Toplevel):
     def change_theme(self, dark_mode):
         theme = dark_theme if dark_mode else light_theme
         self.configure(**theme['Ttoplevel']['configure'])
-        # self.variable_usage.change_theme(dark_mode=dark_mode)
