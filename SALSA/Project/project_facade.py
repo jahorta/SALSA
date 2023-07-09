@@ -1412,4 +1412,9 @@ class SCTProjectFacade:
 
         cur_group[index] = new_sect_name
 
+        for inst in cur_section.insts.values():
+            for link in inst.links_in:
+                link.target_trace[0] = new_sect_name
+            for link in inst.links_out:
+                link.origin_trace[0] = new_sect_name
 
