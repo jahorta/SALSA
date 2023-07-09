@@ -76,7 +76,7 @@ class SCTExportPopup(tk.Toplevel):
         for o_name, o_settings in self.option_settings.items():
             self.option_vars[o_name] = tk.StringVar()
             garbage = ttk.Checkbutton(options_frame, text=o_settings['text'], variable=self.option_vars[o_name],
-                                     onvalue='True', offvalue='False', command=lambda x=o_name: self.change_setting(x))
+                                      onvalue='True', offvalue='False', command=lambda x=o_name: self.change_setting(x))
             garbage.grid(row=row, column=0, sticky=tk.W)
             self.option_vars[o_name].set(settings[self.log_key][o_name])
             row += 1
@@ -104,7 +104,7 @@ class SCTExportPopup(tk.Toplevel):
         all_scripts = self.callbacks['get_tree']()
         iid = 0
         for script in all_scripts:
-            self.scripts.insert(parent='', iid=iid, text=script['name'], values=[], index='end')
+            self.scripts.insert(parent='', iid=str(iid), text=script['name'], values=[], index='end')
             self.script_ids[iid] = script['name']
             iid += 1
 
@@ -145,4 +145,3 @@ class SCTExportPopup(tk.Toplevel):
     def change_theme(self, dark_mode):
         theme = dark_theme if dark_mode else light_theme
         self.configure(**theme['Ttoplevel']['configure'])
-        # self.variable_usage.change_theme(dark_mode=dark_mode)

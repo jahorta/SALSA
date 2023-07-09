@@ -130,15 +130,22 @@ class StringPopup(tk.Toplevel):
 
         head_label = ttk.Label(head_frame, text='Textbox Header')
         head_label.grid(row=0, column=0, sticky=tk.W)
-        self.head_entry = ttk.Entry(head_frame, state='disabled', width=70)
+        self.head_entry = ttk.Entry(head_frame, state='disabled', width=65)
         self.head_entry.grid(row=1, column=0, sticky=tk.W)
         self.head_entry.bind('<FocusIn>', self.on_entry_focus_in)
         self.head_entry.bind('<FocusOut>', lambda e, k='head': self.on_entry_focus_out(k, e))
-        self.head_add_quote = ttk.Button(head_frame, text='add《》to header', command=self.add_quotes_to_head)
-        self.head_add_quote.grid(row=1, column=1, sticky=tk.W)
+        self.head_add_quote_label = ttk.Label(head_frame, text='add header quotes:')
+        self.head_add_quote_label.grid(row=1, column=1, sticky=tk.W)
+        self.head_add_quote_US = ttk.Button(head_frame, text='JP/US', command=lambda: self.add_quotes_to_head('《', '》'))
+        self.head_add_quote_US.grid(row=1, column=2, sticky=tk.W)
+        self.head_add_quote_EU = ttk.Button(head_frame, text='EU', command=lambda: self.add_quotes_to_head('«', '»'))
+        self.head_add_quote_EU.grid(row=1, column=3, sticky=tk.W, padx=3)
+
+        head_encode_warning = ttk.Label(lower_frame, text='**Note: Use EU quotes to ensure strings encode properly for non-jp, non-en characters**')
+        head_encode_warning.grid(row=2, column=0, pady=5)
 
         body_label = ttk.Label(lower_frame, text='Textbox Body')
-        body_label.grid(row=2, column=0, sticky=tk.W)
+        body_label.grid(row=3, column=0, sticky=tk.W)
         self.body_entry = tk.Text(lower_frame, wrap=tk.WORD, height=5, **theme['text']['configure'])
         self.body_entry.grid(row=3, column=0, sticky=tk.W + tk.E)
         self.body_entry.bind('<FocusIn>', self.on_text_focus_in)
@@ -172,7 +179,8 @@ class StringPopup(tk.Toplevel):
     def _change_editor_state(self, state):
         self.no_head.configure(state=state)
         self.head_entry.configure(state=state)
-        self.head_add_quote.configure(state=state)
+        self.head_add_quote_US.configure(state=state)
+        self.head_add_quote_EU.configure(state=state)
         self.body_entry.configure(state=state)
 
     def _clear_editor_fields(self):
@@ -242,9 +250,9 @@ class StringPopup(tk.Toplevel):
         self.no_head_var.set(no_head)
         self.head_entry.insert(0, head)
 
-    def add_quotes_to_head(self):
-        self.head_entry.insert(0, '《')
-        self.head_entry.insert(tk.END, '》')
+    def add_quotes_to_head(self, left, right):
+        self.head_entry.insert(0, left)
+        self.head_entry.insert(tk.END, right)
         self.set_change('head', self.head_entry.get())
 
     def on_entry_focus_in(self, e):
