@@ -821,7 +821,15 @@ class SCTDecoder:
                 if size == max_len:
                     break
         str_bytes = self._sct[pos: pos + size]
-        return str_bytes.decode(encoding=encoding, errors='backslashreplace')
+        if len(str_bytes) > 3:
+            if str_bytes[3] == 0xab:
+                string = ''.join([chr(c) for c in str_bytes])
+            else:
+                string = str_bytes.decode(encoding=encoding, errors='backslashreplace')
+        else:
+            string = str_bytes.decode(encoding=encoding, errors='backslashreplace')
+
+        return string
 
     def _get_garbage_after_string(self, bounds):
         offset = 0
