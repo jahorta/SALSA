@@ -1397,8 +1397,8 @@ class SCTProjectFacade:
 
         old_sect_name = cur_section.name
         new_sect_name = new_name
-        if not old_sect_name == old_sect_name:
-            new_sect_name += old_sect_name[len(old_name):]
+        if logical_sect_suffix in old_sect_name:
+            new_sect_name += logical_sect_suffix
 
         cur_section.name = new_sect_name
         cur_script.sects[new_sect_name] = cur_script.sects.pop(old_sect_name)
