@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
-from SALSA.Common.constants import sep, label_name_sep
+from SALSA.Common.constants import sep, label_name_sep, logical_sect_suffix
 from SALSA.GUI.fonts_used import SALSAFont
 from SALSA.GUI.ProjectEditor.instruction_selector import InstructionSelectorWidget
 from SALSA.GUI.ParamEditorPopups.param_editor_controller import ParamEditController
@@ -359,6 +359,11 @@ class ProjectEditorController:
         if new_name == self.trees['instruction'].item(sel_iid)['values'][0].split(label_name_sep)[0]:
             return
         self.project.change_section_name(self.current['script'], self.current['section'], label_uuid, new_name)
+        if sel_iid == '0':
+            if logical_sect_suffix not in self.current:
+                self.current['section'] = new_name
+            else:
+                self.current['section'] = new_name+logical_sect_suffix
         self.refresh_tree('section', keep_selection=True)
         self.refresh_tree('instruction', keep_selection=True)
 
