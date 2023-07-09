@@ -351,7 +351,10 @@ class ProjectEditorController:
         label_uuid = self.trees['instruction'].row_data.get(sel_iid, None)
         if label_uuid is None:
             return
-        new_name = e.widget.entry_widget.get()
+        new_name = e.widget.get()
+        if self.project.is_sect_name_used(self.current['script'], new_name):
+            self.shake_widget(widget)
+            return
         widget.destroy()
         if new_name == self.trees['instruction'].item(sel_iid)['values'][0].split(label_name_sep)[0]:
             return
