@@ -104,7 +104,7 @@ class SCTExportPopup(tk.Toplevel):
         all_scripts = self.callbacks['get_tree']()
         iid = 0
         for script in all_scripts:
-            self.scripts.insert(parent='', iid=iid, text=script['name'], values=[], index='end')
+            self.scripts.insert(parent='', iid=str(iid), text=script['name'], values=[], index='end')
             self.script_ids[iid] = script['name']
             iid += 1
 
