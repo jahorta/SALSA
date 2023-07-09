@@ -22,26 +22,26 @@ Features (Completed)
 * Script file import and export
 * Script file addressing by setting starting memory address for script file for use with Dolphin Emulator. (right-click headers and include offset to view memory address)
 * Dialog string editing (Project->String Editor)
+* Moving instructions around within a section
+* Grouping and moving sections around within a script
+* Ability to navigate using instruction detail links
+* Adding, removing, and changing instructions (Adding and removing instructions mostly works, though there are some bugs with adding and removing instruction groups)
 
 Features (In Progress)
 --------
-* Adding, removing, and changing instructions (Adding and removing instructions mostly works, though there are some bugs with adding and removing instruction groups)
 * Editing parameter values (most work, except jumps and some other types of parameters)
 * Program help (Opens into a webpage. Only skeleton is implemented)
 * Ability to name script variables (Variable alias editor. Not fully tested)
 
 Features (Planned)
 --------
-* Moving instructions around within a section
-* Grouping and moving sections around within a script
 * Saving groups of sections separately
 * Saving groups of instructions separately
-* Ability to navigate using instruction detail links
 
 
 Credits
 -------
-See credits.md for full credits
+See [CREDITS.md](/CREDITS.md) for full credits
 
 License
 -------
