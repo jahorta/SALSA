@@ -453,15 +453,16 @@ class ProjectEditorController:
 
         # if rightclicked row is a case, add option for delete case
         if group_type != 'case':
-            if group_type != 'else':
-                if 'first' not in restrictions:
-                    m.add_command(label='Add Instruction Above', command=lambda: self.rcm_add_inst('above'))
+            if group_type != 'else' and 'first' not in restrictions:
+                m.add_command(label='Add Instruction Above', command=lambda: self.rcm_add_inst('above'))
 
-            if group_type == 'if':
-                if 'last' in restrictions:
+            if 'last' not in restrictions:
+                if group_type == 'if':
                     next_sel_iid = self.trees['instruction'].next(sel_iid)
                     if 'else' not in self.trees['instruction'].item(next_sel_iid)['values'][0]:
                         m.add_command(label='Add Instruction Below', command=lambda: self.rcm_add_inst('below'))
+                else:
+                    m.add_command(label='Add Instruction Below', command=lambda: self.rcm_add_inst('below'))
 
             m.add_command(label='Remove Instruction', command=self.rcm_remove_inst)
             if restrictions != '':
