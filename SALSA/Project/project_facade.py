@@ -429,6 +429,41 @@ class SCTProjectFacade:
                     return True
         return False
 
+    def change_section_name(self, script, section, instruction, new_name):
+        cur_script = self.project.scts[script]
+        cur_section = cur_script.sects[section]
+        if instruction is None:
+            instruction = cur_section.inst_list[0]
+        cur_label = cur_section.insts[instruction]
+
+        cur_label.label = new_name
+
+        if cur_section.inst_list.index(instruction) != 0:
+            return
+
+        old_sect_name = cur_section.name
+        new_sect_name = new_name
+        if logical_sect_suffix in old_sect_name:
+            new_sect_name += logical_sect_suffix
+
+        cur_section.name = new_sect_name
+        cur_script.sects[new_sect_name] = cur_script.sects.pop(old_sect_name)
+        cur_script.sect_list[cur_script.sect_list.index(old_sect_name)] = new_sect_name
+
+        cur_group = cur_script.sect_tree
+        parents, index = self.get_grouped_parents_and_index(old_sect_name, cur_group)
+
+        for p in parents:
+            cur_group = cur_group[p]
+
+        cur_group[index] = new_sect_name
+
+        for inst in cur_section.insts.values():
+            for link in inst.links_in:
+                link.target_trace[0] = new_sect_name
+            for link in inst.links_out:
+                link.origin_trace[0] = new_sect_name
+
     # ------------------------------------------ #
     # Instruction and parameter analysis methods #
     # ------------------------------------------ #
@@ -602,8 +637,6 @@ class SCTProjectFacade:
                 self.change_link_tgt(cur_sect, link, new_tgt_uuid, remove_from_old_tgt=False)
         for link in changed_links:
             cur_sect.insts[old_tgt_uuid].links_in.remove(link)
-
-
 
     def move_switch_case(self, script, section, switch_uuid, case, insert_after):
         cur_sect = self.project.scts[script].sects[section]
@@ -1192,6 +1225,15 @@ class SCTProjectFacade:
         cur_sect.inst_list.insert(inst_pos + 1, case_goto.ID)
         cur_group[index][list(cur_group[index].keys())[0]] = {sub_group: [case_goto.ID], **test_group}
 
+    def inst_specific_setup(self, script, new_inst: SCTInstruction):
+        if new_inst.base_id == 9:
+            i = 0
+            new_label = f'Untitiled({i})'
+            while self.is_sect_name_used(script, new_label):
+                i += 1
+                new_label = f'Untitiled({i})'
+            new_inst.label = new_label
+
     # --------------------------- #
     # Inst group analysis methods #
     # --------------------------- #
@@ -1386,47 +1428,3 @@ class SCTProjectFacade:
             tgt_sect.insts[prev_tgt_uuid].links_in.remove(link)
         tgt_sect.insts[new_tgt_uuid].links_in.append(link)
         link.target_trace[1] = new_tgt_uuid
-
-    def change_section_name(self, script, section, instruction, new_name):
-        cur_script = self.project.scts[script]
-        cur_section = cur_script.sects[section]
-        if instruction is None:
-            instruction = cur_section.inst_list[0]
-        cur_label = cur_section.insts[instruction]
-
-        cur_label.label = new_name
-
-        if cur_section.inst_list.index(instruction) != 0:
-            return
-
-        old_sect_name = cur_section.name
-        new_sect_name = new_name
-        if logical_sect_suffix in old_sect_name:
-            new_sect_name += logical_sect_suffix
-
-        cur_section.name = new_sect_name
-        cur_script.sects[new_sect_name] = cur_script.sects.pop(old_sect_name)
-        cur_script.sect_list[cur_script.sect_list.index(old_sect_name)] = new_sect_name
-
-        cur_group = cur_script.sect_tree
-        parents, index = self.get_grouped_parents_and_index(old_sect_name, cur_group)
-
-        for p in parents:
-            cur_group = cur_group[p]
-
-        cur_group[index] = new_sect_name
-
-        for inst in cur_section.insts.values():
-            for link in inst.links_in:
-                link.target_trace[0] = new_sect_name
-            for link in inst.links_out:
-                link.origin_trace[0] = new_sect_name
-
-    def inst_specific_setup(self, script, new_inst: SCTInstruction):
-        if new_inst.base_id == 9:
-            i = 0
-            new_label = f'Untitiled({i})'
-            while self.is_sect_name_used(script, new_label):
-                i += 1
-                new_label = f'Untitiled({i})'
-            new_inst.label = new_label
