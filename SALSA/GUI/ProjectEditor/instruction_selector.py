@@ -84,7 +84,7 @@ class InstructionSelectorWidget(ttk.Frame):
         self.result_dropdown.bind('<KeyPress-Up>', self.handle_dropdown_up_keypress)
 
     def update_search(self, current):
-        self.update_menu(self.callbacks['get_relevant'](current))
+        self.update_menu(self.callbacks['get_relevant'](current, exclude_modifiers=True))
 
     def update_menu(self, relevant_entries):
         self.result_dropdown.clear_all_entries()

@@ -8,6 +8,9 @@ from SALSA.FileModels.instruction_model import InstructionModel
 from SALSA.Common.constants import LOCK
 
 
+modifiers = (129, 13)
+
+
 class BaseInstLibFacade:
 
     def __init__(self):
@@ -108,13 +111,15 @@ class BaseInstLibFacade:
     def get_user_type(self):
         return self.user_identifier
 
-    def get_relevant(self, search):
+    def get_relevant(self, search, exclude_modifiers=False):
         relevant = []
         if search == '':
             return relevant
         for inst in self.lib.insts:
             inst: BaseInst
             if search in str(inst.instruction_id) or search.lower() in inst.name.lower():
+                if exclude_modifiers and inst.instruction_id in modifiers:
+                    continue
                 relevant.append(f'{inst.instruction_id} - {inst.name}')
         return relevant
 
