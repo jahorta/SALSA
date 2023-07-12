@@ -823,7 +823,7 @@ class SCTDecoder:
         str_bytes = self._sct[pos: pos + size]
         if len(str_bytes) > 3:
             if str_bytes[3] == 0xab:
-                string = ''.join([chr(c) for c in str_bytes])
+                string = str_bytes.decode(encoding='cp1252', errors='backslashreplace')
             else:
                 string = str_bytes.decode(encoding=encoding, errors='backslashreplace')
         else:

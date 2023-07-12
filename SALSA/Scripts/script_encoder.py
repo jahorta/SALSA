@@ -409,7 +409,7 @@ class SCTEncoder:
 
     def _encode_string(self, string, encoding='shiftjis', align=True, size=-1):
         if '«' in string:
-            str_bytes = bytearray([ord(c) for c in string])
+            str_bytes = bytearray(string.encode(encoding='cp1252', errors='backslashreplace'))
         else:
             str_bytes = bytearray(string.encode(encoding=encoding, errors='backslashreplace'))
 
