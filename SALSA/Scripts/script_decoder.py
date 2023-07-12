@@ -157,7 +157,7 @@ class SCTDecoder:
                         decoded_sct.section_groups[sect_group_key] = [sect_name]
                         decoded_sct.section_group_keys[sect_name] = sect_group_key
             else:
-                if new_section.type == 'Script':
+                if new_section.type in ('Script', 'Label'):
                     decoded_sct.section_groups[sect_group_key].append(sect_name)
                     decoded_sct.section_group_keys[sect_name] = sect_group_key
                     last_inst = new_section.get_instruction_by_index(-1)
