@@ -1,7 +1,8 @@
 # This file tests decoding and encoding of sct files.
 
 # Requires a script directory to run
-script_dir = './../../decompressed_scripts'
+script_dir = './../../compressed_scripts'
+eu_validation = True if 'EU' in script_dir else False
 
 # Determines whether compressed or decompressed scripts are checked
 check_compressed = False
