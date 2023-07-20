@@ -212,6 +212,10 @@ class Application(tk.Tk):
     def on_print_debug(self):
         print(f'\nWindow Dimensions:\nHeight: {self.winfo_height()}\nWidth: {self.winfo_width()}')
 
+    # --------------------------- #
+    # Adding scripts to a project #
+    # --------------------------- #
+
     def add_script(self):
         kwargs = {'filetypes': (('Script File', '*.sct'),), 'title': 'Select script(s) to add to the current project'}
         base_dir = self.sct_model.get_default_directory()
@@ -261,6 +265,10 @@ class Application(tk.Tk):
             if save:
                 self.on_save_project()
         self.destroy()
+
+    # -------------------------------- #
+    # Exporting scripts from a project #
+    # -------------------------------- #
 
     def on_export_scts(self, directory, scripts, options):
         compress = options['compress_aklz']
