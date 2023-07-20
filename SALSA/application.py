@@ -274,30 +274,40 @@ class Application(tk.Tk):
         compress = options['compress_aklz']
         options.pop('compress_aklz')
 
-        script_paths = []
+        script_dict = {}
         for script in scripts:
             script_file = script
             if script_file[-4:] != '.sct':
                 script_file += '.sct'
             filepath = os.path.join(directory, script_file)
-            script_paths.append(filepath)
+            script_dict[script] = filepath
 
-        self._notify_export_sct(script_paths, scripts, options, compress)
+        self.gui.show_status_popup(title='Exporting Script(s)', msg=f'tempMSG')
 
-    def _notify_export_sct(self, script_paths, script_names, options, compress):
-        filepath = script_paths[0]
-        self.gui.show_status_popup(title='Exporting Script', msg=f'Exporting Script ({os.path.basename(filepath)})')
-        self.after(10, self._continue_export_sct, script_paths, script_names, options, compress)
+        finish_queue = queue.SimpleQueue()
+        script_thread = threading.Thread(target=self._threaded_script_exporter,
+                                         args=(script_dict, options, compress, finish_queue, self.gui.status_queue))
+        script_thread.start()
+        self._script_export_listener(finish_queue)
 
-    def _continue_export_sct(self, script_paths, script_names, options, compress):
-        script = self.project.get_project_script_by_name(script_names.pop(0))
-        filepath = script_paths.pop(0)
-        self.sct_model.export_script_as_sct(filepath=filepath, script=script, base_insts=self.base_insts,
-                                            options=options, compress=compress)
-        if len(script_paths) > 0:
-            self._notify_export_sct(script_paths, script_names, options, compress)
-        else:
-            self.gui.stop_status_popup()
+    def _script_export_listener(self, decode_queue):
+        if not decode_queue.empty():
+            item = decode_queue.get()
+            if isinstance(item, str):
+                if item == 'stop':
+                    return self.finish_export_scripts()
+        self.after(20, self._script_export_listener, decode_queue)
+
+    def _threaded_script_exporter(self, scripts, options, compress, finish_queue, status_queue: queue.SimpleQueue):
+        for name, filepath in scripts.items():
+            status_queue.put({'msg': f'Encoding {name}.sct'})
+            script = self.project.get_project_script_by_name(name)
+            self.sct_model.export_script_as_sct(filepath=filepath, script=script, base_insts=self.base_insts,
+                                                options=options, compress=compress)
+        finish_queue.put('stop')
+
+    def finish_export_scripts(self):
+        self.gui.stop_status_popup()
 
     def change_theme(self, dark_mode=True):
         self.is_darkmode = dark_mode
