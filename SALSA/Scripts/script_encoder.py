@@ -1,6 +1,7 @@
 import copy
 from typing import Union, Literal
 
+from Common.script_string_utils import fix_string_encoding_errors
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.byte_array_utils import float2Hex
 from SALSA.Project.project_container import SCTScript, SCTSection, footer_str_group_name
@@ -420,9 +421,20 @@ class SCTEncoder:
 
     def _encode_string(self, string, encoding='shiftjis', align=True, size=-1):
         if '«' in string:
-            str_bytes = bytearray(string.encode(encoding='cp1252', errors='backslashreplace'))
-        else:
-            str_bytes = bytearray(string.encode(encoding=encoding, errors='backslashreplace'))
+            self._EU_encoding = True
+
+        alt_encoding = 'cp1252'
+        if self._EU_encoding and '＜' not in string and '《' not in string:
+            encoding, alt_encoding = alt_encoding, encoding
+
+        str_bytes = bytearray(string.encode(encoding=encoding, errors='backslashreplace'))
+        if self._EU_encoding and encoding == 'shiftjis':
+            str_bytes = fix_string_encoding_errors(str_bytes, encoding=encoding)
+        if b'\\x' in str_bytes or b'\\u' in str_bytes:
+            str_bytes = bytearray(string.encode(encoding=alt_encoding, errors='backslashreplace'))
+
+        if self._EU_validation:
+            str_bytes = str_bytes.replace(b'\x20', b'\x81')
 
         if size > 0:
             if len(str_bytes) > size:
