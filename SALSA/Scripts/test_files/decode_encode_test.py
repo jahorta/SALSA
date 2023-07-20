@@ -64,10 +64,12 @@ def compare_files(ba_1, ba_2):
 
 
 def save_diffs(d_dict, path):
-    out_str = '"Script Name","Difference Name","Difference"'
+    out_str = '"Script Name","Difference Pos","Difference Hex","Difference"'
     for n, d in d_dict.items():
         for diff_name, diff_str in d.items():
-            out_str += f'\n{n},{diff_name},{diff_str}'
+            out_str += f'\n{n},{diff_name}'
+            out_str += f',{hex(int(diff_name))}' if diff_name != 'length' else ','
+            out_str += f',{diff_str}'
 
     with open(path, 'w') as fh:
         fh.write(out_str)
