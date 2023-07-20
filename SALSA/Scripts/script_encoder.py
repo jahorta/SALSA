@@ -39,13 +39,14 @@ class SCTEncoder:
                                           b'\x00\x00\x00\x1D\x00\x00\x00\x00\x00\x00\x04\x00\xC0\x0F\xC5\x1D\x00\x00\x00'
                                           b'\x00\x00\x00\x04\x00\x00\x80\x3F\x1D\x00\x00\x00')
             if '241a' in script.name:
-                self.sct_body = bytearray(b'\x0b\x00\x00\x00\xc4\xe2\x00\x00')
+                self.sct_body = bytearray(b'\x0b\x00\x00\x00\xc4\xe2\x00\x00') if not self._EU_validation \
+                    else bytearray(b'\x0b\x00\x00\x00\x08\x63\x01\x00')
             if '513a' in script.name or '576a' in script.name:
                 self.sct_body = bytearray(b'\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00'
                                           b'\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00'
                                           b'\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D'
                                           b'\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00')
-            self._additions = {
+            additions = {
                 'M04523-177-1': b'\x50\x00\x00\x01',
                 'M04524-177-1': b'\x50\x00\x00\x01',
                 'M04525-177-1': b'\x50\x00\x00\x01',
@@ -63,6 +64,13 @@ class SCTEncoder:
                 'camb02-224-13': {'ind': [10], 'value': b'\x04\x00\x00\x00\x42\xF9\x00\x00'},
                 '_EV_VER2-50-0': {'ind': [2], 'value': b'\x50\x00\x00\x01'}
             }
+
+            eu_additions = {
+                'camb02-232-3': {'ind': [8], 'value': b'\x04\x00\x00\x00\x42\x80\x00\x00'},
+                'camb02-224-13': {'ind': [10], 'value': b'\x04\x00\x00\x00\x42\xF9\x00\x00'},
+            }
+
+            self._additions = additions if not self._EU_validation else eu_additions
 
         self.update_inst_pos = update_inst_pos
 
