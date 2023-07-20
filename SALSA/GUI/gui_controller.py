@@ -37,6 +37,8 @@ class GUIController:
     def __init__(self, parent, scpt_editor_view: ProjectEditorView, project_facade: SCTProjectFacade,
                  inst_lib_facade: BaseInstLibFacade):
 
+        self.status_msg: Union[None, tk.Label] = None
+        self.status_sub_msg: Union[None, tk.Label] = None
         self.help_path = os.path.abspath('./SALSA/Help/Skies of Arcadia Legends Script Assistant.html')
         self.parent = parent
         self.scpt_view = scpt_editor_view
@@ -196,8 +198,11 @@ class GUIController:
         self.status_popup.columnconfigure(0, weight=1)
         self.status_popup.rowconfigure(0, weight=1)
 
-        msg_lbl = tk.Label(self.status_popup, text=msg, anchor=tk.CENTER, background=bg, foreground=fg)
-        msg_lbl.grid(row=0, column=0)
+        self.status_msg = tk.Label(self.status_popup, text=msg, anchor=tk.CENTER, background=bg, foreground=fg)
+        self.status_msg.grid(row=0, column=0)
+
+        self.status_sub_msg = tk.Label(self.status_popup, text=msg, anchor=tk.CENTER, background=bg, foreground=fg)
+        self.status_sub_msg.grid(row=1, column=0)
 
         cur_geom = (self.scpt_view.winfo_width(), self.scpt_view.winfo_height(), self.scpt_view.winfo_rootx(),
                     self.scpt_view.winfo_rooty())
@@ -209,6 +214,16 @@ class GUIController:
     def stop_status_popup(self):
         self.status_popup.destroy()
         self.status_popup = None
+        self.status_msg = None
+        self.status_sub_msg = None
+
+    def change_status_msg(self, msg=None, sub_msg=None):
+        if self.status_popup is None:
+            return
+        if msg is not None and isinstance(msg, str):
+            self.status_msg.configure(text=msg)
+        if sub_msg is not None and isinstance(msg, str):
+            self.status_sub_msg.configure(text=sub_msg)
 
     def change_theme(self, dark_mode):
         for popup in self.popups.values():
