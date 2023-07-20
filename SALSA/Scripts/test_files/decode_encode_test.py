@@ -117,7 +117,8 @@ if __name__ == '__main__':
         print(f'Starting re-encode for {f.split(".")[0]}')
         encoded_ba = SCTEncoder.encode_sct_file_from_project_script(project_script=script, base_insts=baseinsts,
                                                                     use_garbage=True, combine_footer_links=False,
-                                                                    add_spurious_refresh=True, validation=True)
+                                                                    add_spurious_refresh=True, validation=True,
+                                                                    eu_validation=eu_validation)
         if check_compressed:
             aklz = Aklz()
             original_ba = aklz.compress(original_ba)
