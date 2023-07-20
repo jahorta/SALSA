@@ -220,7 +220,8 @@ class GUIController:
         self.status_popup = None
         self.status_msg = None
         self.status_sub_msg = None
-        self.status_queue.put('stop')
+        while not self.status_queue.empty():
+            self.status_queue.get_nowait()
 
     def change_status_msg(self, msg=None, sub_msg=None):
         if self.status_popup is None:
@@ -240,6 +241,4 @@ class GUIController:
             item = self.status_queue.get()
             if isinstance(item, dict):
                 self.change_status_msg(**item)
-            else:
-                return
         self.status_popup.after(20, self.status_listener)
