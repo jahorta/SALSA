@@ -220,6 +220,7 @@ class GUIController:
         self.status_popup = None
         self.status_msg = None
         self.status_sub_msg = None
+        self.status_queue.put('stop')
 
     def change_status_msg(self, msg=None, sub_msg=None):
         if self.status_popup is None:
@@ -235,5 +236,10 @@ class GUIController:
                 popup.change_theme(dark_mode)
 
     def status_listener(self):
-        if self.status_queue.empty():
-            self.status_popup.after(20, self.status_listener)
+        if not self.status_queue.empty():
+            item = self.status_queue.get()
+            if isinstance(item, dict):
+                self.change_status_msg(**item)
+            else:
+                return
+        self.status_popup.after(20, self.status_listener)
