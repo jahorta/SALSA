@@ -1,7 +1,7 @@
 import copy
 from typing import Union, Literal
 
-from Common.script_string_utils import fix_string_encoding_errors
+from SALSA.Common.script_string_utils import fix_string_encoding_errors
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.byte_array_utils import float2Hex
 from SALSA.Project.project_container import SCTScript, SCTSection, footer_str_group_name
