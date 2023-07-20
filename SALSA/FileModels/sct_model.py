@@ -1,4 +1,5 @@
 import os
+import queue
 
 from SALSA.Common.setting_class import settings
 from SALSA.AKLZ.aklz import Aklz
@@ -44,13 +45,14 @@ class SCTModel:
 
         print(f'{self.log_key}: SCT file saved to {filepath}')
 
-    def load_sct(self, insts, file: str):
+    def load_sct(self, insts, file: str, status: queue.SimpleQueue = None):
         out = self.read_sct_file(file)
         if out is None:
             return None
         name = out[0]
+        status.put({'msg': f'Decoding script file: {name}'})
         sct_raw = out[1]
-        sct_out = SCTDecoder.decode_sct_from_file(name=name, sct=sct_raw, inst_lib=insts)
+        sct_out = SCTDecoder.decode_sct_from_file(name=name, sct=sct_raw, inst_lib=insts, status=status)
         return name, sct_out
 
     def read_sct_file(self, filepath: str):

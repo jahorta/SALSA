@@ -1,5 +1,6 @@
 import copy
 import math
+import queue
 import re
 import struct
 import difflib
@@ -76,13 +77,16 @@ class SCTDecoder:
         self._EU_encoding = False
 
     @classmethod
-    def decode_sct_from_file(cls, name, sct, inst_lib: BaseInstLibFacade, strings_only=False, is_validation=False):
+    def decode_sct_from_file(cls, name, sct, inst_lib: BaseInstLibFacade, status: queue.SimpleQueue, strings_only=False, is_validation=False):
         sct_decoder = cls()
+        status.put({'sub_msg': 'Decoding...'})
         decoded_sct = sct_decoder._decode_sct(name, sct, inst_lib, strings_only=strings_only, is_validation=is_validation)
         if strings_only:
             return decoded_sct
         decoded_sct = sct_decoder._organize_sct(decoded_sct)
+        status.put({'sub_msg': 'Organizing...'})
         sct_decoder._finalize_sct(decoded_sct)
+        status.put({'sub_msg': 'Finalizing...'})
         return decoded_sct
 
     def _decode_sct(self, script_name: str, sct: bytearray, inst_lib: BaseInstLibFacade,

@@ -1,7 +1,10 @@
 import os
+import queue
 import random
+import threading
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
+from typing import Union
 
 from SALSA.Project.RepairTools.texbox_disappear_repair import TBStringToParamRepair
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
@@ -218,20 +221,37 @@ class Application(tk.Tk):
         if script_paths == '' or script_paths is None:
             return
         self.sct_model.set_default_directory(os.path.dirname(script_paths[0]))
-        self._notify_add_script(list(script_paths))
 
-    def _notify_add_script(self, script_paths):
-        filepath = script_paths.pop(0)
-        self.gui.show_status_popup(title='Decoding Script', msg=f'Decoding Script ({os.path.basename(filepath)})')
-        self.after(10, self._continue_add_script, filepath, script_paths)
+        self.gui.show_status_popup('Adding Script(s)', 'tempMSG')
 
-    def _continue_add_script(self, filepath, script_paths):
-        name, script = self.sct_model.load_sct(self.base_insts, file=filepath)
-        self.project.add_script_to_project(name, script)
-        if len(script_paths) > 0:
-            self._notify_add_script(script_paths)
-        else:
-            self.gui.stop_status_popup()
+        script_decode_queue = queue.Queue()
+        script_thread = threading.Thread(target=self._threaded_script_decoder,
+                                         args=(list(script_paths), script_decode_queue, self.gui.status_queue))
+        script_thread.start()
+        self._script_add_listener(script_decode_queue)
+
+    def _script_add_listener(self, decode_queue, scripts: Union[None, dict] = None):
+        if scripts is None:
+            scripts = {}
+        if not decode_queue.empty():
+            item = decode_queue.get()
+            decode_queue.task_done()
+            if isinstance(item, str):
+                if item == 'stop':
+                    return self.finish_add_script(scripts)
+            else:
+                scripts |= item
+        self.after(20, self._script_add_listener, decode_queue, scripts)
+
+    def _threaded_script_decoder(self, script_paths, script_decode_out_queue: queue.Queue, status_queue: queue.SimpleQueue):
+        for filepath in script_paths:
+            name, script = self.sct_model.load_sct(self.base_insts, file=filepath, status=status_queue)
+            script_decode_out_queue.put({name: script})
+        script_decode_out_queue.put('stop')
+
+    def finish_add_script(self, scripts):
+        self.project.add_scripts_to_project(scripts)
+        self.gui.stop_status_popup()
 
     def on_quit(self):
         if self.project_edit_controller.has_changes:
