@@ -1,6 +1,7 @@
 import copy
 from typing import Union, Literal
 
+from Common.script_string_utils import fix_string_encoding_errors
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.byte_array_utils import float2Hex
 from SALSA.Project.project_container import SCTScript, SCTSection, footer_str_group_name
@@ -25,11 +26,12 @@ class SCTEncoder:
     param_tests = {'==': is_equal, '!=': not_equal}
 
     def __init__(self, script: SCTScript, base_insts: BaseInstLibFacade, update_inst_pos=True,
-                 endian: Literal['little', 'big'] = 'big', validation=False):
+                 endian: Literal['little', 'big'] = 'big', validation=False, eu_validation=False):
         self.sct_body = bytearray()
 
         # for decoder, encoder validation only
         self.validation = validation
+        self._EU_validation = eu_validation
         if self.validation:
             if '099' in script.name:
                 self.sct_body = bytearray(b'\x4F\x00\x00\x00\x00\x00\x00\x04\x00\x00\x66\x43\x1D\x00\x00\x00\x00\x00\x00'
@@ -38,13 +40,14 @@ class SCTEncoder:
                                           b'\x00\x00\x00\x1D\x00\x00\x00\x00\x00\x00\x04\x00\xC0\x0F\xC5\x1D\x00\x00\x00'
                                           b'\x00\x00\x00\x04\x00\x00\x80\x3F\x1D\x00\x00\x00')
             if '241a' in script.name:
-                self.sct_body = bytearray(b'\x0b\x00\x00\x00\xc4\xe2\x00\x00')
+                self.sct_body = bytearray(b'\x0b\x00\x00\x00\xc4\xe2\x00\x00') if not self._EU_validation \
+                    else bytearray(b'\x0b\x00\x00\x00\x08\x63\x01\x00')
             if '513a' in script.name or '576a' in script.name:
                 self.sct_body = bytearray(b'\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00'
                                           b'\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00'
                                           b'\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D'
                                           b'\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00')
-            self._additions = {
+            additions = {
                 'M04523-177-1': b'\x50\x00\x00\x01',
                 'M04524-177-1': b'\x50\x00\x00\x01',
                 'M04525-177-1': b'\x50\x00\x00\x01',
@@ -63,7 +66,15 @@ class SCTEncoder:
                 '_EV_VER2-50-0': {'ind': [2], 'value': b'\x50\x00\x00\x01'}
             }
 
+            eu_additions = {
+                'camb02-232-3': {'ind': [8], 'value': b'\x04\x00\x00\x00\x42\x80\x00\x00'},
+                'camb02-224-13': {'ind': [10], 'value': b'\x04\x00\x00\x00\x42\xF9\x00\x00'},
+            }
+
+            self._additions = additions if not self._EU_validation else eu_additions
+
         self.update_inst_pos = update_inst_pos
+        self._EU_encoding = self.detect_encoding(script)
 
         self.script = script
         self.bi = base_insts
@@ -93,9 +104,10 @@ class SCTEncoder:
     @classmethod
     def encode_sct_file_from_project_script(cls, project_script: SCTScript, base_insts: BaseInstLibFacade,
                                             use_garbage=True, combine_footer_links=False, add_spurious_refresh=True,
-                                            update_inst_pos=True, validation=False):
+                                            update_inst_pos=True, validation=False, eu_validation=False):
         print(f'{cls.log_key}: encoding {project_script.name}')
-        encoder = cls(script=project_script, base_insts=base_insts, update_inst_pos=update_inst_pos, validation=validation)
+        encoder = cls(script=project_script, base_insts=base_insts, update_inst_pos=update_inst_pos,
+                      validation=validation, eu_validation=eu_validation)
         encoder.encode_sct_file(use_garbage=use_garbage, combine_footer_links=combine_footer_links,
                                 add_spurious_refresh=add_spurious_refresh)
         print(f'{cls.log_key}: finished encoding for {project_script.name}')
@@ -409,9 +421,20 @@ class SCTEncoder:
 
     def _encode_string(self, string, encoding='shiftjis', align=True, size=-1):
         if '«' in string:
-            str_bytes = bytearray([ord(c) for c in string])
-        else:
-            str_bytes = bytearray(string.encode(encoding=encoding, errors='backslashreplace'))
+            self._EU_encoding = True
+
+        alt_encoding = 'cp1252'
+        if self._EU_encoding and '＜' not in string and '《' not in string:
+            encoding, alt_encoding = alt_encoding, encoding
+
+        str_bytes = bytearray(string.encode(encoding=encoding, errors='backslashreplace'))
+        if self._EU_encoding and encoding == 'shiftjis':
+            str_bytes = fix_string_encoding_errors(str_bytes, encoding=encoding)
+        if b'\\x' in str_bytes or b'\\u' in str_bytes:
+            str_bytes = bytearray(string.encode(encoding=alt_encoding, errors='backslashreplace'))
+
+        if self._EU_validation:
+            str_bytes = str_bytes.replace(b'\x20', b'\x81')
 
         if size > 0:
             if len(str_bytes) > size:
@@ -441,4 +464,13 @@ class SCTEncoder:
             return
 
         self.sct_body = self.sct_body[:location] + value + self.sct_body[location+len(value):]
+
+    @staticmethod
+    def detect_encoding(script: SCTScript):
+        for string in script.strings.values():
+            if '«' in string:
+                return True
+            if '＜' in string or '《' in string:
+                return False
+        return False
 

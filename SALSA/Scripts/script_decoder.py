@@ -5,6 +5,7 @@ import struct
 import difflib
 from typing import Dict, Tuple, List, Callable, Literal, Union
 
+from SALSA.Common.script_string_utils import fix_string_decoding_errors
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Project.project_container import SCTScript, SCTSection, SCTLink, SCTInstruction, SCTParameter, \
     footer_str_group_name, footer_str_id_prefix
@@ -60,6 +61,7 @@ class SCTDecoder:
     }
 
     _debug_log: List[str] = []
+    _EU_encoding = False
 
     def _init(self, strings_only=False, is_validation=False):
         self._str_sect_links = []
@@ -71,6 +73,7 @@ class SCTDecoder:
         self._variables = {}
         self._instruction_groups = {}
         self._footer_dialog_locs = []
+        self._EU_encoding = False
 
     @classmethod
     def decode_sct_from_file(cls, name, sct, inst_lib: BaseInstLibFacade, strings_only=False, is_validation=False):
@@ -157,7 +160,7 @@ class SCTDecoder:
                         decoded_sct.section_groups[sect_group_key] = [sect_name]
                         decoded_sct.section_group_keys[sect_name] = sect_group_key
             else:
-                if new_section.type == 'Script':
+                if new_section.type in ('Script', 'Label'):
                     decoded_sct.section_groups[sect_group_key].append(sect_name)
                     decoded_sct.section_group_keys[sect_name] = sect_group_key
                     last_inst = new_section.get_instruction_by_index(-1)
@@ -821,13 +824,21 @@ class SCTDecoder:
                 if size == max_len:
                     break
         str_bytes = self._sct[pos: pos + size]
-        if len(str_bytes) > 3:
+
+        if len(str_bytes) > 3 and not self._EU_encoding:
             if str_bytes[3] == 0xab:
-                string = ''.join([chr(c) for c in str_bytes])
-            else:
-                string = str_bytes.decode(encoding=encoding, errors='backslashreplace')
-        else:
-            string = str_bytes.decode(encoding=encoding, errors='backslashreplace')
+                self._EU_encoding = True
+
+        alt_encoding = 'cp1252'
+        if self._EU_encoding and not str_bytes[:2] == bytearray(b'\x81\x83') and not str_bytes[3:5] == bytearray(b'\x81\x73'):
+            encoding, alt_encoding = alt_encoding, encoding
+
+        string = str_bytes.decode(encoding=encoding, errors='backslashreplace')
+        if '\\x' in string:
+            string = fix_string_decoding_errors(string, encoding)
+
+        if '\\x' in string:
+            string = str_bytes.decode(encoding=alt_encoding, errors='backslashreplace')
 
         return string
 

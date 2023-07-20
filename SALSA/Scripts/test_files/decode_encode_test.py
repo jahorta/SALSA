@@ -1,7 +1,8 @@
 # This file tests decoding and encoding of sct files.
 
 # Requires a script directory to run
-script_dir = './../../decompressed_scripts'
+script_dir = './../../compressed_scripts'
+eu_validation = True if 'EU' in script_dir else False
 
 # Determines whether compressed or decompressed scripts are checked
 check_compressed = False
@@ -63,10 +64,12 @@ def compare_files(ba_1, ba_2):
 
 
 def save_diffs(d_dict, path):
-    out_str = '"Script Name","Difference Name","Difference"'
+    out_str = '"Script Name","Difference Pos","Difference Hex","Difference"'
     for n, d in d_dict.items():
         for diff_name, diff_str in d.items():
-            out_str += f'\n{n},{diff_name},{diff_str}'
+            out_str += f'\n{n},{diff_name}'
+            out_str += f',{hex(int(diff_name))}' if diff_name != 'length' else ','
+            out_str += f',{diff_str}'
 
     with open(path, 'w') as fh:
         fh.write(out_str)
@@ -114,7 +117,8 @@ if __name__ == '__main__':
         print(f'Starting re-encode for {f.split(".")[0]}')
         encoded_ba = SCTEncoder.encode_sct_file_from_project_script(project_script=script, base_insts=baseinsts,
                                                                     use_garbage=True, combine_footer_links=False,
-                                                                    add_spurious_refresh=True, validation=True)
+                                                                    add_spurious_refresh=True, validation=True,
+                                                                    eu_validation=eu_validation)
         if check_compressed:
             aklz = Aklz()
             original_ba = aklz.compress(original_ba)

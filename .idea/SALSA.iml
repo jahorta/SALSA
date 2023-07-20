@@ -6,6 +6,7 @@
       <excludeFolder url="file://$MODULE_DIR$/compressed_scripts" />
       <excludeFolder url="file://$MODULE_DIR$/decompressed_scripts" />
       <excludeFolder url="file://$MODULE_DIR$/compressed scripts" />
+      <excludeFolder url="file://$MODULE_DIR$/_EU_scripts" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.10" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
