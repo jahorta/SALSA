@@ -51,3 +51,23 @@ def head_and_body_to_SAstr(no_head, head, body):
     else:
         return f'{body}\\e'
     return f'\\h({head}){body}\\e'
+
+
+decoding_errors = {'cp1252': [('\\x81', ' ')],
+                   'shiftjis': [('\\x85', '…')]}
+
+
+def fix_string_decoding_errors(string, encoding):
+    for error in decoding_errors[encoding]:
+        string = string.replace(error[0], error[1])
+    return string
+
+
+encoding_errors = {'cp1252': [],
+                   'shiftjis': [(b'\x81\x63', b'\x85')]}
+
+
+def fix_string_encoding_errors(str_bytes: bytearray, encoding):
+    for error in encoding_errors[encoding]:
+        str_bytes = str_bytes.replace(error[0], error[1])
+    return str_bytes

@@ -5,6 +5,7 @@ import struct
 import difflib
 from typing import Dict, Tuple, List, Callable, Literal, Union
 
+from SALSA.Common.script_string_utils import fix_string_decoding_errors
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Project.project_container import SCTScript, SCTSection, SCTLink, SCTInstruction, SCTParameter, \
     footer_str_group_name, footer_str_id_prefix
