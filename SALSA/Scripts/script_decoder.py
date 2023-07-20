@@ -61,6 +61,7 @@ class SCTDecoder:
     }
 
     _debug_log: List[str] = []
+    _EU_encoding = False
 
     def _init(self, strings_only=False, is_validation=False):
         self._str_sect_links = []
@@ -72,6 +73,7 @@ class SCTDecoder:
         self._variables = {}
         self._instruction_groups = {}
         self._footer_dialog_locs = []
+        self._EU_encoding = False
 
     @classmethod
     def decode_sct_from_file(cls, name, sct, inst_lib: BaseInstLibFacade, strings_only=False, is_validation=False):
@@ -822,13 +824,21 @@ class SCTDecoder:
                 if size == max_len:
                     break
         str_bytes = self._sct[pos: pos + size]
-        if len(str_bytes) > 3:
+
+        if len(str_bytes) > 3 and not self._EU_encoding:
             if str_bytes[3] == 0xab:
-                string = str_bytes.decode(encoding='cp1252', errors='backslashreplace')
-            else:
-                string = str_bytes.decode(encoding=encoding, errors='backslashreplace')
-        else:
-            string = str_bytes.decode(encoding=encoding, errors='backslashreplace')
+                self._EU_encoding = True
+
+        alt_encoding = 'cp1252'
+        if self._EU_encoding and not str_bytes[:2] == bytearray(b'\x81\x83') and not str_bytes[3:5] == bytearray(b'\x81\x73'):
+            encoding, alt_encoding = alt_encoding, encoding
+
+        string = str_bytes.decode(encoding=encoding, errors='backslashreplace')
+        if '\\x' in string:
+            string = fix_string_decoding_errors(string, encoding)
+
+        if '\\x' in string:
+            string = str_bytes.decode(encoding=alt_encoding, errors='backslashreplace')
 
         return string
 
