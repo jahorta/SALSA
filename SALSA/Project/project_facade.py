@@ -224,13 +224,17 @@ class SCTProjectFacade:
         instruction_details['description'] = format_description(inst=instruction, base_inst=base_inst, callbacks=self.desc_callbacks)
         return instruction_details
 
-    def add_script_to_project(self, script_name, script):
-        self.project.scts[script_name] = script
-        script_keys = sorted(list(self.project.scts.keys()), key=str.casefold)
-        self.project.scts = {k: self.project.scts[k] for k in script_keys}
+    def add_scripts_to_project(self, scripts: dict):
+        for name, script in scripts.items():
+            self._add_script_to_project(name, script)
         if 'update_scripts' not in self.callbacks:
             return
         self.callbacks['update_scripts']()
+
+    def _add_script_to_project(self, script_name, script):
+        self.project.scts[script_name] = script
+        script_keys = sorted(list(self.project.scts.keys()), key=str.casefold)
+        self.project.scts = {k: self.project.scts[k] for k in script_keys}
 
     def get_project_script_by_name(self, name):
         if name not in self.project.scts.keys():
