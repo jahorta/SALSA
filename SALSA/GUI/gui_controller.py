@@ -1,4 +1,5 @@
 import os.path
+import queue
 import tkinter as tk
 from tkinter import ttk
 from typing import Union, TypedDict, Literal
@@ -39,6 +40,7 @@ class GUIController:
 
         self.status_msg: Union[None, tk.Label] = None
         self.status_sub_msg: Union[None, tk.Label] = None
+        self.status_queue: queue.SimpleQueue = queue.SimpleQueue()
         self.help_path = os.path.abspath('./SALSA/Help/Skies of Arcadia Legends Script Assistant.html')
         self.parent = parent
         self.scpt_view = scpt_editor_view
@@ -183,7 +185,7 @@ class GUIController:
     # Status popup functions #
     # ---------------------- #
 
-    def show_status_popup(self, title, msg):
+    def show_status_popup(self, title, msg, sub_msg=''):
         if self.status_popup is not None:
             self.stop_status_popup()
         height = 50
@@ -211,6 +213,8 @@ class GUIController:
         new_geom = f'{width}x{height}+{x}+{y}'
         self.status_popup.geometry(new_geom)
 
+        self.status_listener()
+
     def stop_status_popup(self):
         self.status_popup.destroy()
         self.status_popup = None
@@ -229,3 +233,7 @@ class GUIController:
         for popup in self.popups.values():
             if popup is not None:
                 popup.change_theme(dark_mode)
+
+    def status_listener(self):
+        if self.status_queue.empty():
+            self.status_popup.after(20, self.status_listener)
