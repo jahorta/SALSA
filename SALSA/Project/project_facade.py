@@ -1,6 +1,7 @@
 import copy
 from typing import Union, Tuple, Literal
 
+from SALSA.Project.RepairTools.texbox_disappear_repair import TBStringToParamRepair
 from SALSA.Project.Updater.project_updater import ProjectUpdater
 from SALSA.BaseInstructions.bi_defaults import loop_count_name
 from SALSA.Common.script_string_utils import SAstr_to_head_and_body, head_and_body_to_SAstr
@@ -1432,3 +1433,9 @@ class SCTProjectFacade:
             tgt_sect.insts[prev_tgt_uuid].links_in.remove(link)
         tgt_sect.insts[new_tgt_uuid].links_in.append(link)
         link.target_trace[1] = new_tgt_uuid
+
+    def repair_text_box_fade(self, sct_model):
+        project = TBStringToParamRepair.repair_project(project=self.project, inst_lib=self.base_insts, sct_model=sct_model)
+        if project is None:
+            return
+        self.project = project
