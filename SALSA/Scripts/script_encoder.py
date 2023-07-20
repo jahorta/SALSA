@@ -73,6 +73,7 @@ class SCTEncoder:
             self._additions = additions if not self._EU_validation else eu_additions
 
         self.update_inst_pos = update_inst_pos
+        self._EU_encoding = self.detect_encoding(script)
 
         self.script = script
         self.bi = base_insts
@@ -451,4 +452,13 @@ class SCTEncoder:
             return
 
         self.sct_body = self.sct_body[:location] + value + self.sct_body[location+len(value):]
+
+    @staticmethod
+    def detect_encoding(script: SCTScript):
+        for string in script.strings.values():
+            if '«' in string:
+                return True
+            if '＜' in string or '《' in string:
+                return False
+        return False
 
