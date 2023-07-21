@@ -1,3 +1,4 @@
+import copy
 import os
 import queue
 import random
@@ -139,14 +140,14 @@ class Application(tk.Tk):
             'is_darkmode': return_darkmode,
         })
 
-        self.gui.disable_script_view()
+        self.gui.disable_project_view()
 
         # self.bind('<<ChangeTheme>>', self.propagate_change_theme)
         self.change_theme(self.is_darkmode)
 
     def on_new_project(self):
         self.project.create_new_project()
-        self.gui.enable_script_view()
+        self.gui.enable_project_view()
         self.gui.toggle_frame_state(self.project_edit_view.inst_frame, 'disabled')
         self.project_edit_controller.update_tree(None, None)
 
@@ -170,13 +171,15 @@ class Application(tk.Tk):
             return
 
         self.gui.show_status_popup(title='Saving Project', msg=f'Saving Project ({os.path.basename(filepath)})')
-        self.after(10, self._continue_save_project, filepath)
+        self.gui.disable_project_view()
+        save_thread = threading.Thread(target=self._save_project, args=(filepath, ))
+        save_thread.start()
 
-    def _continue_save_project(self, filepath):
-        project = self.project.project
-        self.proj_model.save_project(proj=project, filepath=filepath)
+    def _save_project(self, filepath):
+        self.proj_model.save_project(proj=self.project.project, filepath=filepath)
         self.proj_model.add_recent_file(filepath=filepath)
         self.gui.stop_status_popup()
+        self.gui.enable_project_view()
 
     def on_load_recent_project(self, index):
         self.on_load_project(self.proj_model.get_recent_filepath(index=index))
@@ -193,20 +196,31 @@ class Application(tk.Tk):
                 return
 
         self.gui.show_status_popup(title='Loading Project', msg=f'Loading Project ({os.path.basename(filepath)})')
-        self.after(10, self._continue_load_project, filepath)
+        load_queue = queue.SimpleQueue()
+        load_thread = threading.Thread(target=self._load_project, args=(filepath, load_queue))
+        load_thread.start()
+        self.after(10, self._load_project_listener, load_queue)
 
-    def _continue_load_project(self, filepath):
+    def _load_project(self, filepath, load_queue):
         prj = self.proj_model.load_project(filepath=filepath)
         self.proj_model.add_recent_file(filepath=filepath)
         success = self.project.load_project(prj)
+        load_queue.put(success)
+
+    def _load_project_listener(self, listen_queue):
+        if listen_queue.empty():
+            return self.after(20, self._load_project_listener, listen_queue)
+        self._finish_load_project(listen_queue.get())
+
+    def _finish_load_project(self, success):
         if not success:
-            self.gui.show_status_popup(title='Loading Project', msg=f'Project load failed :(')
-            self.gui.scpt_view.after(1000, self.gui.stop_status_popup)
+            self.gui.change_status_msg(msg=f'Project load failed :(')
+            self.after(1000, self.gui.stop_status_popup)
             return
         self.menu.update_recents(self.proj_model.get_recent_filenames())
         self.project_edit_controller.load_project()
         self.gui.stop_status_popup()
-        self.gui.enable_script_view()
+        self.gui.enable_project_view()
         self.gui.toggle_frame_state(self.project_edit_view.inst_frame, 'disabled')
 
     def on_print_debug(self):

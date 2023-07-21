@@ -58,24 +58,24 @@ class GUIController:
     # Functions to inactivate script view when no project is loaded #
     # ------------------------------------------------------------- #
 
-    def enable_script_view(self):
-        self.recursive_toggle(self.scpt_view, 'normal')
+    def enable_project_view(self):
+        self._recursive_toggle(self.scpt_view, 'normal')
         self.callbacks['script']()
 
-    def disable_script_view(self):
-        self.recursive_toggle(self.scpt_view, 'disabled')
+    def disable_project_view(self):
+        self._recursive_toggle(self.scpt_view, 'disabled')
         self.callbacks['no_script']()
 
     def toggle_frame_state(self, frame, state: Literal['normal', 'disabled']):
-        self.recursive_toggle(frame, state)
+        self._recursive_toggle(frame, state)
 
-    def recursive_toggle(self, parent, state):
+    def _recursive_toggle(self, parent, state):
         for child in parent.winfo_children():
             r = child.__repr__().split('.')[-1]
 
             # capture the children of the scroll frame
             if isinstance(child, w.ScrollLabelFrame) or isinstance(child, w.ScrollFrame):
-                self.recursive_toggle(child.scroll_frame, state)
+                self._recursive_toggle(child.scroll_frame, state)
 
             child_type = type(child)
             # ttk containers do both
@@ -83,16 +83,17 @@ class GUIController:
                 ttk_state = state
                 ttk_state = ttk_state if ttk_state != 'normal' else '!disabled'
                 child.state([ttk_state])
-                self.recursive_toggle(child, state)
+                self._recursive_toggle(child, state)
 
             # tk containers and tk fields with no state
             elif child_type in (
-            tk.Frame, tk.LabelFrame, tk.Message, tk.Menu, tk.Menubutton, w.ScrollFrame, w.ScrollLabelFrame, tk.Toplevel):
-                self.recursive_toggle(child, state)
+                    tk.Frame, tk.LabelFrame, tk.Message, tk.Menu, tk.Menubutton, w.ScrollFrame, w.ScrollLabelFrame,
+                    tk.Toplevel):
+                self._recursive_toggle(child, state)
 
             # ttk widgets
             elif type(child) in (
-            ttk.Button, ttk.Checkbutton, DataTreeview, ttk.Treeview, ttk.Scrollbar, ttk.Label, ttk.Separator):
+                    ttk.Button, ttk.Checkbutton, DataTreeview, ttk.Treeview, ttk.Scrollbar, ttk.Label, ttk.Separator):
                 ttk_state = state
                 ttk_state = ttk_state if ttk_state != 'normal' else '!disabled'
                 child.state([ttk_state])
@@ -166,7 +167,7 @@ class GUIController:
             'get_tree': lambda: self.project.get_tree(self.scpt_view.get_headers('script')),
         }
         self.popups['export'] = SCTExportPopup(self.parent, callbacks=callbacks, name='export', selected=selected,
-                                                is_darkmode=self.callbacks['is_darkmode']())
+                                               is_darkmode=self.callbacks['is_darkmode']())
 
     # ----------------------- #
     # Popup cleanup functions #
