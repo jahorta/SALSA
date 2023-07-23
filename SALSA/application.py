@@ -164,7 +164,7 @@ class Application(tk.Tk):
         self.project.set_filepath(filepath=filepath)
         self.on_save_project()
 
-    def on_save_project(self):
+    def on_save_project(self, quit_program=False):
         filepath = self.project.get_filepath()
         if filepath == '' or filepath is None:
             self.on_save_as_project()
@@ -172,14 +172,22 @@ class Application(tk.Tk):
 
         self.gui.show_status_popup(title='Saving Project', msg=f'Saving Project ({os.path.basename(filepath)})')
         self.gui.disable_project_view()
-        save_thread = threading.Thread(target=self._save_project, args=(filepath, ))
+
+        quit_queue = queue.SimpleQueue()
+        save_thread = threading.Thread(target=self._save_project, args=(filepath, quit_program, quit_queue))
         save_thread.start()
 
-    def _save_project(self, filepath):
+        if quit_program:
+            self.quit_await(quit_queue)
+
+    def _save_project(self, filepath, quit_program, quit_queue):
         self.proj_model.save_project(proj=self.project.project, filepath=filepath)
         self.proj_model.add_recent_file(filepath=filepath)
+        self.project_edit_controller.has_changes = False
         self.gui.stop_status_popup()
         self.gui.enable_project_view()
+        if quit_program:
+            quit_queue.put('quit')
 
     def on_load_recent_project(self, index):
         self.on_load_project(self.proj_model.get_recent_filepath(index=index))
@@ -277,8 +285,13 @@ class Application(tk.Tk):
             save = tk.messagebox.askyesno(title='Unsaved Changes',
                                           message='There are unsaved changes remaining.\nWould you like to save them?')
             if save:
-                self.on_save_project()
+                return self.on_save_project(quit_program=True)
         self.destroy()
+
+    def quit_await(self, quit_queue):
+        if not quit_queue.empty():
+            self.on_quit()
+        self.after(20, self.quit_await, quit_queue)
 
     # -------------------------------- #
     # Exporting scripts from a project #
