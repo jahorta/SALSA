@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
+from typing import Literal
 
+from SALSA.GUI.Widgets.hover_tooltip import schedule_tooltip
+from SALSA.GUI.Widgets.toggle_button import ToggleButton
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
 from SALSA.GUI.themes import dark_theme, light_theme
 
@@ -21,8 +24,28 @@ default_tree_stretch = False
 default_tree_label = ''
 
 note_font = {}
-no_head_warning = 'Removing the header will allow for 5 lines of body text instead of 4.\nWARNING: Clicking this check box will delete the current header.'
-body_note = 'NOTE: [ and ] are used for open and close quotes respectively. Using " or \' will only give the close quote.'
+
+tooltips = {
+    'no_head': 'Removing the header will allow for 5 lines of body text instead of 4 and delete the current header.',
+    'body': 'NOTE: [ and ] are used for open and close quotes respectively. Using " or \' will only give the close quote.'
+}
+
+tooltip_delay = 500
+
+quote_types = {
+    'US/JP': ('《', '》'),
+    'EU': ('«', '»')
+}
+
+quote_replacement = {
+    'US/JP': [[quote_types['EU'][i], quote_types['US/JP'][i]] for i in range(len(quote_types['US/JP']))],
+    'EU': [[quote_types['US/JP'][i], quote_types['EU'][i]] for i in range(len(quote_types['EU']))]
+}
+
+sp_chars = {
+    'EU': '€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ¡¢£¤¥¦§¨©ª«¬SHY®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ',
+    'US/JP': '、。，．・：；？！゛゜´｀¨＾￣＿ヽヾゝゞ〃仝々〆〇ー―‐／＼～∥｜…‥‘’“”（）〔〕［］｛｝〈〉《》「」『』【】＋－±×÷＝≠＜＞≦≧∞∴♂♀°′″℃￥＄￠￡％＃＆＊＠§☆★○●◎◇◆□■△▲▽▼※〒→←↑↓〓∈∋⊆⊇⊂⊃∪∩∧∨￢⇒⇔∀∃∠⊥⌒∂∇≡≒≪≫√∽∝∵∫∬Å‰♯♭♪†‡¶◯ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψωАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя│┌┐┘└├┬┤┴┼━┃┏┓┛┗┣┳┫┻╋┠┯┨┷┿┝┰┥┸╂①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩⅰⅱⅲⅳⅴⅵⅶⅷⅸⅹ㍉㌔㌢㍍㌘㌧㌃㌶㍑㍗㌍㌦㌣㌫㍊㌻㎜㎝㎞㎎㎏㏄㎡㍻〝〟№㏍℡㊤㊥㊦㊧㊨㈱㈲㈹㍾㍽㍼∮∑∟⊿￤＇＂'
+}
 
 
 class StringPopup(tk.Toplevel):
@@ -40,8 +63,8 @@ class StringPopup(tk.Toplevel):
         self.callbacks = callbacks
         self.name = name
         self.protocol('WM_DELETE_WINDOW', self.close)
-        theme = dark_theme if is_darkmode else light_theme
-        self.configure(**theme['Ttoplevel']['configure'])
+        self.theme = dark_theme if is_darkmode else light_theme
+        self.configure(**self.theme['Ttoplevel']['configure'])
 
         # if self.log_key not in settings:
         #     settings.add_group(self.log_key)
@@ -115,43 +138,56 @@ class StringPopup(tk.Toplevel):
         lower_frame.grid(row=2, column=0, sticky='NSEW', padx=5)
         lower_frame.columnconfigure(0, weight=1)
 
+        encode_frame = ttk.Frame(lower_frame)
+        encode_frame.grid(row=0, column=0, sticky=tk.W)
+
+        str_encode_label = ttk.Label(encode_frame, text='String Encoding:   ')
+        str_encode_label.grid(row=0, column=0)
+        self.str_encode_toggle = ToggleButton(encode_frame, on_text='US/JP', off_text='EU', theme=self.theme,
+                                              command=self.set_encoding, bd=0, highlightthickness=0)
+        self.str_encode_toggle.grid(row=0, column=1)
+
         no_head_frame = ttk.Frame(lower_frame)
-        no_head_frame.grid(row=0, column=0, sticky=tk.W)
+        no_head_frame.grid(row=1, column=0, sticky=tk.W)
 
         self.no_head_var = tk.IntVar()
-        self.no_head = ttk.Checkbutton(no_head_frame, text='Remove Header', variable=self.no_head_var, onvalue=1, offvalue=0,
+        self.no_head = ttk.Checkbutton(no_head_frame, text=' Remove Header', variable=self.no_head_var, onvalue=1, offvalue=0,
                                        command=lambda: self.set_change('no_head', self.no_head_var.get() == 1), state='disabled')
         self.no_head.grid(row=0, column=0, sticky=tk.W)
-        no_head_warning_label = ttk.Label(no_head_frame, text=no_head_warning, anchor='w', justify=tk.LEFT)
-        no_head_warning_label.grid(row=1, column=0)
+        no_head_warning_label = ttk.Label(no_head_frame, text='⚠', anchor='w', justify=tk.LEFT)
+        no_head_warning_label.grid(row=0, column=1)
+        no_head_warning_label.bind('<Enter>', lambda e: schedule_tooltip(no_head_warning_label, tooltips['no_head']))
 
         head_frame = ttk.Frame(lower_frame)
-        head_frame.grid(row=1, column=0, sticky=tk.W)
+        head_frame.grid(row=2, column=0, sticky=tk.W)
 
         head_label = ttk.Label(head_frame, text='Textbox Header')
-        head_label.grid(row=0, column=0, sticky=tk.W)
+        head_label.grid(row=1, column=0, sticky=tk.W)
         self.head_entry = ttk.Entry(head_frame, state='disabled', width=65)
         self.head_entry.grid(row=1, column=0, sticky=tk.W)
         self.head_entry.bind('<FocusIn>', self.on_entry_focus_in)
         self.head_entry.bind('<FocusOut>', lambda e, k='head': self.on_entry_focus_out(k, e))
-        self.head_add_quote_label = ttk.Label(head_frame, text='add header quotes:')
+        self.head_add_quote_label = ttk.Label(head_frame, text='')
         self.head_add_quote_label.grid(row=1, column=1, sticky=tk.W)
-        self.head_add_quote_US = ttk.Button(head_frame, text='JP/US', command=lambda: self.add_quotes_to_head('《', '》'))
-        self.head_add_quote_US.grid(row=1, column=2, sticky=tk.W)
-        self.head_add_quote_EU = ttk.Button(head_frame, text='EU', command=lambda: self.add_quotes_to_head('«', '»'))
-        self.head_add_quote_EU.grid(row=1, column=3, sticky=tk.W, padx=3)
+        self.head_add_quote_button = ttk.Button(head_frame, text='add header quotes', command=self.add_quotes_to_head)
+        self.head_add_quote_button.grid(row=1, column=3, sticky=tk.W, padx=3)
 
-        head_encode_warning = ttk.Label(lower_frame, text='**Note: Use EU quotes to ensure strings encode properly for non-jp, non-en characters**')
-        head_encode_warning.grid(row=2, column=0, pady=5)
+        body_label_frame = ttk.Frame(lower_frame)
+        body_label_frame.grid(row=3, column=0, sticky=tk.W)
+        body_label = ttk.Label(body_label_frame, text='Textbox Body')
+        body_label.grid(row=0, column=0)
+        body_tooltip_label = ttk.Label(body_label_frame, text='ⓘ')
+        body_tooltip_label.grid(row=0, column=1)
+        body_tooltip_label.bind('<Enter>', lambda e: schedule_tooltip(body_tooltip_label, tooltips['body']))
 
-        body_label = ttk.Label(lower_frame, text='Textbox Body')
-        body_label.grid(row=3, column=0, sticky=tk.W)
-        self.body_entry = tk.Text(lower_frame, wrap=tk.WORD, height=5, **theme['text']['configure'])
-        self.body_entry.grid(row=3, column=0, sticky=tk.W + tk.E)
+        insert_frame = ttk.Frame(lower_frame)
+        insert_frame.grid(row=4, column=0, sticky=tk.E+tk.W)
+
+        self.body_entry = tk.Text(lower_frame, wrap=tk.WORD, height=5, **self.theme['text']['configure'],
+                                  undo=True, maxundo=-1, autoseparators=True)
+        self.body_entry.grid(row=5, column=0, sticky=tk.W + tk.E, pady='0 5')
         self.body_entry.bind('<FocusIn>', self.on_text_focus_in)
         self.body_entry.bind('<FocusOut>', lambda e, k='body': self.on_text_focus_out(k, e))
-        body_note_label = ttk.Label(lower_frame, text=body_note, anchor='w', justify=tk.LEFT)
-        body_note_label.grid(row=4, column=0, sticky=tk.W)
 
         self.update_scripts()
 
@@ -160,6 +196,10 @@ class StringPopup(tk.Toplevel):
         self.string_defaults = {}
         self.string_changes = {}
         self.header_invalid = False
+        self.cur_encoding: Literal['US/JP', 'EU'] = 'US/JP'
+        self.cur_script_encoding: Literal['US/JP', 'EU'] = 'US/JP'
+        self.scheduled_tooltip = None
+        self.active_tooltip = None
 
         self.title(self.t)
 
@@ -179,8 +219,7 @@ class StringPopup(tk.Toplevel):
     def _change_editor_state(self, state):
         self.no_head.configure(state=state)
         self.head_entry.configure(state=state)
-        self.head_add_quote_US.configure(state=state)
-        self.head_add_quote_EU.configure(state=state)
+        self.head_add_quote_button.configure(state=state)
         self.body_entry.configure(state=state)
 
     def _clear_editor_fields(self):
@@ -200,6 +239,7 @@ class StringPopup(tk.Toplevel):
         string_tree = self.callbacks['get_string_tree'](script, headers)
         parent_list = ['']
         prev_iid = -1
+        encoding_set = False
         for entry in string_tree:
             if isinstance(entry, str):
                 if entry == 'group':
@@ -211,6 +251,16 @@ class StringPopup(tk.Toplevel):
                 else:
                     raise ValueError(f'{self.log_key}: Unknown command in tree list sent to _add_tree_entries')
                 continue
+            if not encoding_set:
+                if 'string' in entry:
+                    if '《' in entry['string']:
+                        self.cur_script_encoding = 'US/JP'
+                        encoding_set = True
+                        self.str_encode_toggle.set_state_by_value(self.cur_script_encoding)
+                    if '«' in entry['string']:
+                        self.cur_script_encoding = 'EU'
+                        encoding_set = True
+                        self.str_encode_toggle.set_state_by_value(self.cur_script_encoding)
             kwargs = {'parent': parent_list[-1], 'index': 'end'}
             values = []
             first = True
@@ -249,13 +299,33 @@ class StringPopup(tk.Toplevel):
         no_head = 1 if no_head else 0
         self.no_head_var.set(no_head)
         self.head_entry.insert(0, head)
+        if '《' in head:
+            self.cur_encoding = 'US/JP'
+        elif '«' in head:
+            self.cur_encoding = 'EU'
+        else:
+            self.cur_encoding = self.cur_script_encoding
 
-    def add_quotes_to_head(self, left, right):
+        self.str_encode_toggle.set_state_by_value(self.cur_encoding)
+
+    def add_quotes_to_head(self):
+        left, right = quote_types[self.cur_encoding]
         self.head_entry.insert(0, left)
         self.head_entry.insert(tk.END, right)
         self.set_change('head', self.head_entry.get())
 
-    def on_entry_focus_in(self, e):
+    def set_encoding(self, new_encoding: Literal['US/JP', 'EU']):
+        self.cur_encoding = new_encoding
+        head = self.head_entry.get()
+        for quote_set in quote_replacement[self.cur_encoding]:
+            head = head.replace(quote_set[0], quote_set[1])
+
+        self.head_entry.delete(0, tk.END)
+        self.head_entry.insert(0, head)
+        self.set_change('head', self.head_entry.get())
+
+    @staticmethod
+    def on_entry_focus_in(e):
         e.widget.cur_value = e.widget.get()
 
     def on_entry_focus_out(self, key, e):
@@ -264,7 +334,8 @@ class StringPopup(tk.Toplevel):
             return
         self.set_change(key=key, value=e.widget.get())
 
-    def on_text_focus_in(self, e):
+    @staticmethod
+    def on_text_focus_in(e):
         e.widget.cur_value = e.widget.get(1.0, tk.END)
 
     def on_text_focus_out(self, key, e):
@@ -287,9 +358,7 @@ class StringPopup(tk.Toplevel):
             return
         self.save_button.configure(state='normal')
 
-    def save_and_close(self):
-        self.save()
-        self.callbacks['close'](self.name, self)
+
 
     def save(self):
         for script, strings in self.string_changes.items():
@@ -301,9 +370,14 @@ class StringPopup(tk.Toplevel):
         self.focus()
         self.after(10, self.save_and_close)
 
-    def change_theme(self, dark_mode=True):
-        theme = dark_theme if dark_mode else light_theme
+    def save_and_close(self):
+        self.save()
+        self.callbacks['close'](self.name, self)
 
-        self.body_entry.configure(**theme['text']['configure'])
-        self.configure(**theme['Ttoplevel']['configure'])
+    def change_theme(self, dark_mode=True):
+        self.theme = dark_theme if dark_mode else light_theme
+
+        self.body_entry.configure(**self.theme['text']['configure'])
+        self.configure(**self.theme['Ttoplevel']['configure'])
+        self.str_encode_toggle.change_theme(self.theme)
 
