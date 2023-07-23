@@ -147,7 +147,6 @@ class ProjectEditorController:
         child_tree = tree_children[tree_key]
         kwargs['headers'] = self.view.get_headers(tree_key=child_tree)
         tree_list = self.project.get_tree(**kwargs)
-        tree_list = self.adjust_tree_entries(tree_list, child_tree)
         self.update_tree(child_tree, tree_list)
 
     def adjust_tree_entries(self, entries, key):
@@ -157,7 +156,6 @@ class ProjectEditorController:
                     continue
                 entry['delay_param'] = '*' if entry['delay_param'] != 'None' else ''
                 entry['skip_refresh'] = '*' if entry['skip_refresh'] == 'True' else ''
-
         return entries
 
     def on_select_instruction(self, instructID):
@@ -191,6 +189,7 @@ class ProjectEditorController:
         if tree_dict is None:
             return
 
+        tree_dict = self.adjust_tree_entries(tree_dict, tree)
         self._add_tree_entries(tree, tree_dict)
 
     def _add_tree_entries(self, tree_key: str, tree_list):
