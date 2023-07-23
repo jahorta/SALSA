@@ -142,7 +142,7 @@ class StringPopup(tk.Toplevel):
         encode_frame.grid(row=0, column=0, sticky=tk.W)
 
         str_encode_label = ttk.Label(encode_frame, text='String Encoding:   ')
-        str_encode_label.grid(row=0, column=0)
+        str_encode_label.grid(row=0, column=0, pady=1)
         self.str_encode_toggle = ToggleButton(encode_frame, on_text='US/JP', off_text='EU', theme=self.theme,
                                               command=self.set_encoding, bd=0, highlightthickness=0)
         self.str_encode_toggle.grid(row=0, column=1)
