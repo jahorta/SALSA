@@ -66,12 +66,12 @@ def theme_generator(colors: Colors):
         },
         "TEntry": {
             "configure": {
-                "background": colors.bg,
+                "background": colors.bg_internal,
                 "foreground": colors.text,
-                "highlightbackground": colors.bg_highlight,
-                "highlightcolor": colors.bg_highlight,
+                "highlightbackground": colors.bg,
+                "highlightcolor": colors.bg,
                 "fieldbackground": colors.bg_internal,
-                "bordercolor": colors.bg_internal,
+                "lightcolor": colors.border,
                 "selectbackground": colors.bright_selector,
                 "selectforeground": colors.selector_text,
                 "insertcolor": colors.insert_indicator,
