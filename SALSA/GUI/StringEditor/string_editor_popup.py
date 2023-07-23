@@ -229,6 +229,7 @@ class StringPopup(tk.Toplevel):
 
     def on_script_select(self, name, script):
         self.cur_script = script
+        self.cur_string_id = ''
         self._clear_editor_fields()
         self._change_editor_state('disabled')
         self._update_string_tree(script)
