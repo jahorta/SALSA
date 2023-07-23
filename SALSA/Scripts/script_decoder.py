@@ -1468,7 +1468,8 @@ class SCTDecoder:
                 decoded_sct.section_groups[cur_group] = []
 
             if section.type == 'Label':
-                in_group = False
+                if suffix not in sect_name:
+                    in_group = False
 
         empty_sections = []
         for name, group in decoded_sct.section_groups.items():
