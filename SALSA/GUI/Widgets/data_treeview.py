@@ -120,6 +120,8 @@ class DataTreeview(ttk.Treeview):
         self.is_darkmode = is_darkmode
 
     def select_entry(self, event):
+        if len(self.get_children('')) == 0:
+            return
         if self.in_motion:
             return
         if 'select' not in self.callbacks:
@@ -199,6 +201,8 @@ class DataTreeview(ttk.Treeview):
             self.item(row_id, open=True)
 
     def bDown_Shift(self, event):
+        if len(self.get_children('')) == 0:
+            return
         self.has_shift = True
 
         clicked_iid = self.identify_row(event.y)
@@ -235,6 +239,8 @@ class DataTreeview(ttk.Treeview):
         self.has_shift = False
 
     def bDown_move(self, event):
+        if len(self.get_children('')) == 0:
+            return
         sel = self.identify_row(event.y)
         if sel == '':
             return
@@ -258,6 +264,8 @@ class DataTreeview(ttk.Treeview):
             self.after(10, self.selection_set, sel)
 
     def bUp_move(self, event):
+        if len(self.get_children('')) == 0:
+            return
         if not self.in_motion:
                 return
         final_index = self.index(self.placeholder)
@@ -293,6 +301,8 @@ class DataTreeview(ttk.Treeview):
         self.selection_bounds = None
 
     def bMove(self, event):
+        if len(self.get_children('')) == 0:
+            return
         if self.has_shift:
             return
         if not self.in_motion:
