@@ -25,6 +25,11 @@ def theme_generator(colors: Colors):
                 "foreground": colors.text
             }
         },
+        "tooltip.TFrame": {
+            "configure": {
+                "background": colors.bg_highlight,
+            }
+        },
         "TLabelframe": {
             "configure": {
                 "highlightbackground": colors.bg_highlight,
