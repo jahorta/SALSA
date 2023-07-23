@@ -237,6 +237,28 @@ def theme_generator(colors: Colors):
                 "darkcolor": colors.bg_internal
             },
         },
+        "ToggleButton.Canvas": {
+            "configure": {
+                "background": colors.bg
+            }
+        },
+        "ToggleButton.Background": {
+            "configure": {
+                "fill": colors.selector,
+                'outline': colors.border,
+                'width': 2
+            }
+        },
+        "ToggleButton.Text": {
+            "configure": {
+                "fill": colors.selector_text
+            }
+        },
+        "ToggleButton.Slider": {
+            "configure": {
+                "fill": colors.bg_highlight
+            }
+        }
     }
 
 
