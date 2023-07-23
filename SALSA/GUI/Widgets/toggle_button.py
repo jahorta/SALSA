@@ -122,6 +122,7 @@ class ToggleButton(tk.Canvas):
 
     def set_state(self, state: Literal['on', 'off']):
         self._toggle_step([self.slider_anim_inds[state][-1]], 0)
+        self.slider_state = state
 
     def set_state_by_value(self, key: str):
         if key not in self.state_keys:
