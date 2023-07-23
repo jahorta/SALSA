@@ -189,6 +189,7 @@ class SCTEncoder:
     def _encode_section(self, name, section):
         # If the inst is a label, just add the entry to the header and add a string label
         sect_name = name
+        section.absolute_offset = len(self.sct_body)
         for inst_id in section.inst_list:
             inst = section.insts[inst_id]
             if inst.base_id == 9:
