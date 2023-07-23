@@ -11,6 +11,7 @@ class Colors:
     selector: str
     bright_selector: str
     selector_text: str
+    insert_indicator: str
     border: str
     button: str
     link: str
@@ -68,7 +69,7 @@ def theme_generator(colors: Colors):
                 "bordercolor": colors.bg_internal,
                 "selectbackground": colors.bright_selector,
                 "selectforeground": colors.selector_text,
-                "insertcolor": colors.selector_text,
+                "insertcolor": colors.insert_indicator,
             },
         },
         "TCheckbutton": {
@@ -122,7 +123,7 @@ def theme_generator(colors: Colors):
             "configure": {
                 "background": colors.bg_internal,
                 "foreground": colors.text,
-                "insertbackground": colors.bg_highlight,
+                "insertbackground": colors.insert_indicator,
                 "selectbackground": colors.selector,
                 "selectforeground": colors.selector_text
             }
@@ -243,6 +244,7 @@ themes = {
         selector='#333366',
         bright_selector='#6666cc',
         selector_text="#cccccc",
+        insert_indicator='#cccccc',
         border='#5d5d5d',
         button="#3c4f4f",
         link='#5588ff'
@@ -255,6 +257,7 @@ themes = {
         selector='#4444dd',
         bright_selector='#3333bb',
         selector_text='white',
+        insert_indicator='black',
         border='#888888',
         button="#acafd1",
         link='#0055ee'
