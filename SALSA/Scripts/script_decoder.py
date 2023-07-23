@@ -935,27 +935,17 @@ class SCTDecoder:
             decoded_sct.section_groups.pop(group)
 
         for name, group in decoded_sct.section_groups.items():
-            # if 'logical' not in name:
-            #     continue
+            if 'logical' not in name:
+                continue
             new_name = group[0]
-            if new_name[:2] != 'me':
-
-                for sect_name in group[1:]:
-                    match = difflib.SequenceMatcher(None, new_name.lower(),
-                                                    sect_name.lower()).find_longest_match(0, len(new_name), 0,
-                                                                                          len(sect_name))
-                    if match.size < 3:
-                        continue
-                    new_name = new_name[match.a: match.a + match.size]
-
-                if new_name in decoded_sct.sects:
-                    i = 0
-                    while True:
-                        test_name = f'{new_name}({i})'
-                        if test_name not in decoded_sct.sects:
-                            break
-                        i += 1
-                    new_name = test_name
+            if new_name in decoded_sct.sects:
+                i = 0
+                while True:
+                    test_name = f'{new_name}({i})'
+                    if test_name not in decoded_sct.sects:
+                        break
+                    i += 1
+                new_name = test_name
 
             # Setup combined logical section
             new_section: SCTSection = decoded_sct.sects[group[0]]
@@ -1473,6 +1463,8 @@ class SCTDecoder:
                 in_group = True
                 cur_group = f'{sect_name}{sep}group'
                 suffix = sect_name[len(script_filename):].lower()
+                if ')' in suffix:
+                    suffix = suffix[:-3]
                 decoded_sct.section_groups[cur_group] = []
 
             if section.type == 'Label':
