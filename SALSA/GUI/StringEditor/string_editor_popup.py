@@ -358,8 +358,6 @@ class StringPopup(tk.Toplevel):
             return
         self.save_button.configure(state='normal')
 
-
-
     def save(self):
         for script, strings in self.string_changes.items():
             for string_id, string_changes in strings.items():
