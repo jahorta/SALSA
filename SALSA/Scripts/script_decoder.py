@@ -175,6 +175,9 @@ class SCTDecoder:
                         in_sect_group = False
                         sect_group_key = None
                 else:
+                    last_sect = decoded_sct.sects[decoded_sct.section_groups[sect_group_key][-1]]
+                    if last_sect.insts[last_sect.inst_list[-1]].base_id == 9:
+                        decoded_sct.section_groups[sect_group_key].pop(-1)
                     in_sect_group = False
                     sect_group_key = None
 
