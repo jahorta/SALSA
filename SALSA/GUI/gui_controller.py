@@ -153,7 +153,10 @@ class GUIController:
         callbacks = {
             'save': self.project.edit_string, 'close': self.close_popup,
             'get_scripts': lambda: self.project.get_tree(self.scpt_view.get_headers('script')),
-            'get_string_tree': self.project.get_string_tree, 'get_string_to_edit': self.project.get_string_to_edit
+            'get_string_tree': self.project.get_string_tree, 'get_string_to_edit': self.project.get_string_to_edit,
+            'add_string_group': self.project.add_string_group, 'delete_string_group': self.project.remove_string_group,
+            'rename_string_group': self.project.rename_string_group, 'add_string': self.project.add_string,
+            'delete_string': self.project.delete_string, 'change_string_id': self.project.change_string_id
         }
         self.popups['string'] = StringPopup(self.parent, callbacks=callbacks, name='string',
                                             is_darkmode=self.callbacks['is_darkmode']())
