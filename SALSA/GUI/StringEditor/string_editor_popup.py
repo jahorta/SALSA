@@ -32,7 +32,7 @@ tooltips = {
 }
 
 tooltip_delay = 500
-warning_time = 3000
+warning_time = 1800
 
 quote_types = {
     'US/JP': ('《', '》'),
@@ -474,11 +474,11 @@ class StringPopup(tk.Toplevel):
         if new_name == old_name:
             return self.destroy_rename_widget(widget)
         if self.callbacks['is_sect_name_used'](self.cur_script, new_name):
-            schedule_tooltip(widget, 'This name is in use', delay=0, time_limit=warning_time, position='above center')
+            schedule_tooltip(widget, 'This name is in use', delay=0, min_time=warning_time, position='above center', is_warning=True)
             return self.shake_widget(widget)
         if new_name == '':
-            schedule_tooltip(widget, 'A name is required', delay=0, time_limit=warning_time, position='above center')
-            return self.shake_widget(widget)
+            schedule_tooltip(widget, 'A name is required', delay=0, min_time=warning_time, position='above center', is_warning=True)
+            return self.after(20, self.shake_widget, widget)
         self.destroy_rename_widget(widget)
         self.rename_active = False
         if is_section:
