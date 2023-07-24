@@ -499,6 +499,8 @@ class SCTProjectFacade:
             else:
                 if sect.name == new_name:
                     return True
+        if new_name in cur_script.strings.keys():
+            return True
         return False
 
     def change_section_name(self, script, section, instruction, new_name):
