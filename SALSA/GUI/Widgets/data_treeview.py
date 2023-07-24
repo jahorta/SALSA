@@ -148,7 +148,7 @@ class DataTreeview(ttk.Treeview):
         self.first_entry = '0'
         return iid
 
-    def get_row_by_rowdata(self, row_data):
+    def get_iid_from_rowdata(self, row_data):
         temp_row_data = [v for v in self.row_data.values()]
         return list(self.row_data.keys())[temp_row_data.index(row_data)] if row_data in temp_row_data else None
 
@@ -189,12 +189,12 @@ class DataTreeview(ttk.Treeview):
             if sep in item_uuid:
                 item_uuid, case = item_uuid.split(sep)
                 row_id = None
-                for child in self.get_children(self.get_row_by_rowdata(item_uuid)):
+                for child in self.get_children(self.get_iid_from_rowdata(item_uuid)):
                     if case in self.item(child)['values'][0]:
                         row_id = child
                         break
             else:
-                row_id = self.get_row_by_rowdata(item_uuid)
+                row_id = self.get_iid_from_rowdata(item_uuid)
             if row_id is None:
                 continue
             self.see(row_id)

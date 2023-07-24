@@ -303,7 +303,7 @@ class ProjectEditorController:
         sect = link_parts[0]
         inst = self.project.get_inst_uuid_by_ind(script=self.current['script'], section=sect, inst_ind=link_parts[1])
         if sect != self.current['section']:
-            sel_iid = self.trees['section'].get_row_by_rowdata(sect)
+            sel_iid = self.trees['section'].get_iid_from_rowdata(sect)
             self.trees['section'].see(sel_iid)
             self.trees['section'].focus(sel_iid)
             self.trees['section'].selection_set([sel_iid])
@@ -313,7 +313,7 @@ class ProjectEditorController:
             self.goto_link_inst(inst)
 
     def goto_link_inst(self, inst):
-        sel_iid = self.trees['instruction'].get_row_by_rowdata(inst)
+        sel_iid = self.trees['instruction'].get_iid_from_rowdata(inst)
         self.trees['instruction'].see(sel_iid)
         self.trees['instruction'].focus(sel_iid)
         self.trees['instruction'].selection_set([sel_iid])
