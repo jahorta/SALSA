@@ -4,7 +4,7 @@ from typing import Union, Tuple, Literal
 from SALSA.Project.RepairTools.texbox_disappear_repair import TBStringToParamRepair
 from SALSA.Project.Updater.project_updater import ProjectUpdater
 from SALSA.BaseInstructions.bi_defaults import loop_count_name
-from SALSA.Common.script_string_utils import SAstr_to_head_and_body, head_and_body_to_SAstr
+from SALSA.Common.script_string_utils import SAstr_to_head_and_body, head_and_body_to_SAstr, blank_string
 from SALSA.Project.description_formatting import format_description
 from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter, SCTInstruction, SCTLink
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
@@ -378,6 +378,73 @@ class SCTProjectFacade:
             body = changes['body']
         self.project.scts[script].strings[string_id] = head_and_body_to_SAstr(no_head, head, body)
         self.callbacks['set_change']()
+
+    def add_string_group(self, script, string_group):
+        cur_script = self.project.scts[script]
+        cur_script.string_groups[string_group] = {}
+
+        new_sect = SCTSection()
+        new_sect.name = string_group
+        cur_script.sects[string_group] = new_sect
+        new_inst_id = self.add_inst(script, string_group)
+        self.change_inst(script, string_group, new_inst_id, new_id=9)
+
+        cur_script.sect_list.append(string_group)
+        cur_script.sect_tree.append(string_group)
+
+    def remove_string_group(self, script, string_group):
+        cur_script = self.project.scts[script]
+        cur_script.string_groups.pop(string_group)
+        cur_script.sects.pop(string_group)
+        cur_script.sect_list.remove(string_group)
+
+        parents, index = self.get_grouped_parents_and_index(string_group, cur_script.sect_tree)
+        cur_group = cur_script.sect_tree
+        for p in parents:
+            cur_group = cur_group[p]
+        cur_group.pop(index)
+
+    def rename_string_group(self, script, group_name, new_group_name):
+        cur_script = self.project.scts[script]
+        cur_script.strings[new_group_name] = cur_script.strings.pop(group_name)
+
+        ind = cur_script.sect_list.index(group_name)
+        cur_script.sect_list[ind] = new_group_name
+
+        parents, ind = self.get_grouped_parents_and_index(group_name, cur_script.sect_tree)
+        cur_group = cur_script.sect_tree
+        for p in parents:
+            cur_group = cur_group[p]
+        cur_group[ind] = new_group_name
+
+        cur_script.sects[group_name].insts[cur_script.sects[group_name].inst_list[0]].label = new_group_name
+        cur_script.sects[new_group_name] = cur_script.sects.pop(group_name)
+
+    def add_string(self, script, string_group, string_id, string=None):
+        if string is None:
+            string = blank_string
+        self.project.scts[script].string_groups[string_group].append(string_id)
+        self.project.scts[script].strings[string_id] = string
+
+    def delete_string(self, script, string_id):
+        self.project.scts[script].strings.pop(string_id)
+
+    def change_string_id(self, script, string_id, new_string_id):
+        cur_script = self.project.scts[script]
+        group = cur_script.string_locations[string_id]
+        cur_script.string_groups[group].remove(string_id)
+        cur_script.string_groups[group].append(new_string_id)
+        cur_script.strings[new_string_id] = cur_script.strings.pop(string_id)
+        for sect in cur_script.sects.values():
+            for inst in sect.insts.values():
+                if inst.base_id in (144, ):
+                    if inst.params[0].linked_string == string_id:
+                        inst.params[0].linked_string = new_string_id
+                if inst.base_id in (155, ):
+                    if inst.params[1].linked_string == string_id:
+                        inst.params[1].linked_string = new_string_id
+
+
 
     # ----------------------------- #
     # Param Editor Callback Methods #
