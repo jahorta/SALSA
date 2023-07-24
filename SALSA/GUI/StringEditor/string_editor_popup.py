@@ -65,7 +65,7 @@ class StringPopup(tk.Toplevel):
         self.parent: tk.Tk = parent
         self.callbacks = callbacks
         self.name = name
-        self.protocol('WM_DELETE_WINDOW', self.close)
+        self.protocol('WM_DELETE_WINDOW', self.start_close)
         self.theme = dark_theme if is_darkmode else light_theme
         self.configure(**self.theme['Ttoplevel']['configure'])
 
@@ -384,18 +384,11 @@ class StringPopup(tk.Toplevel):
         else:
             return
 
-    def save(self):
-        for script, strings in self.string_changes.items():
-            for string_id, string_changes in strings.items():
-                self.callbacks['save'](script, string_id, string_changes)
-        self.string_changes = {}
+    def start_close(self):
+        self.focus()
+        self.after(10, self.close)
 
     def close(self):
-        self.focus()
-        self.after(10, self.save_and_close)
-
-    def save_and_close(self):
-        self.save()
         self.callbacks['close'](self.name, self)
 
     def change_theme(self, dark_mode=True):
