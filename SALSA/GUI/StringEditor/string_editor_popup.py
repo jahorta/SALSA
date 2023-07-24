@@ -5,6 +5,7 @@ from typing import Literal
 from SALSA.GUI.Widgets.hover_tooltip import schedule_tooltip
 from SALSA.GUI.Widgets.toggle_button import ToggleButton
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
+from SALSA.GUI.Widgets import widgets as w
 from SALSA.GUI.themes import dark_theme, light_theme
 
 tree_settings = {
@@ -46,6 +47,8 @@ sp_chars = {
     'EU': '€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ¡¢£¤¥¦§¨©ª«¬SHY®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ',
     'US/JP': '、。，．・：；？！゛゜´｀¨＾￣＿ヽヾゝゞ〃仝々〆〇ー―‐／＼～∥｜…‥‘’“”（）〔〕［］｛｝〈〉《》「」『』【】＋－±×÷＝≠＜＞≦≧∞∴♂♀°′″℃￥＄￠￡％＃＆＊＠§☆★○●◎◇◆□■△▲▽▼※〒→←↑↓〓∈∋⊆⊇⊂⊃∪∩∧∨￢⇒⇔∀∃∠⊥⌒∂∇≡≒≪≫√∽∝∵∫∬Å‰♯♭♪†‡¶◯ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψωАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя│┌┐┘└├┬┤┴┼━┃┏┓┛┗┣┳┫┻╋┠┯┨┷┿┝┰┥┸╂①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩⅰⅱⅲⅳⅴⅵⅶⅷⅸⅹ㍉㌔㌢㍍㌘㌧㌃㌶㍑㍗㌍㌦㌣㌫㍊㌻㎜㎝㎞㎎㎏㏄㎡㍻〝〟№㏍℡㊤㊥㊦㊧㊨㈱㈲㈹㍾㍽㍼∮∑∟⊿￤＇＂'
 }
+
+rename_widget_offset = 16
 
 
 class StringPopup(tk.Toplevel):
@@ -128,6 +131,8 @@ class StringPopup(tk.Toplevel):
         self.strings.config(show='tree')
         self.strings.add_callback('select', self.edit_string)
         self.strings.bind('<ButtonRelease-3>', self.on_string_right_click)
+        self.strings.bind('<Double-Button-1>', self.double_click_rename)
+        self.strings.bind('<Double-Button-1>', lambda e: 'break', add='+')
 
         lower_frame = ttk.Frame(self)
         lower_frame.grid(row=2, column=0, sticky='NSEW', padx=5)
@@ -193,6 +198,7 @@ class StringPopup(tk.Toplevel):
         self.cur_script_encoding: Literal['US/JP', 'EU'] = 'US/JP'
         self.scheduled_tooltip = None
         self.active_tooltip = None
+        self.rename_active = False
 
         self.update_scripts()
 
@@ -448,18 +454,62 @@ class StringPopup(tk.Toplevel):
     # Renaming String Groups and Strings #
     # ---------------------------------- #
 
+    def double_click_rename(self, e):
+        if self.strings.identify_region(e.x, e.y) == 'heading':
+            return
+        if self.strings.identify_column(e.x) != '#0':
+            return
+        sel_iid = self.strings.identify_row(e.y)
+        self.show_rename_widget(sel_iid)
+
     def show_rename_widget(self, sel_iid):
-        pass
+        if self.rename_active:
+            return
+        self.rename_active = True
+        name = self.strings.item(sel_iid)['text']
+        bbox = list(self.strings.bbox(sel_iid, '#0'))
+        bbox[0] += rename_widget_offset
+        bbox[2] -= rename_widget_offset
+        widget = w.LabelNameEntry(self.strings)
+        widget.insert(0, name)
+        widget.place(x=bbox[0], y=bbox[1], width=bbox[2], height=bbox[3])
+        widget.columnconfigure(1, weight=1)
+        widget.focus_set()
+        widget.selection_range(0, tk.END)
+        widget.bind('<Return>', lambda event: self.try_rename(widget, sel_iid))
+        widget.bind('<Escape>', lambda event: self.destroy_rename_widget(widget))
 
-    def try_rename(self, e):
-        pass
+    def try_rename(self, widget, sel_iid):
+        old_name = self.strings.row_data.get(sel_iid, None)
+        is_section = False
+        if old_name is None:
+            old_name = self.strings.item(sel_iid)['text']
+            is_section = True
+        new_name = widget.get()
+        if new_name == old_name:
+            return self.destroy_rename_widget(widget)
+        if self.callbacks['is_sect_name_used'](self.cur_script, new_name) or new_name == '':
+            return self.shake_widget(widget)
+        self.destroy_rename_widget(widget)
+        self.rename_active = False
+        if is_section:
+            self.callbacks['rename_string_group'](self.cur_script, old_name, new_name)
+        else:
+            self.callbacks['rename_string'](self.cur_script, old_name, new_name)
+        self.strings.item(sel_iid, text=new_name)
 
-    def string_rename(self, sel_iid):
-        self.callbacks['change_string_id'](self.cur_script, self.strings.row_data[sel_iid], 'test')
-        self.strings.item(sel_iid, text='test')
+    def shake_widget(self, widget):
+        shake_speed = 70
+        shake_intensity = 2
+        widget_x = widget.winfo_x()
+        self.strings.after(shake_speed * 1, lambda: widget.place_configure(x=widget_x + shake_intensity))
+        self.strings.after(shake_speed * 2, lambda: widget.place_configure(x=widget_x - shake_intensity))
+        self.strings.after(shake_speed * 3, lambda: widget.place_configure(x=widget_x + shake_intensity))
+        self.strings.after(shake_speed * 4, lambda: widget.place_configure(x=widget_x - shake_intensity))
+        self.strings.after(shake_speed * 5, lambda: widget.place_configure(x=widget_x))
 
-    def string_group_rename(self, sel_iid):
-        self.callbacks['rename_string_group'](self.cur_script, self.strings.row_data[sel_iid], 'test')
-        self.strings.item(sel_iid, text='test')
+    def destroy_rename_widget(self, widget):
+        self.rename_active = False
+        widget.destroy()
             
     
