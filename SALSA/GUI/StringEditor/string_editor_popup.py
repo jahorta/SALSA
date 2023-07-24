@@ -203,14 +203,6 @@ class StringPopup(tk.Toplevel):
         pos = f'{self.w}x{self.h}+{posX}+{posY}'
         self.geometry(pos)
 
-    def update_scripts(self):
-        self._clear_editor_fields()
-        self._change_editor_state('disabled')
-        self.strings.clear_all_entries()
-        script_tree = self.callbacks['get_scripts']()
-        for entry in script_tree:
-            self.scripts.insert_entry(parent='', index='end', text=entry['name'], values=[], row_data=entry['row_data'])
-
     def _change_editor_state(self, state):
         self.no_head.configure(state=state)
         self.head_entry.configure(state=state)
@@ -222,17 +214,50 @@ class StringPopup(tk.Toplevel):
         self.head_entry.delete(0, tk.END)
         self.body_entry.delete(1.0, tk.END)
 
+    def update_scripts(self):
+        cur_tree_height = self.scripts.yview()[0]
+        script_tree = self.callbacks['get_scripts']()
+        for entry in script_tree:
+            self.scripts.insert_entry(parent='', index='end', text=entry['name'], values=[], row_data=entry['row_data'])
+        if self.cur_script != '':
+            cur_row = self.scripts.get_iid_from_rowdata(self.cur_script)
+            if cur_row is not None:
+                self.scripts.selection_set((cur_row, ))
+            else:
+                self._clear_editor_fields()
+                self._change_editor_state('disabled')
+                self.cur_script = ''
+            self.scripts.yview_moveto(cur_tree_height)
+        else:
+            self._clear_editor_fields()
+            self._change_editor_state('disabled')
+
     def on_script_select(self, name, script):
         self.cur_script = script
         self.cur_string_id = ''
-        self._clear_editor_fields()
-        self._change_editor_state('disabled')
-        self._update_string_tree(script)
+        self.strings.clear_all_entries()
+        self.update_strings()
 
-    def _update_string_tree(self, script):
+    def update_strings(self):
+        cur_tree_height = self.strings.yview()[0]
+        self._populate_string_tree()
+        if self.cur_string_id != '':
+            cur_row = self.strings.get_iid_from_rowdata(self.cur_string_id)
+            if cur_row is not None:
+                self.strings.selection_set((cur_row, ))
+            else:
+                self._clear_editor_fields()
+                self._change_editor_state('disabled')
+                self.cur_string_id = ''
+            self.strings.yview_moveto(cur_tree_height)
+        else:
+            self._clear_editor_fields()
+            self._change_editor_state('disabled')
+
+    def _populate_string_tree(self):
         self.strings.clear_all_entries()
         headers = list(tree_settings['string'].keys())
-        string_tree = self.callbacks['get_string_tree'](script, headers)
+        string_tree = self.callbacks['get_string_tree'](self.cur_script, headers)
         parent_list = ['']
         prev_iid = -1
         encoding_set = False
