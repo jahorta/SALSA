@@ -7,6 +7,8 @@ string_replace_list = [
     ('　', ''),
 ]
 
+blank_string = '\\h(　)\\e'
+
 
 def SAstr_to_visible(string):
     for item in string_replace_list:
