@@ -15,6 +15,7 @@ class Colors:
     border: str
     button: str
     link: str
+    warning_text: str
 
 
 def theme_generator(colors: Colors):
@@ -56,6 +57,12 @@ def theme_generator(colors: Colors):
             "configure": {
                 "background": colors.bg_internal,
                 "foreground": colors.link
+            }
+        },
+        "warning.TLabel": {
+            "configure": {
+                "background": colors.bg_internal,
+                "foreground": colors.warning_text
             }
         },
         "TButton": {
@@ -274,7 +281,8 @@ themes = {
         insert_indicator='#cccccc',
         border='#5d5d5d',
         button="#3c4f4f",
-        link='#5588ff'
+        link='#5588ff',
+        warning_text='#ee4444'
     )),
     'light': theme_generator(Colors(
         bg='#eeeeee',
@@ -287,7 +295,8 @@ themes = {
         insert_indicator='black',
         border='#888888',
         button="#acafd1",
-        link='#0055ee'
+        link='#0055ee',
+        warning_text='#dd1122'
     )),
 }
 
