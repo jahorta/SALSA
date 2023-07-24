@@ -399,3 +399,67 @@ class StringPopup(tk.Toplevel):
         self.configure(**self.theme['Ttoplevel']['configure'])
         self.str_encode_toggle.change_theme(self.theme)
 
+    # ---------------- #
+    # Right Click Menu #
+    # ---------------- #
+
+    def on_string_right_click(self, e):
+        if len(self.strings.get_children('')) == 0:
+            return
+        sel_iid = self.strings.identify_row(e.y)
+        self.strings.focus(sel_iid)
+        self.strings.selection_set([sel_iid])
+        row_data = self.strings.row_data[sel_iid]
+
+        m = tk.Menu(self, tearoff=0)
+        if row_data is None:
+            m.add_command(label='Add String Group', command=lambda: self.string_group_add(sel_iid))
+        if sel_iid != '' and row_data is None:
+            m.add_command(label='Rename String Group', command=lambda: self.show_rename_widget(sel_iid))
+        m.add_command(label='Add String', command=lambda: self.string_add(sel_iid))
+        if sel_iid != '' and row_data is not None:
+            m.add_command(label='Change String ID', command=lambda: self.show_rename_widget(sel_iid))
+            m.add_separator()
+            m.add_command(label='Delete String', command=lambda: self.string_delete(sel_iid))
+        else:
+            if sel_iid != '' and row_data is None and len(self.strings.get_children(sel_iid)) == 0:
+                m.add_separator()
+                m.add_command(label='Delete String Group', command=lambda: self.string_group_delete(sel_iid))
+
+        m.bind('<Escape>', m.destroy)
+        try:
+            m.tk_popup(e.x_root, e.y_root)
+        finally:
+            m.grab_release()
+
+    def string_group_add(self, sel_iid):
+        pass
+
+    def string_group_delete(self, sel_iid):
+        pass
+
+    def string_add(self, sel_iid):
+        pass
+
+    def string_delete(self, sel_iid):
+        pass
+
+    # ---------------------------------- #
+    # Renaming String Groups and Strings #
+    # ---------------------------------- #
+
+    def show_rename_widget(self, sel_iid):
+        pass
+
+    def try_rename(self, e):
+        pass
+
+    def string_rename(self, sel_iid):
+        self.callbacks['change_string_id'](self.cur_script, self.strings.row_data[sel_iid], 'test')
+        self.strings.item(sel_iid, text='test')
+
+    def string_group_rename(self, sel_iid):
+        self.callbacks['rename_string_group'](self.cur_script, self.strings.row_data[sel_iid], 'test')
+        self.strings.item(sel_iid, text='test')
+            
+    
