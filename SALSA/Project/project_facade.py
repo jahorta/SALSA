@@ -831,12 +831,15 @@ class SCTProjectFacade:
             cur_sect.inst_list.remove(inst)
             self._refresh_inst_positions(script, section)
 
-    def add_inst(self, script, section, ref_inst_uuid, case=None, direction='below'):
+    def add_inst(self, script, section, ref_inst_uuid=None, case=None, direction='below'):
         new_inst = SCTInstruction()
         inst_sect = self.project.scts[script].sects[section]
         inst_sect.insts[new_inst.ID] = new_inst
 
-        inst_parents, index = self.get_grouped_parents_and_index(ref_inst_uuid, inst_sect.inst_tree)
+        if ref_inst_uuid is not None:
+            inst_parents, index = self.get_grouped_parents_and_index(ref_inst_uuid, inst_sect.inst_tree)
+        else:
+            inst_parents, index = [], -1
 
         cur_group = inst_sect.inst_tree
         for key in inst_parents:
@@ -857,17 +860,20 @@ class SCTProjectFacade:
 
         cur_group.insert(grouped_insert_loc, new_inst.ID)
 
-        ungroup_ref_inst_uuid = ref_inst_uuid
+        if ref_inst_uuid is not None:
+            ungroup_ref_inst_uuid = ref_inst_uuid
 
-        self.inst_specific_setup(script, new_inst)
+            self.inst_specific_setup(script, new_inst)
 
-        if direction == 'below' and isinstance(cur_group[index], dict):
-            # The ref inst for below is the last instruction of the group this should almost always be a goto
-            ungroup_ref_inst_uuid = self.get_inst_uuid_from_group_entry(cur_group[index], last=True)
+            if direction == 'below' and isinstance(cur_group[index], dict):
+                # The ref inst for below is the last instruction of the group this should almost always be a goto
+                ungroup_ref_inst_uuid = self.get_inst_uuid_from_group_entry(cur_group[index], last=True)
 
-        insert_pos = inst_sect.inst_list.index(ungroup_ref_inst_uuid)
-        if direction in ('inside', 'below'):
-            insert_pos += 1
+            insert_pos = inst_sect.inst_list.index(ungroup_ref_inst_uuid)
+            if direction in ('inside', 'below'):
+                insert_pos += 1
+        else:
+            insert_pos = -1
         inst_sect.inst_list.insert(insert_pos, new_inst.ID)
 
         # if new inst is inside, and clicked is a switch case, change target of link of case to new inst
