@@ -350,7 +350,7 @@ class SCTProjectFacade:
         for key, group in string_groups.items():
             string_tree.append({headers[0]: key, headers[1]: '', 'row_data': None})
             string_tree.append('group')
-            for string_id in group:
+            for string_id in sorted(group):
                 _, str_head, str_body = SAstr_to_head_and_body(strings[string_id])
                 if str_head is None:
                     str_head = ''
