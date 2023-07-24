@@ -61,7 +61,9 @@ class ProjectEditorController:
                         'update_variables': self.update_var_usage,
                         'get_subscript_list': lambda: self.project.get_section_list(self.current['script']),
                         'set_change': self.set_change_flag,
-                        'get_instruction_list': lambda: self.project.get_inst_list(self.current['script'], self.current['section'], self.current['instruction'])}
+                        'get_instruction_list': lambda: self.project.get_inst_list(self.current['script'],
+                                                                                   self.current['section'],
+                                                                                   self.current['instruction'])}
         self.param_editor = ParamEditController(self.view, callbacks=pe_callbacks, is_darkmode=is_darkmode)
 
         if self.log_name not in settings:
@@ -222,7 +224,7 @@ class ProjectEditorController:
                     if entry[col] in ('', 'None') or entry[col] is None:
                         entry[col] = ''
                     else:
-                        entry[col] = hex(int(entry[col])+self.cur_mem_offset)
+                        entry[col] = hex(int(entry[col]) + self.cur_mem_offset)
 
                     if self.current['script'] is not None:
                         if self.current['script'] in self.script_refresh_offset_queue:
@@ -262,7 +264,7 @@ class ProjectEditorController:
             tgt_frame = tk.Frame(self.view.link_out.scroll_frame)
             tgt_frame.bind('<Enter>', self.handle_link_font)
             tgt_frame.bind('<Leave>', self.handle_link_font)
-            tgt_frame.grid(row=i, column=0, sticky=tk.E+tk.W, pady='5 0', padx=5)
+            tgt_frame.grid(row=i, column=0, sticky=tk.E + tk.W, pady='5 0', padx=5)
             tgt_frame.columnconfigure(0, weight=1)
 
             tgt_sect = link.target_trace[0]
@@ -271,7 +273,7 @@ class ProjectEditorController:
 
             tgt_label = ttk.Label(tgt_frame, text=f'{tgt_sect}{link_sep}{tgt_inst}',
                                   font=self.link_font.font, style='canvas.TLabel')
-            tgt_label.grid(row=0, column=0, sticky=tk.E+tk.W)
+            tgt_label.grid(row=0, column=0, sticky=tk.E + tk.W)
             tgt_label.bind('<ButtonRelease-1>', self.goto_link)
 
         for i, link in enumerate(details['links_in']):
@@ -279,7 +281,7 @@ class ProjectEditorController:
             if link.origin_trace is None:
                 continue
             ori_frame = tk.Frame(self.view.link_in.scroll_frame)
-            ori_frame.grid(row=i, column=0, sticky=tk.E+tk.W, pady='5 0', padx=5)
+            ori_frame.grid(row=i, column=0, sticky=tk.E + tk.W, pady='5 0', padx=5)
             ori_frame.bind('<Enter>', self.handle_link_font)
             ori_frame.bind('<Leave>', self.handle_link_font)
             ori_frame.columnconfigure(0, weight=1)
@@ -290,7 +292,7 @@ class ProjectEditorController:
 
             ori_label = ttk.Label(ori_frame, text=f'{ori_sect}{link_sep}{ori_inst}',
                                   font=self.link_font.font, style='canvas.TLabel')
-            ori_label.grid(row=0, column=0, sticky=tk.E+tk.W)
+            ori_label.grid(row=0, column=0, sticky=tk.E + tk.W)
             ori_label.bind('<ButtonRelease-1>', self.goto_link)
 
     def handle_link_font(self, e):
@@ -370,7 +372,7 @@ class ProjectEditorController:
             if logical_sect_suffix not in self.current:
                 self.current['section'] = new_name
             else:
-                self.current['section'] = new_name+logical_sect_suffix
+                self.current['section'] = new_name + logical_sect_suffix
         self.refresh_tree('section', keep_selection=True)
         self.refresh_tree('instruction', keep_selection=True)
 
@@ -378,12 +380,11 @@ class ProjectEditorController:
         shake_speed = 70
         shake_intensity = 2
         widget_x = widget.winfo_x()
-        self.view.after(shake_speed*1, lambda: widget.place_configure(x=widget_x + shake_intensity))
-        self.view.after(shake_speed*2, lambda: widget.place_configure(x=widget_x - shake_intensity))
-        self.view.after(shake_speed*3, lambda: widget.place_configure(x=widget_x + shake_intensity))
-        self.view.after(shake_speed*4, lambda: widget.place_configure(x=widget_x - shake_intensity))
-        self.view.after(shake_speed*5, lambda: widget.place_configure(x=widget_x))
-
+        self.view.after(shake_speed * 1, lambda: widget.place_configure(x=widget_x + shake_intensity))
+        self.view.after(shake_speed * 2, lambda: widget.place_configure(x=widget_x - shake_intensity))
+        self.view.after(shake_speed * 3, lambda: widget.place_configure(x=widget_x + shake_intensity))
+        self.view.after(shake_speed * 4, lambda: widget.place_configure(x=widget_x - shake_intensity))
+        self.view.after(shake_speed * 5, lambda: widget.place_configure(x=widget_x))
 
     # ----------------- #
     # Right Click Menus #
@@ -522,15 +523,15 @@ class ProjectEditorController:
             'group_inst_handler': self.confirm_change_inst_group,
             'set_inst_id': self.project.change_inst,
             'get_relevant': self.project.base_insts.get_relevant,
-            'update_tree': lambda:  self.refresh_tree('instruction')
+            'update_tree': lambda: self.refresh_tree('instruction')
         }
         cell_bbox = self.trees['instruction'].bbox(sel_iid, 'name')
         x_mod = self.trees['instruction'].winfo_x()
         y_mod = self.trees['instruction'].winfo_y()
         w = InstructionSelectorWidget(self.view.inst_tree_frame, callbacks, inst_trace,
-                                      x=cell_bbox[0]+x_mod, y=cell_bbox[1]+y_mod+cell_bbox[3])
+                                      x=cell_bbox[0] + x_mod, y=cell_bbox[1] + y_mod + cell_bbox[3])
         w.bind('<Escape>', w.destroy)
-        w.place(x=cell_bbox[0]+x_mod, y=cell_bbox[1]+y_mod, w=cell_bbox[2], h=cell_bbox[3])
+        w.place(x=cell_bbox[0] + x_mod, y=cell_bbox[1] + y_mod, w=cell_bbox[2], h=cell_bbox[3])
 
     def rcm_remove_inst(self):
         sel_iid = self.trees['instruction'].focus()
@@ -538,7 +539,8 @@ class ProjectEditorController:
         end_kwargs = {'result': None, 'cur_inst_uuid': cur_inst_uuid}
         if self.project.inst_is_group(**self.current):
             children = self.project.get_inst_group(self.current['script'], self.current['section'], cur_inst_uuid)
-            return self.confirm_change_inst_group(children=children, end_callback=self.finish_remove_inst, end_kwargs=end_kwargs)
+            return self.confirm_change_inst_group(children=children, end_callback=self.finish_remove_inst,
+                                                  end_kwargs=end_kwargs)
         self.finish_remove_inst(**end_kwargs)
 
     def finish_remove_inst(self, result, cur_inst_uuid):
@@ -657,7 +659,8 @@ class ProjectEditorController:
         param = e.widget.row_data[row]
         if param is None:
             loop_num = int(e.widget.item(row)['text'][4:])
-            m.add_command(label='Remove Loop Parameter', command=lambda: self.handle_loop_param_change('remove', loop_num=loop_num))
+            m.add_command(label='Remove Loop Parameter',
+                          command=lambda: self.handle_loop_param_change('remove', loop_num=loop_num))
 
         if self.project.inst_is_switch(**self.current):
             m.entryconfigure('Add a Loop Parameter', state='disabled')
