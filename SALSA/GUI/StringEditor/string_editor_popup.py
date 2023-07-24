@@ -152,7 +152,7 @@ class StringPopup(tk.Toplevel):
 
         self.no_head_var = tk.IntVar()
         self.no_head = ttk.Checkbutton(no_head_frame, text=' Remove Header', variable=self.no_head_var, onvalue=1, offvalue=0,
-                                       command=lambda: self.set_change('no_head', self.no_head_var.get() == 1), state='disabled')
+                                       command=lambda: self.save('no_head', self.no_head_var.get() == 1), state='disabled')
         self.no_head.grid(row=0, column=0, sticky=tk.W)
         no_head_warning_label = ttk.Label(no_head_frame, text='⚠', anchor='w', justify=tk.LEFT)
         no_head_warning_label.grid(row=0, column=1)
@@ -339,7 +339,7 @@ class StringPopup(tk.Toplevel):
         left, right = quote_types[self.cur_encoding]
         self.head_entry.insert(0, left)
         self.head_entry.insert(tk.END, right)
-        self.set_change('head', self.head_entry.get())
+        self.save('head', self.head_entry.get())
 
     def set_encoding(self, new_encoding: Literal['US/JP', 'EU']):
         self.cur_encoding = new_encoding
@@ -349,7 +349,7 @@ class StringPopup(tk.Toplevel):
 
         self.head_entry.delete(0, tk.END)
         self.head_entry.insert(0, head)
-        self.set_change('head', self.head_entry.get())
+        self.save('head', self.head_entry.get())
 
     @staticmethod
     def on_entry_focus_in(e):
@@ -359,7 +359,7 @@ class StringPopup(tk.Toplevel):
         if e.widget.get() == e.widget.cur_value:
             print('same value')
             return
-        self.set_change(key=key, value=e.widget.get())
+        self.save(key=key, value=e.widget.get())
 
     @staticmethod
     def on_text_focus_in(e):
@@ -370,19 +370,10 @@ class StringPopup(tk.Toplevel):
         if new_value == e.widget.cur_value:
             print('same text')
             return
-        self.set_change(key=key, value=new_value)
+        self.save(key=key, value=new_value)
 
-    def set_change(self, key, value):
-        if self.cur_script not in self.string_changes:
-            self.string_changes[self.cur_script] = {self.cur_string_id: {key: value}}
-        elif self.cur_string_id not in self.string_changes[self.cur_script]:
-            self.string_changes[self.cur_script][self.cur_string_id] = {key: value}
-        elif key not in self.string_changes[self.cur_script][self.cur_string_id]:
-            self.string_changes[self.cur_script][self.cur_string_id][key] = value
-        elif self.string_changes[self.cur_script][self.cur_string_id][key] != value:
-            self.string_changes[self.cur_script][self.cur_string_id][key] = value
-        else:
-            return
+    def save(self, key, value):
+        self.callbacks['save'](self.cur_script, self.cur_string_id, {key, value})
 
     def start_close(self):
         self.focus()
