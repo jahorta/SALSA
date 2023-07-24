@@ -8,7 +8,7 @@ tooltip_offset_y = 1
 
 class HoverToolTip(tk.Toplevel):
 
-    def __init__(self, master, tooltip, x, y, destroy_callback, *args, **kwargs):
+    def __init__(self, master, tooltip, x, y, destroy_callback, min_time=None, position='', *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
         self.master = master
@@ -23,9 +23,13 @@ class HoverToolTip(tk.Toplevel):
         self.tooltip = ttk.Label(tooltip_frame, text=tooltip)
         self.tooltip.grid(row=0, column=0, sticky='NSEW', padx=1, pady=1)
 
-        self.geometry(f'+{x + tooltip_offset_x}+{y + tooltip_offset_y}')
+        self.after(10, self.move_into_position, x, y, position)
 
-        self.after(100, self.check_for_destroy)
+        if min_time is not None:
+            time = min_time
+        else:
+            time = 100
+        self.after(time, self.check_for_destroy)
 
     def check_for_destroy(self):
         rel_x = self.master.winfo_pointerx() - self.master.winfo_rootx()
@@ -33,6 +37,17 @@ class HoverToolTip(tk.Toplevel):
         if rel_x < 0 or rel_x > self.master.winfo_width() or rel_y < 0 or rel_y > self.master.winfo_height():
             return self.destroy_callback(self)
         self.after(20, self.check_for_destroy)
+
+    def move_into_position(self, x, y, position):
+        if 'above' in position:
+            y -= self.winfo_height()
+        if 'below' in position:
+            y += self.winfo_height()
+        if 'center' in position:
+            x -= self.winfo_width()//2
+        if 'right' in position:
+            x -= self.winfo_width()
+        self.geometry(f'+{x + tooltip_offset_x}+{y + tooltip_offset_y}')
 
 
 tooltip_is_active = False
