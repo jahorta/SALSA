@@ -8,7 +8,7 @@ tooltip_offset_y = 1
 
 class HoverToolTip(tk.Toplevel):
 
-    def __init__(self, master, tooltip, x, y, destroy_callback, min_time=None, position='', *args, **kwargs):
+    def __init__(self, master, tooltip, x, y, destroy_callback, min_time=None, position='', is_warning=False, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
         self.master = master
@@ -20,8 +20,10 @@ class HoverToolTip(tk.Toplevel):
 
         tooltip_frame = ttk.Frame(self, style='tooltip.TFrame')
         tooltip_frame.grid(row=0, column=0)
-        self.tooltip = ttk.Label(tooltip_frame, text=tooltip)
-        self.tooltip.grid(row=0, column=0, sticky='NSEW', padx=1, pady=1)
+        tooltip = ttk.Label(tooltip_frame, text=tooltip)
+        tooltip.grid(row=0, column=0, sticky='NSEW', padx=1, pady=1)
+        if is_warning:
+            tooltip.configure(style='warning.TLabel')
 
         self.after(10, self.move_into_position, x, y, position)
 
