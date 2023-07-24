@@ -37,19 +37,34 @@ class HoverToolTip(tk.Toplevel):
         rel_x = self.master.winfo_pointerx() - self.master.winfo_rootx()
         rel_y = self.master.winfo_pointery() - self.master.winfo_rooty()
         if rel_x < 0 or rel_x > self.master.winfo_width() or rel_y < 0 or rel_y > self.master.winfo_height():
-            return self.destroy_callback(self)
+            return self.destroy()
         self.after(20, self.check_for_destroy)
 
     def move_into_position(self, x, y, position):
         if 'above' in position:
             y -= self.winfo_height()
-        if 'below' in position:
+        elif 'below' in position:
             y += self.winfo_height()
-        if 'center' in position:
-            x -= self.winfo_width()//2
-        if 'right' in position:
-            x -= self.winfo_width()
-        self.geometry(f'+{x + tooltip_offset_x}+{y + tooltip_offset_y}')
+        else:
+            y += tooltip_offset_y
+
+        if 'left' in position:
+            x = self.master.winfo_rootx()
+        elif 'center' in position:
+            c = self.master.winfo_rootx() + self.master.winfo_width()//2
+            x = c - self.winfo_width()//2
+        elif 'right' in position:
+            r = self.master.winfo_rootx() + self.master.winfo_width()
+            x = r - self.winfo_width()
+        else:
+            x += tooltip_offset_x
+
+        self.geometry(f'+{x}+{y}')
+
+    def destroy(self, super_destroy=False):
+        if super_destroy:
+            return super().destroy()
+        self.destroy_callback(self)
 
 
 tooltip_is_active = False
@@ -94,7 +109,7 @@ def tooltip_generator(master, tooltip, x, y, args, kwargs):
 def destroy_tooltip(tooltip):
     global tooltip_is_active
     tooltip_is_active = False
-    tooltip.destroy()
+    tooltip.destroy(super_destroy=True)
     global active_tooltip
     active_tooltip = None
 
