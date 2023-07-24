@@ -127,6 +127,7 @@ class StringPopup(tk.Toplevel):
         self.strings.config(yscrollcommand=string_tree_scrollbar.set)
         self.strings.config(show='tree')
         self.strings.add_callback('select', self.edit_string)
+        self.strings.bind('<ButtonRelease-3>', self.on_string_right_click)
 
         lower_frame = ttk.Frame(self)
         lower_frame.grid(row=2, column=0, sticky='NSEW', padx=5)
@@ -183,8 +184,6 @@ class StringPopup(tk.Toplevel):
         self.body_entry.bind('<FocusIn>', self.on_text_focus_in)
         self.body_entry.bind('<FocusOut>', lambda e, k='body': self.on_text_focus_out(k, e))
 
-        self.update_scripts()
-
         self.cur_script = ''
         self.cur_string_id = ''
         self.string_defaults = {}
@@ -194,6 +193,8 @@ class StringPopup(tk.Toplevel):
         self.cur_script_encoding: Literal['US/JP', 'EU'] = 'US/JP'
         self.scheduled_tooltip = None
         self.active_tooltip = None
+
+        self.update_scripts()
 
         self.title(self.t)
 
