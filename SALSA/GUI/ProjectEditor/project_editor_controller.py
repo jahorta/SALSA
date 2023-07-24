@@ -2,6 +2,7 @@ from typing import Union, Dict, Literal
 import tkinter as tk
 from tkinter import messagebox, ttk
 
+from SALSA.GUI.Widgets.hover_tooltip import schedule_tooltip
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
 from SALSA.Common.constants import sep, label_name_sep, logical_sect_suffix
 from SALSA.GUI.fonts_used import SALSAFont
@@ -353,7 +354,13 @@ class ProjectEditorController:
         new_name = e.widget.get()
         if new_name == self.current['section']:
             return widget.destroy()
-        if self.project.is_sect_name_used(self.current['script'], new_name) or new_name == '':
+        if self.project.is_sect_name_used(self.current['script'], new_name):
+            schedule_tooltip(widget, 'This name is in use', delay=0, min_time=1500, position='above center',
+                             is_warning=True)
+            return self.shake_widget(widget)
+        if new_name == '':
+            schedule_tooltip(widget, 'A name is required', delay=0, min_time=1500, position='above center',
+                             is_warning=True)
             return self.shake_widget(widget)
         widget.destroy()
         if new_name == self.trees['instruction'].item(sel_iid)['values'][0].split(label_name_sep)[0]:
