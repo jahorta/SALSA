@@ -72,12 +72,6 @@ class StringPopup(tk.Toplevel):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
 
-        save_frame = ttk.Frame(self)
-        save_frame.grid(row=0, column=0, padx=5, pady=5, sticky='NSEW')
-
-        self.save_button = ttk.Button(save_frame, text='Save', command=self.save, state='disabled')
-        self.save_button.grid(row=0, column=0, sticky=tk.W)
-
         upper_frame = ttk.Frame(self)
         upper_frame.grid(row=1, column=0, sticky='NSEW')
         upper_frame.columnconfigure(1, weight=1)
@@ -357,7 +351,6 @@ class StringPopup(tk.Toplevel):
             self.string_changes[self.cur_script][self.cur_string_id][key] = value
         else:
             return
-        self.save_button.configure(state='normal')
 
     def save(self):
         for script, strings in self.string_changes.items():
