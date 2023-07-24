@@ -56,15 +56,18 @@ tooltip_delay = 700
 tooltip_hover_interval = 50
 
 
-def schedule_tooltip(master, tooltip, delay=tooltip_delay):
+def schedule_tooltip(master, tooltip, delay=tooltip_delay, *args, **kwargs):
     global tooltip_is_active
     if tooltip_is_active:
         return
     tooltip_is_active = True
-    check_hover(master, tooltip, total_delay=delay)
+    if delay > 0:
+        check_hover(master, tooltip, delay, args, kwargs)
+    else:
+        tooltip_generator(master, tooltip, master.winfo_rootx(), master.winfo_rooty(), args, kwargs)
 
 
-def check_hover(master, tooltip, total_delay, cur_delay=0):
+def check_hover(master, tooltip, total_delay, args, kwargs, cur_delay=0):
     rel_x = master.winfo_pointerx() - master.winfo_rootx()
     rel_y = master.winfo_pointery() - master.winfo_rooty()
     if rel_x < 0 or rel_x > master.winfo_width() or rel_y < 0 or rel_y > master.winfo_height():
@@ -73,16 +76,16 @@ def check_hover(master, tooltip, total_delay, cur_delay=0):
         return
     if cur_delay < total_delay:
         cur_delay += tooltip_hover_interval
-        master.after(20, check_hover, master, tooltip, total_delay, cur_delay)
+        master.after(20, check_hover, master, tooltip, total_delay, args, kwargs, cur_delay)
     else:
-        tooltip_generator(master, tooltip, master.winfo_pointerx(), master.winfo_pointery())
+        tooltip_generator(master, tooltip, master.winfo_pointerx(), master.winfo_pointery(), args, kwargs)
 
 
-def tooltip_generator(master, tooltip, x, y):
+def tooltip_generator(master, tooltip, x, y, args, kwargs):
     global active_tooltip
     if active_tooltip is not None:
         return
-    active_tooltip = HoverToolTip(master, tooltip, x, y, destroy_tooltip)
+    active_tooltip = HoverToolTip(master, tooltip, x, y, destroy_tooltip, *args, **kwargs)
     active_tooltip.tkraise()
 
 
