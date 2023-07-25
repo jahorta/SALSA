@@ -442,6 +442,7 @@ class SCTProjectFacade:
         group = cur_script.string_locations[string_id]
         cur_script.string_groups[group].remove(string_id)
         cur_script.string_groups[group].append(new_string_id)
+        cur_script.string_locations[new_string_id] = cur_script.string_locations.pop(string_id)
         cur_script.strings[new_string_id] = cur_script.strings.pop(string_id)
         for sect in cur_script.sects.values():
             for inst in sect.insts.values():
