@@ -177,9 +177,19 @@ class DataTreeview(ttk.Treeview):
                 is_open = is_open == 1
             if not is_open:
                 continue
+
+            parent_row_data = self.row_data.get(parent, None)
+            if parent_row_data is None:
+                parent_row_data = ''
+
             child_uuid = self.row_data.get(child, None)
-            if child_uuid is None:
-                child_uuid = f'{self.row_data[parent]}{sep}{self.item(child)["values"][0].split(" ")[0]}'
+            if child_uuid is None and len(self.item(child)['values']) > 0:
+                if self.item(child)["values"][0] != '':
+                    child_uuid = f'{parent_row_data}{sep}{self.item(child)["values"][0].split(" ")[0]}'
+                else:
+                    child_uuid = f'{parent_row_data}{sep}{self.item(child)["text"]}'
+            else:
+                child_uuid = f'{parent_row_data}{sep}{self.item(child)["text"]}'
             open_items.append(child_uuid)
             self.get_open_elements(parent=child, open_items=open_items)
         return open_items
@@ -188,9 +198,16 @@ class DataTreeview(ttk.Treeview):
         for item_uuid in open_items:
             if sep in item_uuid:
                 item_uuid, case = item_uuid.split(sep)
+                if item_uuid == '':
+                    parent = item_uuid
+                else:
+                    parent = self.get_iid_from_rowdata(item_uuid)
                 row_id = None
-                for child in self.get_children(self.get_iid_from_rowdata(item_uuid)):
+                for child in self.get_children(parent):
                     if case in self.item(child)['values'][0]:
+                        row_id = child
+                        break
+                    if case in self.item(child)['text']:
                         row_id = child
                         break
             else:
