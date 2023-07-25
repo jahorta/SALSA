@@ -379,7 +379,9 @@ class SCTProjectFacade:
         self.project.scts[script].strings[string_id] = head_and_body_to_SAstr(no_head, head, body)
         self.callbacks['set_change']()
 
-    def add_string_group(self, script, string_group):
+    def add_string_group(self, script, string_group=''):
+        if string_group == '':
+            string_group = self.get_new_sect_name(script)
         cur_script = self.project.scts[script]
         cur_script.string_groups[string_group] = {}
 
@@ -420,7 +422,9 @@ class SCTProjectFacade:
         cur_script.sects[group_name].insts[cur_script.sects[group_name].inst_list[0]].label = new_group_name
         cur_script.sects[new_group_name] = cur_script.sects.pop(group_name)
 
-    def add_string(self, script, string_group, string_id, string=None):
+    def add_string(self, script, string_group, string_id='', string=None):
+        if string_id == '':
+            string_id = self.get_new_sect_name(script)
         if string is None:
             string = blank_string
         self.project.scts[script].string_groups[string_group].append(string_id)
