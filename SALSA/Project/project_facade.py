@@ -446,10 +446,10 @@ class SCTProjectFacade:
         cur_script.strings[new_string_id] = cur_script.strings.pop(string_id)
         for sect in cur_script.sects.values():
             for inst in sect.insts.values():
-                if inst.base_id in (144, ):
+                if inst.base_id in (144, 24):
                     if inst.params[0].linked_string == string_id:
                         inst.params[0].linked_string = new_string_id
-                if inst.base_id in (155, ):
+                if inst.base_id in (155, 25):
                     if inst.params[1].linked_string == string_id:
                         inst.params[1].linked_string = new_string_id
 
