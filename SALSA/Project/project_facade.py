@@ -433,6 +433,9 @@ class SCTProjectFacade:
 
     def delete_string(self, script, string_id):
         self.project.scts[script].strings.pop(string_id)
+        group = self.project.scts[script].string_locations[string_id]
+        self.project.scts[script].string_locations.pop(string_id)
+        self.project.scts[script].string_groups[group].remove(string_id)
 
     def change_string_id(self, script, string_id, new_string_id):
         cur_script = self.project.scts[script]
