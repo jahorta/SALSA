@@ -405,7 +405,7 @@ class StringPopup(tk.Toplevel):
 
         m = tk.Menu(self, tearoff=0)
         if row_data is None:
-            m.add_command(label='Add String Group', command=lambda: self.string_group_add(sel_iid))
+            m.add_command(label='Add String Group', command=self.string_group_add)
         if sel_iid != '' and row_data is None:
             m.add_command(label='Rename String Group', command=lambda: self.show_rename_widget(sel_iid))
         m.add_command(label='Add String', command=lambda: self.string_add(sel_iid))
