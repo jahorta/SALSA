@@ -247,6 +247,9 @@ class StringPopup(tk.Toplevel):
 
     def update_strings(self):
         cur_tree_height = self.strings.yview()[0]
+        open_elements = []
+        if len(self.strings.get_children('')) > 0:
+            open_elements = self.strings.get_open_elements()
         self._populate_string_tree()
         if self.cur_string_id != '':
             cur_row = self.strings.get_iid_from_rowdata(self.cur_string_id)
@@ -260,6 +263,7 @@ class StringPopup(tk.Toplevel):
         else:
             self._clear_editor_fields()
             self._change_editor_state('disabled')
+        self.strings.open_tree_elements(open_elements)
 
     def _populate_string_tree(self):
         self.strings.clear_all_entries()
