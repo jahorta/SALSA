@@ -311,9 +311,6 @@ class StringPopup(tk.Toplevel):
             prev_iid = self.strings.insert_entry(**kwargs)
 
     def edit_string(self, name, string_id):
-        if len(self.string_changes) > 0:
-            self.save()
-
         self._change_editor_state('normal')
         self._clear_editor_fields()
 
