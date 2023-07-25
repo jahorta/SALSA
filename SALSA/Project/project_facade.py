@@ -429,6 +429,7 @@ class SCTProjectFacade:
             string = blank_string
         self.project.scts[script].string_groups[string_group].append(string_id)
         self.project.scts[script].strings[string_id] = string
+        self.project.scts[script].string_locations[string_id] = string_group
 
     def delete_string(self, script, string_id):
         self.project.scts[script].strings.pop(string_id)
