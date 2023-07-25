@@ -497,6 +497,12 @@ class SCTProjectFacade:
 
         return isinstance(cur_group[index], dict)
 
+    def get_new_sect_name(self, script):
+        i = 0
+        while self.is_sect_name_used(script, f'untitled{i}'):
+            i += 1
+        return f'untitled{i}'
+
     def is_sect_name_used(self, script, new_name):
         cur_script = self.project.scts[script]
         for sect in cur_script.sects.values():
