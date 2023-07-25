@@ -424,17 +424,30 @@ class StringPopup(tk.Toplevel):
         finally:
             m.grab_release()
 
-    def string_group_add(self, sel_iid):
-        pass
+    def string_group_add(self):
+        self.callbacks['add_string_group'](self.cur_script)
+        self.update_strings()
 
     def string_group_delete(self, sel_iid):
-        pass
+        group_name = self.strings.item(sel_iid)['text']
+        self.callbacks['delete_string_group'](self.cur_script, group_name)
+        self.cur_string_id = ''
+        self.update_strings()
 
     def string_add(self, sel_iid):
-        pass
+        if self.strings.parent(sel_iid) != '':
+            group_iid = self.strings.parent(sel_iid)
+        else:
+            group_iid = sel_iid
+        string_group = self.strings.item(group_iid)['text']
+        self.callbacks['add_string'](self.cur_script, string_group)
+        self.update_strings()
 
     def string_delete(self, sel_iid):
-        pass
+        string_id = self.strings.row_data[sel_iid]
+        self.callbacks['delete_string'](self.cur_script, string_id)
+        self.cur_string_id = ''
+        self.update_strings()
 
     # ---------------------------------- #
     # Renaming String Groups and Strings #
