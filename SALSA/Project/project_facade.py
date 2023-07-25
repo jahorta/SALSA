@@ -873,7 +873,8 @@ class SCTProjectFacade:
             if case is not None:
                 cur_group = cur_group[case]
 
-        steal_links_from_uuid = self.get_inst_uuid_from_group_entry(cur_group[index])
+        if len(cur_group) > 0:
+            steal_links_from_uuid = self.get_inst_uuid_from_group_entry(cur_group[index])
 
         cur_group.insert(grouped_insert_loc, new_inst.ID)
 
