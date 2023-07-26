@@ -375,7 +375,7 @@ class StringPopup(tk.Toplevel):
         self.save(key=key, value=new_value)
 
     def save(self, key, value):
-        self.callbacks['save'](self.cur_script, self.cur_string_id, {key, value})
+        self.callbacks['save'](self.cur_script, self.cur_string_id, {key: value})
 
     def start_close(self):
         self.focus()
