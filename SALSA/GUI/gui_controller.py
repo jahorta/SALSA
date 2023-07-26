@@ -5,6 +5,7 @@ from tkinter import ttk
 from typing import Union, TypedDict, Literal
 import webbrowser
 
+from SALSA.GUI.ProjectEditor.project_editor_controller import ProjectEditorController
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
 from SALSA.GUI.themes import light_theme, dark_theme
 from SALSA.GUI.Widgets import widgets as w
@@ -35,7 +36,7 @@ class GUIController:
     parent: tk.Tk
     scpt_view: ProjectEditorView
 
-    def __init__(self, parent, scpt_editor_view: ProjectEditorView, project_facade: SCTProjectFacade,
+    def __init__(self, parent, scpt_editor_controller: ProjectEditorController, project_facade: SCTProjectFacade,
                  inst_lib_facade: BaseInstLibFacade):
 
         self.status_msg: Union[None, tk.Label] = None
@@ -43,7 +44,8 @@ class GUIController:
         self.status_queue: queue.SimpleQueue = queue.SimpleQueue()
         self.help_path = os.path.abspath('./SALSA/Help/Skies of Arcadia Legends Script Assistant.html')
         self.parent = parent
-        self.scpt_view = scpt_editor_view
+        self.scpt_cont = scpt_editor_controller
+        self.scpt_view = self.scpt_cont.view
         self.project = project_facade
         self.base_lib = inst_lib_facade
 
