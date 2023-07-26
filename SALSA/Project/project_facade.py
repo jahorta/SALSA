@@ -898,6 +898,7 @@ class SCTProjectFacade:
             if case is not None:
                 cur_group = cur_group[case]
 
+        steal_links_from_uuid = None
         if len(cur_group) > 0:
             steal_links_from_uuid = self.get_inst_uuid_from_group_entry(cur_group[index])
 
@@ -927,10 +928,11 @@ class SCTProjectFacade:
                     loop[3].link.target_trace[1] = new_inst.ID
                     break
 
-        remove_direction: Literal['in', 'out'] = 'in'
-        if direction == 'below':
-            remove_direction = 'out'
-        self.remove_inst_links(script=script, section=section, inst=steal_links_from_uuid, custom_tgt=new_inst.ID, direction=remove_direction)
+        if steal_links_from_uuid is not None:
+            remove_direction: Literal['in', 'out'] = 'in'
+            if direction == 'below':
+                remove_direction = 'out'
+            self.remove_inst_links(script=script, section=section, inst=steal_links_from_uuid, custom_tgt=new_inst.ID, direction=remove_direction)
 
         self.assign_section_type(script, section)
 
