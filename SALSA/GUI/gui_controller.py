@@ -155,7 +155,8 @@ class GUIController:
             'add_string_group': self.project.add_string_group, 'delete_string_group': self.project.remove_string_group,
             'rename_string_group': self.project.rename_string_group, 'add_string': self.project.add_string,
             'delete_string': self.project.delete_string, 'change_string_id': self.project.change_string_id,
-            'is_sect_name_used': self.project.is_sect_name_used
+            'is_sect_name_used': self.project.is_sect_name_used,
+            'refresh_sections': lambda: self.scpt_cont.refresh_tree('section')
         }
         self.popups['string'] = StringPopup(self.parent, callbacks=callbacks, name='string',
                                             is_darkmode=self.callbacks['is_darkmode']())

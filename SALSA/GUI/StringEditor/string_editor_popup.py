@@ -427,12 +427,14 @@ class StringPopup(tk.Toplevel):
     def string_group_add(self):
         self.callbacks['add_string_group'](self.cur_script)
         self.update_strings()
+        self.callbacks['refresh_sections']()
 
     def string_group_delete(self, sel_iid):
         group_name = self.strings.item(sel_iid)['text']
         self.callbacks['delete_string_group'](self.cur_script, group_name)
         self.cur_string_id = ''
         self.update_strings()
+        self.callbacks['refresh_sections']()
 
     def string_add(self, sel_iid):
         if self.strings.parent(sel_iid) != '':
@@ -500,6 +502,7 @@ class StringPopup(tk.Toplevel):
         else:
             self.callbacks['rename_string'](self.cur_script, old_name, new_name)
         self.strings.item(sel_iid, text=new_name)
+        self.callbacks['refresh_sections']()
 
     def shake_widget(self, widget):
         shake_speed = 70
