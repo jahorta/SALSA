@@ -446,8 +446,6 @@ class SCTProjectFacade:
                     if inst.params[1].linked_string == string_id:
                         inst.params[1].linked_string = new_string_id
 
-
-
     # ----------------------------- #
     # Param Editor Callback Methods #
     # ----------------------------- #
