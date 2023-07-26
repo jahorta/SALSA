@@ -383,7 +383,7 @@ class SCTProjectFacade:
         if string_group == '':
             string_group = self.get_new_sect_name(script)
         cur_script = self.project.scts[script]
-        cur_script.string_groups[string_group] = {}
+        cur_script.string_groups[string_group] = []
 
         new_sect = SCTSection()
         new_sect.name = string_group
