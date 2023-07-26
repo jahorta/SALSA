@@ -152,15 +152,6 @@ class ProjectEditorController:
         tree_list = self.project.get_tree(**kwargs)
         self.update_tree(child_tree, tree_list)
 
-    def adjust_tree_entries(self, entries, key):
-        if key == 'instruction':
-            for entry in entries:
-                if not isinstance(entry, dict):
-                    continue
-                entry['delay_param'] = '*' if entry['delay_param'] != 'None' else ''
-                entry['skip_refresh'] = '*' if entry['skip_refresh'] == 'True' else ''
-        return entries
-
     def on_select_instruction(self, instructID):
         self.current['instruction'] = instructID
         self.current['parameter'] = None
@@ -238,6 +229,15 @@ class ProjectEditorController:
             kwargs['values'] = values
             kwargs = {**kwargs, **entry}
             prev_iid = tree.insert_entry(**kwargs)
+
+    def adjust_tree_entries(self, entries, key):
+        if key == 'instruction':
+            for entry in entries:
+                if not isinstance(entry, dict):
+                    continue
+                entry['delay_param'] = '*' if entry['delay_param'] != 'None' else ''
+                entry['skip_refresh'] = '*' if entry['skip_refresh'] == 'True' else ''
+        return entries
 
     def set_instruction_details(self, details):
         if details is None:
