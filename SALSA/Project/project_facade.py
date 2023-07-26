@@ -871,6 +871,8 @@ class SCTProjectFacade:
             cur_sect.inst_list.remove(inst)
             self._refresh_inst_positions(script, section)
 
+        self.assign_section_type(script, section)
+
     def add_inst(self, script, section, ref_inst_uuid=None, case=None, direction='below'):
         new_inst = SCTInstruction()
         inst_sect = self.project.scts[script].sects[section]
@@ -929,6 +931,8 @@ class SCTProjectFacade:
         if direction == 'below':
             remove_direction = 'out'
         self.remove_inst_links(script=script, section=section, inst=steal_links_from_uuid, custom_tgt=new_inst.ID, direction=remove_direction)
+
+        self.assign_section_type(script, section)
 
         return new_inst.ID
 
