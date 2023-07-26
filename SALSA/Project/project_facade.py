@@ -385,14 +385,7 @@ class SCTProjectFacade:
         cur_script = self.project.scts[script]
         cur_script.string_groups[string_group] = []
 
-        new_sect = SCTSection()
-        new_sect.name = string_group
-        cur_script.sects[string_group] = new_sect
-        new_inst_id = self.add_inst(script, string_group)
-        self.change_inst(script, string_group, new_inst_id, new_id=9)
-
-        cur_script.sect_list.append(string_group)
-        cur_script.sect_tree.append(string_group)
+        self.create_section(script, new_name=string_group, inst_list=[9])
 
     def remove_string_group(self, script, string_group):
         cur_script = self.project.scts[script]
@@ -517,6 +510,38 @@ class SCTProjectFacade:
         if new_name in cur_script.strings.keys():
             return True
         return False
+
+    def create_section(self, script, new_name='', location=None, insert_in_group=False, inst_list=None):
+        if new_name == '':
+            new_name = self.get_new_sect_name(script)
+
+        cur_script = self.project.scts[script]
+        new_sect = SCTSection()
+        new_sect.name = new_name
+        new_sect.type = 'Group'
+        cur_script.sects[new_name] = new_sect
+
+        inst_list = [] if inst_list is None else inst_list
+        for inst in inst_list:
+            new_inst_id = self.add_inst(script, new_name)
+            self.change_inst(script, new_name, new_inst_id, new_id=inst)
+
+        cur_script.sect_list.append(new_name)
+        cur_script.sect_tree.append(new_name)
+
+        if location is not None:
+            self.move_items((new_name, new_name), location, insert_in_group, script)
+
+        return new_name
+
+    def assign_section_type(self, s, n):
+        inst_list = self.project.scts[s].sects[n].inst_list
+        if len(inst_list) == 0:
+            self.project.scts[s].sects[n].type = 'Group'
+        elif len(inst_list) == 1:
+            self.project.scts[s].sects[n].type = 'Label'
+        else:
+            self.project.scts[s].sects[n].type = 'Script'
 
     def change_section_name(self, script, section, instruction, new_name):
         cur_script = self.project.scts[script]
