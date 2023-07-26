@@ -115,7 +115,7 @@ class Application(tk.Tk):
             'prj->variable': self.gui.show_variables_popup,
             'prj->string': self.gui.show_strings_popup,
             'prj->repair->textbox': lambda: self.project.repair_text_box_fade(self.sct_model),
-            'analysis->export': self.gui.show_analysis_view,
+            # 'analysis->export': self.gui.show_analysis_view,
             'view->inst': self.gui.show_instruction_view,
             'view->theme': self.change_theme,
             'help->help': self.gui.show_help,

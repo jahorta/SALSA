@@ -43,9 +43,9 @@ class MainMenu(tk.Menu):
         self.project_menu.add_cascade(label='Repair', menu=self.p_repair_menu)
         self.add_cascade(label='Project', menu=self.project_menu)
 
-        analysis_menu = tk.Menu(self, tearoff=False)
-        analysis_menu.add_command(label='Export Data', command=callbacks['analysis->export'])
-        self.add_cascade(label='Analysis', menu=analysis_menu)
+        # analysis_menu = tk.Menu(self, tearoff=False)
+        # analysis_menu.add_command(label='Export Data', command=callbacks['analysis->export'])
+        # self.add_cascade(label='Analysis', menu=analysis_menu)
 
         self.view_menu = tk.Menu(self, tearoff=False)
         self.view_menu.add_command(label='Instruction editor', command=callbacks['view->inst'])
@@ -61,7 +61,13 @@ class MainMenu(tk.Menu):
         help_menu.add_command(label='About', command=callbacks['help->about'])
         self.add_cascade(label='Help', menu=help_menu)
 
-        self.all_menus = [self.file_menu, self.recent_menu, self.project_menu, analysis_menu, self.view_menu, help_menu]
+        self.all_menus = [
+            self.file_menu,
+            self.recent_menu,
+            self.project_menu,
+            # analysis_menu,
+            self.view_menu,
+            help_menu]
 
         self.toggle_dark_mode()
 

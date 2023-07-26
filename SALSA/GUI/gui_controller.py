@@ -119,10 +119,6 @@ class GUIController:
                                                           inst_lib_facade=self.base_lib, name='inst',
                                                           is_darkmode=self.callbacks['is_darkmode']())
 
-    def show_analysis_view(self):
-        # self.popups['analysis'] = AnalysisController()
-        pass
-
     def show_about(self):
         position = Vector2(x=self.parent.winfo_x(), y=self.parent.winfo_y())
         self.popups['about'] = AboutView(parent=self.parent, position=position, callback=self.close_popup)
