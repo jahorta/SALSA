@@ -475,6 +475,7 @@ class StringPopup(tk.Toplevel):
         widget.focus_set()
         widget.selection_range(0, tk.END)
         widget.bind('<Return>', lambda event: self.try_rename(widget, sel_iid))
+        widget.bind('<FocusOut>', lambda event: self.try_rename(widget, sel_iid))
         widget.bind('<Escape>', lambda event: self.destroy_rename_widget(widget))
 
     def try_rename(self, widget, sel_iid):
