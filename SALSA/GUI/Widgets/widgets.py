@@ -6,7 +6,6 @@ from tkinter import ttk
 from typing import Dict, List, Union
 
 from SALSA.Common.constants import sep
-from SALSA.GUI.themes import light_theme, dark_theme
 
 
 # ------ #
@@ -289,9 +288,18 @@ class RequiredFloatEntry(RequiredEntry):
 # ------------- #
 
 
+canvas_default_theme = {
+    'TCanvas': {
+        'configure': {
+            'background': 'white'
+        }
+    }
+}
+
+
 class ScrollCanvas(ttk.Frame):
 
-    def __init__(self, parent, size: dict, is_darkmode=True, *args, **kwargs):
+    def __init__(self, parent, size: dict, theme=None, *args, **kwargs):
 
         super().__init__(parent, *args, **kwargs)
 
@@ -299,7 +307,7 @@ class ScrollCanvas(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.parent = parent
 
-        theme = dark_theme if is_darkmode else light_theme
+        theme = theme if theme is not None else canvas_default_theme
         self.canvas = tk.Canvas(self, width=size['width'], height=size['height'], **theme['TCanvas']['configure'])
         self.canvas.grid(row=0, column=0, sticky='NSEW')
 
@@ -340,14 +348,18 @@ class ScrollCanvas(ttk.Frame):
         else:
             self.canvas.unbind_all("<MouseWheel>")
 
-    def change_theme(self, dark_mode=True):
-        theme = dark_theme if dark_mode else light_theme
+    def change_theme(self, theme):
         self.canvas.configure(**theme['TCanvas']['configure'])
+
+    def set_size(self, w, h):
+        self.canvas.config(scrollregion=self.canvas.bbox("all"))
+        w -= self.canvas_scrollbar.winfo_width()
+        self.canvas.configure(width=w, height=h)
 
 
 class ScrollLabelCanvas(ttk.LabelFrame):
 
-    def __init__(self, parent, size: dict, has_label=True, is_darkmode=True, *args, **kwargs):
+    def __init__(self, parent, size: dict, has_label=True, theme=None, *args, **kwargs):
         if not has_label:
             kwargs = kwargs
             kwargs['text'] = ''
@@ -358,7 +370,7 @@ class ScrollLabelCanvas(ttk.LabelFrame):
         self.columnconfigure(0, weight=1)
         self.parent = parent
 
-        theme = dark_theme if is_darkmode else light_theme
+        theme = theme if theme is not None else canvas_default_theme
         self.canvas = tk.Canvas(self, width=size['width'], height=size['height'], **theme['TCanvas']['configure'])
         self.canvas.grid(row=0, column=0, sticky='NSEW')
 
@@ -399,26 +411,33 @@ class ScrollLabelCanvas(ttk.LabelFrame):
         else:
             self.canvas.unbind_all("<MouseWheel>")
 
-    def change_theme(self, dark_mode=True):
-        theme = dark_theme if dark_mode else light_theme
+    def change_theme(self, theme):
         self.canvas.configure(**theme['TCanvas']['configure'])
+
+
+text_default_theme = {
+    'TCanvasText': {
+        'configure': {
+            'fill': 'black'
+        }
+    }
+}
 
 
 class TextScrollLabelCanvas(ScrollLabelCanvas):
 
-    def __init__(self, parent, size: dict, canvas_text_offset: dict, canvas_text: str, has_label=True, is_darkmode=True):
-        super().__init__(parent, size, has_label=has_label, is_darkmode=is_darkmode)
+    def __init__(self, parent, size: dict, canvas_text_offset: dict, canvas_text: str, theme=None, has_label=True, *args, **kwargs):
+        super().__init__(parent, size, has_label=has_label, theme=theme, *args, **kwargs)
 
-        theme = dark_theme if is_darkmode else light_theme
+        theme = theme if theme is not None else text_default_theme
+
         fill = theme['TCanvasText']['configure']['fill']
         self.text = self.canvas.create_text((canvas_text_offset['x'], canvas_text_offset['y']),
                                             anchor=tk.NW, text=canvas_text, fill=fill,
                                             width=size['width'] - canvas_text_offset['x'])
 
-    def change_theme(self, dark_mode=True):
-        super().change_theme(dark_mode)
-
-        theme = dark_theme if dark_mode else light_theme
+    def change_theme(self, theme):
+        super().change_theme(theme)
         fill = theme['TCanvasText']['configure']['fill']
 
         self.canvas.itemconfigure(self.text, fill=fill)
@@ -426,9 +445,9 @@ class TextScrollLabelCanvas(ScrollLabelCanvas):
 
 class ScrollFrame(ScrollCanvas):
 
-    def __init__(self, parent, size=None, is_darkmode=True, *args, **kwargs):
+    def __init__(self, parent, size=None, theme=None, *args, **kwargs):
         size = {'width': 100, 'height': 100} if size is None else size
-        super().__init__(parent, size, is_darkmode=is_darkmode, *args, **kwargs)
+        super().__init__(parent, size, theme=theme, *args, **kwargs)
 
         self.scroll_frame = ttk.Frame(self.canvas, style='canvas.TFrame')
 
@@ -446,15 +465,15 @@ class ScrollFrame(ScrollCanvas):
         """Reset the scroll region to encompass the canvas contents"""
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-    def change_theme(self, dark_mode=True):
-        super().change_theme(dark_mode)
+    def change_theme(self, theme):
+        super().change_theme(theme)
 
 
 class ScrollLabelFrame(ScrollLabelCanvas):
 
-    def __init__(self, parent, size=None, has_label=True, is_darkmode=True, *args, **kwargs):
+    def __init__(self, parent, size=None, has_label=True, theme=None, *args, **kwargs):
         size = {'width': 100, 'height': 100} if size is None else size
-        super().__init__(parent, size, has_label=has_label, is_darkmode=is_darkmode, *args, **kwargs)
+        super().__init__(parent, size, has_label=has_label, theme=theme, *args, **kwargs)
 
         self.scroll_frame = ttk.Frame(self.canvas, style='canvas.TFrame')
 
@@ -471,8 +490,8 @@ class ScrollLabelFrame(ScrollLabelCanvas):
         """Reset the scroll region to encompass the canvas contents"""
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-    def change_theme(self, dark_mode=True):
-        super().change_theme(dark_mode)
+    def change_theme(self, theme):
+        super().change_theme(theme)
 
 
 class ThemedScrolledText(tk.Text):
@@ -500,6 +519,5 @@ class ThemedScrolledText(tk.Text):
     def __str__(self):
         return str(self.frame)
 
-    def change_theme(self, dark_mode):
-        theme = dark_theme if dark_mode else light_theme
+    def change_theme(self, theme):
         self.configure(**theme['text']['configure'])

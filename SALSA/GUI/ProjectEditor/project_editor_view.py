@@ -429,8 +429,8 @@ class ProjectEditorView(ttk.Frame):
 
         self.inst_description.configure(**theme['Tmessage']['configure'])
 
-        self.inst_desc_frame.change_theme(dark_mode)
-        self.link_in.change_theme(dark_mode)
-        self.link_out.change_theme(dark_mode)
+        self.inst_desc_frame.change_theme(theme)
+        self.link_in.change_theme(theme)
+        self.link_out.change_theme(theme)
         self.insts_tree.set_darkmode(dark_mode)
         self.sections_tree.set_darkmode(dark_mode)
