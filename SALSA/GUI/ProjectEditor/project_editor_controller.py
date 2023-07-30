@@ -334,6 +334,8 @@ class ProjectEditorController:
             child.destroy()
 
     def refresh_tree(self, tree_key, keep_selection=False):
+        if len(self.trees[tree_key].get_children('')) == 0:
+            return
         open_items = self.trees[tree_key].get_open_elements()
         cur_y_view, _ = self.trees[tree_key].yview()
         kwargs = {'script': self.current['script']} if tree_key != 'script' else {}
