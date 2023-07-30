@@ -108,10 +108,11 @@ class ProjectEditorController:
     def delay_set_change_flag(self, delay):
         self.view.after(delay, self.set_change_flag)
 
-    def set_change_flag(self):
-        if self.current['script'] is not None:
-            if self.current['script'] not in self.script_refresh_offset_queue:
-                self.script_refresh_offset_queue.append(self.current['script'])
+    def set_change_flag(self, script=None):
+        script = self.current.get('script', None) if script is None else script
+        if script not in self.script_refresh_offset_queue and script is not None:
+            self.script_refresh_offset_queue.append(script)
+
         self.has_changes = True
         self.view.save_button.configure(state='normal')
 
