@@ -210,6 +210,7 @@ class StringPopup(tk.Toplevel):
         self.head_entry.configure(state=state)
         self.head_add_quote_button.configure(state=state)
         self.body_entry.configure(state=state)
+        self.str_encode_toggle.set_widget_state(state=state)
 
     def _clear_editor_fields(self):
         self.no_head_var.set(0)

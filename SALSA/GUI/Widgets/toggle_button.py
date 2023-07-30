@@ -97,9 +97,20 @@ class ToggleButton(tk.Canvas):
         self.addtag_all('toggle')
 
         self.tag_bind('toggle', sequence='<ButtonRelease-1>', func=self.start_toggle)
+        self._widget_state = 'normal'
 
         canvas_size = self.bbox('all')
         self.configure(width=canvas_size[2]-1, height=canvas_size[3]-1, **self.theme['ToggleButton.Canvas']['configure'])
+
+    def set_widget_state(self, state):
+        if state == self._widget_state:
+            return
+        self._widget_state = state
+        if state == 'normal':
+            self.tag_bind('toggle', sequence='<ButtonRelease-1>', func=self.start_toggle)
+        if state == 'disabled':
+            self.tag_unbind('toggle', sequence='<ButtonRelease-1>')
+
 
     def start_toggle(self, e):
         if self._in_toggle:
