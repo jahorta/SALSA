@@ -377,7 +377,7 @@ class SCTProjectFacade:
         if 'body' in changes:
             body = changes['body']
         self.project.scts[script].strings[string_id] = head_and_body_to_SAstr(no_head, head, body)
-        self.callbacks['set_change']()
+        self.callbacks['set_change'](script)
 
     def add_string_group(self, script, string_group=''):
         if string_group == '':
@@ -386,6 +386,8 @@ class SCTProjectFacade:
         cur_script.string_groups[string_group] = []
 
         self.create_section(script, new_name=string_group, inst_list=[9])
+
+        self.callbacks['set_change'](script)
 
     def remove_string_group(self, script, string_group):
         cur_script = self.project.scts[script]
@@ -398,6 +400,8 @@ class SCTProjectFacade:
         for p in parents:
             cur_group = cur_group[p]
         cur_group.pop(index)
+
+        self.callbacks['set_change'](script)
 
     def rename_string_group(self, script, group_name, new_group_name):
         cur_script = self.project.scts[script]
@@ -424,11 +428,15 @@ class SCTProjectFacade:
         self.project.scts[script].strings[string_id] = string
         self.project.scts[script].string_locations[string_id] = string_group
 
+        self.callbacks['set_change'](script)
+
     def delete_string(self, script, string_id):
         self.project.scts[script].strings.pop(string_id)
         group = self.project.scts[script].string_locations[string_id]
         self.project.scts[script].string_locations.pop(string_id)
         self.project.scts[script].string_groups[group].remove(string_id)
+
+        self.callbacks['set_change'](script)
 
     def change_string_id(self, script, string_id, new_string_id):
         cur_script = self.project.scts[script]
