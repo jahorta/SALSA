@@ -279,7 +279,7 @@ class StringPopup(tk.Toplevel):
                 else:
                     raise ValueError(f'{self.log_key}: Unknown command in tree list sent to _add_tree_entries')
                 continue
-            if not encoding_set:
+            if not encoding_set and self.cur_string_id == '':
                 if 'string' in entry:
                     if '《' in entry['string']:
                         self.cur_script_encoding = 'US/JP'
