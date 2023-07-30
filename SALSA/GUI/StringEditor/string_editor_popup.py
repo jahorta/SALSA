@@ -499,6 +499,9 @@ class StringPopup(tk.Toplevel):
             self.callbacks['rename_string_group'](self.cur_script, old_name, new_name)
         else:
             self.callbacks['rename_string'](self.cur_script, old_name, new_name)
+            self.strings.row_data[sel_iid] = new_name
+            if self.cur_string_id == old_name:
+                self.cur_string_id = new_name
         self.strings.item(sel_iid, text=new_name)
         self.callbacks['refresh_sections']()
 
