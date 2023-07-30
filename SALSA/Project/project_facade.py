@@ -525,6 +525,7 @@ class SCTProjectFacade:
         new_sect = SCTSection()
         new_sect.name = new_name
         new_sect.type = 'Group'
+        new_sect.absolute_offset = -1
         cur_script.sects[new_name] = new_sect
 
         inst_list = [] if inst_list is None else inst_list
