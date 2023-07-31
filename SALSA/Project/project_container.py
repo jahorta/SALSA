@@ -377,7 +377,7 @@ class SCTProject:
     scts: Dict[str, SCTScript]
 
     # NOTE: version numbers should change only when the master branch is updated.
-    cur_version = 2
+    cur_version = 3
 
     def __init__(self):
         self.scts = {}

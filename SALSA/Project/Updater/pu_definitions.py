@@ -1,5 +1,13 @@
 from SALSA.Project.Updater.pu_constants import PP, UP
 
+v3 = {
+    PP.section: {
+        1: {
+            UP.callable: '_move_sect_labels_v1',
+        }
+    }
+}
+
 v2 = {
     PP.project: {
         1: {
@@ -63,9 +71,11 @@ v2 = {
 }
 
 update_tasks = {
-    1: v2
+    1: v2,
+    2: v3
 }
 
 p_max_depth = {
-    1: PP.parameter
+    1: PP.parameter,
+    2: PP.instruction
 }
