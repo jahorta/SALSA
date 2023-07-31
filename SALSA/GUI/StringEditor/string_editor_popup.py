@@ -1,7 +1,10 @@
+import json
 import tkinter as tk
 from tkinter import ttk
 from typing import Literal
 
+from SALSA.Common.setting_class import settings
+from SALSA.GUI.StringEditor.special_chars_widget import SpecialCharSelectWidget
 from SALSA.GUI.Widgets.hover_tooltip import schedule_tooltip
 from SALSA.GUI.Widgets.toggle_button import ToggleButton
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
@@ -46,6 +49,10 @@ quote_replacement = {
 
 rename_widget_offset = 16
 
+default_settings = {
+    'recents': json.dumps([])
+}
+
 
 class StringPopup(tk.Toplevel):
     t = 'SALSA - String Editor'
@@ -65,8 +72,12 @@ class StringPopup(tk.Toplevel):
         self.theme = theme
         self.configure(**self.theme['Ttoplevel']['configure'])
 
-        # if self.log_key not in settings:
-        #     settings.add_group(self.log_key)
+        if self.log_key not in settings:
+            settings.add_group(self.log_key)
+
+        for k, v in default_settings.items():
+            if k not in settings[self.log_key]:
+                settings.set_single(self.log_key, k, v)
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
@@ -379,6 +390,7 @@ class StringPopup(tk.Toplevel):
         self.after(10, self.close)
 
     def close(self):
+        settings.set_single(self.log_key, 'recents', json.dumps(self.sp_chars.recents))
         self.callbacks['close'](self.name, self)
 
     def change_theme(self, theme):
