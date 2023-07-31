@@ -23,3 +23,6 @@ class AnalysisController:
 
     def export_as_csv(self, csv_dict):
         pass
+
+    def change_theme(self, theme):
+        pass

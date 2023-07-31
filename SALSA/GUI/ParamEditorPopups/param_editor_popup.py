@@ -385,7 +385,7 @@ class ParamEditPopup(tk.Toplevel):
 
     option_settings = {}
 
-    def __init__(self, parent, is_darkmode, *args, **kwargs):
+    def __init__(self, parent, theme, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.parent: tk.Tk = parent
@@ -393,13 +393,12 @@ class ParamEditPopup(tk.Toplevel):
 
         self.title(self.t)
         self.geometry(f'{self.w}x{self.h}')
-        theme = dark_theme if is_darkmode else light_theme
         self.configure(**theme['Ttoplevel']['configure'])
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
-        self.main_frame_label = w.ScrollLabelFrame(self, text='', relief=tk.FLAT, labelanchor='n')
+        self.main_frame_label = w.ScrollLabelFrame(self, text='', relief=tk.FLAT, labelanchor='n', theme=theme, canvas_style='lightCanvas')
         self.main_frame_label.grid(row=0, column=0, sticky='NSEW')
         self.main_frame = self.main_frame_label.scroll_frame
 
@@ -429,5 +428,6 @@ class ParamEditPopup(tk.Toplevel):
     def on_close(self):
         self.callbacks['close']()
 
-    def change_theme(self, is_darkmode):
-        pass
+    def change_theme(self, theme):
+        self.configure(**theme['Ttoplevel']['configure'])
+        self.main_frame_label.change_theme(theme)

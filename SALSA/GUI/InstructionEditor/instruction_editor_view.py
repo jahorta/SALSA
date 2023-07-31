@@ -46,7 +46,7 @@ class InstructionEditorView(tk.Toplevel):
     nm_key = '<<ChangeTheme>>'
     nm_priority = 1
 
-    def __init__(self, parent, callbacks, is_darkmode, *args, **kwargs):
+    def __init__(self, parent, callbacks, theme, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.title('SALSA - Instruction Editor')
@@ -258,7 +258,7 @@ class InstructionEditorView(tk.Toplevel):
         elif user_type == 'user':
             self.user_notes_blocker.grid_forget()
 
-        self.change_theme(is_darkmode)
+        self.change_theme(theme)
 
     # ------------------------------------------------------------ #
     # Methods to generate or use the instruction or parameter tree #
@@ -385,8 +385,7 @@ class InstructionEditorView(tk.Toplevel):
         values[column_id - 1] = value
         self.param_list_tree.item(sel_iid, values=values)
 
-    def change_theme(self, dark_mode):
-        theme = dark_theme if dark_mode else light_theme
+    def change_theme(self, theme):
 
         # self - toplevel
         self.configure(background=theme['.']['configure']['background'])
@@ -400,4 +399,4 @@ class InstructionEditorView(tk.Toplevel):
         self.user_notes_text.configure(**theme['Tmessage']['configure'])
 
         # default_notes_frame - ScrollCanvasFrame
-        self.default_notes_frame.change_theme(dark_mode)
+        self.default_notes_frame.change_theme(theme)

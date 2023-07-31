@@ -13,13 +13,13 @@ class ParamEditController:
 
     log_code = 'ParamEditCtrlr'
 
-    def __init__(self, parent, callbacks, is_darkmode):
+    def __init__(self, parent, callbacks, theme):
         self.column_id = None
         self.param_id = None
         self.parent = parent
         self.callbacks = callbacks
         self.view: Union[None, ParamEditPopup] = None
-        self.is_darkmode = is_darkmode
+        self.theme = theme
         self.end_callback = None
         self.end_kwargs = None
 
@@ -55,7 +55,7 @@ class ParamEditController:
         self.end_kwargs = end_kwargs
         if self.view is not None:
             return
-        self.view = ParamEditPopup(self.parent, is_darkmode=self.is_darkmode)
+        self.view = ParamEditPopup(self.parent, theme=self.theme)
         self.view.main_frame_label.config(text=base_param.type)
         self.param = param
         if self.param is not None:
@@ -338,6 +338,6 @@ class ParamEditController:
     def clear_int(self):
         self.int_field.remove_value()
 
-    def change_theme(self, is_darkmode):
+    def change_theme(self, theme):
         if self.view is not None:
-            self.view.change_theme(is_darkmode)
+            self.view.change_theme(theme)

@@ -33,7 +33,7 @@ class ProjectEditorController:
         'style': 'grouped'
     }
 
-    def __init__(self, parent: tk.Tk, view: ProjectEditorView, facade: SCTProjectFacade, callbacks, is_darkmode):
+    def __init__(self, parent: tk.Tk, view: ProjectEditorView, facade: SCTProjectFacade, callbacks, theme):
         self.parent: tk.Tk = parent
         self.callbacks = callbacks
 
@@ -64,7 +64,7 @@ class ProjectEditorController:
                         'get_instruction_list': lambda: self.project.get_inst_list(self.current['script'],
                                                                                    self.current['section'],
                                                                                    self.current['instruction'])}
-        self.param_editor = ParamEditController(self.view, callbacks=pe_callbacks, is_darkmode=is_darkmode)
+        self.param_editor = ParamEditController(self.view, callbacks=pe_callbacks, theme=theme)
 
         if self.log_name not in settings:
             settings[self.log_name] = {}

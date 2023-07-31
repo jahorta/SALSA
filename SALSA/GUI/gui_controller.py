@@ -37,7 +37,7 @@ class GUIController:
     scpt_view: ProjectEditorView
 
     def __init__(self, parent, scpt_editor_controller: ProjectEditorController, project_facade: SCTProjectFacade,
-                 inst_lib_facade: BaseInstLibFacade):
+                 inst_lib_facade: BaseInstLibFacade, theme):
 
         self.status_msg: Union[None, tk.Label] = None
         self.status_sub_msg: Union[None, tk.Label] = None
@@ -48,6 +48,7 @@ class GUIController:
         self.scpt_view = self.scpt_cont.view
         self.project = project_facade
         self.base_lib = inst_lib_facade
+        self.theme = theme
 
         self.popups: PopupTypes = {'inst': None, 'analysis': None, 'about': None,
                                    'variable': None, 'string': None, 'export': None}
@@ -117,7 +118,7 @@ class GUIController:
         }
         self.popups['inst'] = InstructionEditorController(parent=self.parent, callbacks=callbacks,
                                                           inst_lib_facade=self.base_lib, name='inst',
-                                                          is_darkmode=self.callbacks['is_darkmode']())
+                                                          theme=self.theme)
 
     def show_about(self):
         position = Vector2(x=self.parent.winfo_x(), y=self.parent.winfo_y())
@@ -142,7 +143,7 @@ class GUIController:
             'close': self.close_popup
         }
         self.popups['variable'] = VariablePopup(self.parent, callbacks=callbacks, name='variable',
-                                                is_darkmode=self.callbacks['is_darkmode']())
+                                                theme=self.theme)
 
     def show_strings_popup(self):
         if self.popups['string'] is not None:
@@ -159,7 +160,7 @@ class GUIController:
             'refresh_sections': lambda: self.scpt_cont.refresh_tree('section')
         }
         self.popups['string'] = StringPopup(self.parent, callbacks=callbacks, name='string',
-                                            is_darkmode=self.callbacks['is_darkmode']())
+                                            theme=self.theme)
 
     def show_sct_export_popup(self, selected=None):
         if self.popups['export'] is not None:
@@ -170,7 +171,7 @@ class GUIController:
             'get_tree': lambda: self.project.get_tree(self.scpt_view.get_headers('script')),
         }
         self.popups['export'] = SCTExportPopup(self.parent, callbacks=callbacks, name='export', selected=selected,
-                                               is_darkmode=self.callbacks['is_darkmode']())
+                                               theme=self.theme)
 
     # ----------------------- #
     # Popup cleanup functions #
@@ -235,10 +236,11 @@ class GUIController:
         if sub_msg is not None and isinstance(sub_msg, str):
             self.status_sub_msg.configure(text=sub_msg)
 
-    def change_theme(self, dark_mode):
+    def change_theme(self, theme):
+        self.theme = theme
         for popup in self.popups.values():
             if popup is not None:
-                popup.change_theme(dark_mode)
+                popup.change_theme(theme)
 
     def status_listener(self):
         if not self.status_queue.empty():

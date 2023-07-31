@@ -72,6 +72,7 @@ class Application(tk.Tk):
                 self.style.map(key, **{mk: mv})
 
         theme_name = list(themes.keys())[0] if self.is_darkmode else list(themes.keys())[1]
+        theme = themes[theme_name]
         self.style.theme_use(theme_name)
 
         # maps dynamic style attributes for the current theme
@@ -82,7 +83,7 @@ class Application(tk.Tk):
         self.project_filepath = ''
 
         # Setup script editor view and controller
-        self.project_edit_view = ProjectEditorView(self, is_darkmode=self.is_darkmode)
+        self.project_edit_view = ProjectEditorView(self, theme=theme)
         self.project_edit_view.grid(row=0, column=0, sticky='NSEW', pady=5, padx=5)
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
@@ -90,10 +91,10 @@ class Application(tk.Tk):
         project_controller_callbacks = {'save_project': self.on_save_project}
         self.project_edit_controller = ProjectEditorController(self, self.project_edit_view, self.project,
                                                                callbacks=project_controller_callbacks,
-                                                               is_darkmode=self.is_darkmode)
+                                                               theme=theme)
 
         self.gui = GUIController(parent=self, scpt_editor_controller=self.project_edit_controller,
-                                 project_facade=self.project, inst_lib_facade=self.base_insts)
+                                 project_facade=self.project, inst_lib_facade=self.base_insts, theme=theme)
 
         self.project_edit_controller.add_callback('toggle_frame_state', self.gui.toggle_frame_state)
 
@@ -348,8 +349,8 @@ class Application(tk.Tk):
 
         self.configure(bg=theme['.']['configure']['background'])
 
-        self.project_edit_view.change_theme(dark_mode)
-        self.gui.change_theme(dark_mode)
+        self.project_edit_view.change_theme(theme)
+        self.gui.change_theme(theme)
 
     def map_current_theme(self, theme):
         for item_key, arg_dict in theme.items():

@@ -55,14 +55,14 @@ class StringPopup(tk.Toplevel):
 
     option_settings = {}
 
-    def __init__(self, parent, callbacks, name, is_darkmode, *args, **kwargs):
+    def __init__(self, parent, callbacks, name, theme, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.parent: tk.Tk = parent
         self.callbacks = callbacks
         self.name = name
         self.protocol('WM_DELETE_WINDOW', self.start_close)
-        self.theme = dark_theme if is_darkmode else light_theme
+        self.theme = theme
         self.configure(**self.theme['Ttoplevel']['configure'])
 
         # if self.log_key not in settings:
@@ -381,9 +381,8 @@ class StringPopup(tk.Toplevel):
     def close(self):
         self.callbacks['close'](self.name, self)
 
-    def change_theme(self, dark_mode=True):
-        self.theme = dark_theme if dark_mode else light_theme
-
+    def change_theme(self, theme):
+        self.theme = theme
         self.body_entry.configure(**self.theme['text']['configure'])
         self.configure(**self.theme['Ttoplevel']['configure'])
         self.str_encode_toggle.change_theme(self.theme)

@@ -64,13 +64,13 @@ default_tree_label = ''
 class ProjectEditorView(ttk.Frame):
     log_name = 'PrjEditorView'
 
-    def __init__(self, parent, is_darkmode, *args, **kwargs):
+    def __init__(self, parent, theme, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         if self.log_name not in settings.keys():
             settings[self.log_name] = {}
 
         self.callbacks = None
-        self.is_darkmode = is_darkmode
+        self.theme = theme
 
         # if 'headers' not in settings[self.log_name].keys():
         settings.set_single(self.log_name, 'headers', json.dumps(default_headers))
@@ -138,7 +138,7 @@ class ProjectEditorView(ttk.Frame):
 
         columns = list(header_settings['section'].keys())[1:]
         self.sections_tree = DataTreeview(section_tree_frame, name='section', columns=columns,
-                                          can_move=True, selectmode='extended', is_darkmode=self.is_darkmode)
+                                          can_move=True, selectmode='extended', theme=theme)
         self.sections_tree.configure('columns')
         self.sections_tree.grid(row=1, column=0, sticky='NSEW')
         first = True
@@ -169,7 +169,7 @@ class ProjectEditorView(ttk.Frame):
 
         columns = list(header_settings['instruction'].keys())[1:]
         self.insts_tree = DataTreeview(self.inst_tree_frame, name='instruction', columns=columns,
-                                       can_move=True, selectmode='extended', is_darkmode=self.is_darkmode,
+                                       can_move=True, selectmode='extended', theme=self.theme,
                                        prevent_extreme_selection=True, keep_group_ends=True)
         self.insts_tree.grid(row=1, column=0, sticky='NSEW')
         first = True
@@ -423,14 +423,13 @@ class ProjectEditorView(ttk.Frame):
         widget.entry_widget.bind('<Return>', lambda event: self.callbacks['change_label_name'](widget, sel_iid, event))
         widget.entry_widget.bind('<Escape>', lambda event: widget.destroy())
 
-    def change_theme(self, dark_mode):
-        self.is_darkmode = dark_mode
-        theme = dark_theme if dark_mode else light_theme
+    def change_theme(self, theme):
+        self.theme = theme
 
         self.inst_description.configure(**theme['Tmessage']['configure'])
 
         self.inst_desc_frame.change_theme(theme)
         self.link_in.change_theme(theme)
         self.link_out.change_theme(theme)
-        self.insts_tree.set_darkmode(dark_mode)
-        self.sections_tree.set_darkmode(dark_mode)
+        self.insts_tree.set_theme(theme)
+        self.sections_tree.set_theme(theme)

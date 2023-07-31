@@ -20,7 +20,7 @@ class SCTExportPopup(tk.Toplevel):
         'compress_aklz': {'text': 'Compress file using AKLZ compression', 'default': 'False'}
     }
 
-    def __init__(self, parent, callbacks, name, selected, is_darkmode, *args, **kwargs):
+    def __init__(self, parent, callbacks, name, selected, theme, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.parent: tk.Tk = parent
@@ -29,7 +29,6 @@ class SCTExportPopup(tk.Toplevel):
         self.selected = selected
         self.script_ids = {}
         self.protocol('WM_DELETE_WINDOW', self.close)
-        theme = dark_theme if is_darkmode else light_theme
         self.configure(**theme['Ttoplevel']['configure'])
 
         if self.log_key not in settings:
@@ -142,6 +141,5 @@ class SCTExportPopup(tk.Toplevel):
     def close(self):
         self.callbacks['close'](self.name, self)
 
-    def change_theme(self, dark_mode):
-        theme = dark_theme if dark_mode else light_theme
+    def change_theme(self, theme):
         self.configure(**theme['Ttoplevel']['configure'])

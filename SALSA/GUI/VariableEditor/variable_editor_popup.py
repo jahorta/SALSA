@@ -34,7 +34,7 @@ class VariablePopup(tk.Toplevel):
     option_settings = {}
     tree_names = ['Bit', 'Byte', 'Int', 'Float']
 
-    def __init__(self, parent, callbacks, name, is_darkmode, *args, **kwargs):
+    def __init__(self, parent, callbacks, name, theme, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.parent: tk.Tk = parent
@@ -42,7 +42,6 @@ class VariablePopup(tk.Toplevel):
         self.name = name
         self.script_ids = {}
         self.protocol('WM_DELETE_WINDOW', self.on_close)
-        theme = dark_theme if is_darkmode else light_theme
         self.configure(**theme['Ttoplevel']['configure'])
 
         if self.log_key not in settings:
@@ -58,7 +57,7 @@ class VariablePopup(tk.Toplevel):
 
         tree_callbacks = {'select': self.script_select}
 
-        self.script_tree = DataTreeview(script_frame, 'script', tree_callbacks, return_none=True)
+        self.script_tree = DataTreeview(script_frame, name='script', callbacks=tree_callbacks, return_none=True)
         anchor = tk.CENTER
         self.script_tree.heading('#0', text='Script', anchor=anchor)
         self.script_tree.column('#0', anchor=anchor, minwidth=10, width=100, stretch=True)
@@ -116,7 +115,7 @@ class VariablePopup(tk.Toplevel):
         variable_usage_frame.columnconfigure(0, weight=1)
         variable_usage_frame.rowconfigure(0, weight=1)
 
-        self.variable_usage = w.ScrollLabelFrame(variable_usage_frame, is_darkmode=is_darkmode)
+        self.variable_usage = w.ScrollLabelFrame(variable_usage_frame, theme=theme)
         self.variable_usage.grid(row=0, column=0, sticky='NSEW')
 
         self.status_label = ttk.Label(self, text='')
@@ -278,7 +277,6 @@ class VariablePopup(tk.Toplevel):
     def on_close(self):
         self.callbacks['close'](self.name, self)
 
-    def change_theme(self, dark_mode):
-        theme = dark_theme if dark_mode else light_theme
+    def change_theme(self, theme):
         self.configure(**theme['Ttoplevel']['configure'])
-        self.variable_usage.change_theme(dark_mode=dark_mode)
+        self.variable_usage.change_theme(theme)

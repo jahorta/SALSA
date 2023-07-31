@@ -1,7 +1,5 @@
 import tkinter as tk
 
-from SALSA.GUI.themes import dark_theme, light_theme
-
 
 class MainMenu(tk.Menu):
     """The application's main menu"""
@@ -101,8 +99,5 @@ class MainMenu(tk.Menu):
 
     def toggle_dark_mode(self):
         dark_mode = True if self.dark_mode_var.get() == 1 else False
-
-        # For when the custom themed menu is fully implemented
-        # self.change_theme(dark_mode)
 
         self.callbacks['view->theme'](dark_mode)

@@ -22,13 +22,12 @@ default_tree_label = ''
 
 class DragWindow(tk.Toplevel):
 
-    def __init__(self, master, tree_dict, is_darkmode, bbox, *args, **kwargs):
+    def __init__(self, master, tree_dict, theme, bbox, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
         self.attributes('-alpha', 0.5)
         self.overrideredirect(True)
 
-        theme = dark_theme if is_darkmode else light_theme
         self.configure(**theme['drag.Ttoplevel']['configure'], bd=0)
 
         tree = ttk.Treeview(self, columns=list(tree_dict['headers'].keys())[1:], style='drag.Treeview', show='tree')
@@ -66,10 +65,32 @@ group_open_y_percent = 2/3  # proportion of a cell
 group_open_delay = 800  # delay to open a group by hovering (milliseconds)
 move_ignore_event_delay = 5
 
+default_tree_theme = {
+
+    "drag.Ttoplevel": {
+        "configure": {
+            "background": 'gray120',
+            "highlightbackground": 'gray120',
+            "highlightcolor": 'gray120',
+            "highlightthickness": 0,
+        }
+    },
+    # Treeview configuration for the next three items
+    "drag.Treeview": {
+        "configure": {
+            "background": 'white',
+            "foreground": 'black',
+            "fieldbackground": 'white',
+            "lightcolor": 'white',
+            "darkcolor": 'white'
+        },
+    },
+}
+
 
 class DataTreeview(ttk.Treeview):
 
-    def __init__(self, parent, name, is_darkmode=True, callbacks=None, can_open=True, can_move=False, return_none=False,
+    def __init__(self, parent, name, callbacks=None, theme=None, can_open=True, can_move=False, return_none=False,
                  selectmode='browse', prevent_extreme_selection=False, keep_group_ends=False, **kwargs):
         super().__init__(parent, selectmode=selectmode, **kwargs)
         self._parent = parent
@@ -80,7 +101,7 @@ class DataTreeview(ttk.Treeview):
         self.cur_selection = []
         self.selection_order = []
         self.return_none = return_none
-        self.is_darkmode = is_darkmode
+        self.theme = theme if theme is not None else default_tree_theme
 
         self.can_open = can_open
 
@@ -116,8 +137,8 @@ class DataTreeview(ttk.Treeview):
     def add_callback(self, key, callback):
         self.callbacks[key] = callback
 
-    def set_darkmode(self, is_darkmode):
-        self.is_darkmode = is_darkmode
+    def set_theme(self, theme):
+        self.theme = theme
 
     def select_entry(self, event):
         if len(self.get_children('')) == 0:
@@ -410,7 +431,7 @@ class DataTreeview(ttk.Treeview):
 
         bbox = self.winfo_rootx(), self.winfo_rooty(), self.winfo_rootx()+self.winfo_width(), self.winfo_rooty()+self.winfo_height()
 
-        self.drag_widget = DragWindow(self, is_darkmode=self.is_darkmode, bbox=bbox, tree_dict=tree_dict)
+        self.drag_widget = DragWindow(self, theme=self.theme, bbox=bbox, tree_dict=tree_dict)
 
         for s in base_select:
             self.delete(s)

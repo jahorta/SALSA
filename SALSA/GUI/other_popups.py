@@ -38,3 +38,6 @@ class AboutView(HelpPopupView):
         window_offset = Vector2(x=50, y=50)
         super().__init__(parent=parent, position=position, close_callback=callback,
                          size=size, text_offset=text_offset, window_offset=window_offset, *args, **kwargs)
+
+    def change_theme(self, theme):
+        pass
