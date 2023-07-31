@@ -6,7 +6,6 @@ from typing import List, Dict
 import SALSA.GUI.Widgets.widgets as w
 from SALSA.Common.constants import label_name_sep
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
-from SALSA.GUI.themes import light_theme, dark_theme
 from SALSA.GUI.ProjectEditor.inst_group_handler import InstGroupHandlerDialog
 from SALSA.Common.setting_class import settings
 from SALSA.BaseInstructions.bi_defaults import loop_count_name

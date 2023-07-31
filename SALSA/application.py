@@ -115,7 +115,7 @@ class Application(tk.Tk):
             'prj->export_script': self.gui.show_sct_export_popup,
             'prj->variable': self.gui.show_variables_popup,
             'prj->string': self.gui.show_strings_popup,
-            'prj->repair->textbox': lambda: self.project.repair_text_box_fade(self.sct_model),
+            'prj->repair->textbox': self.textbox_fadeout_repair,
             # 'analysis->export': self.gui.show_analysis_view,
             'view->inst': self.gui.show_instruction_view,
             'view->theme': self.change_theme,
@@ -318,14 +318,6 @@ class Application(tk.Tk):
         script_thread.start()
         self._script_export_listener(finish_queue)
 
-    def _script_export_listener(self, decode_queue):
-        if not decode_queue.empty():
-            item = decode_queue.get()
-            if isinstance(item, str):
-                if item == 'stop':
-                    return self.finish_export_scripts()
-        self.after(20, self._script_export_listener, decode_queue)
-
     def _threaded_script_exporter(self, scripts, options, compress, finish_queue, status_queue: queue.SimpleQueue):
         for name, filepath in scripts.items():
             status_queue.put({'msg': f'Encoding {name}.sct'})
@@ -334,8 +326,37 @@ class Application(tk.Tk):
                                                 options=options, compress=compress)
         finish_queue.put('stop')
 
-    def finish_export_scripts(self):
+    def _script_export_listener(self, decode_queue):
+        if not decode_queue.empty():
+            item = decode_queue.get()
+            if isinstance(item, str):
+                if item == 'stop':
+                    return self.gui.stop_status_popup()
+        self.after(20, self._script_export_listener, decode_queue)
+
+    # ------------------------- #
+    # Threaded textbox repairer #
+    # ------------------------- #
+
+    def textbox_fadeout_repair(self):
+        self.gui.show_status_popup('Texbox Repair', 'Repairing script: ')
+        done_queue = queue.SimpleQueue()
+        thread = threading.Thread(target=self._threaded_textbox_fadeout_repair, args=(self.sct_model, self.gui.status_queue, done_queue))
+        thread.start()
+        self.after(20, self._textbox_fadeout_repair_listener, done_queue)
+
+    def _threaded_textbox_fadeout_repair(self, model, sq, dq):
+        self.project.repair_text_box_fade(model, sq)
+        dq.put('done')
+
+    def _textbox_fadeout_repair_listener(self, dq: queue.SimpleQueue):
+        if dq.empty():
+            return self.after(20, self._textbox_fadeout_repair_listener, dq)
         self.gui.stop_status_popup()
+
+    # ------------- #
+    # Other methods #
+    # ------------- #
 
     def change_theme(self, dark_mode=True):
         self.is_darkmode = dark_mode
