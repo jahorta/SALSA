@@ -23,10 +23,16 @@ sel_halo = 2
 
 class SpecialCharSelectWidget(tk.Frame):
 
-    def __init__(self, master, insert_callback: Callable, recents=None, theme=None, cur_enc=None, location=None, *args, **kwargs):
+    def __init__(self, master, insert_callback: Callable, recents=None, theme=None, cur_enc=None, location=None, button_num=recent_num, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
+        global recent_num
+        recent_num = button_num
+
         self.recents = recents if recents is not None else []
+        if len(self.recents) >= recent_num:
+            self.recents = self.recents[:recent_num]
+
         self.cur_enc: Literal['EU','US/JP'] = cur_enc if cur_enc is not None else 'US/JP'
         self.insert_callback = insert_callback
 
