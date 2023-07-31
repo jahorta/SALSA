@@ -187,8 +187,8 @@ class SALSAMenuBar(ttk.Frame):
         self.labels[label] = ttk.Label(self, text=label, style=self.label_style)
         self.labels[label].grid(row=0, column=len(self.menus), sticky='NSEW', ipadx=self.padding_x)
         self.labels[label].bind('<Button-1>', self.handle_click)
-        self.labels[label].bind('<Enter>', self.take_focus)
-        self.labels[label].bind('<Leave>', self.release_focus)
+        self.labels[label].bind('<Enter>', self.take_focus, add='+')
+        self.labels[label].bind('<Leave>', self.release_focus, add='+')
         self.labels[label].bind('<Button-1>', self.print_bbox, add='+')
         self.labels[label].bind('<Escape>', lambda: self.close_menu(label))
         self.menus[label] = target_menu
