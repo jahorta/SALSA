@@ -14,7 +14,7 @@ recent_num = 10
 char_pad = 3
 
 font = 'Arial 12'
-sp_char_cols = 10
+sp_char_cols = 16
 sp_char_rows_vis = 10
 
 sel_halo = 2
@@ -29,25 +29,25 @@ class SpecialCharSelectWidget(tk.Frame):
         self.cur_enc: Literal['EU','US/JP'] = cur_enc if cur_enc is not None else 'US/JP'
         self.insert_callback = insert_callback
 
+        expand_button = ttk.Button(self, text='Other chars...', command=lambda: self.toggle_widget(location=location))
+        expand_button.grid(row=0, column=0)
+        self.widget_is_expanded = False
+
         self.recent_buttons = []
         i = 0
         for char in self.recents:
             if i >= recent_num:
                 break
             b = ttk.Button(self, text=char, command=lambda ind=i: self.select_recent(ind), width=button_width)
-            b.grid(row=0, column=i)
+            b.grid(row=0, column=i+1)
             self.recent_buttons.append(b)
             i += 1
 
         while i < recent_num:
             b = ttk.Button(self, text='', state='disabled', width=button_width)
-            b.grid(row=0, column=i)
+            b.grid(row=0, column=i+1)
             self.recent_buttons.append(b)
             i += 1
-
-        expand_button = ttk.Button(self, text='Other chars...', command=lambda: self.toggle_widget(location=location))
-        expand_button.grid(row=0, column=i)
-        self.widget_is_expanded = False
 
         self.char_widgets: Dict[str, ScrollCanvas] = {'EU': ScrollCanvas(master, size={'width': 0, 'height': 0}, theme=theme),
                                                       'US/JP': ScrollCanvas(master, size={'width': 0, 'height': 0}, theme=theme)}
@@ -89,13 +89,13 @@ class SpecialCharSelectWidget(tk.Frame):
             self._expand_widget(location=location)
 
     def _expand_widget(self, location=None):
-        x = self.winfo_x()+self.winfo_width()
+        x = self.winfo_x()
         y = self.winfo_y()+self.winfo_height()
-        anchor = tk.NE
+        anchor = tk.NW
         if location is not None:
             if location == 'above':
                 y -= self.winfo_height()
-                anchor = tk.SE
+                anchor = tk.SW
         self.char_widgets[self.cur_enc].place(x=x, y=y, anchor=anchor)
         self.widget_is_expanded = True
 
@@ -118,7 +118,7 @@ class SpecialCharSelectWidget(tk.Frame):
             if char in self.recents:
                 self.recents.remove(char)
             self.recents.insert(0, char)
-            if len(self.recents) > 10:
+            if len(self.recents) > recent_num:
                 self.recents.pop(-1)
         for i, c in enumerate(self.recents):
             self.recent_buttons[i].configure(text=c)
