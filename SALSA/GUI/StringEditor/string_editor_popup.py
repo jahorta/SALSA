@@ -225,6 +225,7 @@ class StringPopup(tk.Toplevel):
         self.head_add_quote_button.configure(state=state)
         self.body_entry.configure(state=state)
         self.str_encode_toggle.set_widget_state(state=state)
+        self.sp_chars.set_state(state)
 
     def _clear_editor_fields(self):
         self.no_head_var.set(0)
@@ -299,10 +300,12 @@ class StringPopup(tk.Toplevel):
                         self.cur_script_encoding = 'US/JP'
                         encoding_set = True
                         self.str_encode_toggle.set_state_by_value(self.cur_script_encoding)
+                        self.sp_chars.set_encoding(self.cur_script_encoding)
                     if '«' in entry['string']:
                         self.cur_script_encoding = 'EU'
                         encoding_set = True
                         self.str_encode_toggle.set_state_by_value(self.cur_script_encoding)
+                        self.sp_chars.set_encoding(self.cur_script_encoding)
             kwargs = {'parent': parent_list[-1], 'index': 'end'}
             values = []
             first = True
