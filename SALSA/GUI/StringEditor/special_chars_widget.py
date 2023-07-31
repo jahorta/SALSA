@@ -60,7 +60,7 @@ class SpecialCharSelectWidget(tk.Frame):
                                                       'US/JP': ScrollCanvas(master, size={'width': 0, 'height': 0}, theme=theme)}
 
         self.insert_callback = insert_callback
-        self.configure(**theme['canvas.TFrame']['configure'])
+        self.configure(**theme['lightCanvas']['configure'])
         txt_fill = 'black' if theme is None else theme['TCanvasText']['configure']['fill']
 
         max_dim = 0
