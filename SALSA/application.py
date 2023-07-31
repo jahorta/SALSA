@@ -354,6 +354,10 @@ class Application(tk.Tk):
             return self.after(20, self.textbox_fadeout_repair, dq)
         self.gui.stop_status_popup()
 
+    # ------------- #
+    # Other methods #
+    # ------------- #
+
     def change_theme(self, dark_mode=True):
         self.is_darkmode = dark_mode
         settings.set_single(self.log_key, 'darkmode', str(dark_mode))
