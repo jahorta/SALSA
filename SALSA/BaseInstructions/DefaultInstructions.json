@@ -2570,7 +2570,7 @@
   },
   "155": {
     "Name": "Select Choice",
-    "Description": "Presents choice at:\n\n*str[Offset]*\n\n\nThe text box will not fade out if the Fadeout parameter is overridden (0x7FFFFFFF).\n(param_value: *hex[<Fadeout>]*)\n\n\n",
+    "Description": "Presents choice at:\n\n*str[Offset]*\n\n\nThe text box will not fade out if the Fadeout parameter is overridden (0x7FFFFFFF).\nparam_value: *hex[<Fadeout>]*\n\n\n\n",
     "Notes": "The value of the Fadeout parameter (param 2) doesn't seem to make a difference in terms of timing, so the value itself may not matter.\n\nSetting param2 causes the first character of the string (usually \\h) to be changed to \\c. This prefix is what leads to the fadeout effect for the message box.\n",
     "Parameters": {
       "0": {
