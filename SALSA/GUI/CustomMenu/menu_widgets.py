@@ -194,12 +194,21 @@ class SALSAMenuBar(ttk.Frame):
         self.menus[label] = target_menu
 
     def handle_click(self, e):
-        self.active = e.widget['text']
-        self.open_menu(e.widget['text'])
+        state = e.widget.cget('state')
+        if not isinstance(state, str):
+            state = state.string
+        if state == 'disabled':
+            return
+        self.toggle_menu(e.widget['text'])
 
     def take_focus(self, e):
         # Put hover highlight here
         if self.active == '':
+            return
+        state = e.widget.cget('state')
+        if not isinstance(state, str):
+            state = state.string
+        if state == 'disabled':
             return
         if self.active != e.widget['text']:
             self.close_menu(self.active)
