@@ -371,6 +371,7 @@ class StringPopup(tk.Toplevel):
 
     def insert_sp_char(self, char):
         self.body_entry.insert(tk.INSERT, char)
+        self.body_entry.focus_set()
 
     @staticmethod
     def on_entry_focus_in(e):
