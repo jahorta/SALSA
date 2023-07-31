@@ -206,9 +206,9 @@ class StringPopup(tk.Toplevel):
 
         self.sp_chars = SpecialCharSelectWidget(master=self, insert_callback=self.insert_sp_char, theme=theme,
                                                 cur_enc=self.cur_encoding, location='above',
-                                                recents=json.loads(settings[self.log_key]['recents']))
-        self.sp_chars.grid(row=3, column=0, sticky=tk.W, padx=5)
-        lower_frame.bind('<Escape>', lambda e: self.sp_chars.contract_widget(), add='+')
+                                                recents=json.loads(settings[self.log_key]['recents']), button_num=16)
+        self.sp_chars.grid(row=3, column=0, sticky=tk.W, padx=5, pady=5)
+        self.bind('<Escape>', lambda e: self.sp_chars.contract_widget(), add='+')
 
         self.update_scripts()
 
