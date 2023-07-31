@@ -257,6 +257,8 @@ class StringPopup(tk.Toplevel):
         self.update_strings()
 
     def update_strings(self):
+        if self.cur_script == '':
+            return
         cur_tree_height = self.strings.yview()[0]
         open_elements = []
         if len(self.strings.get_children('')) > 0:
@@ -365,6 +367,7 @@ class StringPopup(tk.Toplevel):
         self.head_entry.delete(0, tk.END)
         self.head_entry.insert(0, head)
         self.save('head', self.head_entry.get())
+        self.sp_chars.set_encoding(new_encoding)
 
     def insert_sp_char(self, char):
         self.body_entry.insert(tk.INSERT, char)
