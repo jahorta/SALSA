@@ -359,7 +359,7 @@ class ScrollCanvas(ttk.Frame):
 
 class ScrollLabelCanvas(ttk.LabelFrame):
 
-    def __init__(self, parent, size: dict, has_label=True, theme=None, *args, **kwargs):
+    def __init__(self, parent, size: dict, has_label=True, canvas_style=None, theme=None, *args, **kwargs):
         if not has_label:
             kwargs = kwargs
             kwargs['text'] = ''
@@ -369,9 +369,10 @@ class ScrollLabelCanvas(ttk.LabelFrame):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         self.parent = parent
+        self.canvas_style = 'TCanvas' if canvas_style is None else canvas_style
 
         theme = theme if theme is not None else canvas_default_theme
-        self.canvas = tk.Canvas(self, width=size['width'], height=size['height'], **theme['TCanvas']['configure'])
+        self.canvas = tk.Canvas(self, width=size['width'], height=size['height'], **theme[self.canvas_style]['configure'])
         self.canvas.grid(row=0, column=0, sticky='NSEW')
 
         self.canvas_scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
@@ -411,8 +412,11 @@ class ScrollLabelCanvas(ttk.LabelFrame):
         else:
             self.canvas.unbind_all("<MouseWheel>")
 
+    def set_canvas_style(self, style):
+        self.canvas_style = style
+
     def change_theme(self, theme):
-        self.canvas.configure(**theme['TCanvas']['configure'])
+        self.canvas.configure(**theme[self.canvas_style]['configure'])
 
 
 text_default_theme = {
@@ -471,7 +475,7 @@ class ScrollFrame(ScrollCanvas):
 
 class ScrollLabelFrame(ScrollLabelCanvas):
 
-    def __init__(self, parent, size=None, has_label=True, theme=None, *args, **kwargs):
+    def __init__(self, parent, size=None, has_label=True, theme=None, canvas_style=None, *args, **kwargs):
         size = {'width': 100, 'height': 100} if size is None else size
         super().__init__(parent, size, has_label=has_label, theme=theme, *args, **kwargs)
 
@@ -479,6 +483,9 @@ class ScrollLabelFrame(ScrollLabelCanvas):
 
         self.canvas_window = self.canvas.create_window(2, 2, window=self.scroll_frame, anchor='nw',
                                                        tags='self.viewport')
+
+        if canvas_style is not None:
+            self.set_canvas_style(canvas_style)
 
         # bind an event whenever the size of the viewPort frame changes.
         self.scroll_frame.bind("<Configure>", self.onCanvasContentChange)
