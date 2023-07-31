@@ -204,16 +204,11 @@ class StringPopup(tk.Toplevel):
         self.body_entry.bind('<FocusIn>', self.on_text_focus_in)
         self.body_entry.bind('<FocusOut>', lambda e, k='body': self.on_text_focus_out(k, e))
 
-        self.cur_script = ''
-        self.cur_string_id = ''
-        self.string_defaults = {}
-        self.string_changes = {}
-        self.header_invalid = False
-        self.cur_encoding: Literal['US/JP', 'EU'] = 'US/JP'
-        self.cur_script_encoding: Literal['US/JP', 'EU'] = 'US/JP'
-        self.scheduled_tooltip = None
-        self.active_tooltip = None
-        self.rename_active = False
+        self.sp_chars = SpecialCharSelectWidget(master=self, insert_callback=self.insert_sp_char, theme=theme,
+                                                cur_enc=self.cur_encoding, location='above',
+                                                recents=json.loads(settings[self.log_key]['recents']))
+        self.sp_chars.grid(row=3, column=0, sticky=tk.W, padx=5)
+        lower_frame.bind('<Escape>', lambda e: self.sp_chars.contract_widget(), add='+')
 
         self.update_scripts()
 
@@ -367,6 +362,9 @@ class StringPopup(tk.Toplevel):
         self.head_entry.delete(0, tk.END)
         self.head_entry.insert(0, head)
         self.save('head', self.head_entry.get())
+
+    def insert_sp_char(self, char):
+        self.body_entry.insert(tk.INSERT, char)
 
     @staticmethod
     def on_entry_focus_in(e):
