@@ -1,4 +1,5 @@
 import os.path
+import queue
 from tkinter.filedialog import askdirectory
 
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
@@ -10,7 +11,7 @@ from SALSA.Scripts.script_decoder import SCTDecoder
 class TBStringToParamRepair:
 
     @classmethod
-    def repair_project(cls, project: SCTProject, inst_lib: BaseInstLibFacade, sct_model: SCTModel):
+    def repair_project(cls, project: SCTProject, inst_lib: BaseInstLibFacade, sct_model: SCTModel, status_queue: queue.SimpleQueue):
 
         directory = sct_model.get_default_directory()
         prj_repair = cls()
@@ -32,6 +33,7 @@ class TBStringToParamRepair:
 
         for name, script in project.scts.items():
             print(f'Repairing script: {name}')
+            status_queue.put(f'Repairing script: {name}')
             _, sct = sct_model.read_sct_file(f'{name}.sct')
             dec_script = SCTDecoder.decode_sct_from_file(name, sct, inst_lib, strings_only=True)
             for sect in script.sects.values():
