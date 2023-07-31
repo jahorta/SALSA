@@ -8,6 +8,49 @@ from SALSA.GUI.themes import dark_theme, light_theme
 
 prohibited_labels = [None, '']
 
+menu_default_theme = {
+    "SALSAMenu": {
+        'configure': {
+            "background": 'grey100',
+        }
+    },
+    "SALSAMenu.TLabel": {
+        'configure': {
+            "background": 'grey100',
+            "foreground": 'black',
+        },
+        'map': {
+            'background': [('selected', 'blue'), ('active', 'blue')],
+            'foreground': [('selected', 'white'), ('active', 'white')]
+        }
+    },
+    "SALSAMenu.TCheckbutton": {
+        'configure': {
+            "background": 'grey100',
+            "foreground": 'black',
+        },
+        'map': {
+            'background': [('selected', 'blue'), ('active', 'blue')],
+            'foreground': [('selected', 'white'), ('active', 'white')]
+        }
+    },
+    "SALSAMenuBar.TFrame": {
+        'configure': {
+            "background": 'grey100',
+        }
+    },
+    "SALSAMenuBar.TLabel": {
+        'configure': {
+            "background": 'gray90',
+            "foreground": 'black',
+        },
+        'map': {
+            'background': [('selected', 'blue'), ('active', 'blue')],
+            'foreground': [('selected', 'white'), ('active', 'white')]
+        }
+    },
+}
+
 
 class SALSAMenu(tk.Toplevel):
     log_key = 'SALSAMenu'
@@ -18,12 +61,16 @@ class SALSAMenu(tk.Toplevel):
     cascade_offset_y = -2
 
     padding = 10
+    style = 'SALSAMenu'
     custom_label_style = 'SALSAMenu.TLabel'
     custom_checkbox_style = 'SALSAMenu.TCheckbutton'
 
-    def __init__(self, parent, *args, is_darkmode, **kwargs):
-        theme = dark_theme if is_darkmode else light_theme
-        self.colors = theme['SALSAMenu']['configure']
+    def __init__(self, parent, *args, theme=None, style=None, label_style=None, checkbox_style=None, **kwargs):
+        self.custom_label_style = label_style if label_style is not None else self.custom_label_style
+        self.custom_checkbox_style = checkbox_style if checkbox_style is None else self.custom_checkbox_style
+        self.style = style if style is not None else self.style
+        self.theme = theme if theme is not None else menu_default_theme
+        self.colors = self.theme[self.style]['configure']
         super().__init__(parent, *args, **self.colors, **kwargs)
 
         self.entries_order: List[str] = []
@@ -105,9 +152,8 @@ class SALSAMenu(tk.Toplevel):
     def close(self):
         self.state('withdrawn')
 
-    def change_theme(self, dark_mode):
-        theme = dark_theme if dark_mode else light_theme
-        self.colors = theme['SALSAMenu']['configure']
+    def change_theme(self, theme):
+        self.colors = theme[self.style]['configure']
         self.configure(**self.colors)
 
 
@@ -121,9 +167,11 @@ class SALSAMenuBar(ttk.Frame):
     menubar_style = 'SALSAMenuBar.TFrame'
     label_style = 'SALSAMenuBar.TLabel'
 
-    def __init__(self, parent, *args, **kwargs):
+    def __init__(self, parent, menubar_style=None, label_style=None, theme=None, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
-
+        theme = menu_default_theme if theme is None else theme
+        self.menubar_style = menubar_style if menubar_style is not None else self.menubar_style
+        self.label_style = label_style if label_style is not None else self.label_style
         self.configure(style=self.menubar_style)
 
         self.labels: Dict[str, ttk.Label] = {}
