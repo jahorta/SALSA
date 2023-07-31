@@ -104,6 +104,18 @@ def theme_generator(colors: Colors):
                 "arrowcolor": colors.text
             },
         },
+        "TSpinbox": {
+            "configure": {
+                "background": colors.bg,  # Dark grey background
+                "foreground": colors.text,  # White text
+                "fieldbackground": colors.bg_highlight,
+                "insertcolor": colors.text,
+                "bordercolor": colors.border,
+                "lightcolor": colors.bg_highlight,
+                "darkcolor": colors.bg_internal,
+                "arrowcolor": colors.text
+            },
+        },
         # Treeview configuration for the next three items
         "Treeview": {
             "configure": {
