@@ -10,6 +10,7 @@ sp_chars = {
     'US/JP': '、。，．・：；？！゛゜´｀¨＾￣＿ヽヾゝゞ〃仝々〆〇ー―‐／＼～∥｜…‥‘’“”（）〔〕［］｛｝〈〉《》「」『』【】＋－±×÷＝≠＜＞≦≧∞∴♂♀°′″℃￥＄￠￡％＃＆＊＠§☆★○●◎◇◆□■△▲▽▼※〒→←↑↓〓∈∋⊆⊇⊂⊃∪∩∧∨￢⇒⇔∀∃∠⊥⌒∂∇≡≒≪≫√∽∝∵∫∬Å‰♯♭♪†‡¶◯ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψωАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя│┌┐┘└├┬┤┴┼━┃┏┓┛┗┣┳┫┻╋┠┯┨┷┿┝┰┥┸╂①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩⅰⅱⅲⅳⅴⅵⅶⅷⅸⅹ㍉㌔㌢㍍㌘㌧㌃㌶㍑㍗㌍㌦㌣㌫㍊㌻㎜㎝㎞㎎㎏㏄㎡㍻〝〟№㏍℡㊤㊥㊦㊧㊨㈱㈲㈹㍾㍽㍼∮∑∟⊿￤＇＂'
 }
 button_width = 2
+button_pad = 2
 recent_num = 10
 char_pad = 3
 
@@ -29,8 +30,8 @@ class SpecialCharSelectWidget(tk.Frame):
         self.cur_enc: Literal['EU','US/JP'] = cur_enc if cur_enc is not None else 'US/JP'
         self.insert_callback = insert_callback
 
-        expand_button = ttk.Button(self, text='Other chars...', command=lambda: self.toggle_widget(location=location))
-        expand_button.grid(row=0, column=0)
+        self.expand_button = ttk.Button(self, text='Other chars...', command=lambda: self.toggle_widget(location=location))
+        self.expand_button.grid(row=0, column=0, padx=button_pad)
         self.widget_is_expanded = False
 
         self.recent_buttons = []
@@ -39,13 +40,13 @@ class SpecialCharSelectWidget(tk.Frame):
             if i >= recent_num:
                 break
             b = ttk.Button(self, text=char, command=lambda ind=i: self.select_recent(ind), width=button_width)
-            b.grid(row=0, column=i+1)
+            b.grid(row=0, column=i+1, padx=button_pad)
             self.recent_buttons.append(b)
             i += 1
 
         while i < recent_num:
             b = ttk.Button(self, text='', state='disabled', width=button_width)
-            b.grid(row=0, column=i+1)
+            b.grid(row=0, column=i+1, padx=button_pad)
             self.recent_buttons.append(b)
             i += 1
 
@@ -53,6 +54,7 @@ class SpecialCharSelectWidget(tk.Frame):
                                                       'US/JP': ScrollCanvas(master, size={'width': 0, 'height': 0}, theme=theme)}
 
         self.insert_callback = insert_callback
+        self.configure(**theme['canvas.TFrame']['configure'])
         txt_fill = 'black' if theme is None else theme['TCanvasText']['configure']['fill']
 
         max_dim = 0
@@ -125,6 +127,14 @@ class SpecialCharSelectWidget(tk.Frame):
 
     def select_recent(self, ind):
         self.insert_callback(self.recents[ind])
+
+    def set_encoding(self, enc):
+        self.cur_enc = enc
+
+    def set_state(self, state):
+        self.expand_button.configure(state=state)
+        for i in range(len(self.recents)):
+            self.recent_buttons[i].configure(state=state)
 
 
 if __name__ == '__main__':
