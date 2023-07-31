@@ -210,6 +210,11 @@ def theme_generator(colors: Colors):
                 "background": colors.bg_internal,
             }
         },
+        "lightCanvas": {
+            'configure': {
+                "background": colors.bg,
+            }
+        },
         "TCanvas": {
             'configure': {
                 "background": colors.bg_internal,
