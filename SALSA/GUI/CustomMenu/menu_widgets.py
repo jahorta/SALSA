@@ -220,6 +220,12 @@ class SALSAMenuBar(ttk.Frame):
         if self.active != '':
             return
 
+    def toggle_menu(self, label):
+        if self.active == '':
+            self.open_menu(label)
+        else:
+            self.close_menu(label)
+
     def open_menu(self, label):
         x, y, h = (
         self.labels[label].winfo_rootx(), self.labels[label].winfo_rooty(), self.labels[label].winfo_height())
