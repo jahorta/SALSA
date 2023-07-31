@@ -216,6 +216,7 @@ class SALSAMenuBar(ttk.Frame):
         self.labels[label].winfo_rootx(), self.labels[label].winfo_rooty(), self.labels[label].winfo_height())
         pos = f'+{x + self.cascade_offset_x}+{y + h + self.cascade_offset_y}'
         self.menus[label].display(pos)
+        self.active = label
 
     def close_menu(self, label):
         self.menus[label].close()
