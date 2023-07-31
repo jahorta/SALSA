@@ -226,3 +226,43 @@ class SALSAMenuBar(ttk.Frame):
 
     def print_bbox(self, e):
         label: ttk.Label = e.widget
+
+
+if __name__ == '__main__':
+    w = tk.Tk()
+
+    menu = SALSAMenuBar(w)
+    menu.grid(row=0, column=0, sticky=tk.W)
+
+    default_style = 'clam'
+    w.style = ttk.Style()
+    w.style.theme_create('menu', parent=default_style, settings=menu_default_theme)
+
+    for item_key, arg_dict in menu_default_theme.items():
+        if 'map' not in arg_dict:
+            continue
+        w.style.map(item_key, **arg_dict['map'])
+    w.style.theme_use('menu')
+
+    filemenu = SALSAMenu(menu)
+    filemenu.add_command('Hi', command=lambda: print('Hi'))
+    filemenu.add_command('Bye', command=lambda: print('Bye'))
+    menu.add_cascade('File', filemenu)
+    disable_var = tk.IntVar()
+
+    def disable_file_toggle():
+        new_state = 'disabled' if disable_var.get() == 1 else 'normal'
+        filemenu.entryconfig('Hi', state=new_state)
+        filemenu.entryconfig('Bye', state=new_state)
+        menu.entryconfig('File', state=new_state)
+
+    viewmenu = SALSAMenu(menu)
+    viewmenu.add_checkbutton('Disable File', variable=disable_var, command=lambda: disable_file_toggle(),
+                             onvalue=1, offvalue=0)
+    menu.add_cascade('View', viewmenu)
+
+    w.mainloop()
+
+    def change_theme(theme):
+        filemenu.change_theme(theme=theme)
+        viewmenu.change_theme(theme=theme)
