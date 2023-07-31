@@ -1564,7 +1564,7 @@ class SCTProjectFacade:
         link.target_trace[1] = new_tgt_uuid
 
     def repair_text_box_fade(self, sct_model, queue):
-        project = TBStringToParamRepair.repair_project(project=self.project, inst_lib=self.base_insts, sct_model=sct_model, queue=queue)
+        project = TBStringToParamRepair.repair_project(project=self.project, inst_lib=self.base_insts, sct_model=sct_model, status_queue=queue)
         if project is None:
             return
         self.project = project

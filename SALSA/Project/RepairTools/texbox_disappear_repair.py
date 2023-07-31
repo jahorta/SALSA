@@ -33,7 +33,7 @@ class TBStringToParamRepair:
 
         for name, script in project.scts.items():
             print(f'Repairing script: {name}')
-            status_queue.put(f'Repairing script: {name}')
+            status_queue.put({'sub_msg': f'{name}'})
             _, sct = sct_model.read_sct_file(f'{name}.sct')
             dec_script = SCTDecoder.decode_sct_from_file(name, sct, inst_lib, strings_only=True)
             for sect in script.sects.values():

@@ -341,7 +341,7 @@ class Application(tk.Tk):
     def textbox_fadeout_repair(self):
         self.gui.show_status_popup('Texbox Repair', 'Repairing script: ')
         done_queue = queue.SimpleQueue()
-        thread = threading.Thread(target=self._threaded_textbox_fadeout_repair, args=(self.sct_model, self.gui.status_queue))
+        thread = threading.Thread(target=self._threaded_textbox_fadeout_repair, args=(self.sct_model, self.gui.status_queue, done_queue))
         thread.start()
         self.after(20, self._textbox_fadeout_repair_listener, done_queue)
 
@@ -351,7 +351,7 @@ class Application(tk.Tk):
 
     def _textbox_fadeout_repair_listener(self, dq: queue.SimpleQueue):
         if dq.empty():
-            return self.after(20, self.textbox_fadeout_repair, dq)
+            return self.after(20, self._textbox_fadeout_repair_listener, dq)
         self.gui.stop_status_popup()
 
     # ------------- #
