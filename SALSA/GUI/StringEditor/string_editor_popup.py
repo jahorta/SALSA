@@ -60,8 +60,6 @@ class StringPopup(tk.Toplevel):
     w = 600
     h = 500
 
-    option_settings = {}
-
     def __init__(self, parent, callbacks, name, theme, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
@@ -71,6 +69,16 @@ class StringPopup(tk.Toplevel):
         self.protocol('WM_DELETE_WINDOW', self.start_close)
         self.theme = theme
         self.configure(**self.theme['Ttoplevel']['configure'])
+        self.cur_script = ''
+        self.cur_string_id = ''
+        self.string_defaults = {}
+        self.string_changes = {}
+        self.header_invalid = False
+        self.cur_encoding: Literal['US/JP', 'EU'] = 'US/JP'
+        self.cur_script_encoding: Literal['US/JP', 'EU'] = 'US/JP'
+        self.scheduled_tooltip = None
+        self.active_tooltip = None
+        self.rename_active = False
 
         if self.log_key not in settings:
             settings.add_group(self.log_key)
