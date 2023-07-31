@@ -370,6 +370,8 @@ class StringPopup(tk.Toplevel):
         self.sp_chars.set_encoding(new_encoding)
 
     def insert_sp_char(self, char):
+        if self.cur_script == '' or self.cur_string_id == '':
+            return
         self.body_entry.insert(tk.INSERT, char)
         self.body_entry.focus_set()
 
