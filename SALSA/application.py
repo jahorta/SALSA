@@ -318,14 +318,6 @@ class Application(tk.Tk):
         script_thread.start()
         self._script_export_listener(finish_queue)
 
-    def _script_export_listener(self, decode_queue):
-        if not decode_queue.empty():
-            item = decode_queue.get()
-            if isinstance(item, str):
-                if item == 'stop':
-                    return self.finish_export_scripts()
-        self.after(20, self._script_export_listener, decode_queue)
-
     def _threaded_script_exporter(self, scripts, options, compress, finish_queue, status_queue: queue.SimpleQueue):
         for name, filepath in scripts.items():
             status_queue.put({'msg': f'Encoding {name}.sct'})
