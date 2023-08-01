@@ -100,6 +100,7 @@ class SCTEncoder:
         self.string_links = {}
         self.footer_links = {}
         self.inst_positions = {}
+        self.errors = []
 
     @classmethod
     def encode_sct_file_from_project_script(cls, project_script: SCTScript, base_insts: BaseInstLibFacade,
@@ -118,6 +119,14 @@ class SCTEncoder:
         self.combine_footer_links = combine_footer_links
         self.add_spurious_refresh = add_spurious_refresh
 
+        pops = []
+        for i, error in enumerate(self.script.errors):
+            if 'Encode' in error:
+                pops.append(i)
+
+        for i in reversed(pops):
+            self.script.errors.pop(i)
+
         # encode sections in order
         for name in self.script.sect_list:
             section = self.script.sects[name]
@@ -130,12 +139,20 @@ class SCTEncoder:
 
         # Resolve through jmp_links
         for link_offset, jmp_to in self.sct_links.items():
+            if jmp_to[1] not in self.inst_positions:
+                self.script.errors.append(f'Encode: No target inst {jmp_to[0]}-{jmp_to[1]}')
+                print(f'No target inst{jmp_to[1]}')
+                continue
             jmp_to_pos = self.inst_positions[jmp_to[1]]
             jmp_offset = self._make_word(i=(jmp_to_pos - link_offset), signed=True)
             self._sct_body_insert_hex(location=link_offset, value=jmp_offset, validation=self._placeholder)
 
         # Resolve string links
         for link_offset, section in self.string_links.items():
+            if section not in self.header_dict:
+                self.script.errors.append(f'Encode: No string {section}')
+                print(f'No string {section}')
+                continue
             str_pos = self.header_dict[section]
             str_offset = str_pos - link_offset
             str_offset_word = self._make_word(i=str_offset, signed=True)
@@ -331,6 +348,9 @@ class SCTEncoder:
             if param.override is not None:
                 value = param.override
             else:
+                if param.value is None:
+                    self.script.errors.append(f'Encode: Parameter value is None: {"-".join(trace)}')
+                    return
                 no_loop = False
                 if isinstance(param.value, str):
                     if param.value in self.param_code.no_loop.keys():
@@ -346,6 +366,9 @@ class SCTEncoder:
                         self._check_additions(trace, value)
                     value.extend(self._make_word(self.param_code.stop_code))
         else:
+            if param.value is None:
+                self.script.errors.append(f'Encode: Parameter value is None: {"-".join(trace)}')
+                return
             if 'var' in base_param.type:
                 value = self._encode_scpt_param(param.value)
             else:
