@@ -1,6 +1,7 @@
 import copy
 from typing import Union, Tuple, Literal
 
+from SALSA.FileModels.sct_model import SCTModel
 from SALSA.Project.RepairTools.texbox_disappear_repair import TBStringToParamRepair
 from SALSA.Project.Updater.project_updater import ProjectUpdater
 from SALSA.BaseInstructions.bi_defaults import loop_count_name
@@ -11,6 +12,7 @@ from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
 from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep, label_name_sep, logical_sect_suffix
 from SALSA.Scripts.scpt_param_codes import get_scpt_override
+from Scripts.script_encoder import SCTEncoder
 
 
 class SCTProjectFacade:
@@ -1568,3 +1570,16 @@ class SCTProjectFacade:
         if project is None:
             return
         self.project = project
+
+    def refresh_abs_poses(self, scripts, queue):
+        error_scts = []
+        for script in scripts:
+            queue.put({'sub_msg': ''})
+            SCTEncoder.encode_sct_file_from_project_script(project_script=self.project.scts[script], use_garbage=True,
+                                                           combine_footer_links=False, add_spurious_refresh=True,
+                                                           base_insts=self.base_insts, update_inst_pos=True)
+            for error in self.project.scts[script].errors:
+                if 'Encode' in error:
+                    error_scts.append(script)
+                    break
+        return error_scts
