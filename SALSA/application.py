@@ -361,6 +361,29 @@ class Application(tk.Tk):
             return self.after(20, self._textbox_fadeout_repair_listener, dq)
         self.gui.stop_status_popup()
 
+    # -------------------- #
+    # Threaded Refresh Pos #
+    # -------------------- #
+
+    def refresh_poses(self):
+        scts = self.project_edit_controller.script_refresh_offset_queue
+        done_queue = queue.SimpleQueue()
+        self.gui.show_status_popup('Refresh Absolute Positions', 'Refreshing positions:')
+        thread = threading.Thread(target=self._threaded_refresh_poses, args=(self, scts, self.gui.status_queue, done_queue))
+        thread.start()
+        self.after(20, self._textbox_fadeout_repair_listener, done_queue)
+
+    def _threaded_refresh_poses(self, scripts, message_queue, done_queue):
+        errored_scts = self.project.refresh_abs_poses(scripts, message_queue)
+        self.project_edit_controller.encoding_errors = errored_scts
+        self.project_edit_controller.script_refresh_offset_queue = errored_scts
+        done_queue.put('done')
+
+    def _refresh_pos_listener(self, dq: queue.SimpleQueue):
+        if dq.empty():
+            return self.after(20, self._textbox_fadeout_repair_listener, dq)
+        self.gui.stop_status_popup()
+
     # ------------- #
     # Other methods #
     # ------------- #
