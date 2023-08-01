@@ -330,6 +330,7 @@ class StringPopup(tk.Toplevel):
         self._clear_editor_fields()
 
         self.cur_string_id = string_id
+        self.strings.selection_set((self.strings.get_iid_from_rowdata(string_id), ))
         no_head, head, body = self.callbacks['get_string_to_edit'](string_id, self.cur_script)
         self.header_invalid = False
         self.body_entry.insert(tk.INSERT, body)

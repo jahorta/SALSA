@@ -391,9 +391,9 @@ class InstructionEditorView(tk.Toplevel):
         self.configure(background=theme['.']['configure']['background'])
 
         # details_desc_text - scrolledtext
-        self.details_desc_text.configure(**theme['Tmessage']['configure'])
+        self.details_desc_text.configure(**theme['text']['configure'])
         # default_notes_text - scrolledtext
-        self.default_notes_text.configure(**theme['Tmessage']['configure'])
+        self.default_notes_text.configure(**theme['text']['configure'])
         self.default_notes_msg.configure(**theme['Tmessage']['configure'])
         # default_notes_text - scrolledtext
         self.user_notes_text.configure(**theme['Tmessage']['configure'])
