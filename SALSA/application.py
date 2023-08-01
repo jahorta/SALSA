@@ -320,10 +320,17 @@ class Application(tk.Tk):
 
     def _threaded_script_exporter(self, scripts, options, compress, finish_queue, status_queue: queue.SimpleQueue):
         for name, filepath in scripts.items():
+            if name in self.project_edit_controller.encoding_errors:
+                self.project_edit_controller.encoding_errors.remove(name)
             status_queue.put({'msg': f'Encoding {name}.sct'})
             script = self.project.get_project_script_by_name(name)
             self.sct_model.export_script_as_sct(filepath=filepath, script=script, base_insts=self.base_insts,
                                                 options=options, compress=compress)
+            for error in self.project.get_project_script_by_name(name).errors:
+                if 'Encoding' in error:
+                    self.project_edit_controller.encoding_errors.append(name)
+                    self.project_edit_controller.script_refresh_offset_queue.append(name)
+        self.project_edit_controller.check_encoding_errors()
         finish_queue.put('stop')
 
     def _script_export_listener(self, decode_queue):
