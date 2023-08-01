@@ -104,6 +104,7 @@ class ProjectEditorController:
         self.has_changes = False
 
         self.link_font = SALSAFont()
+        self.encoding_errors = []
 
     def delay_set_change_flag(self, delay):
         self.view.after(delay, self.set_change_flag)
@@ -702,3 +703,7 @@ class ProjectEditorController:
             self.trees['instruction'].clear_all_entries()
 
         self.refresh_tree(tree_key)
+
+    def check_encoding_errors(self):
+        if len(self.encoding_errors) > 0:
+            pass
