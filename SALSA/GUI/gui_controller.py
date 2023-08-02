@@ -30,6 +30,7 @@ class PopupTypes(TypedDict):
     variable: Union[None, VariablePopup]
     string: Union[None, StringPopup]
     export: Union[None, SCTExportPopup]
+    errors: Union[None, SCTExportPopup]
 
 
 class GUIController:
@@ -50,7 +51,7 @@ class GUIController:
         self.base_lib = inst_lib_facade
         self.theme = theme
 
-        self.popups: PopupTypes = {'inst': None, 'analysis': None, 'about': None,
+        self.popups: PopupTypes = {'inst': None, 'analysis': None, 'about': None, 'errors': None,
                                    'variable': None, 'string': None, 'export': None}
 
         self.callbacks = {}
@@ -128,6 +129,9 @@ class GUIController:
         webbrowser.open(url='file://' + self.help_path)
 
     def show_settings(self):
+        pass
+
+    def show_project_errors(self):
         pass
 
     def show_variables_popup(self):
