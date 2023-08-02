@@ -342,6 +342,7 @@ class ProjectEditorController:
         cur_y_view, _ = self.trees[tree_key].yview()
         kwargs = {'script': self.current['script']} if tree_key != 'script' else {}
         kwargs |= {'section': self.current['section']} if tree_key not in ('script', 'section') else {}
+        kwargs |= {'instruction': self.current['instruction']} if tree_key not in ('script', 'section', 'instruction') else {}
         cur_sel = []
         if keep_selection:
             cur_sel = self.trees[tree_key].selection()
