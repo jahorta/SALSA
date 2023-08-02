@@ -68,7 +68,7 @@ class ProjectEditorView(ttk.Frame):
         if self.log_name not in settings.keys():
             settings[self.log_name] = {}
 
-        self.callbacks = None
+        self.callbacks = {}
         self.theme = theme
 
         # if 'headers' not in settings[self.log_name].keys():
@@ -80,8 +80,9 @@ class ProjectEditorView(ttk.Frame):
         self.rowconfigure(1, weight=1)
 
         header_frame = ttk.Frame(self)
-        header_frame.grid(row=0, column=0, sticky=tk.W)
-        self.save_button = ttk.Button(header_frame, text='Save', command=self.on_save_button)
+        header_frame.grid(row=0, column=0, sticky=tk.W+tk.E)
+        self.save_button = ttk.Button(header_frame, text='Save',
+                                      command=lambda: self.use_future_callback('save_project'))
         self.save_button.grid(row=0, column=0)
 
         mem_offset_label = ttk.Label(header_frame, text='Memory Offset: 0x')
@@ -90,9 +91,23 @@ class ProjectEditorView(ttk.Frame):
         mem_offset_entry = w.HexEntry(master=header_frame, textvariable=self.mem_offset_var, hex_max_length=8,
                                       hex_min_length=0, width=10)
         mem_offset_entry.grid(row=0, column=2, sticky=tk.W)
-        mem_offset_button = ttk.Button(header_frame, text='Set', command=self.set_mem_offset)
+        mem_offset_button = ttk.Button(header_frame, text='Set',
+                                       command=lambda: self.use_future_callback('set_mem_offset'))
         mem_offset_button.grid(row=0, column=3)
         self.cur_mem_offset = None
+
+        refresh_offset = ttk.Button(header_frame, text='Refresh Offsets',
+                                    command=lambda: self.use_future_callback('refresh_offsets'))
+        refresh_offset.grid(row=0, column=4, padx=5)
+
+        separator = ttk.Label(header_frame, text=' ')
+        separator.grid(row=0, column=5, sticky='NSEW')
+        header_frame.columnconfigure(5, weight=1)
+
+        self.error_button = ttk.Button(header_frame, text='Show Encoding Errors', style='error.TButton',
+                                       command=lambda: self.use_future_callback('show_project_errors'))
+        self.error_button.grid(row=0, column=6, sticky=tk.E)
+        self.error_button.grid_remove()
 
         self.pane_frame = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
         self.pane_frame.grid(row=1, column=0, sticky='NSEW')
@@ -286,11 +301,8 @@ class ProjectEditorView(ttk.Frame):
 
         print('pause here')
 
-    def on_save_button(self):
-        self.callbacks['save_project']()
-
-    def set_mem_offset(self):
-        self.callbacks['set_mem_offset']()
+    def use_future_callback(self, key):
+        self.callbacks[key]()
 
     def get_headers(self, tree_key=None, get_all=False):
         if tree_key is None:
