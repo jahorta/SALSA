@@ -14,6 +14,7 @@ class Colors:
     insert_indicator: str
     border: str
     button: str
+    error_button: str
     link: str
     warning_text: str
 
@@ -68,6 +69,12 @@ def theme_generator(colors: Colors):
         "TButton": {
             "configure": {
                 "background": colors.button,
+                "foreground": colors.text
+            }
+        },
+        "error.TButton": {
+            "configure": {
+                "background": colors.error_button,
                 "foreground": colors.text
             }
         },
@@ -298,6 +305,7 @@ themes = {
         insert_indicator='#cccccc',
         border='#5d5d5d',
         button="#3c4f4f",
+        error_button="#5c2f2f",
         link='#5588ff',
         warning_text='#ee4444'
     )),
@@ -312,6 +320,7 @@ themes = {
         insert_indicator='black',
         border='#888888',
         button="#acafd1",
+        error_button="#dcafa1",
         link='#0055ee',
         warning_text='#dd1122'
     )),
