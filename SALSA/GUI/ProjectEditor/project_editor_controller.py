@@ -52,7 +52,8 @@ class ProjectEditorController:
             'set_mem_offset': self.set_mem_offset,
             'param_rcm': self.param_right_click_menu,
             'inst_is_label': self.check_is_label,
-            'change_label_name': self.change_label_name
+            'change_label_name': self.change_label_name,
+            'refresh_offsets': self.callbacks['refresh_offsets']
         }
         self.view.add_and_bind_callbacks(view_callbacks)
 
