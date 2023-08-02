@@ -250,7 +250,7 @@ class Application(tk.Tk):
             return
         self.sct_model.set_default_directory(os.path.dirname(script_paths[0]))
 
-        self.gui.show_status_popup('Adding Script(s)', 'tempMSG')
+        self.gui.show_status_popup('Adding Script(s)', 'Adding Script:')
 
         script_decode_queue = queue.Queue()
         script_thread = threading.Thread(target=self._threaded_script_decoder,
@@ -311,7 +311,7 @@ class Application(tk.Tk):
             filepath = os.path.join(directory, script_file)
             script_dict[script] = filepath
 
-        self.gui.show_status_popup(title='Exporting Script(s)', msg=f'tempMSG')
+        self.gui.show_status_popup(title='Exporting Script(s)', msg=f'Exporting Script:')
 
         finish_queue = queue.SimpleQueue()
         script_thread = threading.Thread(target=self._threaded_script_exporter,
