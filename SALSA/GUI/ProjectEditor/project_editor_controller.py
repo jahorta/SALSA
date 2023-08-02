@@ -350,7 +350,7 @@ class ProjectEditorController:
                          clear_other_trees=clear_others)
         self.trees[tree_key].open_tree_elements(open_items)
         self.trees[tree_key].yview_moveto(cur_y_view)
-        if keep_selection:
+        if keep_selection and len(cur_sel) > 0:
             self.trees[tree_key].selection_set(cur_sel)
 
     def refresh_all_trees(self, skip_param_tree=True):
