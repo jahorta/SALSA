@@ -715,7 +715,7 @@ class ProjectEditorController:
         if tree_key == 'section':
             self.trees['instruction'].clear_all_entries()
 
-        self.refresh_tree(tree_key)
+        self.refresh_all_trees(skip_param_tree=True)
 
     def check_encoding_errors(self):
         if len(self.encoding_errors) > 0:
