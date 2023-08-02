@@ -372,9 +372,9 @@ class Application(tk.Tk):
         scts = self.project_edit_controller.script_refresh_offset_queue
         done_queue = queue.SimpleQueue()
         self.gui.show_status_popup('Refresh Absolute Positions', 'Refreshing positions:')
-        thread = threading.Thread(target=self._threaded_refresh_poses, args=(self, scts, self.gui.status_queue, done_queue))
+        thread = threading.Thread(target=self._threaded_refresh_poses, args=(scts, self.gui.status_queue, done_queue))
         thread.start()
-        self.after(20, self._textbox_fadeout_repair_listener, done_queue)
+        self.after(20, self._refresh_pos_listener, done_queue)
 
     def _threaded_refresh_poses(self, scripts, message_queue, done_queue):
         for name in scripts:
@@ -387,7 +387,7 @@ class Application(tk.Tk):
 
     def _refresh_pos_listener(self, dq: queue.SimpleQueue):
         if dq.empty():
-            return self.after(20, self._textbox_fadeout_repair_listener, dq)
+            return self.after(20, self._refresh_pos_listener, dq)
         self.gui.stop_status_popup()
         self.project_edit_controller.check_encoding_errors()
         self.project_edit_controller.refresh_all_trees()
