@@ -83,6 +83,7 @@ class ProjectEditorController:
 
         self.cur_mem_offset = 0
         self.script_refresh_offset_queue = []
+        self.encoding_errors = []
 
         self.trees: Dict[str, DataTreeview] = {
             'script': self.view.scripts_tree,
@@ -105,7 +106,6 @@ class ProjectEditorController:
         self.has_changes = False
 
         self.link_font = SALSAFont()
-        self.encoding_errors = []
 
     def delay_set_change_flag(self, delay):
         self.view.after(delay, self.set_change_flag)
