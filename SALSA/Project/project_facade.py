@@ -1573,7 +1573,7 @@ class SCTProjectFacade:
     def refresh_abs_poses(self, scripts, queue):
         error_scts = []
         for script in scripts:
-            queue.put({'sub_msg': ''})
+            queue.put({'sub_msg': f'{script}'})
             SCTEncoder.encode_sct_file_from_project_script(project_script=self.project.scts[script], use_garbage=True,
                                                            combine_footer_links=False, add_spurious_refresh=True,
                                                            base_insts=self.base_insts, update_inst_pos=True)
