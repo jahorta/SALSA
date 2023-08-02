@@ -115,6 +115,7 @@ class Application(tk.Tk):
             'prj->export_script': self.gui.show_sct_export_popup,
             'prj->variable': self.gui.show_variables_popup,
             'prj->string': self.gui.show_strings_popup,
+            'prj->refresh_pos': self.refresh_poses,
             'prj->repair->textbox': self.textbox_fadeout_repair,
             # 'analysis->export': self.gui.show_analysis_view,
             'view->inst': self.gui.show_instruction_view,
