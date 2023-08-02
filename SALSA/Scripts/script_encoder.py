@@ -348,7 +348,7 @@ class SCTEncoder:
             if param.override is not None:
                 value = param.override
             else:
-                if param.value is None:
+                if param.value is None and 'skip' not in base_param.type:
                     self.script.errors.append(f'Encode: Parameter value is None: {"-".join(trace)}')
                     return
                 no_loop = False
