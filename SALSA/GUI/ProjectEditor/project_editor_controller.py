@@ -352,6 +352,8 @@ class ProjectEditorController:
         self.trees[tree_key].open_tree_elements(open_items)
         self.trees[tree_key].yview_moveto(cur_y_view)
         if keep_selection and len(cur_sel) > 0:
+            children = list(self.trees[tree_key].row_data.keys())
+            cur_sel = tuple([s for s in cur_sel if s in children])
             self.trees[tree_key].selection_set(cur_sel)
 
     def refresh_all_trees(self, skip_param_tree=True):
