@@ -719,4 +719,6 @@ class ProjectEditorController:
 
     def check_encoding_errors(self):
         if len(self.encoding_errors) > 0:
-            pass
+            self.view.error_button.grid()
+        else:
+            self.view.error_button.grid_remove()
