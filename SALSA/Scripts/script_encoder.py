@@ -221,7 +221,7 @@ class SCTEncoder:
 
     def _encode_instruction(self, instruction, trace):
         base_inst = self.bi.get_inst(instruction.base_id)
-        trace.append(str(instruction.base_id))
+        trace.append(str(instruction.ID))
         self.inst_positions[instruction.ID] = len(self.sct_body)
         if self.update_inst_pos:
             instruction.absolute_offset = len(self.sct_body)
@@ -426,7 +426,9 @@ class SCTEncoder:
         return param_bytes
 
     def _check_additions(self, trace, ba: bytearray):
-        key = '-'.join(trace)
+        new_trace = copy.deepcopy(trace)
+        new_trace[1] = self.script.sects[new_trace[0]].insts[new_trace[1]].base_id
+        key = '-'.join(new_trace)
         if key in self._additions:
             addition = self._additions[key]
             if isinstance(addition, dict):
