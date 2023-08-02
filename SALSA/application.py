@@ -7,7 +7,6 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from typing import Union
 
-from SALSA.Project.RepairTools.texbox_disappear_repair import TBStringToParamRepair
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
 from SALSA.FileModels.project_model import ProjectModel
