@@ -332,7 +332,6 @@ class Application(tk.Tk):
                 if 'Encoding' in error:
                     self.project_edit_controller.encoding_errors.append(name)
                     self.project_edit_controller.script_refresh_offset_queue.append(name)
-        self.project_edit_controller.check_encoding_errors()
         finish_queue.put('stop')
 
     def _script_export_listener(self, decode_queue):
@@ -340,6 +339,8 @@ class Application(tk.Tk):
             item = decode_queue.get()
             if isinstance(item, str):
                 if item == 'stop':
+                    self.project_edit_controller.check_encoding_errors()
+                    self.project_edit_controller.refresh_all_trees()
                     return self.gui.stop_status_popup()
         self.after(20, self._script_export_listener, decode_queue)
 
@@ -388,6 +389,8 @@ class Application(tk.Tk):
         if dq.empty():
             return self.after(20, self._textbox_fadeout_repair_listener, dq)
         self.gui.stop_status_popup()
+        self.project_edit_controller.check_encoding_errors()
+        self.project_edit_controller.refresh_all_trees()
 
     # ------------- #
     # Other methods #
