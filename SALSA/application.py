@@ -322,6 +322,8 @@ class Application(tk.Tk):
         for name, filepath in scripts.items():
             if name in self.project_edit_controller.encoding_errors:
                 self.project_edit_controller.encoding_errors.remove(name)
+            if name in self.project_edit_controller.script_refresh_offset_queue:
+                self.project_edit_controller.script_refresh_offset_queue.remove(name)
             status_queue.put({'msg': f'Encoding {name}.sct'})
             script = self.project.get_project_script_by_name(name)
             self.sct_model.export_script_as_sct(filepath=filepath, script=script, base_insts=self.base_insts,
@@ -374,9 +376,12 @@ class Application(tk.Tk):
         self.after(20, self._textbox_fadeout_repair_listener, done_queue)
 
     def _threaded_refresh_poses(self, scripts, message_queue, done_queue):
+        for name in scripts:
+            if name in self.project_edit_controller.script_refresh_offset_queue:
+                self.project_edit_controller.script_refresh_offset_queue.remove(name)
         errored_scts = self.project.refresh_abs_poses(scripts, message_queue)
         self.project_edit_controller.encoding_errors = errored_scts
-        self.project_edit_controller.script_refresh_offset_queue = errored_scts
+        self.project_edit_controller.script_refresh_offset_queue = [*errored_scts]
         done_queue.put('done')
 
     def _refresh_pos_listener(self, dq: queue.SimpleQueue):
