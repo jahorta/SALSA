@@ -165,7 +165,7 @@ class ProjectEditorController:
                                                                     **self.current)
         self.set_instruction_details(details)
 
-    def update_tree(self, tree, tree_dict: Union[dict, None]):
+    def update_tree(self, tree, tree_dict: Union[dict, None], clear_other_trees=True):
         if tree is None:
             for tree in self.trees.keys():
                 self.trees[tree].clear_all_entries()
@@ -174,9 +174,10 @@ class ProjectEditorController:
         # Clear the current tree and all child trees to prevent desync
         cur_tree = tree
         trees_to_clear = [cur_tree]
-        while cur_tree != '':
-            trees_to_clear.append(tree_children[cur_tree])
-            cur_tree = tree_children[cur_tree]
+        if clear_other_trees:
+            while cur_tree != '':
+                trees_to_clear.append(tree_children[cur_tree])
+                cur_tree = tree_children[cur_tree]
 
         for t in trees_to_clear:
             if t != '':
@@ -334,7 +335,7 @@ class ProjectEditorController:
         for child in self.view.link_in.scroll_frame.winfo_children():
             child.destroy()
 
-    def refresh_tree(self, tree_key, keep_selection=False):
+    def refresh_tree(self, tree_key, keep_selection=False, clear_others=True):
         if len(self.trees[tree_key].get_children('')) == 0:
             return
         open_items = self.trees[tree_key].get_open_elements()
@@ -344,7 +345,8 @@ class ProjectEditorController:
         cur_sel = []
         if keep_selection:
             cur_sel = self.trees[tree_key].selection()
-        self.update_tree(tree_key, self.project.get_tree(self.view.get_headers(tree_key), **kwargs))
+        self.update_tree(tree_key, self.project.get_tree(self.view.get_headers(tree_key), **kwargs),
+                         clear_other_trees=clear_others)
         self.trees[tree_key].open_tree_elements(open_items)
         self.trees[tree_key].yview_moveto(cur_y_view)
         if keep_selection:
