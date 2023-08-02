@@ -353,6 +353,12 @@ class ProjectEditorController:
         if keep_selection:
             self.trees[tree_key].selection_set(cur_sel)
 
+    def refresh_all_trees(self, skip_param_tree=True):
+        for key in reversed(self.trees.keys()):
+            if key == 'parameter' and skip_param_tree:
+                continue
+            self.refresh_tree(key, True, clear_others=False)
+
     def check_is_label(self, inst_uuid):
         return self.project.inst_is_label(self.current['script'], self.current['section'], inst_uuid)
 
