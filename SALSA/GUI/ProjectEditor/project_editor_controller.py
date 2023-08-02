@@ -55,7 +55,7 @@ class ProjectEditorController:
             'change_label_name': self.change_label_name,
             'refresh_offsets': self.callbacks['refresh_offsets']
         }
-        self.view.add_and_bind_callbacks(view_callbacks)
+        self.view.add_and_bind_tree_callbacks(view_callbacks)
 
         pe_callbacks = {'get_var_alias': self.get_var_alias,
                         'refresh_inst': self.on_refresh_inst,

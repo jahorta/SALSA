@@ -305,7 +305,10 @@ class ProjectEditorView(ttk.Frame):
     def update_field(self, field_name, value):
         self.callbacks['update_field'](field_name, value)
 
-    def add_and_bind_callbacks(self, callbacks):
+    def add_callback(self, key, callback):
+        self.callbacks[key] = callback
+
+    def add_and_bind_tree_callbacks(self, callbacks):
         self.callbacks = callbacks
         self.scripts_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
         self.sections_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
