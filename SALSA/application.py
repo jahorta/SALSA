@@ -87,7 +87,7 @@ class Application(tk.Tk):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
-        project_controller_callbacks = {'save_project': self.on_save_project}
+        project_controller_callbacks = {'save_project': self.on_save_project, 'refresh_offsets': self.refresh_offsets}
         self.project_edit_controller = ProjectEditorController(self, self.project_edit_view, self.project,
                                                                callbacks=project_controller_callbacks,
                                                                theme=theme)
@@ -96,6 +96,7 @@ class Application(tk.Tk):
                                  project_facade=self.project, inst_lib_facade=self.base_insts, theme=theme)
 
         self.project_edit_controller.add_callback('toggle_frame_state', self.gui.toggle_frame_state)
+        self.project_edit_view.add_callback('show_project_errors', self.gui.show_project_errors)
 
         # Create Models
         self.proj_model = ProjectModel()
@@ -114,7 +115,7 @@ class Application(tk.Tk):
             'prj->export_script': self.gui.show_sct_export_popup,
             'prj->variable': self.gui.show_variables_popup,
             'prj->string': self.gui.show_strings_popup,
-            'prj->refresh_pos': self.refresh_poses,
+            'prj->refresh_pos': self.refresh_offsets,
             'prj->repair->textbox': self.textbox_fadeout_repair,
             # 'analysis->export': self.gui.show_analysis_view,
             'view->inst': self.gui.show_instruction_view,
@@ -368,8 +369,9 @@ class Application(tk.Tk):
     # Threaded Refresh Pos #
     # -------------------- #
 
-    def refresh_poses(self):
-        scts = self.project_edit_controller.script_refresh_offset_queue
+    def refresh_offsets(self):
+        scts = copy.deepcopy(self.project_edit_controller.script_refresh_offset_queue)
+        self.project_edit_controller.script_refresh_offset_queue = []
         done_queue = queue.SimpleQueue()
         self.gui.show_status_popup('Refresh Absolute Positions', 'Refreshing positions:')
         thread = threading.Thread(target=self._threaded_refresh_poses, args=(scts, self.gui.status_queue, done_queue))
@@ -377,9 +379,6 @@ class Application(tk.Tk):
         self.after(20, self._refresh_pos_listener, done_queue)
 
     def _threaded_refresh_poses(self, scripts, message_queue, done_queue):
-        for name in scripts:
-            if name in self.project_edit_controller.script_refresh_offset_queue:
-                self.project_edit_controller.script_refresh_offset_queue.remove(name)
         errored_scts = self.project.refresh_abs_poses(scripts, message_queue)
         self.project_edit_controller.encoding_errors = errored_scts
         self.project_edit_controller.script_refresh_offset_queue = [*errored_scts]
