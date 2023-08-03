@@ -272,11 +272,11 @@ class StringPopup(tk.Toplevel):
                 self._clear_editor_fields()
                 self._change_editor_state('disabled')
                 self.cur_string_id = ''
-            self.strings.yview_moveto(cur_tree_height)
         else:
             self._clear_editor_fields()
             self._change_editor_state('disabled')
         self.strings.open_tree_elements(open_elements)
+        self.strings.yview_moveto(cur_tree_height)
 
     def _populate_string_tree(self):
         self.strings.clear_all_entries()
@@ -388,7 +388,7 @@ class StringPopup(tk.Toplevel):
 
     @staticmethod
     def on_text_focus_in(e):
-        e.widget.cur_value = e.widget.get(1.0, tk.END)
+        e.widget.cur_value = e.widget.get(1.0, tk.END).rstrip(' \n\t')
 
     def on_text_focus_out(self, key, e):
         new_value: str = e.widget.get(1.0, tk.END).rstrip(' \n\t')
