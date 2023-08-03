@@ -388,7 +388,7 @@ class StringPopup(tk.Toplevel):
 
     @staticmethod
     def on_text_focus_in(e):
-        e.widget.cur_value = e.widget.get(1.0, tk.END)
+        e.widget.cur_value = e.widget.get(1.0, tk.END).rstrip(' \n\t')
 
     def on_text_focus_out(self, key, e):
         new_value: str = e.widget.get(1.0, tk.END).rstrip(' \n\t')
