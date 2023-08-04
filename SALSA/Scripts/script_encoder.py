@@ -138,9 +138,9 @@ class SCTEncoder:
                 self._add_strings(name)
 
         # Resolve through jmp_links
-        for link_offset, jmp_to in self.sct_links.items():
+        for link_offset, (jmp_to, trace) in self.sct_links.items():
             if jmp_to[1] not in self.inst_positions:
-                self.script.errors.append(f'Encode: No target inst {jmp_to[0]}-{jmp_to[1]}')
+                self.script.errors.append(('Encode', 'Link', f'No target inst {jmp_to[0]}-{jmp_to[1]}', "-".join(trace)))
                 print(f'No target inst{jmp_to[1]}')
                 continue
             jmp_to_pos = self.inst_positions[jmp_to[1]]
@@ -148,9 +148,9 @@ class SCTEncoder:
             self._sct_body_insert_hex(location=link_offset, value=jmp_offset, validation=self._placeholder)
 
         # Resolve string links
-        for link_offset, section in self.string_links.items():
+        for link_offset, (section, trace) in self.string_links.items():
             if section not in self.header_dict:
-                self.script.errors.append(f'Encode: No string {section}')
+                self.script.errors.append(('Encode', 'String', f'No string {section}', "-".join(trace)))
                 print(f'No string {section}')
                 continue
             str_pos = self.header_dict[section]
@@ -161,7 +161,7 @@ class SCTEncoder:
         # Add footer entries in order by links while resolving links
         has_footer_dialogue = footer_str_group_name in self.script.string_groups
         added_footer_entries = {}
-        for offset, string in self.footer_links.items():
+        for offset, (string, trace) in self.footer_links.items():
 
             if has_footer_dialogue:
                 if string in self.script.string_groups[footer_str_group_name]:
@@ -333,11 +333,11 @@ class SCTEncoder:
         if param.link is not None:
             link_type = param.link.type
             if link_type == 'Footer':
-                self.footer_links[len(self.sct_body)] = param.linked_string
+                self.footer_links[len(self.sct_body)] = (param.linked_string, e_trace)
             elif link_type == 'String':
-                self.string_links[len(self.sct_body)] = param.linked_string
+                self.string_links[len(self.sct_body)] = (param.linked_string, e_trace)
             elif link_type in ('Jump', 'Switch'):
-                self.sct_links[len(self.sct_body)] = param.link.target_trace
+                self.sct_links[len(self.sct_body)] = (param.link.target_trace, e_trace)
             else:
                 print(f'{self.log_key}: Unknown param link type: {link_type}')
             self.sct_body.extend(self._placeholder)
