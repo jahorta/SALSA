@@ -103,12 +103,12 @@ class SCTEncoder:
         self.errors = []
 
     @classmethod
-    def encode_sct_file_from_project_script(cls, project_script: SCTScript, base_insts: BaseInstLibFacade,
+    def encode_sct_file_from_project_script(cls, project_script: SCTScript, base_insts: BaseInstLibFacade, endian,
                                             use_garbage=True, combine_footer_links=False, add_spurious_refresh=True,
                                             update_inst_pos=True, validation=False, eu_validation=False):
         print(f'{cls.log_key}: encoding {project_script.name}')
         encoder = cls(script=project_script, base_insts=base_insts, update_inst_pos=update_inst_pos,
-                      validation=validation, eu_validation=eu_validation)
+                      validation=validation, eu_validation=eu_validation, endian=endian)
         encoder.encode_sct_file(use_garbage=use_garbage, combine_footer_links=combine_footer_links,
                                 add_spurious_refresh=add_spurious_refresh)
         print(f'{cls.log_key}: finished encoding for {project_script.name}')
