@@ -351,7 +351,7 @@ class SCTEncoder:
                 value = param.override
             else:
                 if param.value is None and 'skip' not in base_param.type:
-                    self.script.errors.append(f'Encode: Parameter value is None: {"-".join(trace)}')
+                    self.script.errors.append(('Encode', 'Parameter', 'Value is None', "-".join(e_trace)))
                     return
                 no_loop = False
                 if isinstance(param.value, str):
@@ -369,7 +369,7 @@ class SCTEncoder:
                     value.extend(self._make_word(self.param_code.stop_code))
         else:
             if param.value is None:
-                self.script.errors.append(f'Encode: Parameter value is None: {"-".join(trace)}')
+                self.script.errors.append(('Encode', 'Parameter', 'Value is None', "-".join(e_trace)))
                 return
             if 'var' in base_param.type:
                 value = self._encode_scpt_param(param.value)
