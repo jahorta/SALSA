@@ -212,16 +212,17 @@ class SCTEncoder:
             if inst.base_id == 9:
                 sect_name = inst.label
                 self.header_dict[sect_name] = len(self.sct_body)
-            self._encode_instruction(inst, trace=[sect_name])
+            self._encode_instruction(inst, a_trace=[sect_name], e_trace=[name])
 
         # add garbage at end of section if needed
         if self.use_garbage:
             if 'end' in section.garbage.keys():
                 self.sct_body.extend(section.garbage['end'])
 
-    def _encode_instruction(self, instruction, trace):
+    def _encode_instruction(self, instruction, a_trace, e_trace):
         base_inst = self.bi.get_inst(instruction.base_id)
-        trace.append(str(instruction.ID))
+        a_trace.append(str(instruction.base_id))
+        e_trace.append(str(instruction.ID))
         self.inst_positions[instruction.ID] = len(self.sct_body)
         if self.update_inst_pos:
             instruction.absolute_offset = len(self.sct_body)
@@ -236,7 +237,8 @@ class SCTEncoder:
         if instruction.delay_param is not None or instruction.delay_param == 0:
             self.sct_body.extend(self._make_word(129))
             base_param = self.bi.get_inst(129).params[0]
-            self._encode_param(param=instruction.delay_param, base_param=base_param, trace=[*trace, str(-1)])
+            self._encode_param(param=instruction.delay_param, base_param=base_param,
+                               a_trace=[*a_trace, str(-1)], e_trace=[*e_trace, 'Delay'])
             delay_pos = len(self.sct_body)
             self.sct_body.extend(b'0000')
             inst_pos = len(self.sct_body)
@@ -253,7 +255,7 @@ class SCTEncoder:
                     loop_iter_param_location = len(self.sct_body)
                     loop_iter_param_value = instruction.params[p_id].value
             self._encode_param(param=instruction.params[p_id], base_param=base_inst.params[p_id],
-                               trace=[*trace, str(p_id)])
+                               a_trace=[*a_trace, str(p_id)], e_trace=[*e_trace, str(p_id)])
 
         do_loop = True
         has_loop_cond = False
@@ -277,7 +279,7 @@ class SCTEncoder:
             for i, loop in enumerate(instruction.l_params):
                 for p_id, param in loop.items():
                     self._encode_param(param=loop[p_id], base_param=base_inst.params[p_id],
-                                       trace=[*trace, f'{i}|{p_id}'])
+                                       a_trace=[*a_trace, f'{i}|{p_id}'], e_trace=[*e_trace, f'{i}|{p_id}'])
 
                     # Check internal loop conditions
                     if not has_loop_cond:
@@ -311,7 +313,7 @@ class SCTEncoder:
 
         for p_id in base_inst.params_after:
             self._encode_param(param=instruction.params[p_id], base_param=base_inst.params[p_id],
-                               trace=[*trace, str(p_id)])
+                               a_trace=[*a_trace, str(p_id)], e_trace=[*e_trace, str(p_id)])
 
         # add garbage at then of instruction if needed
         garbage_index = None
@@ -328,7 +330,7 @@ class SCTEncoder:
             inst_len = len(self.sct_body) - inst_pos
             self._sct_body_insert_hex(delay_pos, bytearray(self._make_word(inst_len)))
 
-    def _encode_param(self, param, base_param, trace):
+    def _encode_param(self, param, base_param, a_trace, e_trace):
         # if needed, setup link and use 0x7fffffff as placeholder
         if param.link is not None:
             link_type = param.link.type
@@ -359,11 +361,11 @@ class SCTEncoder:
                 if no_loop:
                     value = self._make_word(self.param_code.no_loop[param.value])
                     if self.validation:
-                        self._check_additions(trace, value)
+                        self._check_additions(a_trace, value)
                 else:
                     value = self._encode_scpt_param(param=param.value)
                     if self.validation:
-                        self._check_additions(trace, value)
+                        self._check_additions(a_trace, value)
                     value.extend(self._make_word(self.param_code.stop_code))
         else:
             if param.value is None:
@@ -374,7 +376,7 @@ class SCTEncoder:
             else:
                 value = self._make_word(param.value, signed=base_param.is_signed)
             if self.validation:
-                self._check_additions(trace, value)
+                self._check_additions(a_trace, value)
 
         # add parameter
         self.sct_body.extend(value)
@@ -426,9 +428,7 @@ class SCTEncoder:
         return param_bytes
 
     def _check_additions(self, trace, ba: bytearray):
-        new_trace = copy.deepcopy(trace)
-        new_trace[1] = self.script.sects[new_trace[0]].insts[new_trace[1]].base_id
-        key = '-'.join(new_trace)
+        key = '-'.join(trace)
         if key in self._additions:
             addition = self._additions[key]
             if isinstance(addition, dict):
