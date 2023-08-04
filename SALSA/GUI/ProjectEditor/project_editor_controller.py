@@ -309,22 +309,36 @@ class ProjectEditorController:
         link_parts = e.widget['text'].split(link_sep)
         sect = link_parts[0]
         inst = self.project.get_inst_uuid_by_ind(script=self.current['script'], section=sect, inst_ind=link_parts[1])
-        if sect != self.current['section']:
+        self.resolve_link(sect=sect, inst=inst)
+
+    def resolve_link(self, script=None, sect=None, inst=None):
+        if script is None:
+            script = self.current['script']
+        if sect is None:
+            sect = self.current['section']
+        if inst is None:
+            inst = self.current['inst']
+
+        if script != self.current['script']:
+            sel_iid = self.trees['script'].get_iid_from_rowdata(script)
+            self.trees['script'].see(sel_iid)
+            self.trees['script'].focus(sel_iid)
+            self.trees['script'].selection_set([sel_iid])
+            self.on_select_tree_entry('script', script)
+            self.view.after(10, self.resolve_link, None, sect, inst)
+        elif sect != self.current['section']:
             sel_iid = self.trees['section'].get_iid_from_rowdata(sect)
             self.trees['section'].see(sel_iid)
             self.trees['section'].focus(sel_iid)
             self.trees['section'].selection_set([sel_iid])
             self.on_select_tree_entry('section', sect)
-            self.view.after(10, self.goto_link_inst, inst)
+            self.view.after(10, self.resolve_link, None, None, inst)
         else:
-            self.goto_link_inst(inst)
-
-    def goto_link_inst(self, inst):
-        sel_iid = self.trees['instruction'].get_iid_from_rowdata(inst)
-        self.trees['instruction'].see(sel_iid)
-        self.trees['instruction'].focus(sel_iid)
-        self.trees['instruction'].selection_set([sel_iid])
-        self.on_select_tree_entry('instruction', inst)
+            sel_iid = self.trees['instruction'].get_iid_from_rowdata(inst)
+            self.trees['instruction'].see(sel_iid)
+            self.trees['instruction'].focus(sel_iid)
+            self.trees['instruction'].selection_set([sel_iid])
+            self.on_select_tree_entry('instruction', inst)
 
     def clear_inst_details(self):
         self.view.inst_label.config(text='ID - Name')
