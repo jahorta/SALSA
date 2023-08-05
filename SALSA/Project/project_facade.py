@@ -1533,10 +1533,12 @@ class SCTProjectFacade:
         for parent in parents:
             cur_group = cur_group[parent]
 
-        new_tgt_inst_uuid = self.get_next_grouped_uuid(script, section, inst) if custom_tgt is None else custom_tgt
+        new_tgt_inst_uuid = custom_tgt
 
         if 'in' in direction:
             for link in cur_inst.links_in:
+                if new_tgt_inst_uuid is None:
+                    new_tgt_inst_uuid = self.get_next_grouped_uuid(script, section, inst)
                 ori_sect = link.origin_trace[0]
                 ori_inst_uuid = link.origin_trace[1]
                 ori_inst = self.project.scts[script].sects[ori_sect].insts[ori_inst_uuid]
