@@ -373,8 +373,8 @@ class StringPopup(tk.Toplevel):
     def insert_sp_char(self, char):
         if self.cur_script == '' or self.cur_string_id == '':
             return
-        self.body_entry.insert(tk.INSERT, char)
         self.body_entry.focus_set()
+        self.after(10, self.body_entry.insert, tk.INSERT, char)
 
     @staticmethod
     def on_entry_focus_in(e):
