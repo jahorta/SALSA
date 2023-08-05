@@ -409,7 +409,7 @@ class ProjectEditorView(ttk.Frame):
 
         InstGroupHandlerDialog(self, title='Group Handling', radio_vars=radio_vars, entry_vars=entry_vars,
                                head_labels=labels, row_labels=row_labels, inst_id=cur_inst_id, new_inst_id=new_id,
-                               is_darkmode=self.is_darkmode, end_callback=end_callback,
+                               theme=self.theme, end_callback=end_callback,
                                end_kwargs=end_kwargs)
 
     def show_label_edit_widget(self, e):

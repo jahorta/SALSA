@@ -8,10 +8,9 @@ from SALSA.GUI.themes import dark_theme, light_theme
 class InstGroupHandlerDialog(tk.Toplevel):
 
     def __init__(self, master, title, radio_vars, entry_vars, head_labels, row_labels, inst_id, new_inst_id,
-                 is_darkmode, end_callback, end_kwargs, *args, **kwargs):
+                 theme, end_callback, end_kwargs, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.title(title)
-        theme = dark_theme if is_darkmode else light_theme
         self.configure(**theme['Ttoplevel']['configure'])
         self.end_callback = end_callback
         self.end_kwargs = end_kwargs
