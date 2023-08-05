@@ -1495,7 +1495,7 @@ class SCTProjectFacade:
 
         if index + 1 < len(cur_group):
             # if cur_inst is an if/else/while
-            if cur_inst.base_id == 0:
+            if cur_inst.base_id == 0 and len(cur_inst.my_goto_uuids) > 0:
                 my_goto = cur_sect.insts[cur_inst.my_goto_uuids[0]]
                 if len(my_goto.links_out) == 0:
                     new_tgt_inst_uuid = self.get_inst_uuid_from_group_entry(cur_group[index + 1])
@@ -1554,6 +1554,17 @@ class SCTProjectFacade:
                 self.project.scts[script].sects[tgt_sect].insts[tgt_inst_uuid].links_in.remove(link)
 
             cur_inst.links_out = []
+
+        if len(cur_inst.my_master_uuids) > 0:
+            for master_uuid in cur_inst.my_master_uuids:
+                master_inst = cur_sect.insts[master_uuid]
+                master_inst.my_goto_uuids.remove(cur_inst.ID)
+
+        if len(cur_inst.my_goto_uuids) > 0:
+            for goto_uuid in cur_inst.my_master_uuids:
+                master_inst = cur_sect.insts[goto_uuid]
+                master_inst.my_master_uuids.remove(cur_inst.ID)
+
 
     @staticmethod
     def change_link_tgt(tgt_sect: SCTSection, link: SCTLink, new_tgt_uuid: str, remove_from_old_tgt=True):
