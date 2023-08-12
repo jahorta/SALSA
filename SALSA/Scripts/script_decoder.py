@@ -323,21 +323,19 @@ class SCTDecoder:
 
                 if instResult.base_id == 0x3:
                     # Check for garbage before first entry
-                    switch_start = (self._cursor + len(instResult.params))
-                    min_case_start = None
-                    switch_end = switch_start + (len(instResult.l_params) * 2)
+                    min_case_start_offset = None
+                    switch_len = (len(instResult.l_params) * 2) + len(instResult.params)
                     for i, paramset in enumerate(instResult.l_params):
-                        case_start = switch_start + (i * 2 + 1) + int(paramset[3].value / 4)
-                        min_case_start = case_start if min_case_start is None else min(min_case_start, case_start)
+                        case_start_offset = len(instResult.params) + (i * 2 + 1) + int(paramset[3].value // 4)
+                        min_case_start_offset = case_start_offset if min_case_start_offset is None else min(
+                            min_case_start_offset, case_start_offset)
 
-                    if switch_end > min_case_start:
-                        garbage_num = min_case_start - switch_end
-                        garbage = bytearray(b'')
-                        for i in range(garbage_num):
-                            garbage += self.getWord(self._cursor * 4)
-                            self._cursor += 1
+                    if switch_len > min_case_start_offset:
+                        print(f'switch with garbage here {section.name}')
+                        garbage_size = min_case_start_offset - switch_len
+                        garbage = self._sct[self._cursor * 4: (self._cursor + garbage_size) * 4]
                         instResult.add_error(('Garbage', garbage))
-                    elif switch_end < min_case_start:
+                    elif switch_len < min_case_start_offset:
                         raise IndexError(f'{self.log_key}: Switch incomplete, switch end < min case start')
 
                 if instResult.base_id == 0xc:
