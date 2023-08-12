@@ -1108,10 +1108,10 @@ class SCTDecoder:
                     bounds = (link.target, inst_end)
                     suffix_insts = target_sct.inst_list[target_inst_id + 1:]
                     target_sct.inst_list = target_sct.inst_list[:target_inst_id + 1]
-                    insts_before = len(target_sct.inst_list)
-                    changes = self._get_links_to_change(target_sct, insts_before)
+                    num_insts_before = len(target_sct.inst_list)
+                    changes = self._get_links_to_change(target_sct, num_insts_before)
                     target_sct = self._create_insts_from_region(bounds, target_sct, target_inst_id + 1)
-                    insts_added = len(target_sct.inst_list) - insts_before
+                    insts_added = len(target_sct.inst_list) - num_insts_before
                     self._set_changes(changes, insts_added)
                     target_sct.inst_list += suffix_insts
                     print(
