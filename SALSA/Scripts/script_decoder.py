@@ -1869,7 +1869,10 @@ class SCTDecoder:
 
         footer_dialog_strings = []
         for trace in self._footer_dialog_locs:
-            inst = decoded_sct.sects[trace[0]].insts[trace[1]]
+            sect = trace[0]
+            if trace[0] not in decoded_sct.sects:
+                sect = self._find_section(trace[0], decoded_sct)
+            inst = decoded_sct.sects[sect].insts[trace[1]]
             string = inst.params[int(inst.links_out[0].origin_trace[2])].linked_string
             if '\\e' in string or '\\c' in string:
                 footer_dialog_strings.append((trace, string))
@@ -1883,6 +1886,17 @@ class SCTDecoder:
             decoded_sct.strings[foot_id] = item[1]
             decoded_sct.string_groups[footer_str_group_name].append(foot_id)
             decoded_sct.string_locations[foot_id] = footer_str_group_name
-            inst = decoded_sct.sects[item[0][0]].insts[item[0][1]]
+            sect = item[0][0]
+            if sect not in decoded_sct.sects:
+                sect = self._find_section(sect, decoded_sct)
+            inst = decoded_sct.sects[sect].insts[item[0][1]]
             param = inst.params[int(inst.links_out[0].origin_trace[2])]
             param.linked_string = foot_id
+
+    @staticmethod
+    def _find_section(tgt_name, decoded_sct) -> str:
+        for name, sect in decoded_sct.sects.items():
+            if len(sect.internal_sections_inst.keys()) > 0:
+                for int_sect in sect.internal_sections_inst.keys():
+                    if int_sect == tgt_name:
+                        return name
