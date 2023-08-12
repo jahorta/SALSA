@@ -1419,7 +1419,7 @@ class SCTDecoder:
                     goto_tgt_ind = self._get_inst_by_pos(section_insts, last_start, goto_jmp, sect_name, switch_inst.ID)
                     group_key = f'{s_id}{sep}{last_case}'
                     self._instruction_groups[sect_name][group_key] = (
-                        f'{prev_start_sect}{sep}{last_start}', f'{end_sect}{sep}{goto_tgt_ind-1}')
+                        f'{prev_start_sect}{sep}{last_start}', f'{end_sect}{sep}{goto_tgt_ind - 1}')
                     goto_inst = section_insts[goto_tgt_ind - 1]
                     switch_inst.my_goto_uuids.append(goto_inst.ID)
                     goto_inst.my_master_uuids.append(switch_inst.ID)
