@@ -94,6 +94,7 @@ class SCTEncoder:
         # for decoder, encoder validation only
         self.validation = validation
         self._EU_validation = eu_validation
+        self._additions = {}
         if self.validation and endian == 'big':
             if '099' in script.name:
                 self.sct_body = bytearray(b'\x4F\x00\x00\x00\x00\x00\x00\x04\x00\x00\x66\x43\x1D\x00\x00\x00\x00\x00\x00'
