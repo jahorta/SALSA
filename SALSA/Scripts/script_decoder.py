@@ -352,11 +352,11 @@ class SCTDecoder:
                                     self._cur_endian = 'big'
                                     if next_i_id in self._inst_lib.lib.p1_scpt:
                                         if (param1_code in self._p_codes.primary_keys
-                                                or param1_code in self._p_codes.no_loop):
+                                                or param1_code in self._p_codes.no_loop) and param1_code != 29:
                                             break
                                         if ((param1_code_little in self._p_codes.primary_keys
                                              or param1_code_little in self._p_codes.no_loop)
-                                                and next_i_id != 0):
+                                                and next_i_id != 0 and param1_code_little != 29):
                                             break
                                         param_prefix = param1_code & 0xff000000
                                         param_little_prefix = param1_code_little & 0xff000000
