@@ -3,7 +3,6 @@ import math
 import queue
 import re
 import struct
-import difflib
 from typing import Dict, Tuple, List, Callable, Literal, Union
 
 from SALSA.Common.script_string_utils import fix_string_decoding_errors
@@ -16,7 +15,6 @@ from SALSA.Scripts.default_variables import default_aliases
 from SALSA.Common.byte_array_utils import word2SignedInt, is_a_number, pad_hex, applyHexMask
 from SALSA.Common.constants import sep
 from SALSA.Scripts import scpt_arithmetic_fxns as scpt_arithmetic, scpt_compare_fxns as scpt_compare
-
 
 ind_entry_len = 0x14
 ind_name_offset = 0x4
