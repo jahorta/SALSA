@@ -73,6 +73,8 @@ class SCTDecoder:
         self._instruction_groups = {}
         self._footer_dialog_locs = []
         self._EU_encoding = False
+        self._base_endian: Literal['big', 'little']
+        self._other_endian: Literal['big', 'little']
 
     @classmethod
     def decode_sct_from_file(cls, name, sct, inst_lib: BaseInstLibFacade, status: queue.SimpleQueue = None,
@@ -102,6 +104,16 @@ class SCTDecoder:
         self._sct = sct
         self._inst_lib = inst_lib
         self._p_codes = SCPTParamCodes(is_decoder=True)
+
+        if (int.from_bytes(self._sct[8:12], byteorder='big') <=
+                int.from_bytes(self._sct[8:12], byteorder='little')):
+            self._base_endian: Literal['big', 'little'] = 'big'
+            self._other_endian: Literal['big', 'little'] = 'little'
+            self._cur_endian = self._base_endian
+        else:
+            self._base_endian: Literal['big', 'little'] = 'little'
+            self._other_endian: Literal['big', 'little'] = 'big'
+            self._cur_endian = self._base_endian
 
         header = self._sct[:8]
         ind_entries: int = int.from_bytes(self._sct[8:12], byteorder=self._cur_endian)
@@ -234,13 +246,13 @@ class SCTDecoder:
         sect_name = section.name
 
         while (self._cursor * 4) < bounds[1]:
-            self._cur_endian = 'big'
+            self._cur_endian = self._base_endian
             currWord = self.getWord(self._cursor * 4)
             currWord_int = int.from_bytes(currWord, byteorder=self._cur_endian)
 
             is_inst = 0 <= currWord_int <= 265
             if not is_inst:
-                self._cur_endian = 'little'
+                self._cur_endian = self._other_endian
                 currWord_int = int.from_bytes(currWord, byteorder=self._cur_endian)
                 is_inst = 0 <= currWord_int <= 265
 
@@ -346,10 +358,11 @@ class SCTDecoder:
                             while self._cursor * 4 < bounds[1]:
                                 next_i_id = self.getInt(self._cursor * 4)
                                 if (0 <= next_i_id <= 265) and next_i_id not in [2, 4]:
+                                    self._cur_endian = self._base_endian
                                     param1_code = self.getInt(self._cursor * 4 + 4)
-                                    self._cur_endian = 'little'
+                                    self._cur_endian = self._other_endian
                                     param1_code_little = self.getInt(self._cursor * 4 + 4)
-                                    self._cur_endian = 'big'
+                                    self._cur_endian = self._base_endian
                                     if next_i_id in self._inst_lib.lib.p1_scpt:
                                         if (param1_code in self._p_codes.primary_keys
                                                 or param1_code in self._p_codes.no_loop) and param1_code != 29:
