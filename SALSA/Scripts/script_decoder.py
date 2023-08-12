@@ -75,11 +75,13 @@ class SCTDecoder:
         self._EU_encoding = False
 
     @classmethod
-    def decode_sct_from_file(cls, name, sct, inst_lib: BaseInstLibFacade, status: queue.SimpleQueue=None, strings_only=False, is_validation=False):
+    def decode_sct_from_file(cls, name, sct, inst_lib: BaseInstLibFacade, status: queue.SimpleQueue = None,
+                             strings_only=False, is_validation=False):
         sct_decoder = cls()
         if status is not None:
             status.put({'sub_msg': 'Decoding...'})
-        decoded_sct = sct_decoder._decode_sct(name, sct, inst_lib, strings_only=strings_only, is_validation=is_validation)
+        decoded_sct = sct_decoder._decode_sct(name, sct, inst_lib, strings_only=strings_only,
+                                              is_validation=is_validation)
         if strings_only:
             return decoded_sct
         decoded_sct = sct_decoder._organize_sct(decoded_sct)
@@ -353,7 +355,7 @@ class SCTDecoder:
                                                 or param1_code in self._p_codes.no_loop) and param1_code != 29:
                                             break
                                         if ((param1_code_little in self._p_codes.primary_keys
-                                             or param1_code_little in self._p_codes.no_loop)
+                                                or param1_code_little in self._p_codes.no_loop)
                                                 and next_i_id != 0 and param1_code_little != 29):
                                             break
                                         param_prefix = param1_code & 0xff000000
@@ -633,7 +635,7 @@ class SCTDecoder:
     def _SCPT_analyze(self, param: SCTParameter):
 
         scpt_result = {}
-        param_key = '{}_S'.format(param.ID)
+        param_key = f'{param.ID}_S'
         done = False
         roundNum = 0
         currentWord = self.getWord(self._cursor * 4)
@@ -838,7 +840,8 @@ class SCTDecoder:
                 self._EU_encoding = True
 
         alt_encoding = 'cp1252'
-        if self._EU_encoding and not str_bytes[:2] == bytearray(b'\x81\x83') and not str_bytes[3:5] == bytearray(b'\x81\x73'):
+        if (self._EU_encoding and not str_bytes[:2] == bytearray(b'\x81\x83')
+                and not str_bytes[3:5] == bytearray(b'\x81\x73')):
             encoding, alt_encoding = alt_encoding, encoding
 
         string = str_bytes.decode(encoding=encoding, errors='backslashreplace')
@@ -953,7 +956,8 @@ class SCTDecoder:
             for sect_name in group[1:]:
                 sect_to_add: SCTSection = decoded_sct.sects[sect_name]
                 new_section.internal_sections_inst[sect_name] = len(new_section.insts)
-                new_section.internal_sections_curs[sect_name] = sect_to_add.absolute_offset - new_section.absolute_offset
+                new_section.internal_sections_curs[
+                    sect_name] = sect_to_add.absolute_offset - new_section.absolute_offset
                 new_section.insts = {**new_section.insts, **sect_to_add.insts}
                 new_section.inst_list.extend(sect_to_add.inst_list)
                 for key, value in sect_to_add.insts_used.items():
@@ -1055,10 +1059,12 @@ class SCTDecoder:
                 inst = target_sct.get_instruction_by_index(target_inst_id)
                 if inst.absolute_offset == link.target:
                     break
+
                 if target_inst_id == len(target_sct.insts) - 1:
                     inst_end = target_sct.absolute_offset + target_sct.length
                 else:
                     inst_end = target_sct.get_instruction_by_index(target_inst_id + 1).absolute_offset
+
                 if inst.absolute_offset < link.target < inst_end:
                     internal = True
                     new_error = None
@@ -1419,7 +1425,8 @@ class SCTDecoder:
                         cur_id = cur_inst.links_out[0].target_trace[1] - 1
                     elif cur_inst.base_id == 3:
                         new_last_case_target = cur_inst.l_params[-1][3].link.target
-                        new_last_case_start = self._get_inst_by_pos(section_insts, cur_id, new_last_case_target, sect_name, switch_inst.ID)
+                        new_last_case_start = self._get_inst_by_pos(section_insts, cur_id, new_last_case_target,
+                                                                    sect_name, switch_inst.ID)
                         cur_id = new_last_case_start
                         gotos_ignored += 1
                     elif cur_inst.base_id == 10:
@@ -1562,7 +1569,7 @@ class SCTDecoder:
             if isinstance(entry, str) and entry in new_groups.keys():
                 new_groups = self._replace_group_name_with_group(new_groups, entry)
                 new_groups[cur_group_key].insert(i, {entry: new_groups[entry]})
-                new_groups[cur_group_key].pop(i+1)
+                new_groups[cur_group_key].pop(i + 1)
                 new_groups.pop(entry)
 
         return new_groups
