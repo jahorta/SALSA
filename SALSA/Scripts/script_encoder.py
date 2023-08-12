@@ -97,19 +97,21 @@ class SCTEncoder:
         self._additions = {}
         if self.validation and endian == 'big':
             if '099' in script.name:
-                self.sct_body = bytearray(b'\x4F\x00\x00\x00\x00\x00\x00\x04\x00\x00\x66\x43\x1D\x00\x00\x00\x00\x00\x00'
-                                          b'\x04\x00\x00\x34\x43\x1D\x00\x00\x00\x00\x00\x00\x04\x00\x00\x16\x43\x1D\x00'
-                                          b'\x00\x00\x00\x00\x00\x04\x00\x00\x80\x3F\x1D\x00\x00\x00\x00\x00\x00\x04\x00'
-                                          b'\x00\x00\x00\x1D\x00\x00\x00\x00\x00\x00\x04\x00\xC0\x0F\xC5\x1D\x00\x00\x00'
-                                          b'\x00\x00\x00\x04\x00\x00\x80\x3F\x1D\x00\x00\x00')
+                self.sct_body = bytearray(
+                    b'\x4F\x00\x00\x00\x00\x00\x00\x04\x00\x00\x66\x43\x1D\x00\x00\x00\x00\x00\x00'
+                    b'\x04\x00\x00\x34\x43\x1D\x00\x00\x00\x00\x00\x00\x04\x00\x00\x16\x43\x1D\x00'
+                    b'\x00\x00\x00\x00\x00\x04\x00\x00\x80\x3F\x1D\x00\x00\x00\x00\x00\x00\x04\x00'
+                    b'\x00\x00\x00\x1D\x00\x00\x00\x00\x00\x00\x04\x00\xC0\x0F\xC5\x1D\x00\x00\x00'
+                    b'\x00\x00\x00\x04\x00\x00\x80\x3F\x1D\x00\x00\x00')
             if '241a' in script.name:
                 self.sct_body = bytearray(b'\x0b\x00\x00\x00\xc4\xe2\x00\x00') if not self._EU_validation \
                     else bytearray(b'\x0b\x00\x00\x00\x08\x63\x01\x00')
             if '513a' in script.name or '576a' in script.name:
-                self.sct_body = bytearray(b'\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00'
-                                          b'\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00'
-                                          b'\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D'
-                                          b'\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00')
+                self.sct_body = bytearray(
+                    b'\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00'
+                    b'\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00'
+                    b'\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D'
+                    b'\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00')
             additions = {
                 'M04523-177-1': b'\x50\x00\x00\x01',
                 'M04524-177-1': b'\x50\x00\x00\x01',
@@ -206,7 +208,8 @@ class SCTEncoder:
         # Resolve through jmp_links
         for link_offset, (jmp_to, trace) in self.sct_links.items():
             if jmp_to[1] not in self.inst_positions:
-                self.script.errors.append(('Encode', 'Link', f'No target inst {jmp_to[0]}-{jmp_to[1]}', "-".join(trace)))
+                self.script.errors.append(
+                    ('Encode', 'Link', f'No target inst {jmp_to[0]}-{jmp_to[1]}', "-".join(trace)))
                 print(f'No target inst{jmp_to[1]}')
                 continue
             jmp_to_pos = self.inst_positions[jmp_to[1]]
@@ -375,7 +378,8 @@ class SCTEncoder:
 
         if loop_iter_param_value is not None:
             if loop_iters_performed != loop_iter_param_value:
-                self._sct_body_insert_hex(location=loop_iter_param_location, value=self._make_word(loop_iters_performed))
+                self._sct_body_insert_hex(location=loop_iter_param_location,
+                                          value=self._make_word(loop_iters_performed))
 
         for p_id in base_inst.params_after:
             self._encode_param(param=instruction.params[p_id], base_param=base_inst.params[p_id],
@@ -501,7 +505,7 @@ class SCTEncoder:
                 will_add = False
                 if 0 in addition['ind']:
                     will_add = True
-                addition['ind'] = [_-1 for _ in addition['ind']]
+                addition['ind'] = [_ - 1 for _ in addition['ind']]
                 if not will_add:
                     return
                 addition = addition['value']
@@ -549,13 +553,14 @@ class SCTEncoder:
         if validation is None:
             valid = True
         else:
-            valid = validation.hex() == self.sct_body[location: location+len(validation)].hex()
+            valid = validation.hex() == self.sct_body[location: location + len(validation)].hex()
 
         if not valid:
-            print(f'{self.log_key}: Validation failed for hex replacement in sct_body: {self.sct_body[location: location+len(validation)-1].hex()} != {validation.hex()}')
+            print(
+                f'{self.log_key}: Validation failed for hex replacement in sct_body: {self.sct_body[location: location + len(validation) - 1].hex()} != {validation.hex()}')
             return
 
-        self.sct_body = self.sct_body[:location] + value + self.sct_body[location+len(value):]
+        self.sct_body = self.sct_body[:location] + value + self.sct_body[location + len(value):]
 
     @staticmethod
     def detect_encoding(script: SCTScript):
@@ -565,4 +570,3 @@ class SCTEncoder:
             if '＜' in string or '《' in string:
                 return False
         return False
-
