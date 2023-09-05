@@ -1165,10 +1165,10 @@ class SCTDecoder:
             param: SCTParameter = origin_inst.params[int(link.origin_trace[2])]
             param.linked_string = target_sct_str
             if '\\c' in decoded_sct.sects[target_sct_str].string and not self._is_validation:
-                if origin_inst.base_id == 144:
+                if origin_inst.base_id in (24, 144):
                     if origin_inst.params[1].value != 'decimal: 1+0/256':
                         origin_inst.params[1].set_value('decimal: 1+0/256')
-                if origin_inst.base_id == 155:
+                if origin_inst.base_id in (25, 155):
                     if origin_inst.params[2].value != 'decimal: 1+0/256':
                         origin_inst.params[2].set_value('decimal: 1+0/256')
 
