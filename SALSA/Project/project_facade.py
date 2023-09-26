@@ -104,8 +104,12 @@ class SCTProjectFacade:
                         tree_list.extend(self._create_tree(group=group, key_list=[ele_key], headers=headers, base=base,
                                                            base_key=base_key, key_only=True, key_only_key=kok))
                         tree_list[-1]['group_type'] = 'case'
-                        tree_list[-1][headers[0]] = group[self.get_inst_uuid_from_group_entry(ele_value)].ungrouped_position
-                        tree_list[-1]['absolute_offset'] = group[self.get_inst_uuid_from_group_entry(ele_value)].absolute_offset
+                        if len(ele_value) != 0:
+                            tree_list[-1][headers[0]] = group[self.get_inst_uuid_from_group_entry(ele_value)].ungrouped_position
+                            tree_list[-1]['absolute_offset'] = group[self.get_inst_uuid_from_group_entry(ele_value)].absolute_offset
+                        else:
+                            tree_list[-1][headers[0]] = ''
+                            tree_list[-1]['absolute_offset'] = ''
                     else:
                         ele_key = ele_key.split(sep)
                         tree_list.extend(
