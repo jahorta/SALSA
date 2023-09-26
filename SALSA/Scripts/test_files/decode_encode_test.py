@@ -1,8 +1,23 @@
 # This file tests decoding and encoding of sct files.
+from typing import Literal
 
 # Requires a script directory to run
-script_dir = './../../compressed_scripts'
+script_dir = './../../_DC_compressed_scripts'
 eu_validation = True if 'EU' in script_dir else False
+endian: Literal['big', 'little'] = 'big'
+if 'DC' in script_dir:
+    endian = 'little'
+
+diff_suffix = '_US'
+if 'EU' in script_dir:
+    diff_suffix = '_EU'
+if 'JP' in script_dir:
+    diff_suffix = '_JP'
+
+if 'DC' in script_dir:
+    diff_suffix += '_DC'
+else:
+    diff_suffix += '_GC'
 
 # Determines whether compressed or decompressed scripts are checked
 check_compressed = False
@@ -11,10 +26,10 @@ check_compressed = False
 # If first_file == None, starts at beginning
 # If last_file == None, goes till end
 
-first_file = None
-# first_file = 'ME355A.sct'
-last_file = None
-# last_file = 'ME355A.sct'
+# first_file = None
+first_file = 'ME017F.sct'
+# last_file = None
+last_file = 'ME017F.sct'
 
 # Determines whether files are exported if there is a difference
 file_out = True
@@ -37,11 +52,19 @@ hex_equivalencies = {
 }
 
 
-def compare_files(ba_1, ba_2):
+def compare_files(ba_1, ba_2, cur_endian='big'):
     d = {}
     if len(ba_1) != len(ba_2):
         d['length'] = f'Original is {len(ba_1)} bytes long, Encoded is {len(ba_2)} bytes long'
     else:
+        if cur_endian == 'big':
+            hex_eq = hex_equivalencies
+        else:
+            hex_eq = {}
+            for k, v in hex_equivalencies.items():
+                k = bytearray(reversed(bytearray.fromhex(k))).hex()
+                v = bytearray(reversed(bytearray.fromhex(v))).hex()
+                hex_eq[k] = v
         for word in range(0, len(ba_1) // 4 + 1):
             original_word = ba_1[word * 4: word * 4 + 4]
             encoded_word = ba_2[word * 4: word * 4 + 4]
@@ -55,8 +78,8 @@ def compare_files(ba_1, ba_2):
                 continue
 
             # check that a different parameter code hasn't been used
-            if original_word.hex() in hex_equivalencies:
-                if encoded_word.hex() == hex_equivalencies[original_word.hex()]:
+            if original_word.hex() in hex_eq:
+                if encoded_word.hex() == hex_eq[original_word.hex()]:
                     continue
 
             d[word * 4] = f'Original is {original_word.hex()}, Encoded has {encoded_word.hex()}'
@@ -98,9 +121,10 @@ if __name__ == '__main__':
 
     differences = {}
     skip_till = first_file if first_file is not None else 'me002a.sct'
+    last_file = last_file if last_file is not None else files[-1]
     skip = True
     for f in files:
-        if f == skip_till:
+        if f.lower() == skip_till.lower():
             skip = False
 
         if skip:
@@ -118,14 +142,14 @@ if __name__ == '__main__':
         encoded_ba = SCTEncoder.encode_sct_file_from_project_script(project_script=script, base_insts=baseinsts,
                                                                     use_garbage=True, combine_footer_links=False,
                                                                     add_spurious_refresh=True, validation=True,
-                                                                    eu_validation=eu_validation)
+                                                                    eu_validation=eu_validation, endian=endian)
         if check_compressed:
             aklz = Aklz()
             original_ba = aklz.compress(original_ba)
             aklz = Aklz()
             encoded_ba = aklz.compress(encoded_ba)
 
-        diffs = compare_files(original_ba, encoded_ba)
+        diffs = compare_files(original_ba, encoded_ba, cur_endian=endian)
         if len(diffs) != 0:
             differences[name] = diffs
 
@@ -135,9 +159,12 @@ if __name__ == '__main__':
             sct_model.save_sct_file(filepath=filepath_enc, sct_file=encoded_ba, compress=check_compressed)
             sct_model.save_sct_file(filepath=filepath_orig, sct_file=original_ba, compress=check_compressed)
             # break
+        else:
+            print(f'No Differences for {name}.sct')
 
-        if f == last_file:
+        if f.lower() == last_file.lower():
             break
 
-    out_path = f'./test_files/diffs_2.csv'
+    out_path = f'./test_files/diffs{diff_suffix}.csv'
     save_diffs(differences, out_path)
+    print(f'Differences saved to {out_path}')
