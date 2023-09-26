@@ -4,7 +4,7 @@ from typing import Union, Literal
 from SALSA.Common.script_string_utils import fix_string_encoding_errors
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.byte_array_utils import float2Hex
-from SALSA.Project.project_container import SCTScript, SCTSection, footer_str_group_name
+from SALSA.Project.project_container import SCTScript, footer_str_group_name
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 from SALSA.Scripts.scpt_compare_fxns import is_equal, not_equal
 
