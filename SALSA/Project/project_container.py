@@ -44,9 +44,16 @@ class SCTLink:
     def __eq__(self, other_link):
         if self.type != other_link.type:
             return False
-        for i, element in enumerate(self.target_trace):
-            if element != other_link.target_trace[i]:
+        if self.target_trace is None:
+            if other_link.target_trace is not None:
                 return False
+        elif other_link.target_trace is None:
+            if self.target_trace is not None:
+                return False
+        else:
+            for i, element in enumerate(self.target_trace):
+                if element != other_link.target_trace[i]:
+                    return False
         for i, element in enumerate(self.origin_trace):
             if element != other_link.origin_trace[i]:
                 return False
