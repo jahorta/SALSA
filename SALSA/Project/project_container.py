@@ -305,7 +305,7 @@ class SCTSection:
     def get_inst_list(self, style):
         return self.inst_tree if style == 'grouped' else self.inst_list
 
-    def get_instruction_by_index(self, pos):
+    def get_inst_by_index(self, pos):
         return self.insts[self.inst_list[pos]]
 
 
