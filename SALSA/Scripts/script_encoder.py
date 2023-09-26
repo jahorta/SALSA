@@ -364,17 +364,18 @@ class SCTEncoder:
                             value1 = param.arithmetic_value
 
                         if not isinstance(value1, int):
-                            value1 = int(value1)
+                            value1 = self.convert_param_to_int(value1)
 
                         value2 = base_inst.loop_cond['Value']
 
                         if not isinstance(value2, int):
-                            value2 = int(value2)
+                            value2 = self.convert_param_to_int(value2)
 
                         test = base_inst.loop_cond['Test']
                         if self.param_tests[test](value1, value2):
                             break_loops = True
                             break
+
                 loop_iters_performed += 1
                 if break_loops:
                     break
@@ -573,3 +574,16 @@ class SCTEncoder:
             if '＜' in string or '《' in string:
                 return False
         return False
+
+    def convert_param_to_int(self, value):
+        if isinstance(value, int):
+            return value
+        if isinstance(value, float):
+            return int(value)
+        if 'decimal' in value:
+            num_pts = value.split(': ')[1].split('+')
+            out_value = int(num_pts[0])
+            if int(num_pts[1].split('/')[0]) > 0:
+                num_pts += (int(num_pts[1].split('/')[0]) / 256)
+            return out_value
+
