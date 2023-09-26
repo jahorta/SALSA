@@ -37,10 +37,20 @@ class SCTDecoder:
     _p_codes: SCPTParamCodes
     _enc = 'shiftjis'
     _str_sect_links: List[SCTLink] = []
+    _decoded_str_sect_links = []
+
     _str_foot_links: List[SCTLink] = []
+    _decoded_str_foot_links = []
+
     _scpt_links: List[SCTLink] = []
-    _jmp_if_falses: Dict[str, List[int]]
-    _switches: Dict[str, List[int]]
+    _decoded_scpt_links = []
+
+    _jmp_if_falses: Dict[str, List[str]]
+    _decoded_jmp_if_falses: Dict[str, List[str]] = {}
+
+    _switches: Dict[str, List[str]]
+    _decoded_switches: Dict[str, List[str]] = {}
+
     _last_sect_pos: int
     _cur_endian: Literal['big', 'little'] = endian['gc']
     _strings_only: bool
@@ -142,14 +152,11 @@ class SCTDecoder:
         self._sctStart = 12 + index_len
         decoded_sct = SCTScript(name=script_name, index=self._index, header=header)
 
-        # print(self.indexed_sct['Sections'].items())
-        # print(self.indexed_sct['Footer'].items())
         self._cursor = 0
         self._sctLength = len(self._sct)
-        in_sect_group = False
-        sect_group_key = None
         for sect_name, bounds in self._index.items():
             print(f'{self.log_key}: Decoding {sect_name}...', end='\r')
+            change_bounds = False
             if bounds[1] == -1:
                 start = None
                 if len(self._str_foot_links) != 0:
@@ -164,40 +171,19 @@ class SCTDecoder:
                     if not self.test_for_string():
                         raise EOFError(f'{self.log_key}: Final Section was not a String...')
                 bounds = (bounds[0], footer_start + 4)
+                change_bounds = True
+
+            if change_bounds:
+                self._index[sect_name] = bounds
 
             new_section = self._decode_sct_section(sect_name, bounds)
 
             if new_section is None and self._strings_only:
                 continue
 
-            # Create or add to a logical section group if needed
-            if not in_sect_group:
-                if new_section.type == 'Script':
-                    if new_section.get_instruction_by_index(-1).base_id != 12:
-                        in_sect_group = True
-                        sect_group_key = f'logical{sep}{sect_name}'
-                        decoded_sct.section_groups[sect_group_key] = [sect_name]
-                        decoded_sct.section_group_keys[sect_name] = sect_group_key
-            else:
-                if new_section.type in ('Script', 'Label'):
-                    decoded_sct.section_groups[sect_group_key].append(sect_name)
-                    decoded_sct.section_group_keys[sect_name] = sect_group_key
-                    last_inst = new_section.get_instruction_by_index(-1)
-                    if last_inst.base_id == 12:
-                        in_sect_group = False
-                        sect_group_key = None
-                else:
-                    last_sect = decoded_sct.sects[decoded_sct.section_groups[sect_group_key][-1]]
-                    if last_sect.insts[last_sect.inst_list[-1]].base_id == 9:
-                        decoded_sct.section_groups[sect_group_key].pop(-1)
-                    in_sect_group = False
-                    sect_group_key = None
-
             decoded_sct.add_section(new_section)
 
         print(f'{self.log_key}: All sections decoded!!!')
-
-        self.section_group_keys = {}
 
         return decoded_sct
 
@@ -273,7 +259,7 @@ class SCTDecoder:
                     delay_inst.length = self._cursor * 4 - inst_pos
                     currWord_int = self.getInt(self._cursor * 4)
 
-                instResult = self._decode_instruction(currWord_int, inst_pos, [sect_name, inst_list_id])
+                instResult = self._decode_instruction(currWord_int, inst_pos, [sect_name])
 
                 if instResult.base_id == 9:
                     instResult.label = sect_name
@@ -287,6 +273,8 @@ class SCTDecoder:
                     if instResult.delay_param.arithmetic_value is not None:
                         if not isinstance(instResult.delay_param.arithmetic_value, int):
                             numeric = False
+                    elif isinstance(instResult.delay_param.value, dict):
+                        numeric = False
                     elif not isinstance(instResult.delay_param.value, int):
                         if not instResult.delay_param.value.isnumeric():
                             numeric = False
@@ -314,39 +302,54 @@ class SCTDecoder:
                 if instResult.base_id == 3:
                     if sect_name not in self._switches.keys():
                         self._switches[sect_name] = []
-                    self._switches[sect_name].append(inst_list_id)
+                    self._switches[sect_name].append(instResult.ID)
 
                 if instResult.base_id == 0:
                     if sect_name not in self._jmp_if_falses.keys():
                         self._jmp_if_falses[sect_name] = []
-                    self._jmp_if_falses[sect_name].append(inst_list_id)
+                    self._jmp_if_falses[sect_name].append(instResult.ID)
 
                 if instResult.base_id == 0x3:
+
+                    # Cleanup garbage entries
+                    garbage_entry_found = False
+                    remove_params_from = None
+                    for i, paramset in enumerate(instResult.l_params):
+                        if not garbage_entry_found and paramset[3].value == 0 and i + 1 != len(instResult.l_params):
+                            garbage_entry_found = True
+                            remove_params_from = i
+                        if garbage_entry_found:
+                            cur_link = paramset[3].link
+                            self._scpt_links.remove(cur_link)
+                            instResult.links_out.remove(cur_link)
+
+                    if garbage_entry_found:
+                        self._cursor -= (len(instResult.l_params) - remove_params_from) * 2
+                        instResult.l_params = instResult.l_params[:remove_params_from]
+                        instResult.params[1].set_value(len(instResult.l_params))
+
                     # Check for garbage before first entry
-                    min_case_start_offset = None
                     switch_len = (len(instResult.l_params) * 2) + len(instResult.params)
+                    min_case_start_offset = None
                     for i, paramset in enumerate(instResult.l_params):
                         case_start_offset = len(instResult.params) + (i * 2 + 1) + int(paramset[3].value // 4)
                         min_case_start_offset = case_start_offset if min_case_start_offset is None else min(
                             min_case_start_offset, case_start_offset)
 
-                    if switch_len > min_case_start_offset:
+                    if switch_len < min_case_start_offset:
                         print(f'switch with garbage here {section.name}')
                         garbage_size = min_case_start_offset - switch_len
                         garbage = self._sct[self._cursor * 4: (self._cursor + garbage_size) * 4]
                         instResult.add_error(('Garbage', garbage))
-                    elif switch_len < min_case_start_offset:
-                        raise IndexError(f'{self.log_key}: Switch incomplete, switch end < min case start')
+                        self._cursor += garbage_size
+                    elif switch_len > min_case_start_offset:
+                        raise IndexError(f'{self.log_key}: Switch incomplete, switch end > min case start')
 
                 if instResult.base_id == 0xc:
-                    end_cursor = bounds[1] // 4
-                    if self._cursor < end_cursor:
-                        next_inst = self.getInt(self._cursor * 4)
-                        if not ((0 < next_inst < 265) or (next_inst in [4, 8])):
-                            section.add_error('Garbage: garbage instruction after return')
-                            garbage = self._sct[self._cursor * 4:bounds[1]]
-                            self._cursor = bounds[1] // 4
-                            section.add_garbage('end', garbage)
+                    section.add_error('Garbage: garbage instruction(s) after return')
+                    garbage = self._sct[self._cursor * 4:bounds[1]]
+                    self._cursor = bounds[1] // 4
+                    instResult.add_error(('Garbage', garbage))
 
                 if instResult.base_id == 0xa:
                     end_cursor = bounds[1] // 4
@@ -363,10 +366,10 @@ class SCTDecoder:
                                     self._cur_endian = self._base_endian
                                     if next_i_id in self._inst_lib.lib.p1_scpt:
                                         if (param1_code in self._p_codes.primary_keys
-                                                or param1_code in self._p_codes.no_loop) and param1_code != 29:
+                                            or param1_code in self._p_codes.no_loop) and param1_code != 29:
                                             break
                                         if ((param1_code_little in self._p_codes.primary_keys
-                                                or param1_code_little in self._p_codes.no_loop)
+                                             or param1_code_little in self._p_codes.no_loop)
                                                 and next_i_id != 0 and param1_code_little != 29):
                                             break
                                         param_prefix = param1_code & 0xff000000
@@ -418,7 +421,7 @@ class SCTDecoder:
                     error_str = f'{self.log_key}: Extra SCPT parameter found:\n\tSCPT Position: {cur_pos}'
                     error_str += f'\n\tAbsolute Position: {absolute_pos}'
                     if int(inst_list_id):
-                        error_str += f'\n\tPrevious Instruction: {section.get_instruction_by_index(inst_list_id).base_id}'
+                        error_str += f'\n\tPrevious Instruction: {section.get_inst_by_index(inst_list_id).base_id}'
                     else:
                         error_str += f'\n\tUnable to determine Previous Instruction: inst_list_id is {inst_list_id}'
                     error_str += f'\n\tLength: {length}\n\tParam: {param.hex()}'
@@ -427,9 +430,9 @@ class SCTDecoder:
                     error_str = f'{self.log_key}: Unknown Instruction Code:\n\tInstruction code: {param.hex()}'
                     error_str += f'\n\tSubscript: {cur_pos}\n\tInstruction List Index: {inst_list_id}'
                     if int(inst_list_id):
-                        error_str += f'\n\tPrevious Instruction: {section.get_instruction_by_index(inst_list_id).base_id}'
+                        error_str += f'\n\tPrevious Instruction: {section.get_inst_by_index(inst_list_id - 1).base_id}'
                     else:
-                        error_str += f'\n\tUnable to determine Previous Instruction: inst_list_id is {inst_list_id}'
+                        error_str += f'\n\tUnable to determine Instruction: inst_list_id is {inst_list_id}'
                     error_str += f'\n\tSCPT Position: {cur_pos}\n\tAbsolute Position: {absolute_pos}'
 
                 raise IndexError(error_str)
@@ -447,6 +450,7 @@ class SCTDecoder:
         cur_inst = SCTInstruction()
         cur_inst.set_inst_id(inst_id)
         cur_inst.set_pos(inst_pos)
+        trace.append(cur_inst.ID)
         base_inst = self._inst_lib.get_inst(inst_id=inst_id)
         self._cursor += 1
 
@@ -556,6 +560,7 @@ class SCTDecoder:
                 signed = scptResult < 0
                 scptResult = math.floor(scptResult)
                 if 'int' not in param_type:
+                    # check that these shouldn't be self.cur_endian or self.base_endian
                     scptResult = bytearray(scptResult.to_bytes(4, 'big', signed=signed)).hex()
                     if 'short' in param_type:
                         scptResult = applyHexMask(scptResult, '0xffff')[2:]
@@ -572,6 +577,7 @@ class SCTDecoder:
                     signed = arithmetic_result < 0
                     arithmetic_result = math.floor(arithmetic_result)
                     if 'int' not in param_type:
+                        # check that these shouldn't be self.cur_endian or self.base_endian
                         arithmetic_result = bytearray(arithmetic_result.to_bytes(4, 'big', signed=signed)).hex()
                         if 'short' in param_type:
                             arithmetic_result = applyHexMask(arithmetic_result, '0xffff')[2:]
@@ -601,7 +607,8 @@ class SCTDecoder:
                     cur_param.type += f'{sep}signed'
                     cur_value = word2SignedInt(currWord)
                 else:
-                    cur_value = int.from_bytes(currWord, byteorder=self._cur_endian)
+                    # check that these shouldn't be self.cur_endian or self.base_endian
+                    cur_value = int.from_bytes(currWord, byteorder='big')
                 cur_param.set_value(cur_value)
                 if base_param.link_type is not None:
                     link_type = base_param.link_type
@@ -701,7 +708,7 @@ class SCTDecoder:
                 for v in currVals.values():
                     if v is None:
                         nones += 1
-                result_stack[stack_index + nones] = cur_result
+                result_stack[int(stack_index + nones)] = cur_result
                 stack_index -= 1
                 if currentWord == 0x0000000a:
                     stack_index += 1
@@ -898,8 +905,6 @@ class SCTDecoder:
     # -------------------------- #
     def _organize_sct(self, decoded_sct) -> SCTScript:
 
-        self._create_logical_sections(decoded_sct=decoded_sct)
-
         # Setup links
         print(f'{self.log_key}: Setting Up Links...', end='\r')
         done = False
@@ -909,177 +914,60 @@ class SCTDecoder:
         self._resolve_scpt_links(decoded_sct=decoded_sct)
         self._setup_string_links(decoded_sct=decoded_sct)
 
-        self._detect_unused_sections(decoded_sct=decoded_sct)
+        while len(self._switches) + len(self._jmp_if_falses) > 0:
+            # Group jump if false commands
+            print(f'{self.log_key}: Creating Jump Groups...', end='\r')
+            self._group_jump_commands(decoded_sct=decoded_sct)
 
-        # Group strings
-        print(f'{self.log_key}: Creating String Groups...', end='\r')
-        self._create_string_groups(decoded_sct=decoded_sct)
+            if len(self._jmp_if_falses) > 0:
+                continue
 
-        # Group jump if false commands
-        print(f'{self.log_key}: Creating Jump Groups...', end='\r')
-        self._group_jump_commands(decoded_sct=decoded_sct)
-
-        # Group switches
-        print(f'{self.log_key}: Creating Switch Groups...', end='\r')
-        self._group_switches(decoded_sct=decoded_sct)
+            # Group switches
+            print(f'{self.log_key}: Creating Switch Groups...', end='\r')
+            self._group_switches(decoded_sct=decoded_sct)
 
         # Group Subscripts
-        print(f'{self.log_key}: Grouping Subscripts...', end='\r')
+        print(f'{self.log_key}: Grouping Sections...', end='\r')
+        self._detect_logical_sections(decoded_sct=decoded_sct)
+        self._resolve_logical_sections(decoded_sct=decoded_sct)
+        self._create_string_groups(decoded_sct=decoded_sct)
         self._group_subscripts(decoded_sct=decoded_sct)
+        self._detect_unused_sections(decoded_sct=decoded_sct)
+        self._create_sect_group_heirarchies(decoded_sct=decoded_sct)
 
+        # Group Instructions
+        self._create_inst_group_heirarchies(decoded_sct=decoded_sct)
+        self._set_inst_ungrouped_pos(decoded_sct=decoded_sct)
+
+        # Detect and create footer dialog strings for string editor
         self._detect_and_move_footer_dialog(decoded_sct=decoded_sct)
-
-        self._create_group_heirarchies(decoded_sct=decoded_sct)
-
-        self._put_inst_ids_into_link_traces(decoded_sct=decoded_sct)
-
-        self._populate_ungrouped_inst_values(decoded_sct=decoded_sct)
 
         return decoded_sct
 
-    def _create_logical_sections(self, decoded_sct: SCTScript):
-        # Prune logical script groups with a single entry
-        groups_to_remove = []
-        for key, group in decoded_sct.section_groups.items():
-            if len(group) < 2:
-                groups_to_remove.append(key)
-        for group in groups_to_remove:
-            decoded_sct.section_groups.pop(group)
-
-        for name, group in decoded_sct.section_groups.items():
-            if 'logical' not in name:
-                continue
-            new_name = group[0]
-            if new_name in decoded_sct.sects:
-                i = 0
-                while True:
-                    test_name = f'{new_name}({i})'
-                    if test_name not in decoded_sct.sects:
-                        break
-                    i += 1
-                new_name = test_name
-
-            # Setup combined logical section
-            new_section: SCTSection = decoded_sct.sects[group[0]]
-            new_section.name = new_name
-            new_section.internal_sections_inst[group[0]] = 0
-            new_section.internal_sections_curs[group[0]] = 0
-            for sect_name in group[1:]:
-                sect_to_add: SCTSection = decoded_sct.sects[sect_name]
-                new_section.internal_sections_inst[sect_name] = len(new_section.insts)
-                new_section.internal_sections_curs[
-                    sect_name] = sect_to_add.absolute_offset - new_section.absolute_offset
-                new_section.insts = {**new_section.insts, **sect_to_add.insts}
-                new_section.inst_list.extend(sect_to_add.inst_list)
-                for key, value in sect_to_add.insts_used.items():
-                    if key not in new_section.insts_used:
-                        new_section.insts_used[key] = 0
-                    new_section.insts_used[key] += value
-                new_section.length += sect_to_add.length
-                new_section.jump_loops.extend(sect_to_add.jump_loops)
-                new_section.strings = {**new_section.strings, **sect_to_add.strings}
-                new_section.errors.extend(sect_to_add.errors)
-                new_section.garbage = {**new_section.garbage, **sect_to_add.garbage}
-                new_section.inst_errors.extend(sect_to_add.inst_errors)
-
-            keys_before = []
-            keys_after = []
-            hit_name = False
-            for key in decoded_sct.sect_list:
-                if key in group:
-                    hit_name = True
-                    continue
-                if not hit_name:
-                    keys_before.append(key)
-                else:
-                    keys_after.append(key)
-
-            sections = {k: decoded_sct.sects[k] for k in keys_before}
-            sections[new_name] = new_section
-            sections = {**sections, **{k: decoded_sct.sects[k] for k in keys_after}}
-            decoded_sct.sects = sections
-
-            decoded_sct.sect_list = [*keys_before, new_name, *keys_after]
-
-            for s in group:
-                decoded_sct.folded_sects[s] = new_name
-
-        decoded_sct.section_groups = {}
-        decoded_sct.section_group_keys = {}
-        for link in self._scpt_links:
-            self._update_link_traces(link, decoded_sct)
-
-        for link in self._str_sect_links:
-            self._update_link_traces(link, decoded_sct)
-
-        for link in self._str_foot_links:
-            self._update_link_traces(link, decoded_sct)
-
-        new_jmps = {}
-        for old_name, entries in self._jmp_if_falses.items():
-            if old_name not in decoded_sct.folded_sects:
-                new_jmps[old_name] = entries
-                continue
-            new_name = decoded_sct.folded_sects[old_name]
-            section_offset = decoded_sct.sects[new_name].internal_sections_inst[old_name]
-            new_entries = [_ + section_offset for _ in entries]
-            if new_name not in new_jmps.keys():
-                new_jmps[new_name] = new_entries
-            else:
-                new_jmps[new_name].extend(new_entries)
-        self._jmp_if_falses = new_jmps
-
-        new_switches = {}
-        for old_name, entries in self._switches.items():
-            if old_name not in decoded_sct.folded_sects:
-                new_switches[old_name] = entries
-                continue
-            new_name = decoded_sct.folded_sects[old_name]
-            section_offset = decoded_sct.sects[new_name].internal_sections_inst[old_name]
-            new_entries = [_ + section_offset for _ in entries]
-            if new_name not in new_switches.keys():
-                new_switches[new_name] = new_entries
-            else:
-                new_switches[new_name].extend(new_entries)
-        self._switches = new_switches
-
-    @staticmethod
-    def _update_link_traces(link, decoded_sct):
-        if link.origin_trace[0] in decoded_sct.folded_sects:
-            old_sect_name = link.origin_trace[0]
-            old_inst_pos = link.origin_trace[1]
-            section = decoded_sct.sects[decoded_sct.folded_sects[old_sect_name]]
-            link.origin_trace[0] = section.name
-            link.origin_trace[1] = section.internal_sections_inst[old_sect_name] + old_inst_pos
-
     def _setup_scpt_links(self, decoded_sct):
         blank_section = SCTSection()
-        sect_keys = list(decoded_sct.sects.keys())
         self.successful_scpt_links = []
         for link in self._scpt_links:
-            target_sct = blank_section
-            target_sct_id = 0
-            while target_sct_id < len(decoded_sct.sects):
-                section = decoded_sct.sects[sect_keys[target_sct_id]]
-                if section.absolute_offset <= link.target < section.absolute_offset + section.length:
-                    target_sct: SCTSection = section
+            target_sect = blank_section
+            for sect_name, bounds in self._index.items():
+                if bounds[0] <= link.target < bounds[1]:
+                    target_sect = decoded_sct.sects[sect_name]
                     break
-                target_sct_id += 1
-            target_inst_id = 0
-            while target_inst_id < len(target_sct.insts):
-                inst = target_sct.get_instruction_by_index(target_inst_id)
+            target_inst_ind = 0
+            inst = None
+            while target_inst_ind < len(target_sect.insts):
+                inst = target_sect.get_inst_by_index(target_inst_ind)
                 if inst.absolute_offset == link.target:
                     break
 
-                if target_inst_id == len(target_sct.insts) - 1:
-                    inst_end = target_sct.absolute_offset + target_sct.length
+                if target_inst_ind == len(target_sect.insts) - 1:
+                    inst_end = target_sect.absolute_offset + target_sect.length
                 else:
-                    inst_end = target_sct.get_instruction_by_index(target_inst_id + 1).absolute_offset
+                    inst_end = target_sect.get_inst_by_index(target_inst_ind + 1).absolute_offset
 
                 if inst.absolute_offset < link.target < inst_end:
                     internal = True
                     new_error = None
-                    error_ind = None
                     for i, e in enumerate(inst.errors):
                         if e[0] != 'Garbage':
                             continue
@@ -1089,48 +977,44 @@ class SCTDecoder:
                             internal = True
                             break
                         new_error = e[1][:link.target - first_start]
-                        error_ind = i
                         break
-
-                    if new_error is not None:
-                        if len(new_error) > 0:
-                            inst.errors[error_ind] = ('Garbage', new_error)
-                        else:
-                            inst.errors.pop(error_ind)
 
                     if internal:
                         print(f'{self.log_key}: link position is internal to an instruction '
-                              f'at {target_sct.name}:{target_inst_id}: \n\t{link}')
+                              f'at {target_sect.name}:{target_inst_ind}: \n\t{link}')
                         decoded_sct.errors.append(
-                            f'link position is internal to an instruction at {target_sct.name}:{target_inst_id}: \n\t{link}')
+                            f'link position is internal to an instruction at {target_sect.name}:{target_inst_ind}: \n\t{link}')
                         break
 
-                    bounds = (link.target, inst_end)
-                    suffix_insts = target_sct.inst_list[target_inst_id + 1:]
-                    target_sct.inst_list = target_sct.inst_list[:target_inst_id + 1]
-                    num_insts_before = len(target_sct.inst_list)
-                    changes = self._get_links_to_change(target_sct, num_insts_before)
-                    target_sct = self._create_insts_from_region(bounds, target_sct, target_inst_id + 1)
-                    insts_added = len(target_sct.inst_list) - num_insts_before
-                    self._set_changes(changes, insts_added)
-                    target_sct.inst_list += suffix_insts
+                    inst_num_before = len(target_sect.inst_list)
+                    self._decode_garbage(sect=target_sect, inst=inst, start=link.target, end=inst_end,
+                                         delete_if_insts_created=True)
+
+                    if new_error is not None and inst_num_before < len(target_sect.inst_list):
+                        if len(new_error) > 0:
+                            inst.errors.append(('Garbage', new_error))
+
                     print(
-                        f'{self.log_key}: New instructions decoded at {target_sct.name}:{target_inst_id + 1}. Restarting Link setup...',
+                        f'{self.log_key}: New instructions decoded at {target_sect.name}:{target_inst_ind + 1}. Restarting Link setup...',
                         end='\r')
                     return False
 
-                target_inst_id += 1
+                target_inst_ind += 1
 
-            link.target_trace = [target_sct.name, target_inst_id]
+            link.target_trace = [target_sect.name, inst.ID]
             self.successful_scpt_links.append(link)
 
+        self._decoded_scpt_links = [*self._decoded_scpt_links, *self._scpt_links]
+        self._scpt_links = []
         return True
 
-    def _resolve_scpt_links(self, decoded_sct: SCTScript):
-        for link in self.successful_scpt_links:
+    def _resolve_scpt_links(self, decoded_sct: SCTScript, links=None):
+        if links is None:
+            links = self.successful_scpt_links
+        for link in links:
 
             # add the origin of a link to its target
-            target_inst = decoded_sct.sects[link.target_trace[0]].get_instruction_by_index(link.target_trace[1])
+            target_inst = decoded_sct.sects[link.target_trace[0]].insts[link.target_trace[1]]
             target_inst.links_in.append(link)
 
             # add to dict with places that subscripts are called from
@@ -1161,7 +1045,10 @@ class SCTDecoder:
                     print(f'link position is incorrect: \n\t{link}')
                     break
                 target_sct_id += 1
-            origin_inst = decoded_sct.sects[link.origin_trace[0]].get_instruction_by_index(link.origin_trace[1])
+
+            # Fix for strings with '\c' on the end to move the text box fade to a parameter instead of hardcoded
+            # in the string.
+            origin_inst = decoded_sct.sects[link.origin_trace[0]].insts[link.origin_trace[1]]
             param: SCTParameter = origin_inst.params[int(link.origin_trace[2])]
             param.linked_string = target_sct_str
             if '\\c' in decoded_sct.sects[target_sct_str].string and not self._is_validation:
@@ -1175,10 +1062,241 @@ class SCTDecoder:
         # setup footer links
         for link in self._str_foot_links:
             foot_str = self.getString(link.target)
-            origin_inst = decoded_sct.sects[link.origin_trace[0]].get_instruction_by_index(link.origin_trace[1])
+            origin_inst = decoded_sct.sects[link.origin_trace[0]].insts[link.origin_trace[1]]
             param: SCTParameter = origin_inst.params[int(link.origin_trace[2])]
             param.linked_string = foot_str
             param.link.type = 'Footer'
+
+        self._decoded_str_sect_links = [*self._decoded_str_sect_links, *self._str_sect_links]
+        self._str_sect_links = []
+        self._decoded_str_foot_links = [*self._decoded_str_foot_links, *self._str_foot_links]
+        self._str_foot_links = []
+
+    @staticmethod
+    def _detect_logical_sections(decoded_sct):
+        in_sect_group = False
+        sect_group_key = None
+        for name, sect in decoded_sct.sects.items():
+            # Create or add to a logical section group if needed
+            if not in_sect_group:
+                if sect.type == 'Script':
+                    if sect.get_inst_by_index(-1).base_id != 12:
+                        in_sect_group = True
+                        sect_group_key = f'logical{sep}{sect.name}'
+                        decoded_sct.section_groups[sect_group_key] = [sect.name]
+                        decoded_sct.section_group_keys[sect.name] = sect_group_key
+            else:
+                if sect.type in ('Script', 'Label'):
+                    decoded_sct.section_groups[sect_group_key].append(sect.name)
+                    decoded_sct.section_group_keys[sect.name] = sect_group_key
+                    last_inst = sect.get_inst_by_index(-1)
+                    if last_inst.base_id == 12:
+                        in_sect_group = False
+                        sect_group_key = None
+                else:
+                    last_sect = decoded_sct.sects[decoded_sct.section_groups[sect_group_key][-1]]
+                    if last_sect.insts[last_sect.inst_list[-1]].base_id == 9:
+                        decoded_sct.section_groups[sect_group_key].pop(-1)
+                    in_sect_group = False
+                    sect_group_key = None
+
+    def _group_jump_commands(self, decoded_sct):
+        processed_jmps = {}
+        for sect_name, jump_list in self._jmp_if_falses.items():
+            processed_jmps[sect_name] = []
+            for jmp_id in jump_list:
+                processed_jmps[sect_name].append(jmp_id)
+                jmp_inst: SCTInstruction = decoded_sct.sects[sect_name].insts[jmp_id]
+                jmp_link = jmp_inst.links_out[0]
+                jmp_tgt_sect_name = jmp_link.target_trace[0]
+                jmp_tgt_sect = decoded_sct.sects[jmp_tgt_sect_name]
+                jmp_tgt_uuid = jmp_link.target_trace[1]
+
+                tgt_prev_sect_name, prev_inst = self.get_prev_inst(sct=decoded_sct, cur_sect=jmp_tgt_sect_name,
+                                                                   cur_inst=jmp_tgt_uuid)
+
+                if not prev_inst.base_id == 10:
+                    prev_inst_id = prev_inst.ID
+
+                    garbage = None
+                    for e in prev_inst.errors:
+                        if e[0] == 'Garbage':
+                            garbage = e
+
+                    if garbage is not None:
+                        prev_inst = self._check_for_goto_in_garbage(decoded_sct, tgt_prev_sect_name, prev_inst)
+
+                    if prev_inst is None or prev_inst_id == prev_inst.ID:
+                        print(
+                            f'SCPT Decoder: Decode Jumps: No goto inst found in garbage: {sect_name}{sep}{jmp_id}, goto inst added')
+
+                goto_inst = prev_inst
+
+                jmp_inst.my_goto_uuids.append(goto_inst.ID)
+                goto_inst.my_master_uuids.append(jmp_inst.ID)
+
+                if sect_name not in self._instruction_groups:
+                    self._instruction_groups[sect_name] = {}
+
+                # Check for a loop and add to loops if true
+                if goto_inst.params[0].value < 0:
+                    group_key = f'{jmp_id}{sep}while'
+                    self._instruction_groups[sect_name][group_key] = (f'{sect_name}{sep}{jmp_id}',
+                                                                      f'{tgt_prev_sect_name}{sep}{goto_inst.ID}')
+                    decoded_sct.sects[sect_name].jump_loops.append(group_key)
+                    continue
+
+                # else, get the end of the false option
+                goto_tgt_sect = goto_inst.links_out[0].target_trace[0]
+                goto_tgt_uuid = goto_inst.links_out[0].target_trace[1]
+
+                group_key = f'{jmp_id}{sep}if'
+                self._instruction_groups[sect_name][group_key] = (f'{sect_name}{sep}{jmp_id}',
+                                                                  f'{tgt_prev_sect_name}{sep}{goto_inst.ID}')
+
+                if jmp_tgt_uuid == goto_tgt_uuid or jmp_tgt_sect_name != goto_tgt_sect:
+                    continue
+
+                goto_tgt_prev_sect_name, goto_tgt_prev_inst = self.get_prev_inst(sct=decoded_sct,
+                                                                                 cur_sect=goto_tgt_sect,
+                                                                                 cur_inst=goto_tgt_uuid)
+
+                goto_tgt_prev_uuid = goto_tgt_prev_inst.ID
+
+                group_key = f'{jmp_id}{sep}else'
+                self._instruction_groups[sect_name][group_key] = (
+                    f'{jmp_tgt_sect_name}{sep}{jmp_tgt_uuid}', f'{goto_tgt_prev_sect_name}{sep}{goto_tgt_prev_uuid}')
+
+        for sect_name, jmp_list in processed_jmps.items():
+            if sect_name not in self._decoded_jmp_if_falses:
+                self._decoded_jmp_if_falses[sect_name] = []
+
+            for jmp in jmp_list:
+                self._decoded_jmp_if_falses[sect_name].append(jmp)
+                self._jmp_if_falses[sect_name].remove(jmp)
+
+        empties = [s for s in self._jmp_if_falses if len(self._jmp_if_falses[s]) == 0]
+        for s in empties:
+            self._jmp_if_falses.pop(s)
+
+    def _group_switches(self, decoded_sct):
+        completed_switches = {}
+
+        # Go through each section and check for switches
+        for sect_name, switch_list in self._switches.items():
+            completed_switches[sect_name] = []
+
+            # Go through each switch in each section
+            for s_id in switch_list:
+                # print(f'SCPT Decoder: Switch Groups: Grouping Switch: {sect_name}:{s_id}')
+                switch_inst: SCTInstruction = decoded_sct.sects[sect_name].insts[s_id]
+
+                # Get all switch start positions
+                num_entries = switch_inst.params[1].value
+                switch_entry_cases = []
+                switch_entry_links = {}
+                for entry_id in range(num_entries):
+                    cur_case = switch_inst.l_params[entry_id][2].value
+                    switch_entry_cases.append(cur_case)
+                    switch_entry_links[cur_case] = switch_inst.l_params[entry_id][3].link
+
+                # Range of each switch entry should be from the start to the next start-1
+                # For all entries except the last one, create instruction groups for switch entries
+                # Then if the goto at the end of an entry is negative, it should be a loop, so add that entry to loops
+                # If at least one is positive, record the goto, and the max goto should be the end of the last one
+                if sect_name not in self._instruction_groups:
+                    self._instruction_groups[sect_name] = {}
+                prev_case = None
+                prev_start_sect = None
+                prev_start_uuid = None
+                last_goto_tgt = None
+                for i, case in enumerate(switch_entry_cases):
+                    cur_ttrace = switch_entry_links[case].target_trace
+                    if prev_case is not None:
+
+                        prev_sect, prev_inst = self.get_prev_inst(decoded_sct, cur_ttrace[0], cur_ttrace[1])
+
+                        alt_goto = self._check_for_goto_in_garbage(decoded_sct=decoded_sct, sect_name=prev_sect,
+                                                                   prev_inst=prev_inst)
+                        if alt_goto is not None:
+                            prev_inst = alt_goto
+
+                        group_key = f'{s_id}{sep}{prev_case}'
+                        self._instruction_groups[sect_name][group_key] = (
+                            f'{prev_start_sect}{sep}{prev_start_uuid}', f'{prev_sect}{sep}{prev_inst.ID}')
+
+                        if prev_inst.base_id == 10:
+
+                            if prev_inst.ID not in switch_inst.my_goto_uuids:
+                                switch_inst.my_goto_uuids.append(prev_inst.ID)
+                            if switch_inst.ID not in prev_inst.my_master_uuids:
+                                prev_inst.my_master_uuids.append(switch_inst.ID)
+
+                            if prev_inst.params[0].value < 0:
+                                decoded_sct.sects[sect_name].jump_loops.append(group_key)
+
+                            if last_goto_tgt is None:
+                                last_goto_tgt = prev_inst.params[0].link.target
+                            elif last_goto_tgt <= prev_inst.params[0].link.target:
+                                last_goto_tgt = prev_inst.params[0].link.target
+
+                    prev_case = case
+                    prev_start_sect = cur_ttrace[0]
+                    prev_start_uuid = cur_ttrace[1]
+
+                # Find end of last swtich entry
+                last_case = switch_entry_cases[-1]
+
+                # if an end for the last section was found previously, set it
+                if last_goto_tgt is not None:
+                    goto_tgt_sect = self.find_sect_by_pos(decoded_sct, last_goto_tgt)
+                    goto_tgt_inst = self._find_inst_by_pos(decoded_sct, last_goto_tgt)
+                    goto_sect, goto_inst = self.get_prev_inst(decoded_sct, goto_tgt_sect.name, goto_tgt_inst.ID)
+                    group_key = f'{s_id}{sep}{last_case}'
+                    self._instruction_groups[sect_name][group_key] = (
+                        f'{prev_start_sect}{sep}{prev_start_uuid}', f'{goto_tgt_sect}{sep}{goto_inst.ID}')
+                    switch_inst.my_goto_uuids.append(goto_inst.ID)
+                    goto_inst.my_master_uuids.append(switch_inst.ID)
+
+                    completed_switches[sect_name].append(s_id)
+                    continue
+
+                cur_sect_name, cur_inst = self.get_next_inst(decoded_sct, prev_start_sect, prev_start_uuid)
+                gotos_ignored = 0
+                goto_found = False
+                # else search for a goto that matches with the switch.
+                # May be error-prone if there are random gotos inside a switch entry
+                while not goto_found:
+
+                    if cur_inst.base_id == 12:
+                        print(f'SCPT Decoder: Switch Groups: End of final switch entry not found: {sect_name}:{s_id}')
+                        break
+                    elif cur_inst.base_id == 0:
+                        cur_uuid = cur_inst.links_out[0].target_trace[1]
+                    elif cur_inst.base_id == 3:
+                        new_last_case_target = cur_inst.l_params[-1][3].link.target
+                        new_last_case_start = self._find_inst_by_pos(decoded_sct, new_last_case_target)
+                        cur_uuid = new_last_case_start.ID
+                        gotos_ignored += 1
+                    elif cur_inst.base_id == 10:
+                        if gotos_ignored > 0:
+                            gotos_ignored -= 1
+                        else:
+                            goto_found = True
+                            break
+                    cur_sect_name, cur_inst = self.get_next_inst(decoded_sct, cur_sect_name, cur_inst.ID)
+
+                group_key = f'{s_id}{sep}{last_case}'
+                self._instruction_groups[sect_name][group_key] = (
+                    f'{prev_start_sect}{sep}{prev_start_uuid}', f'{cur_sect_name}{sep}{cur_inst.ID}')
+                if goto_found:
+                    goto_inst = decoded_sct.sects[cur_sect_name].insts[cur_inst.ID]
+                    switch_inst.my_goto_uuids.append(goto_inst.ID)
+                    goto_inst.my_master_uuids.append(switch_inst.ID)
+
+                completed_switches[sect_name].append(s_id)
+
+        self._remove_completed_switches(completed_switches)
 
     @staticmethod
     def _create_string_groups(decoded_sct):
@@ -1248,6 +1366,97 @@ class SCTDecoder:
         decoded_sct.sects = new_sections_dict
         decoded_sct.sect_list = new_sections_ungrouped
 
+    def _resolve_logical_sections(self, decoded_sct: SCTScript):
+        # Prune logical script groups with a single entry
+        groups_to_remove = []
+        for key, group in decoded_sct.section_groups.items():
+            if len(group) < 2:
+                groups_to_remove.append(key)
+        for group in groups_to_remove:
+            decoded_sct.section_groups.pop(group)
+
+        for name, group in decoded_sct.section_groups.items():
+            if 'logical' not in name:
+                continue
+            new_name = group[0]
+            if new_name in decoded_sct.sects:
+                i = 0
+                while True:
+                    test_name = f'{new_name}({i})'
+                    if test_name not in decoded_sct.sects:
+                        break
+                    i += 1
+                new_name = test_name
+
+            # Setup combined logical section
+            new_section: SCTSection = decoded_sct.sects[group[0]]
+            new_section.name = new_name
+            new_section.internal_sections_inst[group[0]] = 0
+            new_section.internal_sections_curs[group[0]] = 0
+            for sect_name in group[1:]:
+                sect_to_add: SCTSection = decoded_sct.sects[sect_name]
+                new_section.internal_sections_inst[sect_name] = len(new_section.insts)
+                new_section.internal_sections_curs[
+                    sect_name] = sect_to_add.absolute_offset - new_section.absolute_offset
+                new_section.insts = {**new_section.insts, **sect_to_add.insts}
+                new_section.inst_list.extend(sect_to_add.inst_list)
+                for key, value in sect_to_add.insts_used.items():
+                    if key not in new_section.insts_used:
+                        new_section.insts_used[key] = 0
+                    new_section.insts_used[key] += value
+                new_section.length += sect_to_add.length
+                new_section.jump_loops.extend(sect_to_add.jump_loops)
+                new_section.strings = {**new_section.strings, **sect_to_add.strings}
+                new_section.errors.extend(sect_to_add.errors)
+                new_section.garbage = {**new_section.garbage, **sect_to_add.garbage}
+                new_section.inst_errors.extend(sect_to_add.inst_errors)
+
+            keys_before = []
+            keys_after = []
+            hit_name = False
+            for key in decoded_sct.sect_list:
+                if key in group:
+                    hit_name = True
+                    continue
+                if not hit_name:
+                    keys_before.append(key)
+                else:
+                    keys_after.append(key)
+
+            sections = {k: decoded_sct.sects[k] for k in keys_before}
+            sections[new_name] = new_section
+            sections = {**sections, **{k: decoded_sct.sects[k] for k in keys_after}}
+            decoded_sct.sects = sections
+
+            decoded_sct.sect_list = [*keys_before, new_name, *keys_after]
+
+            for s in group:
+                decoded_sct.folded_sects[s] = new_name
+
+        inst_groups_modded = {k: v for k, v in self._instruction_groups.items() if
+                              k not in decoded_sct.folded_sects.keys()}
+        for sect_name, sect_list in decoded_sct.section_groups.items():
+            inst_groups_modded[sect_name] = {}
+            for old_sect_name in sect_list:
+                if old_sect_name in self._instruction_groups.keys():
+                    for group_key, t in self._instruction_groups[old_sect_name].items():
+                        t1 = f'{decoded_sct.folded_sects[old_sect_name]}{sep}{t[0].split(sep)[1]}'
+                        t2 = f'{decoded_sct.folded_sects[old_sect_name]}{sep}{t[1].split(sep)[1]}'
+                        inst_groups_modded[sect_name][group_key] = (t1, t2)
+
+        self._instruction_groups = inst_groups_modded
+
+        decoded_sct.section_groups = {}
+        decoded_sct.section_group_keys = {}
+        for link in self._decoded_scpt_links:
+            self._update_link_traces(link, decoded_sct)
+
+        for link in self._decoded_str_sect_links:
+            self._update_link_traces(link, decoded_sct)
+
+        for link in self._decoded_str_foot_links:
+            self._update_link_traces(link, decoded_sct)
+
     @staticmethod
     def _detect_unused_sections(decoded_sct: SCTScript):
         external_section_pattern = '^M[0-9]{4}$'
@@ -1260,206 +1469,6 @@ class SCTDecoder:
             if re.search(external_section_pattern, sect_name):
                 continue
             decoded_sct.unused_sections.append(sect_name)
-
-    def _group_jump_commands(self, decoded_sct):
-        for sect_name, jump_list in self._jmp_if_falses.items():
-            sect_group = []
-            if sect_name in decoded_sct.section_group_keys.keys():
-                key = decoded_sct.section_group_keys[sect_name]
-                group = decoded_sct.section_groups[key]
-                for s_name in group[group.index(sect_name):]:
-                    sect_group.append(s_name)
-            else:
-                sect_group.append(sect_name)
-            sect_insts = []
-            group_starts = {}
-            for s in sect_group:
-                insts = [decoded_sct.sects[s].insts[i] for i in
-                         decoded_sct.sects[s].inst_list]
-                group_starts[s] = len(sect_insts)
-                sect_insts = [*sect_insts, *insts]
-
-            for jmp_id in jump_list:
-                jmp_inst: SCTInstruction = sect_insts[jmp_id]
-                jmp_link = jmp_inst.links_out[0]
-                jmp_to_sect_name = jmp_link.target_trace[0]
-                jmp_to_id = jmp_link.target_trace[1]
-                if jmp_to_id == 0:
-                    prev_sect_id = sect_group.index(jmp_to_sect_name) - 1
-                    prev_sect_name = sect_group[prev_sect_id]
-                    prev_to_id = len(decoded_sct.sects[prev_sect_name].inst_list) - 1
-                else:
-                    prev_sect_name = jmp_to_sect_name
-                    prev_to_id = jmp_to_id - 1
-
-                prev_inst = decoded_sct.sects[prev_sect_name].get_instruction_by_index(prev_to_id)
-                if not prev_inst.base_id == 10:
-                    print(f'SCPT Decoder: Decode Jumps: No goto inst found: {sect_name}{sep}{jmp_id}')
-                    continue
-
-                jmp_inst.my_goto_uuids.append(prev_inst.ID)
-                prev_inst.my_master_uuids.append(jmp_inst.ID)
-
-                if sect_name not in self._instruction_groups:
-                    self._instruction_groups[sect_name] = {}
-
-                # Check for a loop and add to loops if true
-                if prev_inst.params[0].value < 0:
-                    group_key = f'{jmp_id}{sep}while'
-                    self._instruction_groups[sect_name][group_key] = (f'{sect_name}{sep}{jmp_id}',
-                                                                      f'{prev_sect_name}{sep}{prev_to_id}')
-                    decoded_sct.sects[sect_name].jump_loops.append(group_key)
-
-                    continue
-
-                # else, get the end of the false option
-                jmp_end_sect = prev_inst.links_out[0].target_trace[0]
-                jmp_end_id = prev_inst.links_out[0].target_trace[1]
-
-                group_key = f'{jmp_id}{sep}if'
-                self._instruction_groups[sect_name][group_key] = (f'{sect_name}{sep}{jmp_id}',
-                                                                  f'{prev_sect_name}{sep}{prev_to_id}')
-
-                if jmp_to_id == jmp_end_id or jmp_to_sect_name != jmp_end_sect:
-                    continue
-                group_key = f'{jmp_id}{sep}else'
-                self._instruction_groups[sect_name][group_key] = (
-                    f'{jmp_to_sect_name}{sep}{jmp_to_id}', f'{jmp_end_sect}{sep}{jmp_end_id - 1}')
-
-    def _group_switches(self, decoded_sct):
-
-        # Go through each section and check for switches
-        for sect_name, switch_ids in self._switches.items():
-            sect_group = []
-            if sect_name in decoded_sct.section_group_keys.keys():
-                key = decoded_sct.section_group_keys[sect_name]
-                group = decoded_sct.section_groups[key]
-                for s_name in group[group.index(sect_name):]:
-                    sect_group.append(s_name)
-            else:
-                sect_group.append(sect_name)
-            section_insts: List[SCTInstruction] = []
-            group_starts = {}
-            for s in sect_group:
-                insts = [decoded_sct.sects[s].insts[i] for i in
-                         decoded_sct.sects[s].inst_list]
-                group_starts[s] = len(section_insts)
-                section_insts = [*section_insts, *insts]
-
-            last_inst_pos = section_insts[-1].absolute_offset
-
-            # Go through each switch in each section
-            for s_id in switch_ids:
-                # print(f'SCPT Decoder: Switch Groups: Grouping Switch: {sect_name}:{s_id}')
-                switch_inst: SCTInstruction = section_insts[s_id]
-
-                # Get all switch start positions
-                num_entries = switch_inst.params[1].value
-                switch_entry_target_poses = []
-                switch_entry_cases = []
-                for entry_id in range(num_entries):
-                    switch_entry_target_poses.append(switch_inst.l_params[entry_id][3].link.target)
-                    switch_entry_cases.append(switch_inst.l_params[entry_id][2].value)
-
-                # Create a dicitonary with index for first instructions for each case
-                switch_entry_start_ids: Dict[int, str] = {}
-                start_sect_names: Dict[int, str] = {}
-                for i, entry in enumerate(switch_entry_target_poses):
-                    cur_id = self._get_inst_by_pos(section_insts, s_id, entry, sect_name, s_id)
-                    start_sect = self._find_sect_in_group(group_starts, cur_id)
-                    switch_entry_start_ids[cur_id] = switch_entry_cases[i]
-                    start_sect_names[cur_id] = start_sect
-
-                # Range of each switch entry should be from the start to the next start-1
-                # For all entries except the last one, create instruction groups for switch entries
-                # Then if the goto at the end of an entry is negative, it should be a loop, so add that entry to loops
-                # If at least one is positive, record the goto, and the max goto should be the end of the last one
-                if sect_name not in self._instruction_groups:
-                    self._instruction_groups[sect_name] = {}
-                prev_start = None
-                prev_case = None
-                prev_start_sect = None
-                goto_jmp = None
-                end_sect = None
-                for inst_start, case in switch_entry_start_ids.items():
-                    if prev_case is not None:
-                        group_key = f'{s_id}{sep}{prev_case}'
-                        end_sect = self._find_sect_in_group(group_starts, inst_start - 1)
-                        s = prev_start - group_starts[prev_start_sect]
-                        e = inst_start - group_starts[end_sect] - 1
-
-                        self._instruction_groups[sect_name][group_key] = (
-                            f'{prev_start_sect}{sep}{s}', f'{end_sect}{sep}{e}')
-
-                        prev_inst: SCTInstruction = section_insts[inst_start - 1]
-                        if prev_inst.base_id != 10:
-                            continue
-
-                        switch_inst.my_goto_uuids.append(prev_inst.ID)
-                        prev_inst.my_master_uuids.append(switch_inst.ID)
-
-                        if section_insts[inst_start - 1].params[0].value < 0:
-                            decoded_sct.sects[sect_name].jump_loops.append(group_key)
-                        elif section_insts[inst_start - 1].params[0].link.target <= last_inst_pos:
-                            if goto_jmp is None:
-                                goto_jmp = section_insts[inst_start - 1].params[0].link.target
-                            else:
-                                goto_jmp = max(goto_jmp, section_insts[inst_start - 1].params[0].link.target)
-
-                    prev_start = inst_start
-                    prev_case = case
-                    prev_start_sect = start_sect_names[inst_start]
-
-                # Find end of last swtich entry
-                last_start = list(switch_entry_start_ids.keys())[-1]
-                last_case = switch_entry_start_ids[last_start]
-
-                # if an end for the last section was found previously, set it
-                if goto_jmp is not None:
-                    goto_tgt_ind = self._get_inst_by_pos(section_insts, last_start, goto_jmp, sect_name, switch_inst.ID)
-                    group_key = f'{s_id}{sep}{last_case}'
-                    self._instruction_groups[sect_name][group_key] = (
-                        f'{prev_start_sect}{sep}{last_start}', f'{end_sect}{sep}{goto_tgt_ind - 1}')
-                    goto_inst = section_insts[goto_tgt_ind - 1]
-                    switch_inst.my_goto_uuids.append(goto_inst.ID)
-                    goto_inst.my_master_uuids.append(switch_inst.ID)
-                    continue
-
-                gotos_ignored = 0
-                cur_id = last_start
-                goto_found = False
-                # else search for a goto that matches with the switch.
-                # May be error prone if there are random gotos inside a switch entry
-                while cur_id < len(section_insts):
-                    cur_inst = section_insts[cur_id]
-                    if cur_inst.base_id == 0:
-                        cur_id = cur_inst.links_out[0].target_trace[1] - 1
-                    elif cur_inst.base_id == 3:
-                        new_last_case_target = cur_inst.l_params[-1][3].link.target
-                        new_last_case_start = self._get_inst_by_pos(section_insts, cur_id, new_last_case_target,
-                                                                    sect_name, switch_inst.ID)
-                        cur_id = new_last_case_start
-                        gotos_ignored += 1
-                    elif cur_inst.base_id == 10:
-                        if gotos_ignored > 0:
-                            gotos_ignored -= 1
-                        else:
-                            goto_found = True
-                            break
-                    cur_id += 1
-                    if cur_id == len(section_insts):
-                        print(f'SCPT Decoder: Switch Groups: End of final switch entry not found: {sect_name}:{s_id}')
-
-                if not goto_found:
-                    cur_id -= 1
-
-                group_key = f'{s_id}{sep}{last_case}'
-                self._instruction_groups[sect_name][group_key] = (
-                    f'{prev_start_sect}{sep}{last_start}', f'{end_sect}{sep}{cur_id}')
-                if goto_found:
-                    goto_inst = section_insts[cur_id]
-                    switch_inst.my_goto_uuids.append(goto_inst.ID)
-                    goto_inst.my_master_uuids.append(switch_inst.ID)
 
     @staticmethod
     def _group_subscripts(decoded_sct):
@@ -1495,7 +1504,7 @@ class SCTDecoder:
         for name in empty_sections:
             decoded_sct.section_groups.pop(name)
 
-    def _create_group_heirarchies(self, decoded_sct):
+    def _create_sect_group_heirarchies(self, decoded_sct):
 
         # Create grouped section heirarchy
         groups = decoded_sct.section_groups
@@ -1510,21 +1519,139 @@ class SCTDecoder:
         else:
             decoded_sct.sect_tree = copy.deepcopy(decoded_sct.sect_list)
 
+    def _create_inst_group_heirarchies(self, decoded_sct):
+
         # Create grouped instruction heirarchies
         for section in decoded_sct.sects.values():
             if section.name not in self._instruction_groups:
                 section.inst_tree = copy.deepcopy(section.inst_list)
                 continue
-            inst_groups = self._instruction_groups[section.name]
 
-            inst_groups = {k: [*range(int(v[0].split(sep)[1]), int(v[1].split(sep)[1]) + 1)]
-                           for k, v in inst_groups.items()}
-            new_groups = self._nest_groups(inst_groups, is_sections=False)
-            new_groups = self._complete_heirarchy(list(range(len(section.insts))), new_groups)
-            new_groups = self._remove_duplicate_inst_locations(new_groups)
-            new_groups = self._resolve_switches(new_groups)
-            new_groups = self._replace_pos_with_ids(new_groups, section.inst_list)
+            new_groups = InstNester.nest(section.inst_list, self._instruction_groups[section.name], section.insts)
+
             section.inst_tree = new_groups
+
+    def _complete_heirarchy(self, full_list, groups):
+        heirarchy = []
+        skips = []
+        for entry in full_list:
+            if entry in skips:
+                continue
+            matching_groups = []
+            for key in groups.keys():
+                if str(entry) == key.split(sep)[0]:
+                    matching_groups += [{key: groups[key]}]
+            if len(matching_groups) == 0:
+                heirarchy.append(entry)
+                continue
+            heirarchy = heirarchy + matching_groups
+            skips.extend(self._get_heirarchy_skips(matching_groups))
+        return heirarchy
+
+    # ----------------------------- #
+    # Organize SCT helper functions #
+    # ----------------------------- #
+
+    def _decode_garbage(self, sect, inst, start=None, end=None, delete_if_insts_created=False):
+        garbage = None
+        garbage_index = -1
+        for i, e in enumerate(inst.errors):
+            if e[0] == 'Garbage':
+                garbage = e
+                garbage_index = i
+
+        if garbage is None:
+            return
+
+        inst_ind = sect.inst_list.index(inst.ID)
+
+        if end is None:
+            if inst_ind == len(sect.insts) - 1:
+                end = sect.absolute_offset + sect.length
+            else:
+                end = sect.get_inst_by_index(inst_ind + 1).absolute_offset
+
+        if start is None:
+            start = end - len(garbage[1])
+
+        suffix_insts = sect.inst_list[inst_ind + 1:]
+        sect.inst_list = sect.inst_list[:inst_ind + 1]
+
+        bounds = (start, end)
+        pref_len = len(sect.inst_list)
+        sect = self._create_insts_from_region(bounds, sect, inst_ind + 1)
+        insts_made = len(sect.inst_list) - pref_len
+        sect.inst_list += suffix_insts
+
+        if delete_if_insts_created and insts_made > 0:
+            inst.errors.pop(garbage_index)
+
+    def _check_for_goto_in_garbage(self, decoded_sct, sect_name, prev_inst):
+        sect = decoded_sct.sects[sect_name]
+        prev_inst_ind = sect.inst_list.index(prev_inst.ID)
+
+        next_inst_id = None if prev_inst_ind + 1 == len(sect.inst_list) else sect.inst_list[prev_inst_ind + 1]
+
+        self._decode_garbage(sect=sect, inst=prev_inst, delete_if_insts_created=True)
+
+        done = False
+        while not done:
+            done = self._setup_scpt_links(decoded_sct=decoded_sct)
+
+        self._resolve_scpt_links(decoded_sct=decoded_sct)
+        self._setup_string_links(decoded_sct=decoded_sct)
+
+        goto_out = None
+        if next_inst_id is None:
+            insts_created = [i for i in sect.inst_list[prev_inst_ind + 1:]]
+        else:
+            insts_created = [i for i in sect.inst_list[prev_inst_ind + 1: sect.inst_list.index(next_inst_id)]]
+
+        if len(insts_created) == 0:
+            return goto_out
+
+        for inst_id in insts_created:
+            if sect.insts[inst_id].base_id == 10:
+                goto_out = sect.insts[inst_id]
+                break
+
+        return goto_out
+
+    def _create_new_goto(self, decoded_sct, sect_name, after_inst):
+        next_sect, next_inst_id = self.get_next_inst(decoded_sct, sect_name, after_inst.ID)
+        base_goto = self._inst_lib.get_inst(10)
+        new_goto = SCTInstruction()
+        new_goto.set_inst_id(10)
+        goto_param = SCTParameter(0, base_goto.params[0].type)
+        goto_param.set_value(4)
+        goto_link = SCTLink(base_goto.link_type, origin=-1, origin_trace=[sect_name, new_goto.ID, 0],
+                            target=-1, target_trace=[next_sect, next_inst_id])
+        goto_param.link = goto_link
+        new_goto.add_parameter(0, goto_param)
+        new_goto.add_error(('Validation', 'Do not include in validation SCT exports'))
+
+        if next_sect != sect_name:
+            decoded_sct.sects[sect_name].inst_list.append(new_goto.ID)
+        else:
+            decoded_sct.sects[sect_name].inst_list.insert(decoded_sct.sects[sect_name].inst_list.index(next_inst_id),
+                                                          new_goto.ID)
+
+        decoded_sct.sects[sect_name].insts[new_goto.ID] = new_goto
+
+        return new_goto
+
+    @staticmethod
+    def _update_link_traces(link, decoded_sct):
+        if link.origin_trace[0] in decoded_sct.folded_sects:
+            old_sect_name = link.origin_trace[0]
+            section = decoded_sct.sects[decoded_sct.folded_sects[old_sect_name]]
+            link.origin_trace[0] = section.name
+
+        if link.target_trace is not None:
+            if link.target_trace[0] in decoded_sct.folded_sects:
+                old_sect_name = link.target_trace[0]
+                section = decoded_sct.sects[decoded_sct.folded_sects[old_sect_name]]
+                link.target_trace[0] = section.name
 
     def _nest_groups(self, groups, is_sections=True):
         # replace entries in parent groups with child groups
@@ -1613,23 +1740,6 @@ class SCTDecoder:
 
         return entry in group
 
-    def _complete_heirarchy(self, full_list, groups):
-        heirarchy = []
-        skips = []
-        for entry in full_list:
-            if entry in skips:
-                continue
-            matching_groups = []
-            for key in groups.keys():
-                if str(entry) == key.split(sep)[0]:
-                    matching_groups += [{key: groups[key]}]
-            if len(matching_groups) == 0:
-                heirarchy.append(entry)
-                continue
-            heirarchy = heirarchy + matching_groups
-            skips.extend(self._get_heirarchy_skips(matching_groups))
-        return heirarchy
-
     def _get_heirarchy_skips(self, group, skips=None):
         if skips is None:
             skips = []
@@ -1643,93 +1753,14 @@ class SCTDecoder:
             skips.append(group)
         return skips
 
-    def _resolve_switches(self, inst_list):
-        switches = {}
-        for i, entry in enumerate(inst_list):
-            if not isinstance(entry, dict):
-                continue
-            inst_list[i][list(entry.keys())[0]] = self._resolve_switches(list(entry.values())[0])
-            if list(entry.keys())[0].split(sep)[1].lstrip('-').isnumeric():
-                switch_key = list(entry.keys())[0].split(sep)[0] + f'{sep}switch'
-                if switch_key not in switches.keys():
-                    switches[switch_key] = []
-                switches[switch_key].append(i)
-        if len(switches) > 0:
-            for switch_key, switch_entries in reversed(switches.items()):
-                inst_list = self._reorganize_switch(switch_key, switch_entries, inst_list)
-        return inst_list
-
-    def _remove_duplicate_inst_locations(self, new_groups):
-        key_insts = self._get_key_insts(new_groups)
-        return self._remove_key_insts(new_groups, key_insts)
-
-    def _get_key_insts(self, group, key_insts=None):
-        if key_insts is None:
-            key_insts = []
-        if not isinstance(group, list):
-            return key_insts
-        for entry in group:
-            if not isinstance(entry, dict):
-                continue
-            for key, value in entry.items():
-                key_insts.append(int(key.split(sep)[0]))
-                key_insts = self._get_key_insts(value, key_insts)
-        return key_insts
-
-    def _remove_key_insts(self, group, key_insts):
-        if not isinstance(group, list):
-            return group
-        for inst in key_insts:
-            if inst in group:
-                group.remove(inst)
-        new_entries = []
-        for i, entry in enumerate(group):
-            if not isinstance(entry, dict):
-                continue
-            new_entry = {}
-            for key, value in entry.items():
-                new_entry[key] = self._remove_key_insts(value, key_insts)
-            new_entries.append((i, new_entry))
-        for entry in new_entries:
-            group.insert(entry[0], entry[1])
-            group.pop(entry[0] + 1)
+    @staticmethod
+    def _find_sect_in_group(group_starts, cur_id):
+        group = None
+        for g, p in reversed(group_starts.items()):
+            if cur_id > p:
+                group = g
+                break
         return group
-
-    @staticmethod
-    def _reorganize_switch(switch_key, switch_entries, inst_list: list):
-        first_entry = min(switch_entries)
-        switch = {}
-        for i in switch_entries:
-            entry = inst_list[i]
-            entry_key = list(entry.keys())[0].split(sep)[1]
-            entry_value = list(entry.values())[0]
-            switch[entry_key] = entry_value
-        for i in reversed(switch_entries):
-            inst_list.pop(i)
-        inst_list.insert(first_entry, {switch_key: switch})
-        return inst_list
-
-    @staticmethod
-    def _get_inst_by_pos(inst_list, start_ind, target_pos, origin_sect_name, origin_element_id):
-        cur_ind = start_ind
-        found = False
-        while cur_ind < len(inst_list):
-            cur_inst = inst_list[cur_ind]
-            if cur_inst.absolute_offset == target_pos:
-                found = True
-                break
-            if cur_inst.absolute_offset < target_pos < inst_list[cur_ind + 1].absolute_offset:
-                print(
-                    f'SCPT Decoder: Find Inst: Target pos in middle of entry {origin_sect_name}:{origin_element_id} - {target_pos}')
-                break
-            cur_ind += 1
-
-        if not found:
-            print(
-                f'SCPT Decoder: Find Inst: Entry not found: {origin_sect_name}:{origin_element_id} - {target_pos}')
-            return None
-
-        return cur_ind
 
     def _replace_pos_with_ids(self, group, instruction_ids_ungrouped):
         if isinstance(group, dict):
@@ -1748,58 +1779,113 @@ class SCTDecoder:
         return new_groups
 
     @staticmethod
-    def _find_sect_in_group(group_starts, cur_id):
-        group = None
-        for g, p in reversed(group_starts.items()):
-            if cur_id > p:
-                group = g
+    def _set_inst_ungrouped_pos(decoded_sct):
+        for section in decoded_sct.sects.values():
+            for i, key in enumerate(section.inst_list):
+                section.insts[key].ungrouped_position = i
+
+    def _detect_and_move_footer_dialog(self, decoded_sct):
+        if len(self._footer_dialog_locs) == 0:
+            return
+
+        footer_dialog_strings = []
+        for trace in self._footer_dialog_locs:
+            sect = trace[0]
+            if trace[0] not in decoded_sct.sects:
+                sect = self._find_section(trace[0], decoded_sct)
+            inst = decoded_sct.sects[sect].insts[trace[1]]
+            string = inst.params[int(inst.links_out[0].origin_trace[2])].linked_string
+            if '\\e' in string or '\\c' in string:
+                footer_dialog_strings.append((trace, string))
+
+        if len(footer_dialog_strings) == 0:
+            return
+
+        decoded_sct.string_groups[footer_str_group_name] = []
+        for i, item in enumerate(footer_dialog_strings):
+            foot_id = f'{footer_str_id_prefix}{i:03d}'
+            decoded_sct.strings[foot_id] = item[1]
+            decoded_sct.string_groups[footer_str_group_name].append(foot_id)
+            decoded_sct.string_locations[foot_id] = footer_str_group_name
+            sect = item[0][0]
+            if sect not in decoded_sct.sects:
+                sect = self._find_section(sect, decoded_sct)
+            inst = decoded_sct.sects[sect].insts[item[0][1]]
+            inst.params[int(inst.links_out[0].origin_trace[2])].linked_string = foot_id
+
+    @staticmethod
+    def _find_section(tgt_name, decoded_sct) -> str:
+        for name, sect in decoded_sct.sects.items():
+            if len(sect.internal_sections_inst.keys()) > 0:
+                for int_sect in sect.internal_sections_inst.keys():
+                    if int_sect == tgt_name:
+                        return name
+
+    def find_sect_by_pos(self, decoded_sct, pos) -> Union[None, SCTSection]:
+        for sect_name, bounds in self._index.items():
+            if bounds[0] <= pos < bounds[1]:
+                return decoded_sct.sects[sect_name]
+        return None
+
+    def _find_inst_by_pos(self, sct: SCTScript, pos: int) -> Union[None, SCTInstruction]:
+        sect = self.find_sect_by_pos(sct, pos)
+        inst_list = sect.inst_list
+        found = False
+        pos_range = self._index[sect.name]
+        cur_ind = int(len(inst_list) * ((pos - pos_range[0]) / (pos_range[1] - pos_range[0])))
+        while -1 < cur_ind < len(inst_list):
+            cur_inst = sect.insts[inst_list[cur_ind]]
+            if cur_inst.absolute_offset == pos:
+                found = True
                 break
-        return group
+            if cur_inst.absolute_offset < pos < sect.insts[inst_list[cur_ind + 1]].absolute_offset:
+                print(
+                    f'SCPT Decoder: Find Inst: Target pos in middle of inst {sect.name}:{cur_inst.ID} - {pos}')
+                break
+            if cur_inst.absolute_offset < pos:
+                cur_ind += 1
+            else:
+                cur_ind -= 1
 
-    def _get_links_to_change(self, section, start_inst_list_id):
-        sect_name = section.name
-        changes = {'links': [], 'switches': [], 'jmps': [], 'sect_name': sect_name}
+        if not found:
+            print(
+                f'SCPT Decoder: Find Inst: Entry not found: - {pos}')
+            return None
 
-        # Get links that should be changed
-        for link in [*self._scpt_links, *self._str_foot_links, *self._str_sect_links]:
-            if link.origin_trace[0] != sect_name:
-                continue
-            if link.origin_trace[1] < start_inst_list_id:
-                continue
-            changes['links'].append(link)
+        return sect.insts[sect.inst_list[cur_ind]]
 
-        # Get switch ids that should be changed
-        if sect_name in self._switches:
-            pop_entries = []
-            for i, entry in enumerate(self._switches[sect_name]):
-                if entry >= start_inst_list_id:
-                    pop_entries.append(i)
-                    changes['switches'].append(entry)
-            for i in reversed(pop_entries):
-                self._switches[sect_name].pop(i)
+    @staticmethod
+    def get_prev_inst(sct: SCTScript, cur_sect: str, cur_inst: str) -> (str, SCTInstruction):
+        cur_sect = sct.sects[cur_sect]
+        if cur_sect.inst_list.index(cur_inst) == 0:
+            prev_sect_name = sct.sect_list[sct.sect_list.index(cur_sect.name) - 1]
+            prev_id = len(sct.sects[prev_sect_name].inst_list) - 1
+        else:
+            prev_sect_name = cur_sect.name
+            prev_id = cur_sect.inst_list.index(cur_inst) - 1
 
-        # Get jmp ids that should be changed
-        if sect_name in self._jmp_if_falses:
-            pop_entries = []
-            for i, entry in enumerate(self._jmp_if_falses[sect_name]):
-                if entry >= start_inst_list_id:
-                    pop_entries.append(i)
-                    changes['jmps'].append(entry)
-            for i in reversed(pop_entries):
-                self._jmp_if_falses[sect_name].pop(i)
+        prev_inst = sct.sects[prev_sect_name].get_inst_by_index(prev_id)
+        return prev_sect_name, prev_inst
 
-        return changes
+    @staticmethod
+    def get_next_inst(sct: SCTScript, cur_sect: str, cur_inst: str) -> (str, SCTInstruction):
+        cur_sect = sct.sects[cur_sect]
+        if cur_sect.inst_list.index(cur_inst) == len(cur_sect.inst_list) - 1:
+            next_sect_name = sct.sect_list[sct.sect_list.index(cur_sect) - 1]
+            next_id = len(sct.sects[next_sect_name].inst_list) + 1
+        else:
+            next_sect_name = cur_sect.name
+            next_id = cur_sect.inst_list.index(cur_inst) + 1
 
-    def _set_changes(self, changes, offset):
+        next_inst = sct.sects[next_sect_name].get_inst_by_index(next_id)
+        return next_sect_name, next_inst
 
-        for link in changes['links']:
-            link.origin_trace[1] += offset
+    def _remove_completed_switches(self, completed_switches):
+        for sect, switch_list in completed_switches.items():
+            for s_id in switch_list:
+                self._switches[sect].remove(s_id)
 
-        for i in changes['switches']:
-            self._switches[changes['sect_name']].append(i + offset)
-
-        for i in changes['jmps']:
-            self._jmp_if_falses[changes['sect_name']].append(i + offset)
+        self._switches = {k: v for k, v in self._switches.items() if len(v) > 0}
 
     # ---------------------------------------------------------- #
     # Add useful fields for script manipulation and organization #
@@ -1847,56 +1933,78 @@ class SCTDecoder:
                 self._variables[keys[0]][key_1] = {'alias': '', 'usage': []}
             self._variables[keys[0]][key_1]['usage'].append(trace)
 
-    @staticmethod
-    def _put_inst_ids_into_link_traces(decoded_sct):
-        for section in decoded_sct.sects.values():
-            for key, inst in section.insts.items():
-                inst: SCTInstruction
-                for link in inst.links_in:
-                    link.target_trace[1] = key
-                for link in inst.links_out:
-                    link.origin_trace[1] = key
 
-    @staticmethod
-    def _populate_ungrouped_inst_values(decoded_sct):
-        for section in decoded_sct.sects.values():
-            for i, key in enumerate(section.inst_list):
-                section.insts[key].ungrouped_position = i
+class InstNester:
 
-    def _detect_and_move_footer_dialog(self, decoded_sct):
-        if len(self._footer_dialog_locs) == 0:
-            return
+    def __init__(self, inst_list, groups, insts):
+        self.inst_list = inst_list
+        self.inst_groups = groups
+        self.insts: Dict[str, SCTInstruction] = insts
+        self.cur_ind = 0
+        self.cur_uuid = ''
+        self.group_uuids = [k.split(sep)[0] for k in self.inst_groups.keys()]
 
-        footer_dialog_strings = []
-        for trace in self._footer_dialog_locs:
-            sect = trace[0]
-            if trace[0] not in decoded_sct.sects:
-                sect = self._find_section(trace[0], decoded_sct)
-            inst = decoded_sct.sects[sect].insts[trace[1]]
-            string = inst.params[int(inst.links_out[0].origin_trace[2])].linked_string
-            if '\\e' in string or '\\c' in string:
-                footer_dialog_strings.append((trace, string))
+    @classmethod
+    def nest(cls, inst_list, inst_groups, insts):
+        nester = cls(inst_list, inst_groups, insts)
+        return copy.deepcopy(nester._nest())
 
-        if len(footer_dialog_strings) == 0:
-            return
+    def _nest(self, end=None):
+        cur_level = []
+        while self.cur_ind < len(self.inst_list):
+            self.cur_uuid = self.inst_list[self.cur_ind]
+            # check for end of group
+            if self.cur_uuid not in self.group_uuids:
+                cur_level.append(self.cur_uuid)
+                self.cur_ind += 1
+            else:
+                cur_level += self._add_group()
 
-        decoded_sct.string_groups[footer_str_group_name] = []
-        for i, item in enumerate(footer_dialog_strings):
-            foot_id = f'{footer_str_id_prefix}{i:03d}'
-            decoded_sct.strings[foot_id] = item[1]
-            decoded_sct.string_groups[footer_str_group_name].append(foot_id)
-            decoded_sct.string_locations[foot_id] = footer_str_group_name
-            sect = item[0][0]
-            if sect not in decoded_sct.sects:
-                sect = self._find_section(sect, decoded_sct)
-            inst = decoded_sct.sects[sect].insts[item[0][1]]
-            param = inst.params[int(inst.links_out[0].origin_trace[2])]
-            param.linked_string = foot_id
+            if end is not None:
+                if self.cur_uuid in end:
+                    return cur_level
 
-    @staticmethod
-    def _find_section(tgt_name, decoded_sct) -> str:
-        for name, sect in decoded_sct.sects.items():
-            if len(sect.internal_sections_inst.keys()) > 0:
-                for int_sect in sect.internal_sections_inst.keys():
-                    if int_sect == tgt_name:
-                        return name
+        return cur_level
+
+    def _add_group(self):
+        cur_elements = {g: v for g, v in self.inst_groups.items() if self.inst_list[self.cur_ind] in g}
+        cur_inst_uuid = self.inst_list[self.cur_ind]
+        self.cur_ind += 1
+
+        if list(cur_elements.keys())[0].split(sep)[1] in ['if', 'else', 'while']:
+
+            cur_level = []
+            while len(cur_elements) > 0:
+                next_key = None
+                for s in ['if', 'else', 'while']:
+                    if f'{cur_inst_uuid}{sep}{s}' in cur_elements:
+                        next_key = f'{cur_inst_uuid}{sep}{s}'
+                        break
+                next_element = cur_elements.pop(next_key)
+                next_grouping = {next_key: self._nest(end=next_element[1].split(sep)[1])}
+                cur_level.append(next_grouping)
+
+        else:
+            case_level = {}
+
+            switch = self.insts[cur_inst_uuid]
+            cases = [p[2].value for p in switch.l_params]
+            cur_case_ind = 0
+            while cur_case_ind < len(cases):
+                cur_case = cases[cur_case_ind]
+                ele_key = f'{cur_inst_uuid}{sep}{cur_case}'
+
+                if cur_case_ind + 1 < len(cases):
+                    next_case = cases[cur_case_ind + 1]
+                    if cur_elements[ele_key][0] == cur_elements[f'{cur_inst_uuid}{sep}{next_case}'][0]:
+                        case_level[str(cur_case)] = []
+                        cur_case_ind += 1
+                        continue
+
+                case_level[str(cur_case)] = self._nest(end=cur_elements[ele_key][1].split(sep)[1])
+                cur_case_ind += 1
+
+            sw_key = f'{cur_inst_uuid}{sep}switch'
+            cur_level = [{sw_key: case_level}]
+
+        return cur_level
