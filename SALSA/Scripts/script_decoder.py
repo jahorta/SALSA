@@ -1375,6 +1375,9 @@ class SCTDecoder:
         for group in groups_to_remove:
             decoded_sct.section_groups.pop(group)
 
+        inst_groups_modded = {k: v for k, v in self._instruction_groups.items() if
+                              k not in decoded_sct.folded_sects.keys()}
+
         for name, group in decoded_sct.section_groups.items():
             if 'logical' not in name:
                 continue
@@ -1433,16 +1436,13 @@ class SCTDecoder:
             for s in group:
                 decoded_sct.folded_sects[s] = new_name
 
-        inst_groups_modded = {k: v for k, v in self._instruction_groups.items() if
-                              k not in decoded_sct.folded_sects.keys()}
-        for sect_name, sect_list in decoded_sct.section_groups.items():
-            inst_groups_modded[sect_name] = {}
-            for old_sect_name in sect_list:
+            inst_groups_modded[new_name] = {}
+            for old_sect_name in group:
                 if old_sect_name in self._instruction_groups.keys():
                     for group_key, t in self._instruction_groups[old_sect_name].items():
                         t1 = f'{decoded_sct.folded_sects[old_sect_name]}{sep}{t[0].split(sep)[1]}'
                         t2 = f'{decoded_sct.folded_sects[old_sect_name]}{sep}{t[1].split(sep)[1]}'
-                        inst_groups_modded[sect_name][group_key] = (t1, t2)
+                        inst_groups_modded[new_name][group_key] = (t1, t2)
 
         self._instruction_groups = inst_groups_modded
 
