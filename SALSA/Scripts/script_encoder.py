@@ -1,4 +1,5 @@
 import copy
+import re
 from typing import Union, Literal
 
 from SALSA.Common.script_string_utils import fix_string_encoding_errors
@@ -78,7 +79,6 @@ class SCTEncoder:
     log_key = 'SCTEncoder'
     skip_refresh = 13
     _placeholder = bytearray(b'\x7f\x7f\xff\xff')
-    _str_label = b'\x00\x00\x00\x09\x04\x00\x00\x00\x3f\x80\x00\x00\x00\x00\x00\x1d'
     endian_struct_format = {'big': '>', 'little': '<'}
     _header_offset_length = 0x4
     _header_name_length = 0x10
@@ -97,6 +97,11 @@ class SCTEncoder:
         # for decoder, encoder validation only
         self.validation = validation
         self._EU_validation = eu_validation
+
+        self._str_label = b'\x00\x00\x00\x09\x04\x00\x00\x00\x3f\x80\x00\x00\x00\x00\x00\x1d'
+        if endian == 'little' and re.search('5[0-9]{2}A', script.name) and self.validation:
+            self._str_label = b'\x00\x00\x00\x09\x08\x00\x01\x00\x00\x00\x00\x1d'
+
         self._additions = {}
         if self.validation and endian == 'big':
             if '099' in script.name:
