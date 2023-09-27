@@ -146,6 +146,49 @@ class SCTEncoder:
 
             self._additions = additions if not self._EU_validation else eu_additions
 
+        elif self.validation and endian == 'little':
+            if '099' in script.name:
+                self.sct_body = bytearray(
+                    b'\x4F\x00\x00\x00\x00\x00\x00\x04\x00\x00\x66\x43\x1D\x00\x00\x00\x00\x00\x00'
+                    b'\x04\x00\x00\x34\x43\x1D\x00\x00\x00\x00\x00\x00\x04\x00\x00\x16\x43\x1D\x00'
+                    b'\x00\x00\x00\x00\x00\x04\x00\x00\x80\x3F\x1D\x00\x00\x00\x00\x00\x00\x04\x00'
+                    b'\x00\x00\x00\x1D\x00\x00\x00\x00\x00\x00\x04\x00\xC0\x0F\xC5\x1D\x00\x00\x00'
+                    b'\x00\x00\x00\x04\x00\x00\x80\x3F\x1D\x00\x00\x00')
+            if '241A' in script.name:
+                self.sct_body = bytearray(b'\x0b\x00\x00\x00\x30\xe2\x00\x00') if not self._EU_validation \
+                    else bytearray(b'\x0b\x00\x00\x00\x08\x63\x01\x00')
+            if '513A' in script.name or '576A' in script.name:
+                self.sct_body = bytearray(
+                    b'\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00'
+                    b'\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00'
+                    b'\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D'
+                    b'\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00\x0D\x00\x00\x00')
+            additions = {
+                'M04523-177-1': b'\x50\x00\x00\x01',
+                'M04524-177-1': b'\x50\x00\x00\x01',
+                'M04525-177-1': b'\x50\x00\x00\x01',
+                'K08cut8-136-1': b'\x50\x00\x00\x01',
+                'l01cut6-134-0': b'\x50\x00\x00\x01',
+                'l01cut7-134-0': b'\x50\x00\x00\x01',
+                'doc00_init01-136-1': b'\x50\x00\x00\x01',
+                'hama_big01-136-1': b'\x50\x00\x00\x01',
+                'hama_change01-136-1': b'\x50\x00\x00\x01',
+                'me260aq02-136-1': {'ind': [1], 'value': b'\x50\x00\x00\x01'},
+                'me260aq03-136-1': {'ind': [1], 'value': b'\x50\x00\x00\x01'},
+                'q04a_start-136-1': {'ind': [1], 'value': b'\x50\x00\x00\x01'},
+                'me260aq05-136-1': {'ind': [1], 'value': b'\x50\x00\x00\x01'},
+                'camb02-232-3': {'ind': [8], 'value': b'\x00\x40\x00\x08'},
+                'camb02-224-13': {'ind': [10], 'value': b'\x04\x00\x00\x00\x42\xF9\x00\x00'},
+                '_EV_VER2-50-0': {'ind': [2], 'value': b'\x50\x00\x00\x01'}
+            }
+
+            eu_additions = {
+                'camb02-232-3': {'ind': [8], 'value': b'\x04\x00\x00\x00\x42\x80\x00\x00'},
+                'camb02-224-13': {'ind': [10], 'value': b'\x04\x00\x00\x00\x42\xF9\x00\x00'},
+            }
+
+            self._additions = additions if not self._EU_validation else eu_additions
+
         self.update_inst_pos = update_inst_pos
         self._EU_encoding = self.detect_encoding(script)
 
