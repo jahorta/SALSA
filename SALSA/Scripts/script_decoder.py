@@ -168,7 +168,7 @@ class SCTDecoder:
                 if footer_start is None:
                     footer_start = -1
                     self._cursor = int(bounds[0] / 4)
-                    if not self.test_for_string():
+                    if not self.test_for_string(bounds):
                         raise EOFError(f'{self.log_key}: Final Section was not a String...')
                 bounds = (bounds[0], footer_start + 4)
                 change_bounds = True
@@ -196,10 +196,7 @@ class SCTDecoder:
         section.set_details(length, sct_start_pos)
         self._cursor = int(sct_start_pos / 4)
 
-        if length == 16:
-            section.set_type('Label')
-
-        elif self.test_for_string():
+        if self.test_for_string(bounds):
             currWord = self.getInt(self._cursor * 4)
             while not currWord == 0x0000001d:
                 self._cursor += 1
@@ -215,13 +212,15 @@ class SCTDecoder:
                 section.add_garbage('end', garbage)
             return section
 
-        else:
-            section.set_type('Script')
-
         if self._strings_only:
             return None
 
         section = self._create_insts_from_region(bounds, section, 0)
+
+        if len(section.insts) == 1:
+            section.set_type('Label')
+        else:
+            section.set_type('Script')
 
         return section
 
@@ -819,7 +818,7 @@ class SCTDecoder:
             end_cursor = None
         return end_cursor
 
-    def test_for_string(self):
+    def test_for_string(self, bounds):
         cursor = self._cursor
         currWord = self.getInt(cursor * 4)
         if currWord != 0x00000009:
@@ -827,6 +826,8 @@ class SCTDecoder:
         while not currWord == 0x0000001d:
             cursor += 1
             currWord = self.getInt(cursor * 4)
+        if cursor * 4 == bounds[1]:
+            return False
         cursor += 1
         testWord = self.getInt(cursor * 4)
         return testWord < 0 or testWord > 265
