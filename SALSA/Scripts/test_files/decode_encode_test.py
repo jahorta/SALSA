@@ -82,7 +82,12 @@ def compare_files(ba_1, ba_2, cur_endian='big'):
                 if encoded_word.hex() == hex_eq[original_word.hex()]:
                     continue
 
-            d[word * 4] = f'Original is {original_word.hex()}, Encoded has {encoded_word.hex()}'
+            orig_hex = original_word.hex()
+            enc_hex = encoded_word.hex()
+            if 'DC' in script_dir:
+                orig_hex += f' ({bytearray(reversed(original_word)).hex()})'
+                enc_hex += f' ({bytearray(reversed(encoded_word)).hex()})'
+            d[word * 4] = f'Original is {orig_hex}, Encoded has {enc_hex}'
     return d
 
 
