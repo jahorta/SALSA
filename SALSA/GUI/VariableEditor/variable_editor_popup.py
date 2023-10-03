@@ -256,6 +256,7 @@ class VariablePopup(tk.Toplevel):
 
         # Set alias via callback
         self.callbacks['set_alias'](self.cur_script, f'{tree_key}Var', row_id, new_alias)
+        self.var_trees[tree_key].item(sel_iid, values=[new_alias])
 
     def copy_alias(self, row):
         # Popup to select scripts to copy to?
