@@ -243,7 +243,7 @@ class VariablePopup(tk.Toplevel):
             # Turn entry red
             e.widget.config(foreground='red')
             # Add error to status bar
-            self.status_label.config(text=f'Warning: Unable to set alias, this ({new_alias}) is already in use')
+            self.status_label.config(text=f'Warning: Unable to set alias, "{new_alias}" is already in use')
             return
         if e.widget.cur_alias != '':
             self.cur_var_aliases.remove(e.widget.cur_alias)
