@@ -127,6 +127,10 @@ class VariablePopup(tk.Toplevel):
 
         self._populate_script_tree()
 
+        self.alias_widgets = {}
+        self.cur_alias_id = 0
+        self.bind('<Configure>', lambda event: self.adjust_edit_alias_entries())
+
     def _populate_script_tree(self):
         self.script_tree.insert_entry(parent='', text='global', values=[], index='end', row_data=None)
         all_scripts = self.callbacks['get_scripts']()
@@ -211,16 +215,28 @@ class VariablePopup(tk.Toplevel):
         alias_entry = tk.Entry(self.var_trees[tree_key])
         alias_entry.insert(0, cur_alias)
         alias_entry.cur_alias = cur_alias
-        alias_entry.place(x=cell_bbox[0], y=cell_bbox[1], w=cell_bbox[2], h=cell_bbox[3])
+        alias_entry.place(x=cell_bbox[0]+2, y=cell_bbox[1], w=cell_bbox[2]-4, h=cell_bbox[3])
         alias_entry.bind("<Return>", lambda event: self.attempt_create_alias(tree_key, sel_iid, event))
-        alias_entry.bind("<Escape>", lambda event: alias_entry.destroy())
+        alias_entry.bind("<Escape>", lambda event: self.delete_alias_entry(event))
+        alias_entry.my_id = self.cur_alias_id
+        self.alias_widgets[self.cur_alias_id] = {'tree': tree_key, 'sel_iid': sel_iid, 'column': column, 'widget': alias_entry}
+        self.cur_alias_id += 1
         alias_entry.focus()
+
+    def adjust_edit_alias_entries(self):
+        for v in self.alias_widgets.values():
+            cell_bbox = self.var_trees[v['tree']].bbox(v['sel_iid'], v['column'])
+            v['widget'].place_configure(x=cell_bbox[0]+2, y=cell_bbox[1], width=cell_bbox[2]-4, height=cell_bbox[3])
+
+    def delete_alias_entry(self, e):
+        self.alias_widgets.pop(e.widget.my_id)
+        e.widget.destroy()
 
     def attempt_create_alias(self, tree_key, sel_iid, e):
         # Check for unique alias
         new_alias = e.widget.get()
         if new_alias == e.widget.cur_alias:
-            e.widget.destroy()
+            self.delete_alias_entry(e)
             return
         row_id = self.var_trees[tree_key].item(sel_iid)['text']
         if new_alias in self.cur_var_aliases:
@@ -231,7 +247,8 @@ class VariablePopup(tk.Toplevel):
             return
         if e.widget.cur_alias != '':
             self.cur_var_aliases.remove(e.widget.cur_alias)
-        e.widget.destroy()
+        self.delete_alias_entry(e)
+        self.unbind()
         if new_alias == '':
             return
         self.cur_var_aliases.append(new_alias)
