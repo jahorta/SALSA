@@ -841,7 +841,7 @@ class SCTDecoder:
             word = bytearray(reversed(word))
         return struct.unpack('!f', word)[0]
 
-    def getString(self, pos: int, max_len=None, encoding='shiftjis') -> str:
+    def getString(self, pos: int, max_len=None, encoding='shiftjis', force_jis=False) -> str:
         size = 0
         while True:
             cur_pos = pos + size
@@ -860,7 +860,9 @@ class SCTDecoder:
 
         alt_encoding = 'cp1252'
         if (self._EU_encoding and not str_bytes[:2] == bytearray(b'\x81\x83')
-                and not str_bytes[3:5] == bytearray(b'\x81\x73')):
+                and not str_bytes[3:5] == bytearray(b'\x81\x73')
+                and not str_bytes[3:5] == bytearray(b'\x83\x94')
+                and not force_jis):
             encoding, alt_encoding = alt_encoding, encoding
 
         string = str_bytes.decode(encoding=encoding, errors='backslashreplace')
@@ -1062,7 +1064,7 @@ class SCTDecoder:
 
         # setup footer links
         for link in self._str_foot_links:
-            foot_str = self.getString(link.target)
+            foot_str = self.getString(link.target, force_jis=True)
             origin_inst = decoded_sct.sects[link.origin_trace[0]].insts[link.origin_trace[1]]
             param: SCTParameter = origin_inst.params[int(link.origin_trace[2])]
             param.linked_string = foot_str
