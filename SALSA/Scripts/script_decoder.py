@@ -314,7 +314,7 @@ class SCTDecoder:
                     garbage_entry_found = False
                     remove_params_from = None
                     for i, paramset in enumerate(instResult.l_params):
-                        if not garbage_entry_found and paramset[3].value == 0 and i + 1 != len(instResult.l_params):
+                        if not garbage_entry_found and paramset[3].value == 0:
                             garbage_entry_found = True
                             remove_params_from = i
                         if garbage_entry_found:
