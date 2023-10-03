@@ -3,10 +3,18 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/SALSA" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/compressed_scripts" />
-      <excludeFolder url="file://$MODULE_DIR$/decompressed_scripts" />
       <excludeFolder url="file://$MODULE_DIR$/compressed scripts" />
-      <excludeFolder url="file://$MODULE_DIR$/_EU_compressed_scripts" />
+      <excludeFolder url="file://$MODULE_DIR$/_script_files/_DC_EU_compressed_scripts" />
+      <excludeFolder url="file://$MODULE_DIR$/_script_files/_DC_EU_dream_on" />
+      <excludeFolder url="file://$MODULE_DIR$/_script_files/_DC_JP_Kuzokuban_scripts" />
+      <excludeFolder url="file://$MODULE_DIR$/_script_files/_DC_JP_compressed_scripts" />
+      <excludeFolder url="file://$MODULE_DIR$/_script_files/_DC_US_compressed_scripts" />
+      <excludeFolder url="file://$MODULE_DIR$/_script_files/_DC_US_trial_edition" />
+      <excludeFolder url="file://$MODULE_DIR$/_script_files/_EU_compressed_scripts" />
+      <excludeFolder url="file://$MODULE_DIR$/_script_files/_JP_compressed_scripts" />
+      <excludeFolder url="file://$MODULE_DIR$/_script_files/_US_compressed_scripts" />
+      <excludeFolder url="file://$MODULE_DIR$/_script_files/decompressed_scripts" />
+      <excludeFolder url="file://$MODULE_DIR$/string_extractor" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.10" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
