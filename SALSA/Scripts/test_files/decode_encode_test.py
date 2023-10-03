@@ -2,7 +2,7 @@
 from typing import Literal
 
 # Requires a script directory to run
-script_dir = './../../_DC_compressed_scripts'
+script_dir = './../../_script_files/_EU_compressed_scripts'
 eu_validation = True if 'EU' in script_dir else False
 endian: Literal['big', 'little'] = 'big'
 if 'DC' in script_dir:
@@ -27,9 +27,9 @@ check_compressed = False
 # If last_file == None, goes till end
 
 # first_file = None
-first_file = 'ME017F.sct'
+first_file = 'ME017B.sct'
 # last_file = None
-last_file = 'ME017F.sct'
+last_file = 'ME017B.sct'
 
 # Determines whether files are exported if there is a difference
 file_out = True
@@ -65,7 +65,9 @@ def compare_files(ba_1, ba_2, cur_endian='big'):
                 k = bytearray(reversed(bytearray.fromhex(k))).hex()
                 v = bytearray(reversed(bytearray.fromhex(v))).hex()
                 hex_eq[k] = v
-        for word in range(0, len(ba_1) // 4 + 1):
+
+        # Starts from index 2 to ignore the header which is probably versioning information
+        for word in range(2, len(ba_1) // 4 + 1):
             original_word = ba_1[word * 4: word * 4 + 4]
             encoded_word = ba_2[word * 4: word * 4 + 4]
 

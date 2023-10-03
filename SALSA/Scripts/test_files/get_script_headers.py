@@ -1,5 +1,5 @@
-script_dir1 = './../../_DC_compressed_scripts'
-script_dir2 = './../../compressed_scripts'
+script_dir1 = './../../_script_files/_DC_US_compressed_scripts'
+script_dir2 = './../../_script_files/_DC_JP_compressed_scripts'
 
 if __name__ == '__main__':
     import os
