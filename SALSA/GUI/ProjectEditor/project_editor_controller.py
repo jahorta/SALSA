@@ -47,6 +47,7 @@ class ProjectEditorController:
             'update_field': self.update_field,
             'edit_param': self.on_edit_parameter,
             'show_header_selection_menu': self.show_header_selection_menu,
+            'show_script_menu': self.show_script_right_click_menu,
             'show_inst_menu': self.show_instruction_right_click_menu,
             'save_project': self.save_project,
             'set_mem_offset': self.set_mem_offset,
@@ -473,6 +474,37 @@ class ProjectEditorController:
         display_columns = self.view.visible_headers[tree][1:]
         cur_tree['displaycolumns'] = display_columns
         self.view.fit_headers(cur_tree)
+
+    # # Script Options # #
+
+    def show_script_right_click_menu(self, e):
+        if self.inst_selector is not None:
+            self.shake_widget(self.inst_selector)
+            return
+        if e.widget.identify('region', e.x, e.y) == 'heading':
+            return
+        sel_iid = self.trees['script'].identify_row(e.y)
+        if sel_iid == '':
+            return
+        self.trees['script'].selection_set(sel_iid)
+        self.trees['script'].focus(sel_iid)
+        m = tk.Menu(self.view, tearoff=0)
+
+        # add command to remove script from project
+        m.add_command(label='Remove script from project', command=self.rcm_del_script)
+
+        m.bind('<Escape>', m.destroy)
+        try:
+            m.tk_popup(e.x_root, e.y_root)
+        finally:
+            m.grab_release()
+
+    def rcm_del_script(self):
+        sel_iid = self.trees['script'].focus()
+        rowdata = self.trees['script'].row_data[sel_iid]
+
+        self.project.remove_script(rowdata)
+        self.refresh_tree('script')
 
     # # Instruction Options # #
 

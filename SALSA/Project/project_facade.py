@@ -1599,3 +1599,8 @@ class SCTProjectFacade:
                     error_scts.append(script)
                     break
         return error_scts
+
+    def remove_script(self, rowdata):
+        if rowdata not in self.project.scts:
+            return
+        self.project.scts.pop(rowdata)
