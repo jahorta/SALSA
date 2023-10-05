@@ -299,8 +299,6 @@ class ProjectEditorView(ttk.Frame):
         self.link_out.columnconfigure(0, weight=1)
         self.link_out.rowconfigure(0, weight=1)
 
-        print('pause here')
-
     def use_future_callback(self, key):
         self.callbacks[key]()
 
