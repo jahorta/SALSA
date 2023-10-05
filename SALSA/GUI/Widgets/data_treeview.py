@@ -104,18 +104,9 @@ class DataTreeview(ttk.Treeview):
         self.theme = theme if theme is not None else default_tree_theme
 
         self.can_open = can_open
+        self.can_move = can_move
 
-        if can_move:
-            self.unbind_all("<ButtonPress-1>")
-            self.bind("<ButtonPress-1>", self.bDown_move)
-            self.bind("<ButtonRelease-1>", self.bUp_move, add='+')
-            self.bind("<B1-Motion>", self.bMove, add='+')
-            self.bind("<Shift-ButtonPress-1>", self.bDown_Shift, add='')
-            self.bind("<Shift-ButtonRelease-1>", self.bUp_Shift, add='')
-
-        if can_open:
-            self.bind("<ButtonRelease-1>", self.select_entry, add='+')
-            # self.bind("<ButtonRelease-1>", self.print_parent_and_index, add='+')
+        self.bind_events()
 
         self.in_motion = False
         self.has_shift = False
@@ -133,6 +124,28 @@ class DataTreeview(ttk.Treeview):
         self.keep_group_ends = keep_group_ends
         self.start_index = None
         self.start_parent = None
+        self.block_interactions = False
+
+    def unbind_events(self):
+        self.unbind("<ButtonPress-1>")
+        self.unbind("<ButtonRelease-1>")
+        self.unbind("<B1-Motion>")
+        self.unbind("<Shift-ButtonPress-1>")
+        self.unbind("<Shift-ButtonRelease-1>")
+        if self.can_open:
+            self.bind("<ButtonRelease-1>", self.select_entry, add='+')
+            # self.bind("<ButtonRelease-1>", self.print_parent_and_index, add='+')
+
+    def bind_events(self):
+        if self.can_move:
+            self.bind("<ButtonPress-1>", self.bDown_move)
+            self.bind("<ButtonRelease-1>", self.bUp_move, add='+')
+            self.bind("<B1-Motion>", self.bMove, add='+')
+            self.bind("<Shift-ButtonPress-1>", self.bDown_Shift, add='')
+            self.bind("<Shift-ButtonRelease-1>", self.bUp_Shift, add='')
+        if self.can_open:
+            self.bind("<ButtonRelease-1>", self.select_entry, add='+')
+            # self.bind("<ButtonRelease-1>", self.print_parent_and_index, add='+')
 
     def add_callback(self, key, callback):
         self.callbacks[key] = callback
@@ -141,6 +154,10 @@ class DataTreeview(ttk.Treeview):
         self.theme = theme
 
     def select_entry(self, event):
+        if self.block_interactions:
+            selection = self.selection()
+            self.after(10, self.selection_set, selection)
+            return self.callbacks['select'](self.name, None)
         if len(self.get_children('')) == 0:
             return
         if self.in_motion:
@@ -239,6 +256,8 @@ class DataTreeview(ttk.Treeview):
             self.item(row_id, open=True)
 
     def bDown_Shift(self, event):
+        if self.block_interactions:
+            return
         if len(self.get_children('')) == 0:
             return
         self.has_shift = True
@@ -274,9 +293,15 @@ class DataTreeview(ttk.Treeview):
         self.selection_set(select)
 
     def bUp_Shift(self, event):
+        if self.block_interactions:
+            return
         self.has_shift = False
 
     def bDown_move(self, event):
+        if self.block_interactions:
+            selection = self.selection()
+            self.after(10, self.selection_set, selection)
+            return
         if len(self.get_children('')) == 0:
             return
         sel = self.identify_row(event.y)
@@ -302,6 +327,12 @@ class DataTreeview(ttk.Treeview):
             self.after(10, self.selection_set, sel)
 
     def bUp_move(self, event):
+        if self.block_interactions:
+            selection = self.selection()
+            self.after(10, self.selection_set, selection)
+            return
+        if self.block_interactions:
+            return
         if len(self.get_children('')) == 0:
             return
         if not self.in_motion:
@@ -339,6 +370,8 @@ class DataTreeview(ttk.Treeview):
         self.selection_bounds = None
 
     def bMove(self, event):
+        if self.block_interactions:
+            return
         if len(self.get_children('')) == 0:
             return
         if self.has_shift:

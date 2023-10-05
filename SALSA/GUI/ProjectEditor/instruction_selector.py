@@ -75,11 +75,11 @@ class InstructionSelectorWidget(ttk.Frame):
 
         self.search.focus_set()
 
-        self.search.bind('<KeyPress-Escape>', self.cancel)
+        self.search.bind('<KeyPress-Escape>', lambda event: self.cancel())
         self.search.bind('<KeyPress-Return>', self.select_inst_by_enter)
         self.search.bind('<KeyPress-Down>', self.move_to_results)
 
-        self.result_dropdown.bind('<KeyPress-Escape>', self.cancel)
+        self.result_dropdown.bind('<KeyPress-Escape>', lambda event: self.cancel())
         self.result_dropdown.bind('<KeyPress-Return>', self.select_inst_by_enter)
         self.result_dropdown.bind('<KeyPress-Up>', self.handle_dropdown_up_keypress)
 
@@ -114,7 +114,7 @@ class InstructionSelectorWidget(ttk.Frame):
             if result == 'cancel':
                 return
         self.callbacks['set_inst_id'](*self.inst_trace, new_id=new_ID, change_type=result)
-        self.cancel(None)
+        self.cancel()
         self.callbacks['update_tree']()
 
     def move_to_results(self, e):
@@ -141,6 +141,6 @@ class InstructionSelectorWidget(ttk.Frame):
             return
         self.select_inst(name=None, new_ID=self.result_dropdown.row_data[self.result_dropdown.selection()[0]])
 
-    def cancel(self, e):
+    def cancel(self):
         self.result_dropdown.destroy()
-        self.destroy()
+        self.callbacks['destroy_widget']()

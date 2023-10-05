@@ -107,6 +107,8 @@ class ProjectEditorController:
 
         self.link_font = SALSAFont()
 
+        self.inst_selector: Union[None, InstructionSelectorWidget] = None
+
     def delay_set_change_flag(self, delay):
         self.view.after(delay, self.set_change_flag)
 
@@ -137,6 +139,9 @@ class ProjectEditorController:
         self.update_tree('script', self.project.get_tree(self.view.get_headers('script')))
 
     def on_select_tree_entry(self, tree_key, entry):
+        if self.inst_selector is not None:
+            self.shake_widget(self.inst_selector)
+            return
         self.clear_inst_details()
         if tree_key == 'instruction':
             self.callbacks['toggle_frame_state'](self.view.inst_frame, 'normal')
@@ -156,6 +161,9 @@ class ProjectEditorController:
         self.update_tree(child_tree, tree_list)
 
     def on_select_instruction(self, instructID):
+        if self.inst_selector is not None:
+            self.shake_widget(self.inst_selector)
+            return
         self.current['instruction'] = instructID
         self.current['parameter'] = None
         self.view.param_tree.clear_all_entries()
@@ -306,6 +314,9 @@ class ProjectEditorController:
             child.configure(font=font, style=style)
 
     def goto_link(self, e):
+        if self.inst_selector is not None:
+            self.shake_widget(self.inst_selector)
+            return
         link_parts = e.widget['text'].split(link_sep)
         sect = link_parts[0]
         inst = self.project.get_inst_uuid_by_ind(script=self.current['script'], section=sect, inst_ind=link_parts[1])
@@ -377,6 +388,9 @@ class ProjectEditorController:
             self.refresh_tree(key, True, clear_others=False)
 
     def check_is_label(self, inst_uuid):
+        if self.inst_selector is not None:
+            self.shake_widget(self.inst_selector)
+            return False
         return self.project.inst_is_label(self.current['script'], self.current['section'], inst_uuid)
 
     def change_label_name(self, widget, sel_iid, e):
@@ -423,6 +437,9 @@ class ProjectEditorController:
     # # Header Selection # #
 
     def show_header_selection_menu(self, e):
+        if self.inst_selector is not None:
+            self.shake_widget(self.inst_selector)
+            return
         if e.widget.identify('region', e.x, e.y) != 'heading':
             return
         widget_name = e.widget.name
@@ -460,6 +477,9 @@ class ProjectEditorController:
     # # Instruction Options # #
 
     def show_instruction_right_click_menu(self, e):
+        if self.inst_selector is not None:
+            self.shake_widget(self.inst_selector)
+            return
         if e.widget.identify('region', e.x, e.y) == 'heading':
             return
         if self.current['section'] is None:
@@ -554,15 +574,27 @@ class ProjectEditorController:
             'group_inst_handler': self.confirm_change_inst_group,
             'set_inst_id': self.project.change_inst,
             'get_relevant': self.project.base_insts.get_relevant,
-            'update_tree': lambda: self.refresh_tree('instruction')
+            'update_tree': lambda: self.refresh_tree('instruction'),
+            'destroy_widget': self.delete_inst_selector
         }
         cell_bbox = self.trees['instruction'].bbox(sel_iid, 'name')
         x_mod = self.trees['instruction'].winfo_x()
         y_mod = self.trees['instruction'].winfo_y()
         w = InstructionSelectorWidget(self.view.inst_tree_frame, callbacks, inst_trace,
                                       x=cell_bbox[0] + x_mod, y=cell_bbox[1] + y_mod + cell_bbox[3])
-        w.bind('<Escape>', w.destroy)
+        w.bind('<Escape>', lambda event: self.delete_inst_selector())
         w.place(x=cell_bbox[0] + x_mod, y=cell_bbox[1] + y_mod, w=cell_bbox[2], h=cell_bbox[3])
+        self.inst_selector = w
+        for tree in self.trees.values():
+            tree.configure(selectmode='none')
+            tree.unbind_events()
+
+    def delete_inst_selector(self):
+        self.inst_selector.destroy()
+        self.inst_selector = None
+        for tree in self.trees.values():
+            tree.configure(selectmode='browse')
+            tree.bind_events()
 
     def rcm_remove_inst(self):
         sel_iid = self.trees['instruction'].focus()
@@ -643,6 +675,9 @@ class ProjectEditorController:
     # ------------------------ #
 
     def on_edit_parameter(self, paramID):
+        if self.inst_selector is not None:
+            self.shake_widget(self.inst_selector)
+            return
         paramID = str(paramID)
         self.current['parameter'] = paramID
         param = self.project.get_parameter(**self.current)
@@ -682,6 +717,9 @@ class ProjectEditorController:
         self.on_select_tree_entry('instruction', cur_inst_id)
 
     def param_right_click_menu(self, row, e):
+        if self.inst_selector is not None:
+            self.shake_widget(self.inst_selector)
+            return
         if not self.project.has_loops(**self.current):
             return
         m = tk.Menu(self.view, tearoff=0)
