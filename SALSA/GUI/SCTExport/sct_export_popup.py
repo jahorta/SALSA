@@ -120,6 +120,8 @@ class SCTExportPopup(tk.Toplevel):
 
         self._populate_script_tree()
 
+        self.set_option_state()
+
     def _populate_script_tree(self):
         all_scripts = self.callbacks['get_tree']()
         iid = 0
@@ -148,6 +150,9 @@ class SCTExportPopup(tk.Toplevel):
         directory = self.directory_var.get()
         if not os.path.exists(directory):
             return
+        compress = self.option_vars['compress_aklz'].get() == 'True'
+        if self.option_vars['system'] == 'Dreamcast':
+            compress = False
         options = {
             'use_garbage': self.option_vars['use_garbage'].get() == 'True',
             'combine_footer_links': self.option_vars['combine_footer'].get() == 'True',
