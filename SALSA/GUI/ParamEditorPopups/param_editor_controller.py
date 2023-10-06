@@ -233,7 +233,7 @@ class ParamEditController:
             value = scpt_widget.option_selection.get()
         elif scpt_class == 'input':
             value = scpt_widget.get_input()
-            if 'float' not in self.base_param.type and cur_id == '0' and value != 'override':
+            if 'float' not in self.base_param.type and cur_id == '0' and value != 'override' and 'decimal' not in value:
                 value = int(value)
         else:
             value = None
