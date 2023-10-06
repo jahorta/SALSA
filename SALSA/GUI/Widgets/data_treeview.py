@@ -216,44 +216,24 @@ class DataTreeview(ttk.Treeview):
             if not is_open:
                 continue
 
-            parent_row_data = self.row_data.get(parent, None)
-            if parent_row_data is None:
-                parent_row_data = ''
-
             child_uuid = self.row_data.get(child, None)
-            if child_uuid is None and len(self.item(child)['values']) > 0:
-                if self.item(child)["values"][0] != '':
-                    child_uuid = f'{parent_row_data}{sep}{self.item(child)["values"][0].split(" ")[0]}'
-                else:
-                    child_uuid = f'{parent_row_data}{sep}{self.item(child)["text"]}'
+            if child_uuid is None:
+                child_child_uuid = self.row_data.get(self.get_children(child)[0], None)
+                open_items.append(('see', child_child_uuid))
             else:
-                child_uuid = f'{parent_row_data}{sep}{self.item(child)["text"]}'
-            open_items.append(child_uuid)
+                open_items.append(('open', child_uuid))
             self.get_open_elements(parent=child, open_items=open_items)
         return open_items
 
     def open_tree_elements(self, open_items):
-        for item_uuid in open_items:
-            if sep in item_uuid:
-                item_uuid, case = item_uuid.split(sep)
-                if item_uuid == '':
-                    parent = item_uuid
-                else:
-                    parent = self.get_iid_from_rowdata(item_uuid)
-                row_id = None
-                for child in self.get_children(parent):
-                    if case in self.item(child)['values'][0]:
-                        row_id = child
-                        break
-                    if case in self.item(child)['text']:
-                        row_id = child
-                        break
-            else:
-                row_id = self.get_iid_from_rowdata(item_uuid)
-            if row_id is None:
+        rows = {v: k for k, v in self.row_data.items() if k is not None}
+        for entry in open_items:
+            if entry[1] not in rows:
                 continue
-            self.see(row_id)
-            self.item(row_id, open=True)
+            if entry[0] == 'see':
+                self.see(rows[entry[1]])
+            elif entry[0] == 'open':
+                self.item(rows[entry[1]], open=True)
 
     def bDown_Shift(self, event):
         if self.block_interactions:
