@@ -99,8 +99,7 @@ class ParamEditController:
         if cleared:
             return
         value = self.param.value if self.param is not None else self.base_param.default_value
-        if value is None:
-            return
+
         kwargs = {'value': value, 'cur_id': '0'}
         kwargs |= {'is_base': False} if self.param is not None else {'is_base': True}
         if self.param is not None:

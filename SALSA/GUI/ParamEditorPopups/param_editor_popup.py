@@ -201,8 +201,12 @@ class SCPTEditWidget(ttk.Frame):
     def set_widget_values(self, value, override=None):
         self.option_option.configure(state='normal')
 
+        # If value was cleared
+        if value is None:
+            self.class_selection.set('---')
+
         # Value is a compare type scpt code
-        if value in self.scpt_codes.compare:
+        elif value in self.scpt_codes.compare:
             self.class_selection.set('compare')
             self.update_options()
             self.option_selection.set(value)
