@@ -100,7 +100,7 @@
     "Parameters": {
       "0": {
         "Name": "No Function?",
-        "Default": 1
+        "Default": "decimal: 1+0/256"
       }
     }
   },
