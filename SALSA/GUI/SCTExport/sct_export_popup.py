@@ -19,6 +19,9 @@ class SCTExportPopup(tk.Toplevel):
         'all_refresh': {'text': 'Add unnecessary refresh skips', 'default': 'True'},
         'compress_aklz': {'text': 'Compress file using AKLZ compression', 'default': 'False'}
     }
+    option_settings_radio = {
+        'system': {'label': 'Select target system:', 'entries': ['Dreamcast', 'Gamecube'], 'default': 'Gamecube'}
+    }
 
     def __init__(self, parent, callbacks, name, selected, theme, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
@@ -35,6 +38,10 @@ class SCTExportPopup(tk.Toplevel):
             settings[self.log_key] = {}
 
         for s, v in self.option_settings.items():
+            if s not in settings[self.log_key]:
+                settings[self.log_key][s] = v['default']
+
+        for s, v in self.option_settings_radio.items():
             if s not in settings[self.log_key]:
                 settings[self.log_key][s] = v['default']
 
@@ -79,6 +86,20 @@ class SCTExportPopup(tk.Toplevel):
             garbage.grid(row=row, column=0, sticky=tk.W)
             self.option_vars[o_name].set(settings[self.log_key][o_name])
             row += 1
+
+        for o_name, o_settings in self.option_settings_radio.items():
+            label = ttk.Label(options_frame, text=o_settings['label'])
+            label.grid(row=row, column=0, sticky=tk.W)
+            row += 1
+            default = settings[self.log_key][o_name]
+            self.option_vars[o_name] = tk.StringVar()
+            for e in o_settings['entries']:
+                button = ttk.Radiobutton(options_frame, text=e, value=e, variable=self.option_vars[o_name],
+                                         command=lambda x=o_name: self.change_setting(x))
+                button.grid(row=row, column=0, sticky=tk.W)
+                if e == default:
+                    button.invoke()
+                row += 1
 
         button_frame = ttk.Frame(self)
         button_frame.grid(row=3, column=0, sticky=tk.E+tk.S, padx=5, pady=2)
@@ -131,7 +152,8 @@ class SCTExportPopup(tk.Toplevel):
             'use_garbage': self.option_vars['use_garbage'].get() == 'True',
             'combine_footer_links': self.option_vars['combine_footer'].get() == 'True',
             'add_spurious_refresh': self.option_vars['all_refresh'].get() == 'True',
-            'compress_aklz': self.option_vars['compress_aklz'].get() == 'True'
+            'compress_aklz': compress,
+            'endian': 'little' if self.option_vars['system'] == 'Dreamcast' else 'big'
         }
         scripts = [self.script_ids[int(s)] for s in self.scripts.selection()]
         if len(scripts) > 0:
