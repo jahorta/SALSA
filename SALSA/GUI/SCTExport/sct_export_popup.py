@@ -13,7 +13,7 @@ class SCTExportPopup(tk.Toplevel):
     w = 250
     h = 400
 
-    option_settings = {
+    option_settings_check = {
         'use_garbage': {'text': 'Add garbage from original files', 'default': 'True'},
         'combine_footer': {'text': 'Combine footer entries', 'default': 'False'},
         'all_refresh': {'text': 'Add unnecessary refresh skips', 'default': 'True'},
@@ -37,7 +37,7 @@ class SCTExportPopup(tk.Toplevel):
         if self.log_key not in settings:
             settings[self.log_key] = {}
 
-        for s, v in self.option_settings.items():
+        for s, v in self.option_settings_check.items():
             if s not in settings[self.log_key]:
                 settings[self.log_key][s] = v['default']
 
@@ -79,11 +79,11 @@ class SCTExportPopup(tk.Toplevel):
 
         self.option_vars = {}
         row = 0
-        for o_name, o_settings in self.option_settings.items():
+        for o_name, o_settings in self.option_settings_check.items():
             self.option_vars[o_name] = tk.StringVar()
-            garbage = ttk.Checkbutton(options_frame, text=o_settings['text'], variable=self.option_vars[o_name],
-                                      onvalue='True', offvalue='False', command=lambda x=o_name: self.change_setting(x))
-            garbage.grid(row=row, column=0, sticky=tk.W)
+            button = ttk.Checkbutton(options_frame, text=o_settings['text'], variable=self.option_vars[o_name],
+                                     onvalue='True', offvalue='False', command=lambda x=o_name: self.change_setting(x))
+            button.grid(row=row, column=0, sticky=tk.W)
             self.option_vars[o_name].set(settings[self.log_key][o_name])
             row += 1
 
