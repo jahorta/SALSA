@@ -118,7 +118,7 @@ class SCPTEditWidget(ttk.Frame):
         self.prefix_label.grid(row=0, column=0)
 
         self.class_selection = tk.StringVar(self)
-        self.class_option = ttk.OptionMenu(self, self.class_selection, *self.scpt_codes.classes,
+        self.class_option = ttk.OptionMenu(self, self.class_selection, '---', *self.scpt_codes.classes,
                                            command=lambda e: self.update_options())
         self.class_option.grid(row=0, column=1, sticky='NSEW')
 
