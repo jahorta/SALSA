@@ -588,8 +588,7 @@ class ProjectEditorController:
         inst_uuid = self.project.add_inst(self.current['script'], self.current['section'],
                                           pre_rowdata, case=case, direction=direction)
         inst_trace = [self.current['script'], self.current['section'], inst_uuid]
-        self.update_tree('instruction', self.project.get_tree(self.view.get_headers('instruction'),
-                                                              self.current['script'], self.current['section']))
+        self.refresh_tree('instruction')
 
         sel_iid = str(int(sel_iid) + 1) if direction == 'inside' else sel_iid
 
