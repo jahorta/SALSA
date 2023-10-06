@@ -17,6 +17,7 @@ class Colors:
     error_button: str
     link: str
     warning_text: str
+    disabled_text: str
 
 
 def theme_generator(colors: Colors):
@@ -97,6 +98,12 @@ def theme_generator(colors: Colors):
                 "foreground": colors.text,  # White text
                 "indicatorbackground": colors.bg_internal,
                 "indicatorforeground": colors.text,
+            },
+            "map": {
+                "background": [('disabled', colors.bg)],
+                "foreground": [('disabled', colors.disabled_text)],
+                "indicatorbackground": [('disabled', colors.bg_internal)],
+                "indicatorforeground": [('disabled', colors.disabled_text)]
             }
         },
         "TCombobox": {
@@ -307,7 +314,8 @@ themes = {
         button="#3c4f4f",
         error_button="#5c2f2f",
         link='#5588ff',
-        warning_text='#ee4444'
+        warning_text='#ee4444',
+        disabled_text='#777777'
     )),
     'light': theme_generator(Colors(
         bg='#eeeeee',
@@ -322,7 +330,8 @@ themes = {
         button="#acafd1",
         error_button="#dcafa1",
         link='#0055ee',
-        warning_text='#dd1122'
+        warning_text='#dd1122',
+        disabled_text='#eeeeee'
     )),
 }
 
