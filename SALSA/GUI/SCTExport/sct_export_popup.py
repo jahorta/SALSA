@@ -145,6 +145,13 @@ class SCTExportPopup(tk.Toplevel):
 
     def change_setting(self, setting):
         settings[self.log_key][setting] = self.option_vars[setting].get()
+        self.set_option_state()
+
+    def set_option_state(self):
+        compress_ind = list(self.option_settings_check.keys()).index('compress_aklz') + 1
+        compress_checkbox = self.children['!labelframe3'].children[f'!checkbutton{compress_ind if compress_ind != 1 else ""}']
+        compress_disabled_state = True if self.option_vars['system'] == 'Dreamcast' else False
+        compress_checkbox['disabled'] = compress_disabled_state
 
     def export(self):
         directory = self.directory_var.get()
