@@ -97,6 +97,7 @@ class ParamEditController:
                                                is_base=self.param is None)
         self.scpt_fields['0'].grid(row=0, column=0, sticky='W')
         if cleared:
+            self.scpt_fields['0'].set_widget_values(None)
             return
         value = self.param.value if self.param is not None else self.base_param.default_value
 
