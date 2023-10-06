@@ -23,14 +23,14 @@ class DecimalWidget(ttk.Frame):
         self.left_field = w.RequiredIntEntry(self, b_min=0, b_max=0xffff, width=7, textvariable=self.left_variable)
         self.left_field.grid(row=0, column=0)
 
-        center_label = tk.Label(self, text='+')
+        center_label = ttk.Label(self, text='+')
         center_label.grid(row=0, column=1)
 
         self.right_variable = textvariables[1]
         self.right_field = w.RequiredIntEntry(self, b_min=0, b_max=255, width=4, textvariable=self.right_variable)
         self.right_field.grid(row=0, column=2)
 
-        right_label = tk.Label(self, text='/256')
+        right_label = ttk.Label(self, text='/256')
         right_label.grid(row=0, column=3)
 
 
