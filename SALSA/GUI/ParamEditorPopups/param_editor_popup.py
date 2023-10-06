@@ -118,7 +118,8 @@ class SCPTEditWidget(ttk.Frame):
         self.prefix_label.grid(row=0, column=0)
 
         self.class_selection = tk.StringVar(self)
-        self.class_option = ttk.OptionMenu(self, self.class_selection, *self.scpt_codes.classes, command=self.update_options)
+        self.class_option = ttk.OptionMenu(self, self.class_selection, *self.scpt_codes.classes,
+                                           command=lambda e: self.update_options())
         self.class_option.grid(row=0, column=1, sticky='NSEW')
 
         self.option_selection = tk.StringVar(self, '---')
@@ -143,7 +144,7 @@ class SCPTEditWidget(ttk.Frame):
         self.prev_active_widget = ''
         self.active_widget = ''
 
-    def update_options(self, e):
+    def update_options(self):
         class_selected = self.class_selection.get()
         option_list = list(self.scpt_codes.__getattribute__(class_selected).keys())
         self.option_option.configure(state='normal')
@@ -203,19 +204,19 @@ class SCPTEditWidget(ttk.Frame):
         # Value is a compare type scpt code
         if value in self.scpt_codes.compare:
             self.class_selection.set('compare')
-            self.update_options(None)
+            self.update_options()
             self.option_selection.set(value)
 
         # Value is an arithmetic type scpt code
         elif value in self.scpt_codes.arithmetic:
             self.class_selection.set('arithmetic')
-            self.update_options(None)
+            self.update_options()
             self.option_selection.set(value)
 
         # Value is a secondary code to get a specific value (Reputation, gold, Character level, etc...)
         elif value in self.scpt_codes.secondary:
             self.class_selection.set('secondary')
-            self.update_options(None)
+            self.update_options()
             self.option_selection.set(value)
             self.secondary_option_selection = value
 
@@ -223,7 +224,7 @@ class SCPTEditWidget(ttk.Frame):
         elif isinstance(value, str):
             if '/' in value:
                 self.class_selection.set('input')
-                self.update_options(None)
+                self.update_options()
                 self.option_selection.set('decimal')
                 self.set_active_input_widget('decimal')
                 value_parts = value.split('/')
@@ -240,7 +241,7 @@ class SCPTEditWidget(ttk.Frame):
                 var_type = var_parts[0]
                 var_value = int(var_parts[1])
                 self.class_selection.set('input')
-                self.update_options(None)
+                self.update_options()
                 self.option_selection.set(f'{var_type}: ')
                 self.set_active_input_widget('var')
                 self.input_vars['var'].set(var_value)
@@ -252,7 +253,7 @@ class SCPTEditWidget(ttk.Frame):
         # Value is just a number to input
         else:
             self.class_selection.set('input')
-            self.update_options(None)
+            self.update_options()
             self.option_selection.set('float: ')
             self.set_active_input_widget('float')
             if override:
