@@ -233,7 +233,7 @@ class SCTInstruction:
             prev_pieces = prev_piece.split(' ')
             cur_pieces = cur_piece.split(' ')
             if int(cur_pieces[0]) in aliases[prev_pieces[-1]+'Var']:
-                alias = aliases[prev_pieces[-1]+'Var'][int(cur_pieces[0])]
+                alias = aliases[prev_pieces[-1]+'Var'][int(cur_pieces[0])]['alias']
             else:
                 alias = ''
             alias = alias if alias != '' else f'{prev_pieces[-1]}Var: {cur_pieces[0]}'
