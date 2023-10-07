@@ -1605,3 +1605,15 @@ class SCTProjectFacade:
         if rowdata not in self.project.scts:
             return
         self.project.scts.pop(rowdata)
+
+    def get_project_encode_errors(self):
+        errors = {}
+        for name, sct in self.project.scts.items():
+            sct_errors = []
+            for error in sct.errors:
+                if 'Encode' in error:
+                    sct_errors.append(error)
+            if len(sct_errors) > 0:
+                errors[name] = sct_errors
+        return errors
+
