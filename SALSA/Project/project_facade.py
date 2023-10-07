@@ -849,7 +849,7 @@ class SCTProjectFacade:
     def remove_switch_case(self, script, section, instruction, case, result, **kwargs):
         return self.change_inst(script, section, instruction, case=case, change_type=result)
 
-    def add_loop_param(self, script, section, instruction, **kwargs):
+    def add_loop_param(self, script, section, instruction, position=None, **kwargs):
         inst = self.project.scts[script].sects[section].insts[instruction]
         loop = {}
         for param_id in self.base_insts.get_inst(inst.base_id).loop:
@@ -857,7 +857,8 @@ class SCTProjectFacade:
             loop_param = SCTParameter(param_id, base_param.type)
             loop_param.set_value(base_param.default_value)
             loop[int(param_id)] = loop_param
-        inst.l_params = [loop, *inst.l_params]
+        pos = 0 if position is None else position
+        inst.l_params.insert(pos, loop)
         self.update_loop_param_num(inst)
         return True
 
