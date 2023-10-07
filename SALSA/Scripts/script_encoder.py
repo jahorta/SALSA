@@ -2,6 +2,7 @@ import copy
 import re
 from typing import Union, Literal
 
+from SALSA.Common.constants import alt_sep
 from SALSA.Common.script_string_utils import fix_string_encoding_errors
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.byte_array_utils import float2Hex
@@ -186,7 +187,7 @@ class SCTEncoder:
         for link_offset, (jmp_to, trace) in self.sct_links.items():
             if jmp_to[1] not in self.inst_positions:
                 self.script.errors.append(
-                    ('Encode', 'Link', f'No target inst {jmp_to[0]}-{jmp_to[1]}', "-".join(trace)))
+                    ('Encode', 'Link', f'No target inst {jmp_to[0]}-{jmp_to[1]}', alt_sep.join(trace)))
                 print(f'No target inst{jmp_to[1]}')
                 continue
             jmp_to_pos = self.inst_positions[jmp_to[1]]
@@ -196,7 +197,7 @@ class SCTEncoder:
         # Resolve string links
         for link_offset, (section, trace) in self.string_links.items():
             if section not in self.header_dict:
-                self.script.errors.append(('Encode', 'String', f'No string {section}', "-".join(trace)))
+                self.script.errors.append(('Encode', 'String', f'No string {section}', alt_sep.join(trace)))
                 print(f'No string {section}')
                 continue
             str_pos = self.header_dict[section]
@@ -399,7 +400,7 @@ class SCTEncoder:
                 value = param.override
             else:
                 if param.value is None and 'skip' not in base_param.type:
-                    self.script.errors.append(('Encode', 'Parameter', 'Value is None', "-".join(e_trace)))
+                    self.script.errors.append(('Encode', 'Parameter', 'Value is None', alt_sep.join(e_trace)))
                     return
                 no_loop = False
                 if isinstance(param.value, str):
@@ -417,7 +418,7 @@ class SCTEncoder:
                     value.extend(self._make_word(self.param_code.stop_code))
         else:
             if param.value is None:
-                self.script.errors.append(('Encode', 'Parameter', 'Value is None', "-".join(e_trace)))
+                self.script.errors.append(('Encode', 'Parameter', 'Value is None', alt_sep.join(e_trace)))
                 return
             if 'var' in base_param.type:
                 value = self._encode_scpt_param(param.value)
