@@ -762,16 +762,20 @@ class ProjectEditorController:
         if not self.project.has_loops(**self.current):
             return
         m = tk.Menu(self.view, tearoff=0)
-        m.add_command(label='Add Loop Parameter', command=lambda: self.handle_loop_param_change('add'))
 
         param = e.widget.row_data[row]
         if param is None:
             loop_num = int(e.widget.item(row)['text'][4:])
+            m.add_command(label='Add Loop Parameter Above',
+                          command=lambda: self.handle_loop_param_change('add-above', loop_num=loop_num))
+            m.add_command(label='Add Loop Parameter Below',
+                          command=lambda: self.handle_loop_param_change('add-below', loop_num=loop_num))
             m.add_command(label='Remove Loop Parameter',
                           command=lambda: self.handle_loop_param_change('remove', loop_num=loop_num))
 
         if self.project.inst_is_switch(**self.current):
-            m.entryconfigure('Add a Loop Parameter', state='disabled')
+            m.entryconfigure('Add a Loop Parameter Above', state='disabled')
+            m.entryconfigure('Add a Loop Parameter Below', state='disabled')
             m.entryconfigure('Remove this Loop Parameter', state='disabled')
 
             def blank():
@@ -784,15 +788,14 @@ class ProjectEditorController:
         finally:
             m.grab_release()
 
-    def handle_loop_param_change(self, change: Literal['add', 'remove'], loop_num=None):
+    def handle_loop_param_change(self, change: Literal['add-above', 'add-below', 'remove'], loop_num=None):
         has_changed = False
-        if change == 'add':
-            has_changed = self.project.add_loop_param(**self.current)
+        if 'add' in change:
+            position = loop_num if 'below' not in change else loop_num + 1
+            has_changed = self.project.add_loop_param(**self.current, position=position)
         if change == 'remove':
             has_changed = self.project.remove_loop_param(**self.current, loop_num=loop_num)
         if has_changed:
-            param_tree = self.project.get_parameter_tree(headings=self.view.get_headers('parameter'), **self.current)
-            self.update_tree('parameter', param_tree)
             self.set_change_flag()
 
     def add_callback(self, key: str, callback: callable):
