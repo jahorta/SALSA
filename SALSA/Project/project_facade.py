@@ -1618,3 +1618,7 @@ class SCTProjectFacade:
                 errors[name] = sct_errors
         return errors
 
+    def refresh_condition(self, script, section, instruction, **kwargs):
+        inst = self.project.scts[script].sects[section].insts[instruction]
+        inst.generate_condition(self.get_script_variables_with_aliases(script))
+
