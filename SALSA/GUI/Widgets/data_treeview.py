@@ -187,8 +187,8 @@ class DataTreeview(ttk.Treeview):
         return iid
 
     def get_iid_from_rowdata(self, row_data):
-        temp_row_data = [v for v in self.row_data.values()]
-        return list(self.row_data.keys())[temp_row_data.index(row_data)] if row_data in temp_row_data else None
+        rows = {v: k for k, v in self.row_data.items() if k is not None}
+        return rows[row_data] if row_data in rows else None
 
     def select_by_rowdata(self, row_data):
         for iid, data in self.row_data.items():
