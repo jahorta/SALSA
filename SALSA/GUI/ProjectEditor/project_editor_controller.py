@@ -138,6 +138,9 @@ class ProjectEditorController:
         for tree in self.trees.values():
             tree.clear_all_entries()
         self.update_tree('script', self.project.get_tree(self.view.get_headers('script')))
+        if len(self.project.get_project_encode_errors()) > 0:
+            self.encoding_errors = ['True']
+        self.check_encoding_errors()
 
     def on_select_tree_entry(self, tree_key, entry):
         if self.inst_selector is not None:
