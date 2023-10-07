@@ -811,5 +811,10 @@ class ProjectEditorController:
     def check_encoding_errors(self):
         if len(self.encoding_errors) > 0:
             self.view.error_button.grid()
+            self.show_error_warning()
         else:
             self.view.error_button.grid_remove()
+
+    def show_error_warning(self):
+        message = 'Encoding errors were found.\n\nPlease resolve these for proper script encoding.'
+        tk.messagebox.showwarning(title='Confirm Instruction Group Removal', message=message)
