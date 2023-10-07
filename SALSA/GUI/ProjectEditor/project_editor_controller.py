@@ -324,13 +324,13 @@ class ProjectEditorController:
         inst = self.project.get_inst_uuid_by_ind(script=self.current['script'], section=sect, inst_ind=link_parts[1])
         self.resolve_link(sect=sect, inst=inst)
 
-    def resolve_link(self, script=None, sect=None, inst=None):
+    def resolve_link(self, script=None, sect=None, inst=None, param=None):
         if script is None:
             script = self.current['script']
         if sect is None:
             sect = self.current['section']
         if inst is None:
-            inst = self.current['inst']
+            inst = self.current['instruction']
 
         if script != self.current['script']:
             sel_iid = self.trees['script'].get_iid_from_rowdata(script)
@@ -338,20 +338,26 @@ class ProjectEditorController:
             self.trees['script'].focus(sel_iid)
             self.trees['script'].selection_set([sel_iid])
             self.on_select_tree_entry('script', script)
-            self.view.after(10, self.resolve_link, None, sect, inst)
+            self.view.after(10, self.resolve_link, None, sect, inst, param)
         elif sect != self.current['section']:
             sel_iid = self.trees['section'].get_iid_from_rowdata(sect)
             self.trees['section'].see(sel_iid)
             self.trees['section'].focus(sel_iid)
             self.trees['section'].selection_set([sel_iid])
             self.on_select_tree_entry('section', sect)
-            self.view.after(10, self.resolve_link, None, None, inst)
-        else:
+            self.view.after(10, self.resolve_link, None, None, inst, param)
+        elif inst != self.current['instruction']:
             sel_iid = self.trees['instruction'].get_iid_from_rowdata(inst)
             self.trees['instruction'].see(sel_iid)
             self.trees['instruction'].focus(sel_iid)
             self.trees['instruction'].selection_set([sel_iid])
             self.on_select_tree_entry('instruction', inst)
+            self.view.after(10, self.resolve_link, None, None, None, param)
+        elif param is not None:
+            sel_iid = self.trees['parameter'].get_iid_from_rowdata(param)
+            self.trees['parameter'].see(sel_iid)
+            self.trees['parameter'].focus(sel_iid)
+            self.trees['parameter'].selection_set([sel_iid])
 
     def clear_inst_details(self):
         self.view.inst_label.config(text='ID - Name')
