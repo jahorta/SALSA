@@ -92,7 +92,7 @@ class Application(tk.Tk):
                                                                callbacks=project_controller_callbacks,
                                                                theme=theme)
 
-        self.gui = GUIController(parent=self, scpt_editor_controller=self.project_edit_controller,
+        self.gui = GUIController(parent=self, project_editor_controller=self.project_edit_controller,
                                  project_facade=self.project, inst_lib_facade=self.base_insts, theme=theme)
 
         self.project_edit_controller.add_callback('toggle_frame_state', self.gui.toggle_frame_state)

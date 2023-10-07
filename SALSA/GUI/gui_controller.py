@@ -35,9 +35,9 @@ class PopupTypes(TypedDict):
 
 class GUIController:
     parent: tk.Tk
-    scpt_view: ProjectEditorView
+    prj_view: ProjectEditorView
 
-    def __init__(self, parent, scpt_editor_controller: ProjectEditorController, project_facade: SCTProjectFacade,
+    def __init__(self, parent, project_editor_controller: ProjectEditorController, project_facade: SCTProjectFacade,
                  inst_lib_facade: BaseInstLibFacade, theme):
 
         self.status_msg: Union[None, tk.Label] = None
@@ -45,8 +45,8 @@ class GUIController:
         self.status_queue: queue.SimpleQueue = queue.SimpleQueue()
         self.help_path = os.path.abspath('./SALSA/Help/Skies of Arcadia Legends Script Assistant.html')
         self.parent = parent
-        self.scpt_cont = scpt_editor_controller
-        self.scpt_view = self.scpt_cont.view
+        self.prj_cont = project_editor_controller
+        self.prj_view = self.prj_cont.view
         self.project = project_facade
         self.base_lib = inst_lib_facade
         self.theme = theme
@@ -63,11 +63,11 @@ class GUIController:
     # ------------------------------------------------------------- #
 
     def enable_project_view(self):
-        self._recursive_toggle(self.scpt_view, 'normal')
+        self._recursive_toggle(self.prj_view, 'normal')
         self.callbacks['script']()
 
     def disable_project_view(self):
-        self._recursive_toggle(self.scpt_view, 'disabled')
+        self._recursive_toggle(self.prj_view, 'disabled')
         self.callbacks['no_script']()
 
     def toggle_frame_state(self, frame, state: Literal['normal', 'disabled']):
@@ -139,7 +139,7 @@ class GUIController:
             self.popups['variable'].tkraise()
             return
         callbacks = {
-            'get_scripts': lambda: self.project.get_tree(self.scpt_view.get_headers('script')),
+            'get_scripts': lambda: self.project.get_tree(self.prj_view.get_headers('script')),
             'get_variables': self.project.get_script_variables_with_aliases,
             'set_alias': self.project.set_variable_alias,
             'remove_global': self.project.remove_global,
@@ -155,13 +155,13 @@ class GUIController:
             return
         callbacks = {
             'save': self.project.edit_string, 'close': self.close_popup,
-            'get_scripts': lambda: self.project.get_tree(self.scpt_view.get_headers('script')),
+            'get_scripts': lambda: self.project.get_tree(self.prj_view.get_headers('script')),
             'get_string_tree': self.project.get_string_tree, 'get_string_to_edit': self.project.get_string_to_edit,
             'add_string_group': self.project.add_string_group, 'delete_string_group': self.project.remove_string_group,
             'rename_string_group': self.project.rename_string_group, 'add_string': self.project.add_string,
             'delete_string': self.project.delete_string, 'rename_string': self.project.change_string_id,
             'is_sect_name_used': self.project.is_sect_name_used,
-            'refresh_sections': lambda: self.scpt_cont.refresh_tree('section')
+            'refresh_sections': lambda: self.prj_cont.refresh_tree('section')
         }
         self.popups['string'] = StringPopup(self.parent, callbacks=callbacks, name='string',
                                             theme=self.theme)
@@ -172,7 +172,7 @@ class GUIController:
             return
         callbacks = {
             'export': self.callbacks['export_sct'], 'close': self.close_popup,
-            'get_tree': lambda: self.project.get_tree(self.scpt_view.get_headers('script')),
+            'get_tree': lambda: self.project.get_tree(self.prj_view.get_headers('script')),
         }
         self.popups['export'] = SCTExportPopup(self.parent, callbacks=callbacks, name='export', selected=selected,
                                                theme=self.theme)
@@ -202,7 +202,7 @@ class GUIController:
         theme = dark_theme if self.callbacks['is_darkmode']() else light_theme
         bg = theme['TLabelframe']['configure']['highlightbackground']
         fg = theme['.']['configure']['foreground']
-        self.status_popup = tk.Toplevel(self.scpt_view, background=bg)
+        self.status_popup = tk.Toplevel(self.prj_view, background=bg)
         self.status_popup.title = title
         self.status_popup.overrideredirect(True)
         self.status_popup.wm_focusmodel('active')
@@ -215,8 +215,8 @@ class GUIController:
         self.status_sub_msg = tk.Label(self.status_popup, text=sub_msg, anchor=tk.CENTER, background=bg, foreground=fg)
         self.status_sub_msg.grid(row=1, column=0)
 
-        cur_geom = (self.scpt_view.winfo_width(), self.scpt_view.winfo_height(), self.scpt_view.winfo_rootx(),
-                    self.scpt_view.winfo_rooty())
+        cur_geom = (self.prj_view.winfo_width(), self.prj_view.winfo_height(), self.prj_view.winfo_rootx(),
+                    self.prj_view.winfo_rooty())
         x = cur_geom[2] + cur_geom[0] // 2 - width // 2
         y = cur_geom[3] + cur_geom[1] // 2 - height // 2
         new_geom = f'{width}x{height}+{x}+{y}'
