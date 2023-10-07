@@ -785,6 +785,7 @@ class ProjectEditorController:
         if has_changed:
             param_tree = self.project.get_parameter_tree(headings=self.view.get_headers('parameter'), **self.current)
             self.update_tree('parameter', param_tree)
+            self.set_change_flag()
 
     def add_callback(self, key: str, callback: callable):
         self.callbacks[key] = callback
