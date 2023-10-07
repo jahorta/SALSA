@@ -193,6 +193,7 @@ class DataTreeview(ttk.Treeview):
     def select_by_rowdata(self, row_data):
         for iid, data in self.row_data.items():
             if row_data == data:
+                self.focus(iid)
                 self.selection_set(iid)
                 break
 
