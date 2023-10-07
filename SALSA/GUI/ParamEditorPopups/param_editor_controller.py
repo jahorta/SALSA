@@ -74,6 +74,8 @@ class ParamEditController:
         self.base_param = None
         self.param_id = None
         self.column_id = None
+        self.scpt_rows = {}
+        self.scpt_fields = {}
         if self.end_callback is not None:
             self.end_callback(**self.end_kwargs)
 
