@@ -752,8 +752,8 @@ class ProjectEditorController:
     def on_refresh_inst(self):
         self.project.refresh_condition(**self.current)
         self.on_select_tree_entry('section', self.current['section'])
-        self.trees['instruction'].select_by_rowdata(cur_inst_id)
-        self.on_select_tree_entry('instruction', cur_inst_id)
+        self.trees['instruction'].select_by_rowdata(self.current['instruction'])
+        self.on_select_tree_entry('instruction', self.current['instruction'])
 
     def param_right_click_menu(self, row, e):
         if self.inst_selector is not None:
