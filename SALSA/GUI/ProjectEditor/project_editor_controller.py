@@ -750,7 +750,7 @@ class ProjectEditorController:
         self.project.update_inst_field(field=field, value=value, **self.current)
 
     def on_refresh_inst(self):
-        cur_inst_id = self.current['instruction']
+        self.project.refresh_condition(**self.current)
         self.on_select_tree_entry('section', self.current['section'])
         self.trees['instruction'].select_by_rowdata(cur_inst_id)
         self.on_select_tree_entry('instruction', cur_inst_id)
