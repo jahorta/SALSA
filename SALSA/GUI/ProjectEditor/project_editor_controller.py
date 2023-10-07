@@ -797,6 +797,9 @@ class ProjectEditorController:
             has_changed = self.project.remove_loop_param(**self.current, loop_num=loop_num)
         if has_changed:
             self.set_change_flag()
+            self.refresh_tree('instruction', keep_selection=True)
+            param_tree = self.project.get_parameter_tree(headings=self.view.get_headers('parameter'), **self.current)
+            self.update_tree('parameter', param_tree)
 
     def add_callback(self, key: str, callback: callable):
         self.callbacks[key] = callback
