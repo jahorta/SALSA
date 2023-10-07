@@ -5,6 +5,7 @@ from tkinter import ttk
 from typing import Union, TypedDict, Literal
 import webbrowser
 
+from SALSA.GUI.ProjectErrorPopup.project_error_popup import ProjectErrorPopup
 from SALSA.GUI.ProjectEditor.project_editor_controller import ProjectEditorController
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
 from SALSA.GUI.themes import light_theme, dark_theme
@@ -30,7 +31,7 @@ class PopupTypes(TypedDict):
     variable: Union[None, VariablePopup]
     string: Union[None, StringPopup]
     export: Union[None, SCTExportPopup]
-    errors: Union[None, SCTExportPopup]
+    errors: Union[None, ProjectErrorPopup]
 
 
 class GUIController:
@@ -132,7 +133,16 @@ class GUIController:
         pass
 
     def show_project_errors(self):
-        pass
+        if self.popups['errors'] is not None:
+            self.popups['errors'].tkraise()
+            return
+        callbacks = {
+            'get_errors': self.project.get_project_encode_errors,
+            'goto_error': self.prj_cont.resolve_link,
+            'close': self.close_popup
+        }
+        self.popups['errors'] = ProjectErrorPopup(self.parent, callbacks=callbacks, name='errors',
+                                                  theme=self.theme)
 
     def show_variables_popup(self):
         if self.popups['variable'] is not None:
