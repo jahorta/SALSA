@@ -835,6 +835,22 @@ class SCTProjectFacade:
 
         self.callbacks['set_change']()
 
+    # ---------------------------- #
+    # Section manipulation methods #
+    # ---------------------------- #
+
+    def add_section(self, script, position):
+        pass
+
+    def remove_section(self, script, section):
+        pass
+
+    def group_sections(self, script, section_bounds):
+        pass
+
+    def ungroup_sections(self, script, section):
+        pass
+
     # ---------------------------------------------- #
     # Instruction and parameter manipulation methods #
     # ---------------------------------------------- #
