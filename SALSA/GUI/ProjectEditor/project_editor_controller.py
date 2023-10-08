@@ -748,9 +748,9 @@ class ProjectEditorController:
         self.project.remove_switch_case(script=self.current['script'], section=self.current['section'], **kwargs)
         self.refresh_tree('instruction')
 
-    # ------------------------------------- #
-    # Instruction Confirmation Messageboxes #
-    # ------------------------------------- #
+    # -------------------------------------- #
+    # Group Change Confirmation Messageboxes #
+    # -------------------------------------- #
 
     def confirm_change_inst_group(self, children, end_callback, end_kwargs, warning_suffix='', new_id=None):
         # Create message to confirm change of instruction (separate method)
