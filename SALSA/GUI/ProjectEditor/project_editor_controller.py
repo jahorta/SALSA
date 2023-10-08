@@ -771,6 +771,9 @@ class ProjectEditorController:
             return end_callback(**end_kwargs)
         return self.view.inst_group_handling(cur_inst_id, new_id, children, end_callback, end_kwargs)
 
+    def confirm_remove_sect_group(self, children, end_callback, end_kwargs, warning_suffix='', new_id=None):
+        pass
+
     # ------------------------ #
     # Parameter editor methods #
     # ------------------------ #
