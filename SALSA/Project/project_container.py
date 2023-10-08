@@ -34,9 +34,6 @@ class SCTLink:
     target_trace: Union[List[Union[int, str]], None] = None
     ID: int = dc_field(default_factory=lambda counter=count(): next(counter))
 
-    def set_id(self, _id):
-        self.ID = _id
-
     def __repr__(self):
         return f'Link: {self.ID} - {self.origin_trace[0]}:{self.origin_trace[1]}:{self.origin_trace[2]}' \
                f'\n\torigin: {self.origin}, target: {self.target}'
@@ -172,9 +169,6 @@ class SCTInstruction:
             if len(param.errors) > 0:
                 self.errors.append((f'loop{sep}{len(self.l_params) - 1}{sep}param', p_id))
 
-    def get_links(self):
-        return self.links_out if len(self.links_out) > 0 else None
-
     def generate_condition(self, var_aliases):
         # Only generate conditions for ifs and switches
         if self.base_id not in (0, 3):
@@ -303,9 +297,6 @@ class SCTSection:
     def add_garbage(self, key: str, value: bytearray):
         self.garbage[key] = value
 
-    def add_loop(self, loop_id: int):
-        self.jump_loops.append(loop_id)
-
     def get_inst_list(self, style):
         return self.inst_tree if style == 'grouped' else self.inst_list
 
@@ -365,14 +356,6 @@ class SCTScript:
             self.error_sections[name] = section.errors
         self.section_num += 1
 
-    def add_link(self, link: SCTLink) -> int:
-        self.links.append(link)
-        return len(self.links) - 1
-
-    def add_footer_entry(self, entry):
-        self.footer.append(entry)
-        return len(self.footer) - 1
-
     def get_sect_list(self, style):
         if style == 'grouped':
             return self.sect_tree
@@ -393,6 +376,3 @@ class SCTProject:
         self.filepath = None
         self.global_variables = {'BitVar': {}, 'IntVar': {}, 'ByteVar': {}, 'FloatVar': {}}
         self.version = copy(self.cur_version)
-
-    def add_script(self, filename: str, script: SCTScript):
-        self.scts[filename] = script
