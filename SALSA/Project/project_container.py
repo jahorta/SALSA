@@ -68,11 +68,12 @@ class SCTParameter:
     analyze_log: dict
     skip_refresh: bool
     link_value: (str, str)
+    link: Union[None, SCTLink]
 
     def __init__(self, _id, _type):
         self.ID = _id
         self.type = _type
-        self.link: Union[None, SCTLink] = None
+        self.link = None
         self.errors = []
         self.analyze_log = {}
         self.value = None
@@ -131,6 +132,7 @@ class SCTInstruction:
     links_in: List[SCTLink]
     params: Dict[int, SCTParameter]
     l_params: List[Dict[int, SCTParameter]]
+    ungrouped_position: int
 
     def __init__(self):
         self.ID: str = str(uuid.uuid4()).replace('-', uuid_sep)
@@ -145,7 +147,7 @@ class SCTInstruction:
         self.l_params = []
         self.condition = ''
         self.synopsis = ''
-        self.ungrouped_position: int = -1
+        self.ungrouped_position = -1
         self.my_goto_uuids = []
         self.my_master_uuids = []
         self.label = ''
@@ -247,6 +249,7 @@ class SCTInstruction:
 
 class SCTSection:
 
+    insts: Dict[str, SCTInstruction]
     inst_tree: List[Union[str, Dict[str, Union[list, dict, str]]]]
     type: str
     inst_errors: List[int]
@@ -259,7 +262,7 @@ class SCTSection:
         self.name = None
         self.length = None
         self.absolute_offset = None
-        self.insts: Dict[str, SCTInstruction] = {}
+        self.insts = {}
         self.inst_tree = []
         self.inst_list = []
         self.inst_errors = []
