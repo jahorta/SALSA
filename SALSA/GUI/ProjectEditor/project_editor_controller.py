@@ -46,6 +46,7 @@ class ProjectEditorController:
             'edit_param': self.on_edit_parameter,
             'show_header_selection_menu': self.show_header_selection_menu,
             'show_script_menu': self.show_script_right_click_menu,
+            'show_section_menu': self.show_section_right_click_menu,
             'show_inst_menu': self.show_instruction_right_click_menu,
             'save_project': self.save_project,
             'set_mem_offset': self.set_mem_offset,
@@ -513,6 +514,67 @@ class ProjectEditorController:
 
         self.project.remove_script(rowdata)
         self.refresh_tree('script')
+
+    # # Section Options # #
+
+    def show_section_right_click_menu(self, e):
+        if self.inst_selector is not None:
+            self.shake_widget(self.inst_selector)
+            return
+        if e.widget.identify('region', e.x, e.y) == 'heading':
+            return
+        sel_iid = self.trees['section'].identify_row(e.y)
+        if sel_iid == '':
+            return
+        if sel_iid not in self.trees['section'].selection():
+            self.trees['section'].selection_set(sel_iid)
+            self.trees['section'].focus(sel_iid)
+
+        if len(self.trees['section'].selection()) > 0:
+            is_multiple = True
+            row_data = [self.trees['section'].row_data.get(s, None) for s in self.trees['section'].selection()]
+            is_group = False
+        else:
+            is_multiple = False
+            row_data = [self.trees['section'].row_data.get(s, None) for s in self.trees['section'].selection()]
+            is_group = len(self.trees['section'].get_children(sel_iid)) > 0
+        m = tk.Menu(self.view, tearoff=0)
+
+        # commands to add section from project
+        if not is_multiple:
+            m.add_command(label='Add New Section Above', command=lambda: self.rcm_add_sect('above', *row_data))
+            m.add_command(label='Add New Section Below', command=lambda: self.rcm_add_sect('below', *row_data))
+
+        # command to remove section from project
+        label = 'Delete Section'
+        label += 's' if is_multiple else ''
+        m.add_command(label=label, command=lambda: self.rcm_del_sect(row_data))
+
+        m.add_separator()
+
+        if is_group:
+            m.add_command(label='Ungroup sections', command=lambda: self.rcm_ungroup_sections(*row_data))
+
+        if is_multiple:
+            m.add_command(label='Group sections', command=lambda: self.rcm_group_sections(row_data))
+
+        m.bind('<Escape>', m.destroy)
+        try:
+            m.tk_popup(e.x_root, e.y_root)
+        finally:
+            m.grab_release()
+
+    def rcm_add_sect(self, direction, relative_section):
+        pass
+
+    def rcm_del_sect(self, sections):
+        pass
+
+    def rcm_ungroup_sections(self, section):
+        pass
+
+    def rcm_group_sections(self, sections):
+        pass
 
     # # Instruction Options # #
 
