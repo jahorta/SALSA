@@ -430,6 +430,21 @@ class ProjectEditorController:
         self.refresh_tree('section', keep_selection=True)
         self.refresh_tree('instruction', keep_selection=True)
 
+    def change_section_name(self, widget, sel_iid, e):
+        section_name = self.trees['instruction'].row_data.get(sel_iid, None)
+        new_name = e.widget.get()
+        if new_name == self.current['section']:
+            return widget.destroy()
+        if self.project.is_sect_name_used(self.current['script'], new_name):
+            schedule_tooltip(widget, 'This name is in use', delay=0, min_time=1500, position='above center',
+                             is_warning=True)
+            return self.shake_widget(widget)
+        if new_name == '':
+            schedule_tooltip(widget, 'A name is required', delay=0, min_time=1500, position='above center',
+                             is_warning=True)
+            return self.shake_widget(widget)
+        widget.destroy()
+
     def shake_widget(self, widget):
         shake_speed = 70
         shake_intensity = 2
@@ -542,6 +557,7 @@ class ProjectEditorController:
 
         # commands to add section from project
         if not is_multiple:
+            m.add_command(label='Rename Section', command=lambda: self.rcm_rename_sect(sel_iid))
             m.add_command(label='Add New Section Above', command=lambda: self.rcm_add_sect('above', *row_data))
             m.add_command(label='Add New Section Below', command=lambda: self.rcm_add_sect('below', *row_data))
 
@@ -563,6 +579,9 @@ class ProjectEditorController:
             m.tk_popup(e.x_root, e.y_root)
         finally:
             m.grab_release()
+
+    def rcm_rename_sect(self, sel_iid):
+        pass
 
     def rcm_add_sect(self, direction, relative_section):
         pass
