@@ -271,6 +271,7 @@ class SCTSection:
         self.jump_loops = []
         self.internal_sections_inst = {}
         self.internal_sections_curs = {}
+        self.is_logical = False
 
     def set_name(self, name):
         self.name = name
@@ -335,13 +336,10 @@ class SCTScript:
         self.index = {k: v[0] for k, v in index.items()} if index is not None else {}
         self.header = header
         self.sects = {}
-        self.section_groups = {}
-        self.section_group_keys = {}
         self.sect_tree = []
         self.sect_list = []
         self.inst_locations = [[] for _ in range(266)]
         self.links = []
-        self.links_to_sections = {}
         self.footer = []
         self.strings = {}
         self.string_groups = {}
@@ -383,8 +381,8 @@ class SCTProject:
     file_name: str
     scts: Dict[str, SCTScript]
 
-    # NOTE: version numbers should change only when the master branch is updated.
-    cur_version = 3
+    # NOTE: version numbers should change only when the master branch is updated or when testing the updater.
+    cur_version = 4
 
     def __init__(self):
         self.scts = {}

@@ -85,6 +85,9 @@ class SCTDecoder:
         self._EU_encoding = False
         self._base_endian: Literal['big', 'little']
         self._other_endian: Literal['big', 'little']
+        self._section_groups = {}
+        self._section_group_keys = {}
+        self._links_to_sections = {}
 
     @classmethod
     def decode_sct_from_file(cls, name, sct, inst_lib: BaseInstLibFacade, status: queue.SimpleQueue = None,
@@ -1024,10 +1027,10 @@ class SCTDecoder:
             if link.origin_trace[0] != link.target_trace[0]:
                 tr_sect = link.origin_trace[0]
                 target_tr_sect = link.target_trace[0]
-                if target_tr_sect not in decoded_sct.links_to_sections.keys():
-                    decoded_sct.links_to_sections[target_tr_sect] = []
-                if tr_sect not in decoded_sct.links_to_sections[target_tr_sect]:
-                    decoded_sct.links_to_sections[target_tr_sect].append(tr_sect)
+                if target_tr_sect not in self._links_to_sections.keys():
+                    self._links_to_sections[target_tr_sect] = []
+                if tr_sect not in self._links_to_sections[target_tr_sect]:
+                    self._links_to_sections[target_tr_sect].append(tr_sect)
 
     def _setup_string_links(self, decoded_sct):
         # setup string links
@@ -1075,8 +1078,7 @@ class SCTDecoder:
         self._decoded_str_foot_links = [*self._decoded_str_foot_links, *self._str_foot_links]
         self._str_foot_links = []
 
-    @staticmethod
-    def _detect_logical_sections(decoded_sct):
+    def _detect_logical_sections(self, decoded_sct):
         in_sect_group = False
         sect_group_key = None
         for name, sect in decoded_sct.sects.items():
@@ -1086,20 +1088,20 @@ class SCTDecoder:
                     if sect.get_inst_by_index(-1).base_id != 12:
                         in_sect_group = True
                         sect_group_key = f'logical{sep}{sect.name}'
-                        decoded_sct.section_groups[sect_group_key] = [sect.name]
-                        decoded_sct.section_group_keys[sect.name] = sect_group_key
+                        self._section_groups[sect_group_key] = [sect.name]
+                        self._section_group_keys[sect.name] = sect_group_key
             else:
                 if sect.type in ('Script', 'Label'):
-                    decoded_sct.section_groups[sect_group_key].append(sect.name)
-                    decoded_sct.section_group_keys[sect.name] = sect_group_key
+                    self._section_groups[sect_group_key].append(sect.name)
+                    self._section_group_keys[sect.name] = sect_group_key
                     last_inst = sect.get_inst_by_index(-1)
                     if last_inst.base_id == 12:
                         in_sect_group = False
                         sect_group_key = None
                 else:
-                    last_sect = decoded_sct.sects[decoded_sct.section_groups[sect_group_key][-1]]
+                    last_sect = decoded_sct.sects[self._section_groups[sect_group_key][-1]]
                     if last_sect.insts[last_sect.inst_list[-1]].base_id == 9:
-                        decoded_sct.section_groups[sect_group_key].pop(-1)
+                        self._section_groups[sect_group_key].pop(-1)
                     in_sect_group = False
                     sect_group_key = None
 
@@ -1372,16 +1374,16 @@ class SCTDecoder:
     def _resolve_logical_sections(self, decoded_sct: SCTScript):
         # Prune logical script groups with a single entry
         groups_to_remove = []
-        for key, group in decoded_sct.section_groups.items():
+        for key, group in self._section_groups.items():
             if len(group) < 2:
                 groups_to_remove.append(key)
         for group in groups_to_remove:
-            decoded_sct.section_groups.pop(group)
+            self._section_groups.pop(group)
 
         inst_groups_modded = {k: v for k, v in self._instruction_groups.items() if
                               k not in decoded_sct.folded_sects.keys()}
 
-        for name, group in decoded_sct.section_groups.items():
+        for name, group in self._section_groups.items():
             if 'logical' not in name:
                 continue
             new_name = group[0]
@@ -1449,8 +1451,8 @@ class SCTDecoder:
 
         self._instruction_groups = inst_groups_modded
 
-        decoded_sct.section_groups = {}
-        decoded_sct.section_group_keys = {}
+        self._section_groups = {}
+        self._section_group_keys = {}
         for link in self._decoded_scpt_links:
             self._update_link_traces(link, decoded_sct)
 
@@ -1460,10 +1462,9 @@ class SCTDecoder:
         for link in self._decoded_str_foot_links:
             self._update_link_traces(link, decoded_sct)
 
-    @staticmethod
-    def _detect_unused_sections(decoded_sct: SCTScript):
+    def _detect_unused_sections(self, decoded_sct: SCTScript):
         external_section_pattern = '^M[0-9]{4}$'
-        called_sections = list(decoded_sct.links_to_sections.keys())
+        called_sections = list(self._links_to_sections.keys())
         special_sections = ['init', 'loop']
         string_group_keys = list(decoded_sct.string_groups.keys())
         for sect_name in decoded_sct.sects.keys():
@@ -1473,8 +1474,7 @@ class SCTDecoder:
                 continue
             decoded_sct.unused_sections.append(sect_name)
 
-    @staticmethod
-    def _group_subscripts(decoded_sct):
+    def _group_subscripts(self, decoded_sct):
         sections = decoded_sct.sects
         script_filename = decoded_sct.name.split('.')[0]
         cur_group = ''
@@ -1483,7 +1483,7 @@ class SCTDecoder:
         for sect_name, section in sections.items():
 
             if in_group and suffix in sect_name.lower():
-                decoded_sct.section_groups[cur_group].append(sect_name)
+                self._section_groups[cur_group].append(sect_name)
             else:
                 in_group = False
 
@@ -1493,24 +1493,24 @@ class SCTDecoder:
                 suffix = sect_name[len(script_filename):].lower()
                 if ')' in suffix:
                     suffix = suffix[:-3]
-                decoded_sct.section_groups[cur_group] = []
+                self._section_groups[cur_group] = []
 
             if section.type == 'Label':
                 if suffix not in sect_name:
                     in_group = False
 
         empty_sections = []
-        for name, group in decoded_sct.section_groups.items():
+        for name, group in self._section_groups.items():
             if len(group) == 0:
                 empty_sections.append(name)
 
         for name in empty_sections:
-            decoded_sct.section_groups.pop(name)
+            self._section_groups.pop(name)
 
     def _create_sect_group_heirarchies(self, decoded_sct):
 
         # Create grouped section heirarchy
-        groups = decoded_sct.section_groups
+        groups = self._section_groups
 
         if len(groups) > 0:
             # sort groups by size with the smallest first
