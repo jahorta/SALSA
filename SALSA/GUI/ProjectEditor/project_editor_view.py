@@ -59,6 +59,8 @@ default_tree_anchor = tk.W
 default_tree_stretch = False
 default_tree_label = ''
 
+text_column_indent = 16
+
 
 class ProjectEditorView(ttk.Frame):
     log_name = 'PrjEditorView'
@@ -171,6 +173,7 @@ class ProjectEditorView(ttk.Frame):
         section_tree_scrollbar = ttk.Scrollbar(section_tree_frame, orient='vertical', command=self.sections_tree.yview)
         section_tree_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.S)
         self.sections_tree.config(yscrollcommand=section_tree_scrollbar.set)
+        self.sections_tree.bind('<Double-1>', self.show_sect_rename_widget)
 
         self.inst_tree_frame = ttk.Frame(self.pane_frame, width=400)
         self.inst_tree_frame.grid(row=0, column=0, sticky='NSEW')
@@ -437,6 +440,38 @@ class ProjectEditorView(ttk.Frame):
 
         widget.entry_widget.bind('<Return>', lambda event: self.callbacks['change_label_name'](widget, sel_iid, event))
         widget.entry_widget.bind('<Escape>', lambda event: widget.destroy())
+
+    def show_sect_rename_widget(self, e):
+        column = self.sections_tree.identify_column(e.x)
+        if '0' not in column:
+            return
+        sel_iid = self.sections_tree.identify_row(e.y)
+
+        parent_levels = 0
+        parent = self.sections_tree.parent(sel_iid)
+        while parent != '':
+            parent_levels += 1
+            parent = self.sections_tree.parent(parent)
+
+        sect_text = self.sections_tree.item(sel_iid)['text']
+        label_parts = sect_text.split('(')
+        label_other_parts = label_parts[0].split(' ')
+        suffix = ''
+        if len(label_other_parts) > 1:
+            suffix += f' {" ".join(label_other_parts[1:])}'
+        if len(label_parts) > 1:
+            suffix += f'({"(".join(label_parts[1:])}'
+        sect_name = label_other_parts[0]
+
+        bbox = self.sections_tree.bbox(sel_iid, column)
+        widget = w.LabelNameEntry(self.sections_tree)
+        widget.insert(0, sect_name)
+        widget.suffix = suffix
+        widget.place(x=bbox[0] + text_column_indent, y=bbox[1], width=bbox[2] - text_column_indent, height=bbox[3])
+        self.after(10, widget.focus_set)
+
+        widget.bind('<Return>', lambda ev: self.callbacks['change_section_name'](widget, sel_iid, ev))
+        widget.bind('<Escape>', lambda ev: widget.destroy())
 
     def change_theme(self, theme):
         self.theme = theme
