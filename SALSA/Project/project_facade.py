@@ -242,6 +242,11 @@ class SCTProjectFacade:
         script_keys = sorted(list(self.project.scts.keys()), key=str.casefold)
         self.project.scts = {k: self.project.scts[k] for k in script_keys}
 
+    def remove_script(self, rowdata):
+        if rowdata not in self.project.scts:
+            return
+        self.project.scts.pop(rowdata)
+
     def get_project_script_by_name(self, name):
         if name not in self.project.scts.keys():
             print(f'{self.log_key}: No script loaded with the name: {name}')
@@ -1588,6 +1593,8 @@ class SCTProjectFacade:
             return
         self.project = project
 
+    # #  Refresh Methods  # #
+
     def refresh_abs_poses(self, scripts, queue):
         error_scts = []
         for script in scripts:
@@ -1602,10 +1609,9 @@ class SCTProjectFacade:
                     break
         return error_scts
 
-    def remove_script(self, rowdata):
-        if rowdata not in self.project.scts:
-            return
-        self.project.scts.pop(rowdata)
+    def refresh_condition(self, script, section, instruction, **kwargs):
+        inst = self.project.scts[script].sects[section].insts[instruction]
+        inst.generate_condition(self.get_script_variables_with_aliases(script))
 
     def get_project_encode_errors(self):
         errors = {}
@@ -1617,8 +1623,3 @@ class SCTProjectFacade:
             if len(sct_errors) > 0:
                 errors[name] = sct_errors
         return errors
-
-    def refresh_condition(self, script, section, instruction, **kwargs):
-        inst = self.project.scts[script].sects[section].insts[instruction]
-        inst.generate_condition(self.get_script_variables_with_aliases(script))
-
