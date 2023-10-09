@@ -110,7 +110,7 @@ class ProjectEditorController:
 
         self.link_font = SALSAFont()
 
-        self.inst_selector: Union[None, InstructionSelectorWidget] = None
+        self.entry_widget: Union[None, InstructionSelectorWidget, LabelNameEntry, ttk.Frame] = None
 
     def delay_set_change_flag(self, delay):
         self.view.after(delay, self.set_change_flag)
@@ -145,8 +145,8 @@ class ProjectEditorController:
         self.check_encoding_errors()
 
     def on_select_tree_entry(self, tree_key, entry):
-        if self.inst_selector is not None:
-            self.shake_widget(self.inst_selector)
+        if self.entry_widget is not None:
+            self.shake_widget(self.entry_widget)
             return
         self.clear_inst_details()
         if tree_key == 'instruction':
@@ -167,8 +167,8 @@ class ProjectEditorController:
         self.update_tree(child_tree, tree_list)
 
     def on_select_instruction(self, instructID):
-        if self.inst_selector is not None:
-            self.shake_widget(self.inst_selector)
+        if self.entry_widget is not None:
+            self.shake_widget(self.entry_widget)
             return
         self.current['instruction'] = instructID
         self.current['parameter'] = None
@@ -320,8 +320,8 @@ class ProjectEditorController:
             child.configure(font=font, style=style)
 
     def goto_link(self, e):
-        if self.inst_selector is not None:
-            self.shake_widget(self.inst_selector)
+        if self.entry_widget is not None:
+            self.shake_widget(self.entry_widget)
             return
         link_parts = e.widget['text'].split(link_sep)
         sect = link_parts[0]
@@ -401,8 +401,8 @@ class ProjectEditorController:
             self.refresh_tree(tree_key=key, keep_selection=keep_selection, clear_others=False)
 
     def check_is_label(self, inst_uuid):
-        if self.inst_selector is not None:
-            self.shake_widget(self.inst_selector)
+        if self.entry_widget is not None:
+            self.shake_widget(self.entry_widget)
             return False
         return self.project.inst_is_label(self.current['script'], self.current['section'], inst_uuid)
 
@@ -463,7 +463,7 @@ class ProjectEditorController:
             return
         new_name = e.widget.get()
         if new_name == self.current['section']:
-            return widget.destroy()
+            return self.delete_entry_widget()
         if self.project.is_sect_name_used(self.current['script'], new_name):
             schedule_tooltip(widget, 'This name is in use', delay=0, min_time=1500, position='above center',
                              is_warning=True)
@@ -472,8 +472,10 @@ class ProjectEditorController:
             schedule_tooltip(widget, 'A name is required', delay=0, min_time=1500, position='above center',
                              is_warning=True)
             return self.shake_widget(widget)
-        widget.destroy()
-        if new_name == self.trees['instruction'].item(sel_iid)['values'][0].split(label_name_sep)[0]:
+
+        self.delete_entry_widget()
+
+        if new_name == self.trees['instruction'].item(sel_iid)['values'][0].split(label_name_sep)[1]:
             return
         self.project.change_section_name(self.current['script'], self.current['section'], label_uuid, new_name)
         self.current['section'] = new_name
@@ -482,7 +484,7 @@ class ProjectEditorController:
     def change_section_name(self, widget, e):
         new_name = e.widget.get()
         if new_name == self.current['section']:
-            return widget.destroy()
+            return self.delete_entry_widget()
         if self.project.is_sect_name_used(self.current['script'], new_name):
             schedule_tooltip(widget, 'This name is in use', delay=0, min_time=1500, position='above center',
                              is_warning=True)
@@ -491,7 +493,9 @@ class ProjectEditorController:
             schedule_tooltip(widget, 'A name is required', delay=0, min_time=1500, position='above center',
                              is_warning=True)
             return self.shake_widget(widget)
-        widget.destroy()
+
+        self.delete_entry_widget()
+
         self.project.change_section_name(self.current['script'], self.current['section'], None, new_name)
         self.current['section'] = new_name
         self.refresh_all_trees()
@@ -513,8 +517,8 @@ class ProjectEditorController:
     # # Header Selection # #
 
     def show_header_selection_menu(self, e):
-        if self.inst_selector is not None:
-            self.shake_widget(self.inst_selector)
+        if self.entry_widget is not None:
+            self.shake_widget(self.entry_widget)
             return
         if e.widget.identify('region', e.x, e.y) != 'heading':
             return
@@ -553,8 +557,8 @@ class ProjectEditorController:
     # # Script Options # #
 
     def show_script_right_click_menu(self, e):
-        if self.inst_selector is not None:
-            self.shake_widget(self.inst_selector)
+        if self.entry_widget is not None:
+            self.shake_widget(self.entry_widget)
             return
         if e.widget.identify('region', e.x, e.y) == 'heading':
             return
@@ -584,8 +588,8 @@ class ProjectEditorController:
     # # Section Options # #
 
     def show_section_right_click_menu(self, e):
-        if self.inst_selector is not None:
-            self.shake_widget(self.inst_selector)
+        if self.entry_widget is not None:
+            self.shake_widget(self.entry_widget)
             return
         if e.widget.identify('region', e.x, e.y) == 'heading':
             return
@@ -649,8 +653,8 @@ class ProjectEditorController:
     # # Instruction Options # #
 
     def show_instruction_right_click_menu(self, e):
-        if self.inst_selector is not None:
-            self.shake_widget(self.inst_selector)
+        if self.entry_widget is not None:
+            self.shake_widget(self.entry_widget)
             return
         if e.widget.identify('region', e.x, e.y) == 'heading':
             return
@@ -746,23 +750,23 @@ class ProjectEditorController:
             'set_inst_id': self.project.change_inst,
             'get_relevant': self.project.base_insts.get_relevant,
             'update_tree': self.refresh_all_trees,
-            'destroy_widget': self.delete_inst_selector
+            'destroy_widget': self.delete_entry_widget
         }
         cell_bbox = self.trees['instruction'].bbox(sel_iid, 'name')
         x_mod = self.trees['instruction'].winfo_x()
         y_mod = self.trees['instruction'].winfo_y()
         w = InstructionSelectorWidget(self.view.inst_tree_frame, callbacks, inst_trace,
                                       x=cell_bbox[0] + x_mod, y=cell_bbox[1] + y_mod + cell_bbox[3])
-        w.bind('<Escape>', lambda event: self.delete_inst_selector())
+        w.bind('<Escape>', lambda event: self.delete_entry_widget())
         w.place(x=cell_bbox[0] + x_mod, y=cell_bbox[1] + y_mod, w=cell_bbox[2], h=cell_bbox[3])
-        self.inst_selector = w
+        self.entry_widget = w
         for tree in self.trees.values():
             tree.configure(selectmode='none')
             tree.unbind_events()
 
-    def delete_inst_selector(self):
-        self.inst_selector.destroy()
-        self.inst_selector = None
+    def delete_entry_widget(self):
+        self.entry_widget.destroy()
+        self.entry_widget = None
         for tree in self.trees.values():
             tree.configure(selectmode='browse')
             tree.bind_events()
@@ -849,8 +853,8 @@ class ProjectEditorController:
     # ------------------------ #
 
     def on_edit_parameter(self, paramID):
-        if self.inst_selector is not None:
-            self.shake_widget(self.inst_selector)
+        if self.entry_widget is not None:
+            self.shake_widget(self.entry_widget)
             return
         paramID = str(paramID)
         self.current['parameter'] = paramID
@@ -891,8 +895,8 @@ class ProjectEditorController:
         self.on_select_tree_entry('instruction', self.current['instruction'])
 
     def param_right_click_menu(self, row, e):
-        if self.inst_selector is not None:
-            self.shake_widget(self.inst_selector)
+        if self.entry_widget is not None:
+            self.shake_widget(self.entry_widget)
             return
         if not self.project.has_loops(**self.current):
             return
