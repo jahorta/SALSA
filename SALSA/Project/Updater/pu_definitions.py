@@ -1,5 +1,17 @@
 from SALSA.Project.Updater.pu_constants import PP, UP
 
+v4 = {
+    PP.script: {
+        1: {
+            UP.callable: '_del_attr',
+            UP.arguments: ['links_to_sections', 'section_groups', 'section_group_keys']
+        },
+        2: {
+            UP.callable: '_refactor_logical_sections'
+        }
+    }
+}
+
 v3 = {
     PP.section: {
         1: {
@@ -72,10 +84,12 @@ v2 = {
 
 update_tasks = {
     1: v2,
-    2: v3
+    2: v3,
+    3: v4,
 }
 
 p_max_depth = {
     1: PP.parameter,
-    2: PP.instruction
+    2: PP.instruction,
+    3: PP.script
 }

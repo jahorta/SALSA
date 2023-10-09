@@ -19,12 +19,14 @@ p_levels = [PP.project, PP.script, PP.section, PP.instruction, PP.parameter, PP.
 
 p_attrs = {
     1: ['scripts', 'sections', 'instructions', 'parameters', 'link'],
-    2: ['scts', 'sects', 'insts', 'params', 'link']
+    2: ['scts', 'sects', 'insts', 'params', 'link'],
+    3: ['scts', 'sects', 'insts', 'params', 'link']
 }
 
 loop_attrs = {
     1: 'loop_parameters',
-    2: 'loop_params'
+    2: 'loop_params',
+    3: 'loop_params'
 }
 
 nd_index = -1
