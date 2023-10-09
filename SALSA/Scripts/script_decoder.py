@@ -1391,7 +1391,7 @@ class SCTDecoder:
             # Setup combined logical section
             new_section: SCTSection = decoded_sct.sects[group[0]]
             new_section.name = new_name
-            new_section.is_logical = True
+            new_section.is_compound = True
             new_section.internal_sections_inst[group[0]] = 0
             new_section.internal_sections_curs[group[0]] = 0
             for sect_name in group[1:]:

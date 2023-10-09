@@ -268,7 +268,7 @@ class SCTSection:
         self.jump_loops = []
         self.internal_sections_inst = {}
         self.internal_sections_curs = {}
-        self.is_logical = False
+        self.is_compound = False
 
     def set_name(self, name):
         self.name = name

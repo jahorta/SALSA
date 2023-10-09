@@ -9,7 +9,7 @@ from SALSA.Project.description_formatting import format_description
 from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter, SCTInstruction, SCTLink
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
-from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep, label_name_sep, logical_sect_suffix
+from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep, label_name_sep, compound_sect_suffix
 from SALSA.Scripts.scpt_param_codes import get_scpt_override
 from SALSA.Scripts.script_encoder import SCTEncoder
 
@@ -164,8 +164,8 @@ class SCTProjectFacade:
                     values[header_key] = value_dict[header_key] if isinstance(value_dict[header_key], str) else str(
                         value_dict[header_key])
                 if isinstance(element, SCTSection):
-                    if element.is_logical:
-                        values['name'] += f' {logical_sect_suffix}'
+                    if element.is_compound:
+                        values['name'] += f' {compound_sect_suffix}'
                 if isinstance(element, SCTInstruction):
                     if element.base_id == 9:
                         values['name'] += f'{label_name_sep}{element.label}'
@@ -518,7 +518,7 @@ class SCTProjectFacade:
     def is_sect_name_used(self, script, new_name):
         cur_script = self.project.scts[script]
         for sect in cur_script.sects.values():
-            if sect.is_logical:
+            if sect.is_compound:
                 for inst in sect.insts.values():
                     if inst.base_id == 9:
                         if inst.label == new_name:
@@ -598,14 +598,14 @@ class SCTProjectFacade:
 
     def check_for_logical_sect(self, script, section):
         sect = self.project.scts[script].sects[section]
-        sect.is_logical = False
+        sect.is_compound = False
         inst_ind = 0
-        while not sect.is_logical:
+        while not sect.is_compound:
             inst_ind += 1
             if len(sect.inst_list) <= inst_ind:
                 break
             if sect.insts[sect.inst_list[inst_ind]].base_id == 9:
-                sect.is_logical = True
+                sect.is_compound = True
 
     # ------------------------------------------ #
     # Instruction and parameter analysis methods #
@@ -920,7 +920,7 @@ class SCTProjectFacade:
             cur_sect.inst_list.remove(inst)
             self._refresh_inst_positions(script, section)
 
-        if inst_is_label and cur_sect.is_logical:
+        if inst_is_label and cur_sect.is_compound:
             self.check_for_logical_sect(script, section)
 
         self.assign_section_type(script, section)

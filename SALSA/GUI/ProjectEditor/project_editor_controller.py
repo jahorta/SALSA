@@ -4,7 +4,7 @@ from tkinter import messagebox, ttk
 
 from SALSA.GUI.Widgets.hover_tooltip import schedule_tooltip
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
-from SALSA.Common.constants import sep, label_name_sep, logical_sect_suffix, link_sep
+from SALSA.Common.constants import sep, label_name_sep, compound_sect_suffix, link_sep
 from SALSA.GUI.fonts_used import SALSAFont
 from SALSA.GUI.ProjectEditor.instruction_selector import InstructionSelectorWidget
 from SALSA.GUI.ParamEditorPopups.param_editor_controller import ParamEditController

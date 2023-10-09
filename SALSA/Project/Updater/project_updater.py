@@ -161,7 +161,7 @@ class ProjectUpdater:
     def _refactor_logical_sections(self, cur_piece: SCTScript):
         name_changes = {}
         for name, sect in cur_piece.sects.items():
-            sect.is_logical = False
+            sect.is_compound = False
             if '(0)' not in name:
                 continue
             mul_label = False
@@ -174,7 +174,7 @@ class ProjectUpdater:
                     mul_label = True
 
             if mul_label:
-                sect.is_logical = True
+                sect.is_compound = True
                 new_name = sect.name.replace('(0)', '')
                 name_changes[name] = new_name
                 sect.name = new_name
