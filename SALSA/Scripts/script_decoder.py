@@ -1387,18 +1387,11 @@ class SCTDecoder:
             if 'logical' not in name:
                 continue
             new_name = group[0]
-            if new_name in decoded_sct.sects:
-                i = 0
-                while True:
-                    test_name = f'{new_name}({i})'
-                    if test_name not in decoded_sct.sects:
-                        break
-                    i += 1
-                new_name = test_name
 
             # Setup combined logical section
             new_section: SCTSection = decoded_sct.sects[group[0]]
             new_section.name = new_name
+            new_section.is_logical = True
             new_section.internal_sections_inst[group[0]] = 0
             new_section.internal_sections_curs[group[0]] = 0
             for sect_name in group[1:]:
