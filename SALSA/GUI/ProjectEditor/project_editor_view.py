@@ -447,26 +447,12 @@ class ProjectEditorView(ttk.Frame):
             return
         sel_iid = self.sections_tree.identify_row(e.y)
 
-        parent_levels = 0
-        parent = self.sections_tree.parent(sel_iid)
-        while parent != '':
-            parent_levels += 1
-            parent = self.sections_tree.parent(parent)
-
         sect_text = self.sections_tree.item(sel_iid)['text']
-        label_parts = sect_text.split('(')
-        label_other_parts = label_parts[0].split(' ')
-        suffix = ''
-        if len(label_other_parts) > 1:
-            suffix += f' {" ".join(label_other_parts[1:])}'
-        if len(label_parts) > 1:
-            suffix += f'({"(".join(label_parts[1:])}'
-        sect_name = label_other_parts[0]
+        sect_name = sect_text.split(' ')[0]
 
         bbox = self.sections_tree.bbox(sel_iid, column)
         widget = w.LabelNameEntry(self.sections_tree)
         widget.insert(0, sect_name)
-        widget.suffix = suffix
         widget.place(x=bbox[0] + text_column_indent, y=bbox[1], width=bbox[2] - text_column_indent, height=bbox[3])
         self.after(10, widget.focus_set)
 
