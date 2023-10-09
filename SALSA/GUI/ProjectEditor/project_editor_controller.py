@@ -694,7 +694,7 @@ class ProjectEditorController:
             'group_inst_handler': self.confirm_change_inst_group,
             'set_inst_id': self.project.change_inst,
             'get_relevant': self.project.base_insts.get_relevant,
-            'update_tree': lambda: self.refresh_tree('instruction'),
+            'update_tree': self.refresh_all_trees,
             'destroy_widget': self.delete_inst_selector
         }
         cell_bbox = self.trees['instruction'].bbox(sel_iid, 'name')
@@ -731,7 +731,7 @@ class ProjectEditorController:
             if result == 'cancel':
                 return
         self.project.remove_inst(self.current['script'], self.current['section'], cur_inst_uuid, result)
-        self.refresh_tree('instruction')
+        self.refresh_all_trees()
 
     def rcm_change_inst(self):
         sel_iid = self.trees['instruction'].focus()
