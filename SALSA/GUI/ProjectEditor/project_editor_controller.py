@@ -392,11 +392,11 @@ class ProjectEditorController:
             cur_sel = tuple([s for s in cur_sel if s in children])
             self.trees[tree_key].selection_set(cur_sel)
 
-    def refresh_all_trees(self, skip_param_tree=True):
+    def refresh_all_trees(self, skip_param_tree=True, keep_selection=True):
         for key in reversed(self.trees.keys()):
             if key == 'parameter' and skip_param_tree:
                 continue
-            self.refresh_tree(tree_key=key, keep_selection=True, clear_others=False)
+            self.refresh_tree(tree_key=key, keep_selection=keep_selection, clear_others=False)
 
     def check_is_label(self, inst_uuid):
         if self.inst_selector is not None:
