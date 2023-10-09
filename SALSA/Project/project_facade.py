@@ -914,10 +914,14 @@ class SCTProjectFacade:
         # and remove the inst from the grouped representation of insts
         self.change_inst(script, section, inst, change_type=result)
         cur_sect = self.project.scts[script].sects[section]
+        inst_is_label = cur_sect.insts[inst].base_id == 9
         cur_sect.insts.pop(inst)
         if inst in cur_sect.inst_list:
             cur_sect.inst_list.remove(inst)
             self._refresh_inst_positions(script, section)
+
+        if inst_is_label and cur_sect.is_logical:
+            self.check_for_logical_sect(script, section)
 
         self.assign_section_type(script, section)
 
@@ -1080,7 +1084,10 @@ class SCTProjectFacade:
             cur_group[index] = inst
 
         # Change inst id
+        old_id = cur_inst.base_id
         cur_inst.set_inst_id(int(new_id))
+        if old_id == 9 or new_id == 9:
+            self.check_for_logical_sect(script, section)
 
         # Remove any current parameters and loop parameters
         self.remove_inst_parameters(script, section, inst)
