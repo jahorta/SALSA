@@ -56,7 +56,6 @@ class ProjectEditorController:
             'param_rcm': self.param_right_click_menu,
             'inst_is_label': self.check_is_label,
             'show_rename_widget': self.show_sect_rename_widget,
-            'destroy_rename_widget': self.destroy_rename_widget,
             'refresh_offsets': self.callbacks['refresh_offsets']
         }
         self.view.add_and_bind_tree_callbacks(view_callbacks)
