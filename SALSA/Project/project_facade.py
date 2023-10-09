@@ -1086,7 +1086,7 @@ class SCTProjectFacade:
         # Change inst id
         old_id = cur_inst.base_id
         cur_inst.set_inst_id(int(new_id))
-        if old_id == 9 or new_id == 9:
+        if old_id == 9 or new_id == '9':
             self.check_for_logical_sect(script, section)
 
         # Remove any current parameters and loop parameters
