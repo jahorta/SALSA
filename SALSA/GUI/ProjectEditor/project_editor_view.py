@@ -328,13 +328,6 @@ class ProjectEditorView(ttk.Frame):
         self.insts_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
         self.insts_tree.bind('<Button-3>', self.callbacks['show_inst_menu'], add='+')
 
-    def on_inst_double_click(self, e):
-        sel_iid = self.insts_tree.identify_row(e.y)
-        row_data = self.insts_tree.row_data[sel_iid]
-        if row_data is not None:
-            if self.callbacks['inst_is_label'](row_data):
-                self.show_label_edit_widget(e)
-
     def on_param_double_click(self, param, e):
         if param != 'delay':
             # get item id and values associated with the item
