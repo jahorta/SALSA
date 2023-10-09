@@ -154,7 +154,7 @@ class ProjectEditorView(ttk.Frame):
 
         columns = list(header_settings['section'].keys())[1:]
         self.sections_tree = DataTreeview(section_tree_frame, name='section', columns=columns,
-                                          can_move=True, selectmode='extended', theme=theme)
+                                          can_move=True, can_select_multiple=True, selectmode='none', theme=theme)
         self.sections_tree.configure('columns')
         self.sections_tree.grid(row=1, column=0, sticky='NSEW')
         first = True
@@ -186,7 +186,7 @@ class ProjectEditorView(ttk.Frame):
 
         columns = list(header_settings['instruction'].keys())[1:]
         self.insts_tree = DataTreeview(self.inst_tree_frame, name='instruction', columns=columns,
-                                       can_move=True, selectmode='extended', theme=self.theme,
+                                       can_move=True, can_select_multiple=True, selectmode='none', theme=self.theme,
                                        prevent_extreme_selection=True, keep_group_ends=True)
         self.insts_tree.grid(row=1, column=0, sticky='NSEW')
         first = True

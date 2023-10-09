@@ -90,8 +90,9 @@ default_tree_theme = {
 
 class DataTreeview(ttk.Treeview):
 
-    def __init__(self, parent, name, callbacks=None, theme=None, can_open=True, can_move=False, return_none=False,
-                 selectmode='browse', prevent_extreme_selection=False, keep_group_ends=False, **kwargs):
+    def __init__(self, parent, name, callbacks=None, can_open=True, can_move=False, can_select_multiple=False,
+                 selectmode='browse', prevent_extreme_selection=False, keep_group_ends=False, theme=None,
+                 return_none=False, **kwargs):
         super().__init__(parent, selectmode=selectmode, **kwargs)
         self._parent = parent
         self.name = name
@@ -104,6 +105,7 @@ class DataTreeview(ttk.Treeview):
         self.theme = theme if theme is not None else default_tree_theme
 
         self.can_open = can_open
+        self.can_select_multiple = can_select_multiple
         self.can_move = can_move
 
         self.bind_events()
@@ -134,18 +136,17 @@ class DataTreeview(ttk.Treeview):
         self.unbind("<Shift-ButtonRelease-1>")
         if self.can_open:
             self.bind("<ButtonRelease-1>", self.select_entry, add='+')
-            # self.bind("<ButtonRelease-1>", self.print_parent_and_index, add='+')
 
     def bind_events(self):
         if self.can_move:
             self.bind("<ButtonPress-1>", self.bDown_move)
             self.bind("<ButtonRelease-1>", self.bUp_move, add='+')
             self.bind("<B1-Motion>", self.bMove, add='+')
+        if self.can_select_multiple:
             self.bind("<Shift-ButtonPress-1>", self.bDown_Shift, add='')
             self.bind("<Shift-ButtonRelease-1>", self.bUp_Shift, add='')
         if self.can_open:
             self.bind("<ButtonRelease-1>", self.select_entry, add='+')
-            # self.bind("<ButtonRelease-1>", self.print_parent_and_index, add='+')
 
     def add_callback(self, key, callback):
         self.callbacks[key] = callback
