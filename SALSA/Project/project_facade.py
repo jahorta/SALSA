@@ -576,25 +576,61 @@ class SCTProjectFacade:
             return
 
         old_sect_name = cur_section.name
-        new_sect_name = new_name
+        cur_section.name = new_name
 
-        cur_section.name = new_sect_name
-        cur_script.sects[new_sect_name] = cur_script.sects.pop(old_sect_name)
-        cur_script.sect_list[cur_script.sect_list.index(old_sect_name)] = new_sect_name
+        cur_script.sects[new_name] = cur_script.sects.pop(old_sect_name)
 
-        cur_group = cur_script.sect_tree
-        parents, index = self.get_grouped_parents_and_index(old_sect_name, cur_group)
+        # Change the name in the list and tree
+        cur_script.sect_list[cur_script.sect_list.index(old_sect_name)] = new_name
+        self._recursive_sect_name_replacer(cur_script.sect_tree, old_sect_name, new_name)
 
-        for p in parents:
-            cur_group = cur_group[p]
+        # Change the name in other items
+        if old_sect_name in cur_script.folded_sects:
+            cur_script.folded_sects[new_name] = cur_script.folded_sects.pop(old_sect_name)
 
-        cur_group[index] = new_sect_name
+        if old_sect_name in cur_script.folded_sects.values():
+            folded_keys = list(cur_script.folded_sects.keys())
+            folded_ind = [i for i, x in enumerate(list(cur_script.folded_sects.values())) if x == old_sect_name]
+            keys_to_change = [folded_keys[i] for i in folded_ind]
+            for key in keys_to_change:
+                cur_script.folded_sects[key] = new_name
+
+        if old_sect_name in cur_script.unused_sections:
+            cur_script.unused_sections[cur_script.unused_sections.index(old_sect_name)] = new_name
+
+        for sect_list in cur_script.inst_locations:
+            if old_sect_name in sect_list:
+                sect_list[sect_list.index(old_sect_name)] = new_name
 
         for inst in cur_section.insts.values():
             for link in inst.links_in:
-                link.target_trace[0] = new_sect_name
+                link.target_trace[0] = new_name
             for link in inst.links_out:
-                link.origin_trace[0] = new_sect_name
+                link.origin_trace[0] = new_name
+
+    def _recursive_sect_name_replacer(self, tree, old, new):
+        if isinstance(tree, list):
+            if old in tree:
+                tree[tree.index(old)] = new
+                return True
+
+            for entry in tree:
+                if isinstance(entry, dict):
+                    replaced = self._recursive_sect_name_replacer(entry, old, new)
+                    if replaced:
+                        return True
+
+        if isinstance(tree, dict):
+            if old in list(tree.keys())[0]:
+                old_key = list(tree.keys())[0]
+                new_key = f'{new}{old_key.replace(old, "").replace("(0)", "")}'
+                tree[new_key] = tree.pop(old_key)
+                return True
+
+            for value in tree.values():
+                replaced = self._recursive_sect_name_replacer(value, old, new)
+                if replaced:
+                    return True
 
     def check_for_logical_sect(self, script, section):
         sect = self.project.scts[script].sects[section]
