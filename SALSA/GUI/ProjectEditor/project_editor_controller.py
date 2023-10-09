@@ -423,13 +423,8 @@ class ProjectEditorController:
         if new_name == self.trees['instruction'].item(sel_iid)['values'][0].split(label_name_sep)[0]:
             return
         self.project.change_section_name(self.current['script'], self.current['section'], label_uuid, new_name)
-        if sel_iid == '0':
-            if logical_sect_suffix not in self.current:
-                self.current['section'] = new_name
-            else:
-                self.current['section'] = new_name + logical_sect_suffix
-        self.refresh_tree('section', keep_selection=True)
-        self.refresh_tree('instruction', keep_selection=True)
+        self.current['section'] = new_name
+        self.refresh_all_trees()
 
     def change_section_name(self, widget, e):
         new_name = e.widget.get()
