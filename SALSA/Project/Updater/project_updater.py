@@ -158,6 +158,79 @@ class ProjectUpdater:
                     inst.label = labels.pop(0)
         return cur_piece
 
+    def _refactor_logical_sections(self, cur_piece: SCTScript):
+        name_changes = {}
+        for name, sect in cur_piece.sects.items():
+            sect.is_logical = False
+            if '(0)' not in name:
+                continue
+            mul_label = False
+            inst_ind = 0
+            while not mul_label:
+                inst_ind += 1
+                if len(sect.inst_list) == inst_ind:
+                    break
+                if sect.insts[sect.inst_list[inst_ind]].base_id == 9:
+                    mul_label = True
+
+            if mul_label:
+                sect.is_logical = True
+                new_name = sect.name.replace('(0)', '')
+                name_changes[name] = new_name
+                sect.name = new_name
+
+        for old, new in name_changes.items():
+            # Change the name in sects
+            cur_piece.sects[new] = cur_piece.sects.pop(old)
+
+            # Change the name in the list and tree
+            cur_piece.sect_list[cur_piece.sect_list.index(old)] = new
+            self._recursive_name_replacer(cur_piece.sect_tree, old, new)
+
+            # Change the name in other items
+            if old in cur_piece.folded_sects:
+                cur_piece.folded_sects[new] = cur_piece.folded_sects.pop(old)
+
+            if old in cur_piece.folded_sects.values():
+                folded_keys = list(cur_piece.folded_sects.keys())
+                folded_ind = [i for i, x in enumerate(list(cur_piece.folded_sects.values())) if x == old]
+                keys_to_change = [folded_keys[i] for i in folded_ind]
+                for key in keys_to_change:
+                    cur_piece.folded_sects[key] = new
+
+            if old in cur_piece.unused_sections:
+                cur_piece.unused_sections[cur_piece.unused_sections.index(old)] = new
+
+            for sect_list in cur_piece.inst_locations:
+                if old in sect_list:
+                    sect_list[sect_list.index(old)] = new
+
+        return cur_piece
+
+    def _recursive_name_replacer(self, tree, old, new):
+        if isinstance(tree, list):
+            if old in tree:
+                tree[tree.index(old)] = new
+                return True
+
+            for entry in tree:
+                if isinstance(entry, dict):
+                    replaced = self._recursive_name_replacer(entry, old, new)
+                    if replaced:
+                        return True
+
+        if isinstance(tree, dict):
+            if old in list(tree.keys())[0]:
+                old_key = list(tree.keys())[0]
+                new_key = f'{new}{old_key.replace(old, "").replace("(0)", "")}'
+                tree[new_key] = tree.pop(old_key)
+                return True
+
+            for value in tree.values():
+                replaced = self._recursive_name_replacer(value, old, new)
+                if replaced:
+                    return True
+
 
 if __name__ == '__main__':
     import os
@@ -172,18 +245,22 @@ if __name__ == '__main__':
     os.chdir(cur_dir)
 
     model = ProjectModel()
-    project = model.load_project(filepath=os.path.join('./test', 'test_UwU v1.prj'), ignore_dir=True)
+    project: SCTProject = model.load_project(filepath=os.path.join('./test', 'test_UwU v3.prj'), ignore_dir=True)
     if getattr(project, 'version', None) is None:
         project.version = 1
 
-    # # Only check the first script?
-    # project_first_script_name = list(project.scripts.keys())[0]
-    # project.scripts = {project_first_script_name: project.scripts[project_first_script_name]}
+    # Only check the first script?
+    if 'scripts' in project.__dict__:
+        project_first_script_name = list(project.scripts.keys())[0]
+        project.scripts = {project_first_script_name: project.scripts[project_first_script_name]}
+    else:
+        project_first_script_name = list(project.scts.keys())[0]
+        project.scts = {project_first_script_name: project.scts[project_first_script_name]}
 
     project = ProjectUpdater.update_project(project)
 
     base_insts = BaseInstLibFacade()
     for script in project.scts.values():
-        sct = SCTEncoder.encode_sct_file_from_project_script(project_script=script, base_insts=base_insts)
+        sct = SCTEncoder.encode_sct_file_from_project_script(project_script=script, base_insts=base_insts, endian='big')
 
     print('Success...')
