@@ -324,7 +324,7 @@ class ProjectEditorView(ttk.Frame):
         self.scripts_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
         self.scripts_tree.bind('<Button-3>', self.callbacks['show_script_menu'], add='+')
         self.sections_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
-        self.scripts_tree.bind('<Button-3>', self.callbacks['show_section_menu'], add='+')
+        self.sections_tree.bind('<Button-3>', self.callbacks['show_section_menu'], add='+')
         self.insts_tree.bind('<Button-3>', self.callbacks['show_header_selection_menu'])
         self.insts_tree.bind('<Button-3>', self.callbacks['show_inst_menu'], add='+')
 
