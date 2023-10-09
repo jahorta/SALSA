@@ -632,7 +632,7 @@ class SCTProjectFacade:
                 if replaced:
                     return True
 
-    def check_for_logical_sect(self, script, section):
+    def check_for_compound_sect(self, script, section):
         sect = self.project.scts[script].sects[section]
         sect.is_compound = False
         inst_ind = 0
@@ -957,7 +957,7 @@ class SCTProjectFacade:
             self._refresh_inst_positions(script, section)
 
         if inst_is_label and cur_sect.is_compound:
-            self.check_for_logical_sect(script, section)
+            self.check_for_compound_sect(script, section)
 
         self.assign_section_type(script, section)
 
@@ -1123,7 +1123,7 @@ class SCTProjectFacade:
         old_id = cur_inst.base_id
         cur_inst.set_inst_id(int(new_id))
         if old_id == 9 or new_id == '9':
-            self.check_for_logical_sect(script, section)
+            self.check_for_compound_sect(script, section)
 
         # Remove any current parameters and loop parameters
         self.remove_inst_parameters(script, section, inst)
