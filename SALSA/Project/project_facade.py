@@ -9,7 +9,8 @@ from SALSA.Project.description_formatting import format_description
 from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter, SCTInstruction, SCTLink
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
-from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep, label_name_sep, compound_sect_suffix
+from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep, label_name_sep, compound_sect_suffix, \
+    virtual_sect_suffix, label_sect_suffix
 from SALSA.Scripts.scpt_param_codes import get_scpt_override
 from SALSA.Scripts.script_encoder import SCTEncoder
 
@@ -166,6 +167,10 @@ class SCTProjectFacade:
                 if isinstance(element, SCTSection):
                     if element.is_compound:
                         values['name'] += f' {compound_sect_suffix}'
+                    elif len(element.inst_list) == 0:
+                        values['name'] += f' {virtual_sect_suffix}'
+                    elif len(element.inst_list) == 1:
+                        values['name'] += f' {label_sect_suffix}'
                 if isinstance(element, SCTInstruction):
                     if element.base_id == 9:
                         values['name'] += f'{label_name_sep}{element.label}'
