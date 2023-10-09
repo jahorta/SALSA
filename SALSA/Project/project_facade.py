@@ -518,7 +518,7 @@ class SCTProjectFacade:
     def is_sect_name_used(self, script, new_name):
         cur_script = self.project.scts[script]
         for sect in cur_script.sects.values():
-            if logical_sect_suffix in sect.name:
+            if sect.is_logical:
                 for inst in sect.insts.values():
                     if inst.base_id == 9:
                         if inst.label == new_name:
@@ -577,8 +577,6 @@ class SCTProjectFacade:
 
         old_sect_name = cur_section.name
         new_sect_name = new_name
-        if logical_sect_suffix in old_sect_name:
-            new_sect_name += logical_sect_suffix
 
         cur_section.name = new_sect_name
         cur_script.sects[new_sect_name] = cur_script.sects.pop(old_sect_name)
