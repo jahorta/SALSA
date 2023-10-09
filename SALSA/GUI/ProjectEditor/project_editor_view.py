@@ -171,7 +171,7 @@ class ProjectEditorView(ttk.Frame):
         section_tree_scrollbar = ttk.Scrollbar(section_tree_frame, orient='vertical', command=self.sections_tree.yview)
         section_tree_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.S)
         self.sections_tree.config(yscrollcommand=section_tree_scrollbar.set)
-        self.sections_tree.bind('<Double-1>', lambda e: self.callbacks['show_rename_widget']('instruction', e))
+        self.sections_tree.bind('<Double-1>', lambda e: self.callbacks['show_rename_widget']('section', e))
 
         self.inst_tree_frame = ttk.Frame(self.pane_frame, width=400)
         self.inst_tree_frame.grid(row=0, column=0, sticky='NSEW')
@@ -203,7 +203,7 @@ class ProjectEditorView(ttk.Frame):
         inst_tree_scrollbar = ttk.Scrollbar(self.inst_tree_frame, orient='vertical', command=self.insts_tree.yview)
         inst_tree_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.S)
         self.insts_tree.config(yscrollcommand=inst_tree_scrollbar.set)
-        self.insts_tree.bind('<Double-1>', lambda e: self.callbacks['show_rename_widget']('inst', e))
+        self.insts_tree.bind('<Double-1>', lambda e: self.callbacks['show_rename_widget']('instruction', e))
 
         # Instruction details frame setup
         self.inst_frame = ttk.Frame(self.pane_frame, width=400)
