@@ -205,6 +205,12 @@ class ProjectUpdater:
                 if old in sect_list:
                     sect_list[sect_list.index(old)] = new
 
+            for inst in cur_piece.sects[new].insts.values():
+                for link in inst.links_in:
+                    link.target_trace[0] = new
+                for link in inst.links_out:
+                    link.origin_trace[0] = new
+
         return cur_piece
 
     def _recursive_name_replacer(self, tree, old, new):
