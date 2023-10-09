@@ -356,7 +356,7 @@ class ProjectEditorController:
             self.on_select_tree_entry('instruction', inst)
             if param is not None:
                 self.view.after(10, self.resolve_link, None, None, None, param)
-        else:
+        elif param is not None:
             sel_iid = self.trees['parameter'].get_iid_from_rowdata(param)
             self.trees['parameter'].see(sel_iid)
             self.trees['parameter'].focus(sel_iid)
