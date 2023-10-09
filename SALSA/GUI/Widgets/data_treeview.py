@@ -135,9 +135,11 @@ class DataTreeview(ttk.Treeview):
         self.unbind("<Shift-ButtonPress-1>")
         self.unbind("<Shift-ButtonRelease-1>")
         if self.can_open:
-            self.bind("<ButtonRelease-1>", self.select_entry, add='+')
+            self.bind("<ButtonRelease-1>", self.send_none, add='+')
 
     def bind_events(self):
+        if self.can_open:
+            self.unbind("<ButtonRelease-1>")
         if self.can_move:
             self.bind("<ButtonPress-1>", self.bDown_move)
             self.bind("<ButtonRelease-1>", self.bUp_move, add='+')
@@ -153,6 +155,9 @@ class DataTreeview(ttk.Treeview):
 
     def set_theme(self, theme):
         self.theme = theme
+
+    def send_none(self, e):
+        return self.callbacks['select'](self.name, None)
 
     def select_entry(self, event):
         if self.block_interactions:
