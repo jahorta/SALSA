@@ -599,7 +599,7 @@ class ProjectEditorController:
             self.trees['section'].selection_set(sel_iid)
             self.trees['section'].focus(sel_iid)
 
-        if len(self.trees['section'].selection()) > 0:
+        if len(self.trees['section'].selection()) > 1:
             is_multiple = True
             row_data = [self.trees['section'].row_data.get(s, None) for s in self.trees['section'].selection()]
             is_group = False
