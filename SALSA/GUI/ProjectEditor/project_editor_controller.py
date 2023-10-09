@@ -635,9 +635,6 @@ class ProjectEditorController:
         finally:
             m.grab_release()
 
-    def rcm_rename_sect(self, sel_iid):
-        pass
-
     def rcm_add_sect(self, direction, relative_section):
         pass
 
