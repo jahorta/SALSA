@@ -602,7 +602,7 @@ class SCTProjectFacade:
         inst_ind = 0
         while not sect.is_logical:
             inst_ind += 1
-            if len(sect.inst_list) == inst_ind:
+            if len(sect.inst_list) <= inst_ind:
                 break
             if sect.insts[sect.inst_list[inst_ind]].base_id == 9:
                 sect.is_logical = True
