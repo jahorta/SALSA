@@ -134,7 +134,10 @@ class DataTreeview(ttk.Treeview):
         self.unbind("<Shift-ButtonPress-1>")
         self.unbind("<Shift-ButtonRelease-1>")
         if self.can_open:
-            self.bind("<ButtonRelease-1>", self.send_none, add='+')
+            self.after(100, self.bind_send_none)
+
+    def bind_send_none(self):
+        self.bind("<ButtonRelease-1>", self.send_none, add='+')
 
     def bind_events(self):
         if self.can_open:
