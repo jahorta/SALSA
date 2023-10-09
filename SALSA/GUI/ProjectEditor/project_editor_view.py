@@ -414,49 +414,6 @@ class ProjectEditorView(ttk.Frame):
                                theme=self.theme, end_callback=end_callback,
                                end_kwargs=end_kwargs)
 
-    def show_label_edit_widget(self, e):
-        column = self.insts_tree.identify_column(e.x)
-        sel_iid = self.insts_tree.identify_row(e.y)
-
-        label_label = self.insts_tree.item(sel_iid)['values'][0]
-        if label_name_sep not in label_label:
-            return
-        label_parts = label_label.split(label_name_sep)
-        label_name = label_parts[1]
-
-        bbox = self.insts_tree.bbox(sel_iid, column)
-        widget = ttk.Frame(self.insts_tree)
-        widget.place(x=bbox[0], y=bbox[1], width=bbox[2], height=bbox[3])
-        widget.columnconfigure(1, weight=1)
-
-        label = ttk.Label(widget, text=label_parts[0])
-        label.grid(row=0, column=0, padx='2 0')
-        widget.entry_widget = w.LabelNameEntry(widget)
-        widget.entry_widget.insert(0, label_name)
-        widget.entry_widget.grid(row=0, column=1, sticky=tk.W + tk.E, padx='13 0')
-        self.after(10, widget.entry_widget.focus_set)
-
-        widget.entry_widget.bind('<Return>', lambda event: self.callbacks['change_label_name'](widget, sel_iid, event))
-        widget.entry_widget.bind('<Escape>', lambda event: widget.destroy())
-
-    def show_sect_rename_widget(self, e):
-        column = self.sections_tree.identify_column(e.x)
-        if '0' not in column:
-            return
-        sel_iid = self.sections_tree.identify_row(e.y)
-
-        sect_text = self.sections_tree.item(sel_iid)['text']
-        sect_name = sect_text.split(' ')[0]
-
-        bbox = self.sections_tree.bbox(sel_iid, column)
-        widget = w.LabelNameEntry(self.sections_tree)
-        widget.insert(0, sect_name)
-        widget.place(x=bbox[0] + text_column_indent, y=bbox[1], width=bbox[2] - text_column_indent, height=bbox[3])
-        self.after(10, widget.focus_set)
-
-        widget.bind('<Return>', lambda ev: self.callbacks['change_section_name'](widget, ev))
-        widget.bind('<Escape>', lambda ev: widget.destroy())
-
     def change_theme(self, theme):
         self.theme = theme
 
