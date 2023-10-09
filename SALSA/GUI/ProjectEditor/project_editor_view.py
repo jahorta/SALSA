@@ -456,7 +456,7 @@ class ProjectEditorView(ttk.Frame):
         widget.place(x=bbox[0] + text_column_indent, y=bbox[1], width=bbox[2] - text_column_indent, height=bbox[3])
         self.after(10, widget.focus_set)
 
-        widget.bind('<Return>', lambda ev: self.callbacks['change_section_name'](widget, sel_iid, ev))
+        widget.bind('<Return>', lambda ev: self.callbacks['change_section_name'](widget, ev))
         widget.bind('<Escape>', lambda ev: widget.destroy())
 
     def change_theme(self, theme):

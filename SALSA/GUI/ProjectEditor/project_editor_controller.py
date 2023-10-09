@@ -53,6 +53,7 @@ class ProjectEditorController:
             'param_rcm': self.param_right_click_menu,
             'inst_is_label': self.check_is_label,
             'change_label_name': self.change_label_name,
+            'change_section_name': self.change_section_name,
             'refresh_offsets': self.callbacks['refresh_offsets']
         }
         self.view.add_and_bind_tree_callbacks(view_callbacks)
@@ -430,8 +431,7 @@ class ProjectEditorController:
         self.refresh_tree('section', keep_selection=True)
         self.refresh_tree('instruction', keep_selection=True)
 
-    def change_section_name(self, widget, sel_iid, e):
-        section_name = self.trees['instruction'].row_data.get(sel_iid, None)
+    def change_section_name(self, widget, e):
         new_name = e.widget.get()
         if new_name == self.current['section']:
             return widget.destroy()
@@ -444,6 +444,9 @@ class ProjectEditorController:
                              is_warning=True)
             return self.shake_widget(widget)
         widget.destroy()
+        self.project.change_section_name(self.current['script'], self.current['section'], None, new_name)
+        self.current['section'] = new_name
+        self.refresh_all_trees()
 
     def shake_widget(self, widget):
         shake_speed = 70
