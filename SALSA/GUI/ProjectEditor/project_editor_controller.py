@@ -766,14 +766,12 @@ class ProjectEditorController:
         w.place(x=cell_bbox[0] + x_mod, y=cell_bbox[1] + y_mod, w=cell_bbox[2], h=cell_bbox[3])
         self.entry_widget = w
         for tree in self.trees.values():
-            tree.configure(selectmode='none')
             tree.unbind_events()
 
     def delete_entry_widget(self):
         self.entry_widget.destroy()
         self.entry_widget = None
         for tree in self.trees.values():
-            tree.configure(selectmode='browse')
             tree.bind_events()
 
     def rcm_remove_inst(self):
