@@ -126,7 +126,6 @@ class DataTreeview(ttk.Treeview):
         self.keep_group_ends = keep_group_ends
         self.start_index = None
         self.start_parent = None
-        self.block_interactions = False
 
     def unbind_events(self):
         self.unbind("<ButtonPress-1>")
@@ -160,10 +159,6 @@ class DataTreeview(ttk.Treeview):
         return self.callbacks['select'](self.name, None)
 
     def select_entry(self, event):
-        if self.block_interactions:
-            selection = self.selection()
-            self.after(10, self.selection_set, selection)
-            return self.callbacks['select'](self.name, None)
         if len(self.get_children('')) == 0:
             return
         if self.in_motion:
@@ -243,8 +238,6 @@ class DataTreeview(ttk.Treeview):
                 self.item(rows[entry[1]], open=True)
 
     def bDown_Shift(self, event):
-        if self.block_interactions:
-            return
         if len(self.get_children('')) == 0:
             return
         self.has_shift = True
@@ -280,15 +273,9 @@ class DataTreeview(ttk.Treeview):
         self.selection_set(select)
 
     def bUp_Shift(self, event):
-        if self.block_interactions:
-            return
         self.has_shift = False
 
     def bDown_move(self, event):
-        if self.block_interactions:
-            selection = self.selection()
-            self.after(10, self.selection_set, selection)
-            return
         if len(self.get_children('')) == 0:
             return
         sel = self.identify_row(event.y)
@@ -314,16 +301,11 @@ class DataTreeview(ttk.Treeview):
             self.after(10, self.selection_set, sel)
 
     def bUp_move(self, event):
-        if self.block_interactions:
-            selection = self.selection()
-            self.after(10, self.selection_set, selection)
-            return
-        if self.block_interactions:
-            return
         if len(self.get_children('')) == 0:
             return
         if not self.in_motion:
                 return
+
         final_index = self.index(self.placeholder)
         final_parent = self.parent(self.placeholder)
         kwargs = {}
@@ -357,8 +339,6 @@ class DataTreeview(ttk.Treeview):
         self.selection_bounds = None
 
     def bMove(self, event):
-        if self.block_interactions:
-            return
         if len(self.get_children('')) == 0:
             return
         if self.has_shift:
