@@ -121,7 +121,8 @@ class ProjectEditorView(ttk.Frame):
         self.pane_frame.add(script_tree_frame, weight=1)
 
         columns = list(header_settings['script'].keys())[1:]
-        self.scripts_tree = DataTreeview(script_tree_frame, name='script', columns=columns)
+        self.scripts_tree = DataTreeview(script_tree_frame, name='script', columns=columns, selectmode='none',
+                                         can_open=True)
         self.scripts_tree.grid(row=1, column=0, sticky='NSEW')
         first = True
         for name, d in header_settings['script'].items():
