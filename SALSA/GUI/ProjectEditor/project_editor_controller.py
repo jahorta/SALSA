@@ -407,6 +407,10 @@ class ProjectEditorController:
         return self.project.inst_is_label(self.current['script'], self.current['section'], inst_uuid)
 
     def show_sect_rename_widget(self, tree_key, e):
+        if self.entry_widget is not None:
+            self.shake_widget(self.entry_widget)
+            return
+
         column = self.trees[tree_key].identify_column(e.x)
 
         if tree_key == 'section':
