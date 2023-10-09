@@ -4,7 +4,6 @@ import json
 from typing import List, Dict
 
 import SALSA.GUI.Widgets.widgets as w
-from SALSA.Common.constants import label_name_sep
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
 from SALSA.GUI.ProjectEditor.inst_group_handler import InstGroupHandlerDialog
 from SALSA.Common.setting_class import settings
@@ -58,8 +57,6 @@ default_tree_minwidth = 10
 default_tree_anchor = tk.W
 default_tree_stretch = False
 default_tree_label = ''
-
-text_column_indent = 16
 
 
 class ProjectEditorView(ttk.Frame):
@@ -173,7 +170,7 @@ class ProjectEditorView(ttk.Frame):
         section_tree_scrollbar = ttk.Scrollbar(section_tree_frame, orient='vertical', command=self.sections_tree.yview)
         section_tree_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.S)
         self.sections_tree.config(yscrollcommand=section_tree_scrollbar.set)
-        self.sections_tree.bind('<Double-1>', self.show_sect_rename_widget)
+        self.sections_tree.bind('<Double-1>', lambda e: self.callbacks['show_rename_widget']('instruction', e))
 
         self.inst_tree_frame = ttk.Frame(self.pane_frame, width=400)
         self.inst_tree_frame.grid(row=0, column=0, sticky='NSEW')
@@ -205,7 +202,7 @@ class ProjectEditorView(ttk.Frame):
         inst_tree_scrollbar = ttk.Scrollbar(self.inst_tree_frame, orient='vertical', command=self.insts_tree.yview)
         inst_tree_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.S)
         self.insts_tree.config(yscrollcommand=inst_tree_scrollbar.set)
-        self.insts_tree.bind('<Double-1>', lambda e: self.on_inst_double_click(e))
+        self.insts_tree.bind('<Double-1>', lambda e: self.callbacks['show_rename_widget']('inst', e))
 
         # Instruction details frame setup
         self.inst_frame = ttk.Frame(self.pane_frame, width=400)

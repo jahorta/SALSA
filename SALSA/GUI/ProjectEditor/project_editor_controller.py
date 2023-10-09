@@ -2,9 +2,10 @@ from typing import Union, Dict, Literal
 import tkinter as tk
 from tkinter import messagebox, ttk
 
+from SALSA.GUI.Widgets.widgets import LabelNameEntry
 from SALSA.GUI.Widgets.hover_tooltip import schedule_tooltip
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
-from SALSA.Common.constants import sep, label_name_sep, compound_sect_suffix, link_sep
+from SALSA.Common.constants import sep, label_name_sep, link_sep
 from SALSA.GUI.fonts_used import SALSAFont
 from SALSA.GUI.ProjectEditor.instruction_selector import InstructionSelectorWidget
 from SALSA.GUI.ParamEditorPopups.param_editor_controller import ParamEditController
@@ -22,6 +23,8 @@ tree_children = {
 }
 
 tree_parents = {v: k for k, v in tree_children.items()}
+
+text_column_indent = 16
 
 
 class ProjectEditorController:
@@ -52,8 +55,8 @@ class ProjectEditorController:
             'set_mem_offset': self.set_mem_offset,
             'param_rcm': self.param_right_click_menu,
             'inst_is_label': self.check_is_label,
-            'change_label_name': self.change_label_name,
-            'change_section_name': self.change_section_name,
+            'show_rename_widget': self.show_sect_rename_widget,
+            'destroy_rename_widget': self.destroy_rename_widget,
             'refresh_offsets': self.callbacks['refresh_offsets']
         }
         self.view.add_and_bind_tree_callbacks(view_callbacks)
@@ -403,6 +406,57 @@ class ProjectEditorController:
             self.shake_widget(self.inst_selector)
             return False
         return self.project.inst_is_label(self.current['script'], self.current['section'], inst_uuid)
+
+    def show_sect_rename_widget(self, tree_key, e):
+        column = self.trees[tree_key].identify_column(e.x)
+
+        if tree_key == 'section':
+            if '0' not in column:
+                return
+
+        sel_iid = self.trees[tree_key].identify_row(e.y)
+
+        if tree_key == 'section':
+            sect_text = self.trees[tree_key].item(sel_iid)['text']
+            sect_name = sect_text.split(' ')[0]
+            prefix = ''
+        elif tree_key == 'instruction':
+            label_label = self.trees[tree_key].item(sel_iid)['values'][0]
+            if label_name_sep not in label_label:
+                return
+            label_parts = label_label.split(label_name_sep)
+            sect_name = label_parts[1]
+            prefix = label_parts[0]
+        else:
+            return
+
+        bbox = self.trees[tree_key].bbox(sel_iid, column)
+        if tree_key == 'section':
+            widget = LabelNameEntry(self.trees[tree_key])
+            widget.insert(0, sect_name)
+            widget.place(x=bbox[0] + text_column_indent, y=bbox[1], width=bbox[2] - text_column_indent, height=bbox[3])
+            self.trees[tree_key].after(10, widget.focus_set)
+
+            widget.bind('<Return>', lambda ev: self.callbacks['change_section_name'](widget, ev))
+            widget.bind('<Escape>', lambda ev: self.callbacks['destroy_rename_widget'](widget))
+        else:
+            widget = ttk.Frame(self.trees[tree_key])
+            widget.place(x=bbox[0], y=bbox[1], width=bbox[2], height=bbox[3])
+            widget.columnconfigure(1, weight=1)
+
+            label = ttk.Label(widget, text=prefix)
+            label.grid(row=0, column=0, padx='2 0')
+            widget.entry_widget = LabelNameEntry(widget)
+            widget.entry_widget.insert(0, sect_name)
+            widget.entry_widget.grid(row=0, column=1, sticky=tk.W + tk.E, padx='13 0')
+            self.trees[tree_key].after(10, widget.entry_widget.focus_set)
+
+            widget.entry_widget.bind('<Return>',
+                                     lambda event: self.change_label_name(widget, sel_iid, event))
+            widget.entry_widget.bind('<Escape>', lambda event: self.destroy_rename_widget(widget))
+
+        for tree in self.trees.values():
+            tree.unbind_events()
 
     def change_label_name(self, widget, sel_iid, e):
         label_uuid = self.trees['instruction'].row_data.get(sel_iid, None)
