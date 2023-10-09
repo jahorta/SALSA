@@ -440,7 +440,7 @@ class ProjectEditorController:
             widget.place(x=bbox[0] + text_column_indent, y=bbox[1], width=bbox[2] - text_column_indent, height=bbox[3])
             self.trees[tree_key].after(10, widget.focus_set)
 
-            widget.bind('<Return>', lambda ev: self.change_section_name(widget, ev))
+            widget.bind('<Return>', lambda ev: self.rename_section(ev, widget, None))
             widget.bind('<Escape>', lambda ev: self.delete_entry_widget())
         else:
             widget = ttk.Frame(self.trees[tree_key])
@@ -454,7 +454,7 @@ class ProjectEditorController:
             widget.entry_widget.grid(row=0, column=1, sticky=tk.W + tk.E, padx='13 0')
             self.trees[tree_key].after(10, widget.entry_widget.focus_set)
 
-            widget.entry_widget.bind('<Return>', lambda ev: self.change_label_name(widget, sel_iid, ev))
+            widget.entry_widget.bind('<Return>', lambda ev: self.rename_section(ev, widget, sel_iid))
             widget.entry_widget.bind('<Escape>', lambda ev: self.delete_entry_widget())
 
         self.entry_widget = widget
@@ -462,17 +462,22 @@ class ProjectEditorController:
         for tree in self.trees.values():
             tree.unbind_events()
 
-    def change_label_name(self, widget, sel_iid, e):
-        label_uuid = self.trees['instruction'].row_data.get(sel_iid, None)
-        if label_uuid is None:
-            return
+    def rename_section(self, e, widget, sel_iid):
+        label_uuid = None
+        if sel_iid is not None:
+            label_uuid = self.trees['instruction'].row_data.get(sel_iid, None)
+            if label_uuid is None:
+                return
+
         new_name = e.widget.get()
         if new_name == self.current['section']:
             return self.delete_entry_widget()
+
         if self.project.is_sect_name_used(self.current['script'], new_name):
             schedule_tooltip(widget, 'This name is in use', delay=0, min_time=1500, position='above center',
                              is_warning=True)
             return self.shake_widget(widget)
+
         if new_name == '':
             schedule_tooltip(widget, 'A name is required', delay=0, min_time=1500, position='above center',
                              is_warning=True)
@@ -480,29 +485,18 @@ class ProjectEditorController:
 
         self.delete_entry_widget()
 
-        if new_name == self.trees['instruction'].item(sel_iid)['values'][0].split(label_name_sep)[1]:
-            return
+        if sel_iid is not None:
+            if new_name == self.trees['instruction'].item(sel_iid)['values'][0].split(label_name_sep)[1]:
+                return
+
         self.project.change_section_name(self.current['script'], self.current['section'], label_uuid, new_name)
-        self.current['section'] = new_name
-        self.refresh_all_trees()
 
-    def change_section_name(self, widget, e):
-        new_name = e.widget.get()
-        if new_name == self.current['section']:
-            return self.delete_entry_widget()
-        if self.project.is_sect_name_used(self.current['script'], new_name):
-            schedule_tooltip(widget, 'This name is in use', delay=0, min_time=1500, position='above center',
-                             is_warning=True)
-            return self.shake_widget(widget)
-        if new_name == '':
-            schedule_tooltip(widget, 'A name is required', delay=0, min_time=1500, position='above center',
-                             is_warning=True)
-            return self.shake_widget(widget)
+        if sel_iid is not None:
+            if sel_iid == '0':
+                self.current['section'] = new_name
+        else:
+            self.current['section'] = new_name
 
-        self.delete_entry_widget()
-
-        self.project.change_section_name(self.current['script'], self.current['section'], None, new_name)
-        self.current['section'] = new_name
         self.refresh_all_trees()
 
     def shake_widget(self, widget):
