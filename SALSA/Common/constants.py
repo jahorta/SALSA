@@ -64,7 +64,7 @@ class ReservedVars:
     }
 
 
-logical_sect_suffix = '(0)'
+logical_sect_suffix = '(L)'
 sep = '|'
 alt_sep = ':'
 alt_alt_sep = ';'
