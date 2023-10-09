@@ -172,6 +172,8 @@ class DataTreeview(ttk.Treeview):
             return
         if self.item(row)['text'] == placeholder_text:
             return
+        self.focus(row)
+        self.selection_set([row])
         row_data = self.row_data[row]
         if row_data is not None:
             self.callbacks['select'](self.name, row_data)
