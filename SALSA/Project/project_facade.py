@@ -163,6 +163,9 @@ class SCTProjectFacade:
                         value_dict = base_dict
                     values[header_key] = value_dict[header_key] if isinstance(value_dict[header_key], str) else str(
                         value_dict[header_key])
+                if isinstance(element, SCTSection):
+                    if element.is_logical:
+                        values['name'] += f' {logical_sect_suffix}'
                 if isinstance(element, SCTInstruction):
                     if element.base_id == 9:
                         values['name'] += f'{label_name_sep}{element.label}'
