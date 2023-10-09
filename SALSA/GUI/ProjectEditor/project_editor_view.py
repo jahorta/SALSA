@@ -432,10 +432,10 @@ class ProjectEditorView(ttk.Frame):
         widget.columnconfigure(1, weight=1)
 
         label = ttk.Label(widget, text=label_parts[0])
-        label.grid(row=0, column=0, padx=10)
+        label.grid(row=0, column=0, padx='2 0')
         widget.entry_widget = w.LabelNameEntry(widget)
         widget.entry_widget.insert(0, label_name)
-        widget.entry_widget.grid(row=0, column=1, sticky=tk.W + tk.E)
+        widget.entry_widget.grid(row=0, column=1, sticky=tk.W + tk.E, padx='13 0')
         self.after(10, widget.entry_widget.focus_set)
 
         widget.entry_widget.bind('<Return>', lambda event: self.callbacks['change_label_name'](widget, sel_iid, event))
