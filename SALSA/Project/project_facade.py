@@ -596,6 +596,17 @@ class SCTProjectFacade:
             for link in inst.links_out:
                 link.origin_trace[0] = new_sect_name
 
+    def check_for_logical_sect(self, script, section):
+        sect = self.project.scts[script].sects[section]
+        sect.is_logical = False
+        inst_ind = 0
+        while not sect.is_logical:
+            inst_ind += 1
+            if len(sect.inst_list) == inst_ind:
+                break
+            if sect.insts[sect.inst_list[inst_ind]].base_id == 9:
+                sect.is_logical = True
+
     # ------------------------------------------ #
     # Instruction and parameter analysis methods #
     # ------------------------------------------ #
