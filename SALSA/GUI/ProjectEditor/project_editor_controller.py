@@ -436,8 +436,8 @@ class ProjectEditorController:
             widget.place(x=bbox[0] + text_column_indent, y=bbox[1], width=bbox[2] - text_column_indent, height=bbox[3])
             self.trees[tree_key].after(10, widget.focus_set)
 
-            widget.bind('<Return>', lambda ev: self.callbacks['change_section_name'](widget, ev))
-            widget.bind('<Escape>', lambda ev: self.callbacks['destroy_rename_widget'](widget))
+            widget.bind('<Return>', lambda ev: self.change_section_name(widget, ev))
+            widget.bind('<Escape>', lambda ev: self.delete_entry_widget())
         else:
             widget = ttk.Frame(self.trees[tree_key])
             widget.place(x=bbox[0], y=bbox[1], width=bbox[2], height=bbox[3])
@@ -450,9 +450,10 @@ class ProjectEditorController:
             widget.entry_widget.grid(row=0, column=1, sticky=tk.W + tk.E, padx='13 0')
             self.trees[tree_key].after(10, widget.entry_widget.focus_set)
 
-            widget.entry_widget.bind('<Return>',
-                                     lambda event: self.change_label_name(widget, sel_iid, event))
-            widget.entry_widget.bind('<Escape>', lambda event: self.destroy_rename_widget(widget))
+            widget.entry_widget.bind('<Return>', lambda ev: self.change_label_name(widget, sel_iid, ev))
+            widget.entry_widget.bind('<Escape>', lambda ev: self.delete_entry_widget())
+
+        self.entry_widget = widget
 
         for tree in self.trees.values():
             tree.unbind_events()
