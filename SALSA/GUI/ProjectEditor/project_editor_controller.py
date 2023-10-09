@@ -607,6 +607,7 @@ class ProjectEditorController:
             is_multiple = False
             row_data = self.trees['section'].row_data.get(sel_iid, None)
             is_group = len(self.trees['section'].get_children(sel_iid)) > 0
+            self.current['section'] = row_data
         m = tk.Menu(self.view, tearoff=0)
 
         # commands to add section from project
