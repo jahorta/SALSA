@@ -629,6 +629,11 @@ class ProjectEditorController:
         if is_multiple:
             m.add_command(label='Group sections', command=lambda: self.rcm_group_sections(row_data))
 
+        if not is_multiple:
+            m.add_separator()
+            m.add_command(label='Open all groups', command=self.trees['section'].open_all_groups)
+            m.add_command(label='Close all groups', command=self.trees['section'].close_all_groups)
+
         m.bind('<Escape>', m.destroy)
         try:
             m.tk_popup(e.x_root, e.y_root)
@@ -705,6 +710,11 @@ class ProjectEditorController:
 
         if self.project.inst_is_label(self.current['script'], self.current['section'], self.current['instruction']):
             m.add_command(label='Change Label Section Name', command=lambda: self.view.show_label_edit_widget(e))
+
+        if len(self.trees['instruction'].selection()) < 2:
+            m.add_separator()
+            m.add_command(label='Open all groups', command=self.trees['instruction'].open_all_groups)
+            m.add_command(label='Close all groups', command=self.trees['instruction'].close_all_groups)
 
         m.bind('<Escape>', m.destroy)
         try:
