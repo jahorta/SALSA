@@ -242,6 +242,16 @@ class DataTreeview(ttk.Treeview):
             elif entry[0] == 'open':
                 self.item(rows[entry[1]], open=True)
 
+    def open_all_groups(self):
+        for entry in self.row_data.keys():
+            if len(self.get_children(entry)) > 0:
+                self.item(entry, open=True)
+
+    def close_all_groups(self):
+        for entry in self.row_data.keys():
+            if len(self.get_children(entry)) > 0:
+                self.item(entry, open=False)
+
     def bDown_Shift(self, event):
         if len(self.get_children('')) == 0:
             return
