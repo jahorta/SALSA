@@ -709,7 +709,7 @@ class ProjectEditorController:
             m.add_command(label='Remove Case', command=self.rcm_remove_switch_case)
 
         if self.project.inst_is_label(self.current['script'], self.current['section'], self.current['instruction']):
-            m.add_command(label='Change Label Section Name', command=lambda: self.view.show_label_edit_widget(e))
+            m.add_command(label='Change Label Section Name', command=lambda: self.show_sect_rename_widget('instruction', e))
 
         if len(self.trees['instruction'].selection()) < 2:
             m.add_separator()
