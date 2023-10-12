@@ -680,7 +680,10 @@ class SCTProjectFacade:
 
         # Checks for initial label and return of a function
         if inst_ind == 0:
-            return 'first'
+            if len(cur_sect.inst_list) > 1:
+                return 'first'
+            else:
+                return ''
 
         if inst_ind + 1 == len(cur_sect.inst_list):
             if len(cur_sect.inst_list) > 2:
