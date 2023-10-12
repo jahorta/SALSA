@@ -683,7 +683,10 @@ class SCTProjectFacade:
             return 'first'
 
         if inst_ind + 1 == len(cur_sect.inst_list):
-            return 'last'
+            if len(cur_sect.inst_list) > 2:
+                return 'last'
+            else:
+                return ''
 
         # Checks if the instruction is a goto with a master and there is more than one inst in the group and its a case
         parents, index = self.get_grouped_parents_and_index(instruction, cur_sect.inst_tree)
