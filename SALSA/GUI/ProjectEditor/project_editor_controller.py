@@ -675,9 +675,15 @@ class ProjectEditorController:
             sel_iid = self.trees['instruction'].parent(sel_iid)
         inst_uuid = self.trees['instruction'].row_data[sel_iid]
         self.current['instruction'] = inst_uuid
-        restrictions = self.project.get_inst_rcm_restrictions(**self.current)
-        m = tk.Menu(self.view, tearoff=0)
 
+        parent_is_case = False
+        parent_iid = self.trees['instruction'].parent(sel_iid)
+        if parent_iid is not '':
+            if self.trees['instruction'].row_data.get(parent_iid, None) is None:
+                parent_is_case = True
+        restrictions = self.project.get_inst_rcm_restrictions(parent_is_case=parent_is_case, **self.current)
+
+        m = tk.Menu(self.view, tearoff=0)
         # if rightclicked row is group, add option for "Add Instruction in group"
         if group_type in ('if', 'else', 'while', 'case'):
             m.add_command(label='Add Instruction Inside Group', command=lambda: self.rcm_add_inst('inside'))

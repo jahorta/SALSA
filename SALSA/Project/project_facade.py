@@ -674,7 +674,7 @@ class SCTProjectFacade:
         b_param_id = param_parts[-1]
         return self.base_insts.get_inst(inst_id).params[int(b_param_id)]
 
-    def get_inst_rcm_restrictions(self, script, section, instruction, **kwargs):
+    def get_inst_rcm_restrictions(self, script, section, instruction, parent_is_case=None, **kwargs):
         cur_sect = self.project.scts[script].sects[section]
         inst_ind = cur_sect.inst_list.index(instruction)
 
@@ -685,10 +685,15 @@ class SCTProjectFacade:
         if inst_ind + 1 == len(cur_sect.inst_list):
             return 'last'
 
-        # Checks if the instruction is a goto with a master
-        if len(cur_sect.insts[instruction].my_master_uuids) > 0:
+        # Checks if the instruction is a goto with a master and there is more than one inst in the group and its a case
+        parents, index = self.get_grouped_parents_and_index(instruction, cur_sect.inst_tree)
+        cur_group = cur_sect.inst_tree
+        for p in parents:
+            cur_group = cur_group[p]
+        if len(cur_group) == 1 and parent_is_case:
+            return ''
+        elif len(cur_sect.insts[instruction].my_master_uuids) > 0:
             return 'goto'
-
         return ''
 
     def has_loops(self, script, section, instruction, **kwargs):
