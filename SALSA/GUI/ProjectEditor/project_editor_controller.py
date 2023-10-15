@@ -678,7 +678,7 @@ class ProjectEditorController:
 
         parent_is_case = False
         parent_iid = self.trees['instruction'].parent(sel_iid)
-        if parent_iid is not '':
+        if parent_iid != '':
             if self.trees['instruction'].row_data.get(parent_iid, None) is None:
                 parent_is_case = True
         restrictions = self.project.get_inst_rcm_restrictions(parent_is_case=parent_is_case, **self.current)
