@@ -27,7 +27,8 @@ class SCTProjectFacade:
             settings[self.log_key] = {}
 
         self.desc_callbacks = {
-            'get_str': self.get_string_to_edit
+            'get_str': self.get_string_to_edit,
+            'get_inst': self.get_inst_desc_info
         }
         self.cur_script = None
 
@@ -701,6 +702,10 @@ class SCTProjectFacade:
         elif len(cur_sect.insts[instruction].my_master_uuids) > 0:
             return 'goto'
         return ''
+
+    def get_inst_desc_info(self, link: SCTLink):
+        inst = self.project.scts[link.script].sects[link.target_trace[0]].insts[link.target_trace[1]]
+        return f'{inst.ungrouped_position} - {inst.base_id}'
 
     def has_loops(self, script, section, instruction, **kwargs):
         cur_inst_id = self.project.scts[script].sects[section].insts[instruction].base_id

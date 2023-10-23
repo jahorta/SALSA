@@ -7,14 +7,16 @@ from SALSA.Project.project_container import SCTInstruction, SCTParameter
 
 
 def format_description(inst: SCTInstruction, base_inst: BaseInst, callbacks):
-    desc = description_insert_param_values(inst, base_inst)
+    desc = description_insert_param_values(inst, base_inst, callbacks)
     return resolveDescriptionFuncs(desc, inst, base_inst, callbacks)
 
 
-def description_insert_param_values(inst: SCTInstruction, base_inst: BaseInst):
+def description_insert_param_values(inst: SCTInstruction, base_inst: BaseInst, callbacks):
     desc = base_inst.description
     if '<loop>' in desc:
         desc = desc.replace('<loop>', get_loop_desc(inst, base_inst))
+    if '<switch>' in desc:
+        desc = desc.replace('<switch>', get_switch_desc(inst, base_inst, callbacks))
     paramSets = {}
     for key, param in inst.params.items():
         paramSets[base_inst.params[key].name] = param.formatted_value
@@ -35,6 +37,17 @@ def get_loop_desc(inst, base_inst):
         for param in inst.l_params[i].values():
             result += f'\n\t{param.ID}\t{param.formatted_value}'
         result += '\n'
+    return result
+
+
+def get_switch_desc(inst, base_inst, callbacks):
+    result = f'{inst.condition}'
+    if base_inst.loop is None:
+        return result
+    iterations = inst.params[base_inst.loop_iter].value
+    for i in range(iterations):
+        l_param = inst.l_params[i]
+        result += f'\n\t{l_param[2].value}: {callbacks["get_inst"](l_param[3].link)}'
     return result
 
 
