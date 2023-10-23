@@ -225,7 +225,7 @@ class DataTreeview(ttk.Treeview):
 
             child_uuid = self.row_data.get(child, None)
             if child_uuid is None:
-                child_child_uuid = self.row_data.get(self.get_children(child)[0], None)
+                child_child_uuid = self.row_data.get(self.get_children(child)[-1], None)
                 open_items.append(('see', child_child_uuid))
             else:
                 open_items.append(('open', child_uuid))
