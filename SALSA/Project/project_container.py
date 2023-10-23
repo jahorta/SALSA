@@ -28,6 +28,7 @@ class SCTTrace:
 @dataclass
 class SCTLink:
     type: str  # Available types: Jump, Switch, String
+    script: str
     origin: int
     origin_trace: List[Union[int, str]]
     target: int
@@ -35,11 +36,13 @@ class SCTLink:
     ID: int = dc_field(default_factory=lambda counter=count(): next(counter))
 
     def __repr__(self):
-        return f'Link: {self.ID} - {self.origin_trace[0]}:{self.origin_trace[1]}:{self.origin_trace[2]}' \
+        return f'Link: {self.ID}:{self.script} - {self.origin_trace[0]}:{self.origin_trace[1]}:{self.origin_trace[2]}' \
                f'\n\torigin: {self.origin}, target: {self.target}'
 
     def __eq__(self, other_link):
         if self.type != other_link.type:
+            return False
+        if self.script != other_link.script:
             return False
         if self.target_trace is None:
             if other_link.target_trace is not None:
@@ -367,8 +370,7 @@ class SCTProject:
     file_name: str
     scts: Dict[str, SCTScript]
 
-    # NOTE: version numbers should change only when the master branch is updated or when testing the updater.
-    cur_version = 4
+    cur_version = 5
 
     def __init__(self):
         self.scts = {}

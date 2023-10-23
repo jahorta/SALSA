@@ -22,7 +22,9 @@ class ProjectUpdater:
         return prj
 
     def _upgrade_version(self, p_piece: Union[SCTProject, SCTScript, SCTSection, SCTParameter, SCTInstruction, SCTLink],
-                         cur_version=None, p_level_ind=0, tasks=None):
+                         cur_version=None, p_level_ind=0, tasks=None, cur_script=None):
+        if cur_script is None and isinstance(p_piece, SCTScript):
+            cur_script = p_piece.name
         if cur_version is None:
             cur_version = p_piece.version
             print(f'{self.log_key}: Now updating project from version v{cur_version} to v{cur_version+1}')
@@ -41,41 +43,45 @@ class ProjectUpdater:
         if p_level != max_level and p_level_ind + 1 < len(p_levels):
 
             p_attr_name = p_attrs[cur_version][p_level_ind]
-            child_entries = p_piece.__getattribute__(p_attr_name)
+            if p_attr_name in p_piece.__dict__:
+                child_entries = p_piece.__getattribute__(p_attr_name)
 
-            not_dict = False
-            if not isinstance(child_entries, dict):
-                child_entries = {nd_index: child_entries}
-                not_dict = True
+                not_dict = False
+                if not isinstance(child_entries, dict):
+                    child_entries = {nd_index: child_entries}
+                    not_dict = True
 
-            # Handle children
-            updated_children = {}
-            for child_key, child_piece in child_entries.items():
-                if child_piece is not None:
-                    child_piece = self._upgrade_version(p_piece=child_piece, cur_version=cur_version, p_level_ind=p_level_ind + 1, tasks=tasks)
-                updated_children[child_key] = child_piece
+                # Handle children
+                updated_children = {}
+                for child_key, child_piece in child_entries.items():
+                    if child_piece is not None:
+                        child_piece = self._upgrade_version(p_piece=child_piece, cur_version=cur_version,
+                                                            p_level_ind=p_level_ind + 1, tasks=tasks, cur_script=cur_script)
+                    updated_children[child_key] = child_piece
 
-            if not_dict:
-                updated_children = updated_children[nd_index]
+                if not_dict:
+                    updated_children = updated_children[nd_index]
 
-            p_piece.__setattr__(p_attr_name, updated_children)
+                p_piece.__setattr__(p_attr_name, updated_children)
 
         # Handle loop parameters of instructions since those won't be captured by the other recursive section above
         if p_level == PP.instruction and p_level != max_level:
             loop_params = []
             loop_attr_name = loop_attrs[cur_version]
-            for loop in p_piece.__getattribute__(loop_attr_name):
-                new_loop = {}
-                for param_id, param in loop.items():
-                    param = self._upgrade_version(p_piece=param, cur_version=cur_version,
-                                                  p_level_ind=p_level_ind + 1, tasks=tasks)
-                    new_loop[param_id] = param
-                loop_params.append(new_loop)
-            p_piece.__setattr__(loop_attr_name, loop_params)
+            if loop_attr_name in p_piece.__dict__:
+                for loop in p_piece.__getattribute__(loop_attr_name):
+                    new_loop = {}
+                    for param_id, param in loop.items():
+                        param = self._upgrade_version(p_piece=param, cur_version=cur_version, cur_script=cur_script,
+                                                      p_level_ind=p_level_ind + 1, tasks=tasks)
+                        new_loop[param_id] = param
+                    loop_params.append(new_loop)
+                p_piece.__setattr__(loop_attr_name, loop_params)
 
         if p_level in tasks:
             for task_num, task in tasks[p_level].items():
-                args: list = [p_piece] + task.get(UP.arguments, [])
+                lcls = locals()
+                args: list = [p_piece] + task.get(UP.arguments, []) + [lcls[a] for a in task.get(UP.up_args, [])]
                 p_piece = self.__getattribute__(task[UP.callable])(*args)
 
         if p_level == PP.script:
@@ -236,6 +242,13 @@ class ProjectUpdater:
                 replaced = self._recursive_name_replacer(value, old, new)
                 if replaced:
                     return True
+
+    @staticmethod
+    def _add_script_to_links(cur_piece, scr):
+        if cur_piece.link is None:
+            return cur_piece
+        cur_piece.link.script = scr
+        return cur_piece
 
 
 if __name__ == '__main__':

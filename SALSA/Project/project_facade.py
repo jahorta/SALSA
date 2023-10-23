@@ -1271,7 +1271,7 @@ class SCTProjectFacade:
             target_inst_UUID = inst_sect.inst_list[target_inst_UUID_index]
 
             inst_link = SCTLink(origin=-1, origin_trace=[section, inst.ID, 1], type='Jump',
-                                target=-1, target_trace=[section, target_inst_UUID])
+                                target=-1, target_trace=[section, target_inst_UUID], script=script)
             inst.params[1].link = inst_link
             inst.links_out.append(inst_link)
             inst_sect.insts[target_inst_UUID].links_in.append(inst_link)
@@ -1281,7 +1281,7 @@ class SCTProjectFacade:
             goto_param = SCTParameter(0, 'int|jump')
             goto_inst.add_parameter(0, goto_param)
             goto_link = SCTLink(origin=-1, origin_trace=[section, goto_inst.ID, 0], type='Jump',
-                                target=-1, target_trace=[section, target_inst_UUID])
+                                target=-1, target_trace=[section, target_inst_UUID], script=script)
             goto_param.link = goto_link
             inst_sect.insts[target_inst_UUID].links_in.append(goto_link)
             goto_inst.links_out.append(goto_link)
@@ -1438,12 +1438,12 @@ class SCTProjectFacade:
         case_goto.set_inst_id(10)
         case_goto.params[0] = SCTParameter(0, 'int|jump')
         case_goto.params[0].link = SCTLink('Jump', origin=-1, origin_trace=[section, case_goto.ID, 0],
-                                           target=-1, target_trace=[section, goto_target_uuid])
+                                           target=-1, target_trace=[section, goto_target_uuid], script=script)
 
         switch_loop_params = {2: SCTParameter(2, 'int'), 3: SCTParameter(3, 'int|jump')}
         switch_loop_params[2].value = int(sub_group)
         switch_loop_params[3].link = SCTLink('Jump', origin=-1, origin_trace=[section, inst, f'0{sep}3'],
-                                             target=-1, target_trace=[section, case_goto.ID])
+                                             target=-1, target_trace=[section, case_goto.ID], script=script)
 
         cur_inst.l_params.insert(0, switch_loop_params)
         cur_inst.links_out.insert(0, switch_loop_params[3].link)

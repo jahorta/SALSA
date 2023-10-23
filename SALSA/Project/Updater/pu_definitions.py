@@ -1,5 +1,14 @@
 from SALSA.Project.Updater.pu_constants import PP, UP
 
+v5 = {
+    PP.parameter: {
+        1: {
+            UP.callable: '_add_script_to_links',
+            UP.up_args: ['cur_script']
+        }
+    }
+}
+
 v4 = {
     PP.script: {
         1: {
@@ -86,10 +95,12 @@ update_tasks = {
     1: v2,
     2: v3,
     3: v4,
+    4: v5
 }
 
 p_max_depth = {
     1: PP.parameter,
     2: PP.instruction,
-    3: PP.script
+    3: PP.script,
+    4: PP.parameter
 }

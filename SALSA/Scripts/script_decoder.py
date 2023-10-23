@@ -616,7 +616,7 @@ class SCTDecoder:
                     link_type = base_param.link_type
                     origin = self._cursor * 4
                     target = self._cursor * 4 + cur_value
-                    newLink = SCTLink(type=link_type, origin=origin, target=target, origin_trace=trace)
+                    newLink = SCTLink(type=link_type, script=self._name, origin=origin, target=target, origin_trace=trace)
                     cur_param.link = newLink
                     if link_type == 'String':
                         if target > self._last_sect_pos:
@@ -1620,7 +1620,7 @@ class SCTDecoder:
         new_goto.set_inst_id(10)
         goto_param = SCTParameter(0, base_goto.params[0].type)
         goto_param.set_value(4)
-        goto_link = SCTLink(base_goto.link_type, origin=-1, origin_trace=[sect_name, new_goto.ID, 0],
+        goto_link = SCTLink(base_goto.link_type, script=self._name, origin=-1, origin_trace=[sect_name, new_goto.ID, 0],
                             target=-1, target_trace=[next_sect, next_inst_id])
         goto_param.link = goto_link
         new_goto.add_parameter(0, goto_param)
