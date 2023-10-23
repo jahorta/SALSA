@@ -24,7 +24,7 @@
   },
   "3": {
     "Name": "Switch",
-    "Description": "Functions as a switch with <ChoiceNum> entries with a choice determined by (<Choice>)\n<Switch>\n\n",
+    "Description": "Functions as a switch with <ChoiceNum> entries with a choice determined by (<Choice>)\n<switch>\n\n\n",
     "Notes": "No dependancy on param1\nFunctional at all times\n\nuses SCPT Analyze to get a float back.\nuses this as a parameter into 8025a1a4\n\n8025a1a4:\n  -If the value is between zero and 4.2949e9\n    -If the value is greater than 2.14748e9\n      -2.14748e9 is subtracted from the value\n    -Then neg(int(value)) is returned",
     "Parameters": {
       "0": {
