@@ -41,13 +41,13 @@ def get_loop_desc(inst, base_inst):
 
 
 def get_switch_desc(inst, base_inst, callbacks):
-    result = f'{inst.condition}'
+    result = f'Condition: {inst.condition}\n\n Case\t| Target Inst\n ---------|-----------'
     if base_inst.loop is None:
         return result
     iterations = inst.params[base_inst.loop_iter].value
     for i in range(iterations):
         l_param = inst.l_params[i]
-        result += f'\n\t{l_param[2].value}: {callbacks["get_inst"](l_param[3].link)}'
+        result += f'\n {l_param[2].value}\t| {callbacks["get_inst"](l_param[3].link)}'
     return result
 
 
