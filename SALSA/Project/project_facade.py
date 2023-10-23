@@ -1614,6 +1614,15 @@ class SCTProjectFacade:
             if uuid_sep not in next_inst:
                 if len(parents) == 1:
                     return None
+                if isinstance(parents[-2], str):
+                    if 'switch' in parents[-2]:
+                        case_pos = -1
+                        switch = self.project.scts[script].sects[section].insts[parents[-2].split(sep)[0]]
+                        for i, lp in enumerate(switch.l_params):
+                            if lp[2].value == int(next_inst):
+                                case_pos = i
+                        if case_pos + 1 != switch.params[1].value:
+                            return switch.l_params[case_pos+1][3].link.target_trace[1]
                 next_inst = parents[-2]
             next_inst = next_inst.split(sep)[0]
             new_tgt_inst_uuid = self.get_next_grouped_uuid(script, section, next_inst)
