@@ -27,9 +27,9 @@ p_attrs = {
 
 loop_attrs = {
     1: 'loop_parameters',
-    2: 'loop_params',
-    3: 'loop_params',
-    4: 'loop_params'
+    2: 'l_params',
+    3: 'l_params',
+    4: 'l_params'
 }
 
 nd_index = -1
