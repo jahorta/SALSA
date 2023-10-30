@@ -423,8 +423,16 @@ class ProjectEditorController:
         sel_iid = self.trees[tree_key].identify_row(e.y)
 
         if tree_key == 'section':
-            sect_text = self.trees[tree_key].item(sel_iid)['text']
-            sect_name = sect_text.split(' ')[0]
+            sect_name = self.trees[tree_key].row_data.get(sel_iid)
+
+            p_num = 1
+            parent = self.trees[tree_key].parent(sel_iid)
+            while parent is not '':
+                p_num += 1
+                parent = self.trees[tree_key].parent(sel_iid)
+            if e.x < p_num * group_handle_width:
+                return
+
             prefix = ''
         elif tree_key == 'instruction':
             label_label = self.trees[tree_key].item(sel_iid)['values'][0]
