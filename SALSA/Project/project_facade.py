@@ -908,17 +908,119 @@ class SCTProjectFacade:
     # Section manipulation methods #
     # ---------------------------- #
 
-    def add_section(self, script, position):
-        pass
+    def add_section(self, script, sect_before):
+        cur_script = self.project.scts[script]
+        new_sect = SCTSection()
+        new_sect.type = 'Label'
+        i = 0
+        new_name = f'Untitled({i})'
+        while self.is_sect_name_used(new_name, cur_script):
+            i += 1
+            new_name = f'Untitled({i})'
+        new_sect.name = new_name
+        cur_script.sects[new_name] = new_sect
+
+        cur_script.sect_list.insert(cur_script.sect_list.index(sect_before), new_name)
+        parents, index = self.get_grouped_parents_and_index(sect_before, cur_script.sect_tree)
+        cur_group = cur_script.sect_tree
+        for p in parents:
+            cur_group = cur_group[p]
+        cur_group.insert(index, new_name)
+
+        cur_script.unused_sections.append(new_name)
 
     def remove_section(self, script, section):
-        pass
+        # This method is not used for string group sections
+        cur_script = self.project.scts[script]
+        cur_script.sect_list.remove(section)
+
+        parents, index = self.get_grouped_parents_and_index(section, cur_script.sect_tree)
+        cur_group = cur_script.sect_tree
+        for p in parents:
+            cur_group = cur_group[p]
+        cur_group.remove(section)
+
+        if section in cur_script.unused_sections:
+            cur_script.unused_sections.remove(section)
+            # TODO remove links of external origin in links_in and links_out
+
+        if cur_script.sects[section].is_compound:
+            cur_script.folded_sects = {k: v for k, v in cur_script.folded_sects.items() if v != section}
+
+        if section in cur_script.error_sections:
+            cur_script.error_sections.pop(section)
+
+        cur_script.sects.pop(section)
 
     def group_sections(self, script, section_bounds):
-        pass
+        cur_script = self.project.scts[script]
+        parents_s, index_s = self.get_grouped_parents_and_index(section_bounds[0], cur_script.sect_tree)
+        parents_e, index_e = self.get_grouped_parents_and_index(section_bounds[1], cur_script.sect_tree)
 
-    def ungroup_sections(self, script, section):
-        pass
+        different_sizes = False
+        end_is_longer = False
+        if len(parents_s) != len(parents_e):
+            different_sizes = True
+            end_is_longer = parents_s > parents_e
+
+        parents = parents_s
+        other_parents = parents_e
+        if different_sizes and end_is_longer:
+            parents = parents_e
+            other_parents = parents_s
+
+        latest_same = -1
+        for i, p in enumerate(parents):
+            if p == other_parents[i]:
+                latest_same = i
+                break
+        same_prefix = latest_same + 1 == len(parents)
+
+        if same_prefix:
+            if different_sizes:
+                if end_is_longer:
+                    index_e = index_s + 1
+                else:
+                    parents_s = parents_e
+                    index_s = index_e - 1
+        else:
+            if latest_same == -1:
+                index_s = parents_s[0]
+                index_e = parents_e[0]
+                parents_s = []
+            else:
+                index_s = parents_s[latest_same+1]
+                index_e = parents_e[latest_same+1]
+                parents_s = parents_s[:latest_same+1]
+
+        cur_group = cur_script.sect_tree
+        for p in parents_s:
+            cur_group = cur_group[p]
+
+        if index_e >= len(cur_group) or index_s < 0 or index_s == index_e:
+            return
+
+        if isinstance(cur_group[index_s], dict):
+            return
+
+        new_group = {cur_group[index_s]: [_ for _ in cur_group[index_s+1:index_e]]}
+        for i in reversed(range(index_s, index_e)):
+            cur_group.pop(i)
+        cur_group.insert(index_s, new_group)
+
+        self.callbacks['set_change']()
+
+    def ungroup_section(self, script, section):
+        cur_script = self.project.scts[script]
+        parents, index = self.get_grouped_parents_and_index(section, cur_script.sect_tree)
+        cur_group = cur_script.sect_tree
+        for p in parents:
+            cur_group = cur_group[p]
+        group = cur_group.pop(index)
+        group = list(group.keys()) + list(group.values())
+        cur_group = cur_group[:index] + group + cur_group[index:]
+
+        self.callbacks['set_change']()
 
     # ---------------------------------------------- #
     # Instruction and parameter manipulation methods #
