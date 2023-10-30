@@ -396,8 +396,23 @@ class ProjectEditorController:
 
     def refresh_all_trees(self, skip_param_tree=True, keep_selection=True):
         for key in reversed(self.trees.keys()):
-            if key == 'parameter' and skip_param_tree:
-                continue
+            if key == 'parameter':
+                if skip_param_tree or self.current['instruction'] is None:
+                    continue
+                if self.current['parameter'] is None:
+                    keep_selection = False
+            if key == 'instruction':
+                if self.current['section'] is None:
+                    continue
+                if self.current['instruction'] is None:
+                    keep_selection = False
+            if key == 'section':
+                if self.current['script'] is None:
+                    continue
+                if self.current['section'] is None:
+                    keep_selection = False
+            if key == 'script' and self.current['script'] is None:
+                keep_selection = False
             self.refresh_tree(tree_key=key, keep_selection=keep_selection, clear_others=False)
 
     def check_is_label(self, inst_uuid):
