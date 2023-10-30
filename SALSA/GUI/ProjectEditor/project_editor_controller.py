@@ -416,6 +416,9 @@ class ProjectEditorController:
         if tree_key == 'section':
             if '0' not in column:
                 return
+        else:
+            if '1' not in column:
+                return
 
         sel_iid = self.trees[tree_key].identify_row(e.y)
 
