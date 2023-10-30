@@ -624,8 +624,8 @@ class ProjectEditorController:
         # commands to add section from project
         if not is_multiple:
             m.add_command(label='Rename Section', command=lambda ev=e: self.show_sect_rename_widget('section', ev))
-            m.add_command(label='Add New Section Above', command=lambda: self.rcm_add_sect('above', *row_data))
-            m.add_command(label='Add New Section Below', command=lambda: self.rcm_add_sect('below', *row_data))
+            m.add_command(label='Add New Section Above', command=lambda: self.rcm_add_sect('above', row_data))
+            m.add_command(label='Add New Section Below', command=lambda: self.rcm_add_sect('below', row_data))
 
         # command to remove section from project
         label = 'Delete Section'
