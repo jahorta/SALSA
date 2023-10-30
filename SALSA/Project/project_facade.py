@@ -1032,6 +1032,44 @@ class SCTProjectFacade:
 
         self.callbacks['set_change']()
 
+    def change_section_type(self, script, section, s_type: Literal['virtual', 'label', 'code']):
+        cur_sect = self.project.scts[script].sects[section]
+
+        if len(cur_sect.insts) == 0:
+            cur_type = 'virtual'
+        elif len(cur_sect.insts) == 1:
+            cur_type = 'label'
+        else:
+            cur_type = 'code'
+
+        if s_type == cur_type:
+            return
+
+        if s_type == 'virtual':
+            cur_sect.inst_list = []
+            cur_sect.inst_tree = []
+            cur_sect.insts = {}
+            cur_sect.set_type('Label')
+
+        elif cur_type == 'code':
+            cur_sect.inst_errors = []
+            cur_sect.inst_list = [cur_sect.inst_list[0]]
+            cur_sect.inst_tree = [cur_sect.inst_tree[0]]
+            cur_sect.insts = {cur_sect.inst_list[0]: cur_sect.insts[cur_sect.inst_list[0]]}
+            cur_sect.is_compound = False
+            cur_sect.set_type('Label')
+
+        elif cur_type == 'virtual':
+            new_inst_UUID = self.add_inst(script, section)
+            self.change_inst(script, section, new_inst_UUID, new_id=9)
+
+        if s_type == 'code':
+            new_inst_UUID = self.add_inst(script, section, cur_sect.inst_tree[0])
+            self.change_inst(script, section, new_inst_UUID, new_id=12)
+            cur_sect.set_type('SCT')
+
+        self.callbacks['set_change']()
+
     # ---------------------------------------------- #
     # Instruction and parameter manipulation methods #
     # ---------------------------------------------- #

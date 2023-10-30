@@ -646,6 +646,14 @@ class ProjectEditorController:
             m.add_command(label='Open all groups', command=self.trees['section'].open_all_groups)
             m.add_command(label='Close all groups', command=self.trees['section'].close_all_groups)
 
+        if not is_group and not is_multiple:
+            m.add_separator()
+            s_type = tk.Menu(m, tearoff=0)
+            s_type.add_command(label='Virtual', command=lambda: self.rcm_change_sect_type('virtual'))
+            s_type.add_command(label='Label', command=lambda: self.rcm_change_sect_type('label'))
+            s_type.add_command(label='Code', command=lambda: self.rcm_change_sect_type('code'))
+            m.add_cascade(label='Change section type', menu=s_type)
+
         m.bind('<Escape>', m.destroy)
         try:
             m.tk_popup(e.x_root, e.y_root)
@@ -674,6 +682,12 @@ class ProjectEditorController:
         self.project.group_sections(self.current['script'], section_bounds=(sections[0], sections[-1]))
         self.refresh_all_trees(keep_selection=False)
         self.on_select_tree_entry('script', self.current['script'])
+
+
+    def rcm_change_sect_type(self, s_type: Literal['virtual', 'label', 'code']):
+        self.project.change_section_type(self.current['script'], self.current['section'], s_type)
+        self.refresh_all_trees()
+        self.on_select_tree_entry('section', self.current['section'])
 
     # # Instruction Options # #
 
