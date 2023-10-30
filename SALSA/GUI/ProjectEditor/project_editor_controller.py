@@ -24,7 +24,7 @@ tree_children = {
 
 tree_parents = {v: k for k, v in tree_children.items()}
 
-text_column_indent = 16
+group_handle_width = 20
 
 
 class ProjectEditorController:
