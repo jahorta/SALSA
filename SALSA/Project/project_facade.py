@@ -937,6 +937,8 @@ class SCTProjectFacade:
 
         cur_script.unused_sections.append(new_name)
 
+        return new_name
+
     def remove_section(self, script, section):
         # This method is not used for string group sections
         cur_script = self.project.scts[script]
