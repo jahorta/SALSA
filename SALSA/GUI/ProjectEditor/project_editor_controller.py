@@ -636,7 +636,7 @@ class ProjectEditorController:
             m.add_separator()
 
         if is_group and not is_multiple:
-            m.add_command(label='Ungroup sections', command=lambda: self.rcm_ungroup_sections(*row_data))
+            m.add_command(label='Ungroup sections', command=lambda: self.rcm_ungroup_sections(row_data))
 
         if is_multiple:
             m.add_command(label='Group sections', command=lambda: self.rcm_group_sections(row_data))
