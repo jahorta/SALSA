@@ -448,7 +448,7 @@ class ProjectEditorController:
         if tree_key == 'section':
             widget = LabelNameEntry(self.trees[tree_key])
             widget.insert(0, sect_name)
-            widget.place(x=bbox[0] + text_column_indent, y=bbox[1], width=bbox[2] - text_column_indent, height=bbox[3])
+            widget.place(x=bbox[0] + group_handle_width - 4, y=bbox[1], width=bbox[2] - group_handle_width + 4, height=bbox[3])
             self.trees[tree_key].after(10, widget.focus_set)
 
             widget.bind('<Return>', lambda ev: self.rename_section(ev, widget, None))
