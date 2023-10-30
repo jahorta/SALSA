@@ -914,7 +914,7 @@ class SCTProjectFacade:
         new_sect.type = 'Label'
         i = 0
         new_name = f'Untitled({i})'
-        while self.is_sect_name_used(new_name, cur_script):
+        while self.is_sect_name_used(script, new_name):
             i += 1
             new_name = f'Untitled({i})'
         new_sect.name = new_name
