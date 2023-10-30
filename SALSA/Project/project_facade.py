@@ -979,9 +979,10 @@ class SCTProjectFacade:
 
         latest_same = -1
         for i, p in enumerate(parents):
-            if p == other_parents[i]:
-                latest_same = i
+            if p != other_parents[i]:
                 break
+            else:
+                latest_same = i
         same_prefix = latest_same + 1 == len(parents)
 
         if same_prefix:
@@ -1011,8 +1012,8 @@ class SCTProjectFacade:
         if isinstance(cur_group[index_s], dict):
             return
 
-        new_group = {cur_group[index_s]: [_ for _ in cur_group[index_s+1:index_e]]}
-        for i in reversed(range(index_s, index_e)):
+        new_group = {f'{cur_group[index_s]}{sep}group': [_ for _ in cur_group[index_s+1:index_e+1]]}
+        for i in reversed(range(index_s, index_e+1)):
             cur_group.pop(i)
         cur_group.insert(index_s, new_group)
 
