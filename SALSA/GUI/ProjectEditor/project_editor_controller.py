@@ -427,7 +427,7 @@ class ProjectEditorController:
 
             p_num = 1
             parent = self.trees[tree_key].parent(sel_iid)
-            while parent is not '':
+            while parent != '':
                 p_num += 1
                 parent = self.trees[tree_key].parent(sel_iid)
             if e.x < p_num * group_handle_width:
