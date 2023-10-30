@@ -677,12 +677,13 @@ class ProjectEditorController:
         self.project.ungroup_section(self.current['script'], section)
         self.refresh_all_trees(keep_selection=False)
         self.on_select_tree_entry('script', self.current['script'])
+        self.trees['section'].see(self.trees['section'].get_iid_from_rowdata(section))
 
     def rcm_group_sections(self, sections):
         self.project.group_sections(self.current['script'], section_bounds=(sections[0], sections[-1]))
         self.refresh_all_trees(keep_selection=False)
         self.on_select_tree_entry('script', self.current['script'])
-
+        self.trees['section'].see(self.trees['section'].get_iid_from_rowdata(sections[0]))
 
     def rcm_change_sect_type(self, s_type: Literal['virtual', 'label', 'code']):
         self.project.change_section_type(self.current['script'], self.current['section'], s_type)
