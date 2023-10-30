@@ -908,7 +908,7 @@ class SCTProjectFacade:
     # Section manipulation methods #
     # ---------------------------- #
 
-    def add_section(self, script, sect_before):
+    def add_section(self, script, relevant_sect, is_above):
         cur_script = self.project.scts[script]
         new_sect = SCTSection()
         new_sect.type = 'Label'
@@ -920,8 +920,16 @@ class SCTProjectFacade:
         new_sect.name = new_name
         cur_script.sects[new_name] = new_sect
 
-        cur_script.sect_list.insert(cur_script.sect_list.index(sect_before), new_name)
-        parents, index = self.get_grouped_parents_and_index(sect_before, cur_script.sect_tree)
+        index = cur_script.sect_list.index(relevant_sect)
+        if not is_above:
+            index += 1
+
+        cur_script.sect_list.insert(index, new_name)
+        parents, index = self.get_grouped_parents_and_index(relevant_sect, cur_script.sect_tree)
+
+        if not is_above:
+            index += 1
+
         cur_group = cur_script.sect_tree
         for p in parents:
             cur_group = cur_group[p]
