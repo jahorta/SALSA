@@ -641,16 +641,27 @@ class ProjectEditorController:
             m.grab_release()
 
     def rcm_add_sect(self, direction, relative_section):
-        pass
+        self.project.add_section(self.current['script'], relevant_sect=relative_section, is_above=direction == 'above')
+        self.refresh_all_trees(keep_selection=False)
+        self.on_select_tree_entry('script', self.current['script'])
 
     def rcm_del_sect(self, sections):
-        pass
+        if not isinstance(sections, list):
+            sections = [sections]
+        for s in sections:
+            self.project.remove_section(self.current['script'], s)
+        self.refresh_all_trees(keep_selection=False)
+        self.on_select_tree_entry('script', self.current['script'])
 
     def rcm_ungroup_sections(self, section):
-        pass
+        self.project.ungroup_section(self.current['script'], section)
+        self.refresh_all_trees(keep_selection=False)
+        self.on_select_tree_entry('script', self.current['script'])
 
     def rcm_group_sections(self, sections):
-        pass
+        self.project.group_sections(self.current['script'], section_bounds=(sections[0], sections[-1]))
+        self.refresh_all_trees(keep_selection=False)
+        self.on_select_tree_entry('script', self.current['script'])
 
     # # Instruction Options # #
 
