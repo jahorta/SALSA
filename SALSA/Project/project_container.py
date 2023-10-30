@@ -316,8 +316,6 @@ class SCTScript:
     }
 
     sects: Dict[str, SCTSection]
-    section_groups: Dict[str, List[str]]
-    section_group_keys: Dict[str, str]
     inst_locations: List[List[str]]
     links: List[SCTLink]
     footer: List[str]
