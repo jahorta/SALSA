@@ -676,8 +676,11 @@ class ProjectEditorController:
             m.grab_release()
 
     def rcm_add_sect(self, direction, relative_section):
-        self.project.add_section(self.current['script'], relevant_sect=relative_section, is_above=direction == 'above')
-        self.refresh_all_trees(keep_selection=False)
+        new_sect_name = self.project.add_section(self.current['script'], relevant_sect=relative_section, is_above=direction == 'above')
+        self.current['section'] = new_sect_name
+        self.current['instruction'] = None
+        self.current['parameter'] = None
+        self.refresh_all_trees()
         self.on_select_tree_entry('script', self.current['script'])
 
     def rcm_del_sect(self, sections):
@@ -685,18 +688,26 @@ class ProjectEditorController:
             sections = [sections]
         for s in sections:
             self.project.remove_section(self.current['script'], s)
-        self.refresh_all_trees(keep_selection=False)
+            if s == self.current['section']:
+                self.current['section'] = None
+                self.current['instruction'] = None
+                self.current['parameter'] = None
+        self.refresh_all_trees()
         self.on_select_tree_entry('script', self.current['script'])
 
     def rcm_ungroup_sections(self, section):
         self.project.ungroup_section(self.current['script'], section)
-        self.refresh_all_trees(keep_selection=False)
+        self.current['instruction'] = None
+        self.current['parameter'] = None
+        self.refresh_all_trees()
         self.on_select_tree_entry('script', self.current['script'])
         self.trees['section'].see(self.trees['section'].get_iid_from_rowdata(section))
 
     def rcm_group_sections(self, sections):
         self.project.group_sections(self.current['script'], section_bounds=(sections[0], sections[-1]))
-        self.refresh_all_trees(keep_selection=False)
+        self.current['instruction'] = None
+        self.current['parameter'] = None
+        self.refresh_all_trees()
         self.on_select_tree_entry('script', self.current['script'])
         self.trees['section'].see(self.trees['section'].get_iid_from_rowdata(sections[0]))
 
