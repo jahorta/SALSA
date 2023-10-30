@@ -1026,8 +1026,9 @@ class SCTProjectFacade:
         for p in parents:
             cur_group = cur_group[p]
         group = cur_group.pop(index)
-        group = list(group.keys()) + list(group.values())
-        cur_group = cur_group[:index] + group + cur_group[index:]
+        group = [list(group.keys())[0].split(sep)[0]] + list(group.values())[0]
+        for entry in reversed(group):
+            cur_group.insert(index, entry)
 
         self.callbacks['set_change']()
 
