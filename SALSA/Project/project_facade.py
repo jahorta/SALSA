@@ -952,13 +952,29 @@ class SCTProjectFacade:
 
         if section in cur_script.unused_sections:
             cur_script.unused_sections.remove(section)
-            # TODO remove links of external origin in links_in and links_out
 
         if cur_script.sects[section].is_compound:
             cur_script.folded_sects = {k: v for k, v in cur_script.folded_sects.items() if v != section}
 
         if section in cur_script.error_sections:
             cur_script.error_sections.pop(section)
+
+        cur_sect = cur_script.sects[section]
+        links_in = cur_sect.insts[cur_sect.inst_list[0]].links_in
+        for link in links_in:
+            o_t = link.origin_trace
+            o_inst = cur_script.sects[o_t[0]].insts[o_t[1]]
+            o_inst.links_out.remove(link)
+            o_inst.params[0].link = None
+
+        links_out = []
+        for inst in cur_sect.insts.values():
+            for link in inst.links_out:
+                if link.target_trace[0] != section:
+                    links_out.append(link)
+        for link in links_out:
+            t_t = link.target_trace
+            cur_script.sects[t_t[0]].insts[t_t[1]].links_in.remove(link)
 
         cur_script.sects.pop(section)
 
