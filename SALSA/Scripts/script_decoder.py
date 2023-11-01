@@ -1022,6 +1022,9 @@ class SCTDecoder:
             # add the origin of a link to its target
             target_inst = decoded_sct.sects[link.target_trace[0]].insts[link.target_trace[1]]
             target_inst.links_in.append(link)
+            origin_inst = decoded_sct.sects[link.origin_trace[0]].insts[link.origin_trace[1]]
+            if link not in origin_inst.links_out:
+                origin_inst.links_out.append(link)
 
             # add to dict with places that subscripts are called from
             if link.origin_trace[0] != link.target_trace[0]:
