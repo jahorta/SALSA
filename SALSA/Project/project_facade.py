@@ -1840,6 +1840,19 @@ class SCTProjectFacade:
 
         return uuids
 
+    def extract_parent_uuid_from_group(self, entry):
+        if isinstance(entry, str):
+            if sep not in entry:
+                return entry
+            return entry.split(sep)[0]
+
+        elif isinstance(entry, dict):
+            key = list(entry.keys())[0]
+            return key.split(sep)[0]
+
+        else:
+            raise ValueError(f'{self.log_key}: Incorrect entry type, cannot extract uuid')
+
     def get_inst_uuid_from_group_entry(self, entry, last=False):
         if isinstance(entry, dict):
             if not last:
