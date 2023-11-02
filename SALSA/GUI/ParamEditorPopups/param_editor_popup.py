@@ -104,7 +104,7 @@ class SCPTFloatWidget(ttk.Frame):
 # Single row widget of SCPT parameter
 class SCPTEditWidget(ttk.Frame):
 
-    def __init__(self, parent, callbacks, key: str, is_base, *args, prefix='', **kwargs):
+    def __init__(self, parent, callbacks, key: str, is_base, *args, prefix='', is_delay=False, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.callbacks = callbacks
@@ -117,8 +117,12 @@ class SCPTEditWidget(ttk.Frame):
         self.prefix_label = ttk.Label(self, text=f'{indent} {prefix}')
         self.prefix_label.grid(row=0, column=0)
 
+        class_options = self.scpt_codes.classes
+        if is_delay:
+            class_options = ['arithmetic', 'input']
+
         self.class_selection = tk.StringVar(self)
-        self.class_option = ttk.OptionMenu(self, self.class_selection, '---', *self.scpt_codes.classes,
+        self.class_option = ttk.OptionMenu(self, self.class_selection, '---', *class_options,
                                            command=lambda e: self.update_options())
         self.class_option.grid(row=0, column=1, sticky='NSEW')
 
