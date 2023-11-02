@@ -63,11 +63,12 @@ class ProjectEditorController:
         pe_callbacks = {'get_var_alias': self.get_var_alias,
                         'refresh_inst': self.on_refresh_inst,
                         'update_variables': self.update_var_usage,
-                        'get_subscript_list': lambda: self.project.get_section_list(self.current['script']),
+                        'get_subscript_list': self.project.get_section_list,
                         'set_change': self.set_change_flag,
-                        'get_instruction_list': lambda: self.project.get_inst_list(self.current['script'],
-                                                                                   self.current['section'],
-                                                                                   self.current['instruction'])}
+                        'get_instruction_list': self.project.get_inst_dict,
+                        'get_instruction_identifier': self.project.get_inst_desc_info,
+                        'adjust_inst_grouping': self.project.adjust_IF_grouping_type
+                        }
         self.param_editor = ParamEditController(self.view, callbacks=pe_callbacks, theme=theme)
 
         if self.log_name not in settings:
@@ -941,7 +942,7 @@ class ProjectEditorController:
         end_callback = self.finish_edit_delay_parameter if paramID == 'delay' else None
         end_kwargs = {'param': param} if paramID == 'delay' else None
         self.param_editor.show_param_editor(param=param, base_param=base_param, param_id=paramID,
-                                            end_callback=end_callback, end_kwargs=end_kwargs)
+                                            end_callback=end_callback, end_kwargs=end_kwargs, cur_trace=self.current)
 
     def finish_edit_delay_parameter(self, param):
         if param.value in (0, '0', None, 'None'):

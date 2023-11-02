@@ -358,14 +358,19 @@ class FooterEditWidget(tk.Frame):
 
 class ObjectSelectionWidget(tk.Frame):
 
-    def __init__(self, parent, name, selection_list: List[str], *args, **kwargs):
+    def __init__(self, parent, name, selections: Union[Dict[str, str], List[str]], *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         label = ttk.Label(self, text=f'{name}: ')
         label.grid(row=0, column=0, sticky=tk.W)
 
+        if isinstance(selections, list):
+            self.value_dict = {_: _ for _ in selections}
+        else:
+            self.value_dict = selections
+
         self.entry_variable = tk.StringVar(self)
-        option_field = ttk.OptionMenu(self, self.entry_variable, *selection_list)
+        option_field = ttk.OptionMenu(self, self.entry_variable, *list(selections.keys()))
         option_field.grid(row=0, column=1, sticky=tk.W)
 
     def remove_value(self):
@@ -375,7 +380,7 @@ class ObjectSelectionWidget(tk.Frame):
         self.entry_variable.set(value)
 
     def get_value(self):
-        return self.entry_variable.get()
+        return self.value_dict[self.entry_variable.get()]
 
 
 # --------------------------- #
