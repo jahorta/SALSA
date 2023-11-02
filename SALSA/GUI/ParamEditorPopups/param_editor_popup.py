@@ -72,7 +72,8 @@ class SCPTFloatWidget(ttk.Frame):
         self.float.grid(row=0, column=0)
 
         self.override_value = tk.IntVar(self, 0)
-        override = ttk.Checkbutton(self, text='Override Parameter', variable=self.override_value, command=self.override_clicked)
+        override = ttk.Checkbutton(self, text='Override Parameter', variable=self.override_value,
+                                   command=self.override_clicked)
         override.grid(row=0, column=1)
 
     def override_clicked(self):
@@ -113,7 +114,7 @@ class SCPTEditWidget(ttk.Frame):
         self.is_base = is_base
         self.rowconfigure(0, weight=1)
 
-        indent = '\t'*key.count(sep)
+        indent = '\t' * key.count(sep)
         self.prefix_label = ttk.Label(self, text=f'{indent} {prefix}')
         self.prefix_label.grid(row=0, column=0)
 
@@ -140,7 +141,8 @@ class SCPTEditWidget(ttk.Frame):
         }
 
         self.input_widgets: Dict[str, Union[SCPTVarWidget, SCPTFloatWidget, DecimalWidget]] = {
-            'var': SCPTVarWidget(self, textvariable=self.input_vars['var'], callbacks={'get_alias': self.get_var_alias}, is_base=is_base),
+            'var': SCPTVarWidget(self, textvariable=self.input_vars['var'], callbacks={'get_alias': self.get_var_alias},
+                                 is_base=is_base),
             'float': SCPTFloatWidget(self, callbacks={}),
             'decimal': DecimalWidget(self, textvariables=self.input_vars['decimal'])
         }
@@ -366,7 +368,7 @@ class ObjectSelectionWidget(tk.Frame):
         super().__init__(parent, *args, **kwargs)
 
         label = ttk.Label(self, text=f'{name}: ')
-        label.grid(row=0, column=0, sticky=tk.W+tk.N+tk.S)
+        label.grid(row=0, column=0, sticky=tk.W + tk.N + tk.S)
 
         if isinstance(selections, list):
             self.value_dict = {_: _ for _ in selections}
@@ -412,7 +414,8 @@ class ParamEditPopup(tk.Toplevel):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
-        self.main_frame_label = w.ScrollLabelFrame(self, text='', relief=tk.FLAT, labelanchor='n', theme=theme, canvas_style='lightCanvas')
+        self.main_frame_label = w.ScrollLabelFrame(self, text='', relief=tk.FLAT, labelanchor='n', theme=theme,
+                                                   canvas_style='lightCanvas')
         self.main_frame_label.grid(row=0, column=0, sticky='NSEW')
         self.main_frame = self.main_frame_label.scroll_frame
 

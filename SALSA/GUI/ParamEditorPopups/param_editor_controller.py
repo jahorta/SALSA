@@ -10,7 +10,6 @@ from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 
 
 class ParamEditController:
-
     log_code = 'ParamEditCtrlr'
 
     def __init__(self, parent, callbacks, theme):
@@ -156,7 +155,8 @@ class ParamEditController:
                 self.scpt_fields[key] = self.old_scpt_fields.pop(key)
                 self.scpt_rows[key] = p_row + i + 1
             else:
-                self.scpt_fields[key] = SCPTEditWidget(self.view.main_frame, self.scpt_callbacks, key, prefix=i + 1, is_base=is_base)
+                self.scpt_fields[key] = SCPTEditWidget(self.view.main_frame, self.scpt_callbacks, key, prefix=i + 1,
+                                                       is_base=is_base)
                 self.scpt_rows[key] = p_row + i + 1
 
         self.regrid_scpt_rows(changed_keys)
