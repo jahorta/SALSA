@@ -63,9 +63,9 @@ class ProjectEditorController:
         pe_callbacks = {'get_var_alias': self.get_var_alias,
                         'refresh_inst': self.on_refresh_inst,
                         'update_variables': self.update_var_usage,
-                        'get_subscript_list': self.project.get_section_list,
+                        'get_subscript_list': self.project.get_jmp_section_list,
                         'set_change': self.set_change_flag,
-                        'get_instruction_list': self.project.get_inst_dict,
+                        'get_instruction_list': self.project.get_jmp_inst_dict,
                         'get_instruction_identifier': self.project.get_inst_desc_info,
                         'adjust_inst_grouping': self.project.adjust_IF_grouping_type
                         }
