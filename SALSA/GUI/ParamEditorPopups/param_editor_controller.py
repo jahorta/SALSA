@@ -333,8 +333,9 @@ class ParamEditController:
             inst_id = self.callbacks['get_first_inst'](value)
             self.param.link.target_trace = [value, inst_id]
         elif 'jump' in self.base_param.type:
-            inst_id = self.callbacks['get_inst_by_pos'](value)
-            self.param.link.target_trace[1] = inst_id
+            self.callbacks['adjust_inst_grouping'](self.cur_trace['script'], self.cur_trace['section'],
+                                                   self.cur_trace['instruction'], tgt_inst=value)
+            self.param.link.target_trace[1] = value
         elif 'footer' in self.base_param.type or 'string' in self.base_param.type:
             self.param.linked_string = value
         else:
