@@ -60,10 +60,12 @@ class ParamEditController:
         self.view = ParamEditPopup(self.parent, theme=self.theme)
         self.view.main_frame_label.config(text=base_param.type)
         self.param = param
+        self.param_id = param_id
+        if self.param_id is None:
+            self.param_id == ''
         if self.param is not None:
             self.scpt_callbacks |= {'get_var_alias': self.callbacks['get_var_alias']}
         else:
-            self.param_id = param_id
             self.column_id = column_id
         self.base_param = base_param
         base_type = base_param.type.split(sep)[0]
@@ -98,7 +100,7 @@ class ParamEditController:
         self.view.set_callbacks(self.scpt_callbacks)
         self.scpt_rows['0'] = 0
         self.scpt_fields['0'] = SCPTEditWidget(parent=self.view.main_frame, callbacks=self.scpt_callbacks, key='0',
-                                               is_base=self.param is None)
+                                               is_base=self.param is None, is_delay=self.param_id == 'delay')
         self.scpt_fields['0'].grid(row=0, column=0, sticky='W')
         if cleared:
             self.scpt_fields['0'].set_widget_values(None)
