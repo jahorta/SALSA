@@ -486,13 +486,16 @@ class SCTProjectFacade:
         inst_list = [_ for _ in cur_sect.inst_list if _ != goto_inst]
         if len(cur_inst.my_master_uuids) != 0:
             goto_master_uuid = cur_inst.my_master_uuids[0]
-            goto_master_jmp_tgt_uuid = cur_sect.insts[goto_master_uuid].links_out[0].target_trace[1]
             inst_list = inst_list[:inst_list.index(goto_master_uuid)]
 
             parents, index = self.get_grouped_parents_and_index(goto_master_uuid, cur_sect.inst_tree)
             cur_group = cur_sect.inst_tree
             for p in parents:
                 cur_group = cur_group[p]
+
+            if index + 1 != len(cur_group):
+                if goto_master_uuid == self.extract_parent_uuid_from_group(cur_group[index+1]):
+                    index += 1
 
             if index + 1 != len(cur_group):
                 for entry in cur_group[index+1:]:
