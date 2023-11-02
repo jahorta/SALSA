@@ -706,7 +706,9 @@ class SCTProjectFacade:
 
     def get_inst_desc_info(self, link: SCTLink):
         inst = self.project.scts[link.script].sects[link.target_trace[0]].insts[link.target_trace[1]]
-        return f'{inst.ungrouped_position} - {inst.base_id}'
+        return f'{inst.ungrouped_position}{link_sep}' \
+               f'{self.base_insts.get_inst(inst.base_id).name}{link_sep}' \
+               f'{inst.base_id}'
 
     def has_loops(self, script, section, instruction, **kwargs):
         cur_inst_id = self.project.scts[script].sects[section].insts[instruction].base_id
