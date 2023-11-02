@@ -326,7 +326,7 @@ class ParamEditController:
             return
 
         if self.param is None:
-            self.callbacks['set_change'](self.param_id, self.column_name, value)
+            self.callbacks['set_change'](self.param_id, self.column_id, value)
             return
 
         if 'subscript' in self.base_param.type:
