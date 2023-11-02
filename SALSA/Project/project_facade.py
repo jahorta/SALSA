@@ -1668,7 +1668,7 @@ class SCTProjectFacade:
         else:
             new_group_type = 'while'
 
-        group_key = f'{master_inst}{sep}{cur_group_type}'
+        group_key = f'{master_inst.ID}{sep}{cur_group_type}'
         parents, index = self.get_grouped_parents_and_index(group_key, cur_sect.inst_tree)
 
         cur_group = cur_sect.inst_tree
@@ -1718,7 +1718,7 @@ class SCTProjectFacade:
                 return
 
             index = index - 1
-            group_key = f'{master_inst}{sep}if'
+            group_key = f'{master_inst.ID}{sep}if'
 
         elif new_group_type == 'else':
             # add else group, put required insts into else group
@@ -1736,14 +1736,14 @@ class SCTProjectFacade:
             for inst in insts_to_move:
                 cur_group.remove(insts_to_move)
 
-            cur_group.insert(index+1, {f'{master_inst}{sep}else': insts_to_move})
+            cur_group.insert(index+1, {f'{master_inst.ID}{sep}else': insts_to_move})
 
             if cur_group_type == 'if':
                 return
 
         # change group key
         old_group_entries = cur_group.pop(index)[group_key]
-        cur_group.insert(index, {f'{master_inst}{sep}{new_group_type}': old_group_entries})
+        cur_group.insert(index, {f'{master_inst.ID}{sep}{new_group_type}': old_group_entries})
 
     # --------------------------- #
     # Inst group analysis methods #
