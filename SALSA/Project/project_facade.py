@@ -1728,7 +1728,7 @@ class SCTProjectFacade:
 
             insts_to_move = cur_group[index+1:cur_group.index(new_tgt_inst)]
             for inst in insts_to_move:
-                cur_group.remove(insts_to_move)
+                cur_group.remove(inst)
 
             cur_group.insert(index+1, {f'{master_inst.ID}{sep}else': insts_to_move})
 
