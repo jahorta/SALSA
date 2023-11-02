@@ -500,7 +500,7 @@ class SCTProjectFacade:
 
         return {f'{cur_sect.insts[i].ungrouped_position}{link_sep}'
                 f'{self.base_insts.get_inst(cur_sect.insts[i].base_id).name}'
-                f'{link_sep}{cur_sect.insts[i].base_id}': f'{cur_sect.insts[i].ID}' for i in inst_list}
+                f'{link_sep}{cur_sect.insts[i].base_id}': f'{i}' for i in inst_list}
 
     # ------------------------ #
     # Section analysis methods #
