@@ -362,7 +362,7 @@ class ObjectSelectionWidget(tk.Frame):
         super().__init__(parent, *args, **kwargs)
 
         label = ttk.Label(self, text=f'{name}: ')
-        label.grid(row=0, column=0, sticky=tk.W)
+        label.grid(row=0, column=0, sticky=tk.W+tk.N+tk.S)
 
         if isinstance(selections, list):
             self.value_dict = {_: _ for _ in selections}
