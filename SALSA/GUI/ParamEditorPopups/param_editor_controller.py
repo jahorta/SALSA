@@ -45,14 +45,17 @@ class ParamEditController:
 
         self.int_field: Union[None, IntEditWidget, ObjectSelectionWidget, FooterEditWidget] = None
 
+        self.cur_trace: Union[None, Dict[str, str]] = None
+
     # ------------------------------------- #
     # Param Editor Show and Close functions #
     # ------------------------------------- #
 
     def show_param_editor(self, param: Union[SCTParameter, None], base_param: BaseParam, param_id=None, column_id=None,
-                          end_callback=None, end_kwargs=None):
+                          end_callback=None, end_kwargs=None, cur_trace=None):
         self.end_callback = end_callback
         self.end_kwargs = end_kwargs
+        self.cur_trace = cur_trace
         if self.view is not None:
             return
         self.view = ParamEditPopup(self.parent, theme=self.theme)
