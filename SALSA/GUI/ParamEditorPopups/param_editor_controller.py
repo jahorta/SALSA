@@ -315,6 +315,10 @@ class ParamEditController:
 
         cur_value = self.param.value if self.param is not None else self.base_param.default_value
 
+        if ('jump' in self.base_param.type or 'subscript' in self.base_param.type) and self.param is not None:
+            trace_ind = 1 if 'jump' in self.base_param.type else 0
+            cur_value = self.param.link.target_trace[trace_ind]
+
         if value == 'None':
             value = None
 
