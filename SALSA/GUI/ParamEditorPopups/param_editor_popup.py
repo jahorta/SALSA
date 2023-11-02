@@ -370,7 +370,7 @@ class ObjectSelectionWidget(tk.Frame):
             self.value_dict = selections
 
         self.entry_variable = tk.StringVar(self)
-        option_field = ttk.OptionMenu(self, self.entry_variable, *list(selections.keys()))
+        option_field = ttk.OptionMenu(self, self.entry_variable, *list(self.value_dict.keys()))
         option_field.grid(row=0, column=1, sticky=tk.W)
 
     def remove_value(self):
