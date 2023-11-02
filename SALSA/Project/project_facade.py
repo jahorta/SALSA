@@ -1644,6 +1644,107 @@ class SCTProjectFacade:
                 new_label = f'Untitiled({i})'
             new_inst.label = new_label
 
+    def adjust_IF_grouping_type(self, script, section, inst, new_tgt_inst):
+        cur_sect = self.project.scts[script].sects[section]
+        if len(cur_sect.insts[inst].my_master_uuids) == 0:
+            return
+
+        goto_inst = cur_sect.insts[inst]
+        goto_tgt = goto_inst.links_out[0].target_trace[1]
+        master_inst = cur_sect.insts[goto_inst.my_master_uuids[0]]
+        master_tgt = master_inst.links_out[0].target_trace[1]
+
+        if goto_tgt == master_tgt:
+            cur_group_type = 'if'
+        elif cur_sect.inst_list.index(goto_tgt) > cur_sect.inst_list.index(master_tgt):
+            cur_group_type = 'else'
+        else:
+            cur_group_type = 'while'
+
+        if new_tgt_inst == master_tgt:
+            new_group_type = 'if'
+        elif cur_sect.inst_list.index(new_tgt_inst) > cur_sect.inst_list.index(master_tgt):
+            new_group_type = 'else'
+        else:
+            new_group_type = 'while'
+
+        group_key = f'{master_inst}{sep}{cur_group_type}'
+        parents, index = self.get_grouped_parents_and_index(group_key, cur_sect.inst_tree)
+
+        cur_group = cur_sect.inst_tree
+        for p in parents:
+            cur_group = cur_group[p]
+
+        if cur_group_type == new_group_type:
+            if cur_group_type != 'else':
+                return
+
+            first_out_inst = self.get_next_grouped_uuid(script, section, master_tgt)
+
+            # else becomes smaller
+            if cur_sect.inst_list.index(new_tgt_inst) < cur_sect.inst_list.index(first_out_inst):
+                insts_to_move = cur_sect.inst_list[cur_sect.inst_list.index(new_tgt_inst):
+                                                   cur_sect.inst_list.index(first_out_inst)]
+                for inst in reversed(insts_to_move):
+                    cur_group.insert(index + 1, inst)
+
+                cur_group = cur_group[index][group_key]
+
+                ind_to_remove = cur_group.index(new_tgt_inst) + 1
+                while len(cur_group) > ind_to_remove:
+                    cur_group.pop(ind_to_remove)
+            else:
+                insts_to_move = cur_sect.inst_list[cur_sect.inst_list.index(first_out_inst):
+                                                   cur_sect.inst_list.index(new_tgt_inst)]
+
+                for inst in reversed(insts_to_move):
+                    cur_group.remove(inst)
+
+                cur_group = cur_group[index][group_key]
+
+                for inst in reversed(insts_to_move):
+                    cur_group.append(inst)
+            return
+
+        elif cur_group_type == 'else':
+            # remove else group, replace insts, and change main group title to new title
+
+            removed_else_entries = cur_group.pop(index)[group_key]
+
+            for entry in reversed(removed_else_entries):
+                cur_group.insert(index, entry)
+
+            if new_group_type != 'while':
+                return
+
+            index = index - 1
+            group_key = f'{master_inst}{sep}if'
+
+        elif new_group_type == 'else':
+            # add else group, put required insts into else group
+            group_key = f'{master_inst}{sep}{cur_group_type}'
+            parents, index = self.get_grouped_parents_and_index(group_key, cur_sect.inst_tree)
+
+            cur_group = cur_sect.inst_tree
+            for p in parents:
+                cur_group = cur_group[p]
+
+            if new_tgt_inst not in cur_group:
+                raise IndexError('New target should be at same level as if Group')
+
+            insts_to_move = cur_group[index+1:cur_group.index(new_tgt_inst)]
+            for inst in insts_to_move:
+                cur_group.remove(insts_to_move)
+
+            cur_group.insert(index+1, {f'{master_inst}{sep}else': insts_to_move})
+
+            if cur_group_type == 'if':
+                return
+
+        # change group key
+        old_group_entries = cur_group.pop(index)[group_key]
+        cur_group.insert(index, {f'{master_inst}{sep}{new_group_type}': old_group_entries})
+
     # --------------------------- #
     # Inst group analysis methods #
     # --------------------------- #
