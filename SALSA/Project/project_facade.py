@@ -477,8 +477,8 @@ class SCTProjectFacade:
     # Param Editor Callback Methods #
     # ----------------------------- #
 
-    def get_section_list(self, script):
-        return self.project.scts[script].sect_list
+    def get_jmp_section_list(self, script, section):
+        return [_ for _ in self.project.scts[script].sect_list if _ != section]
 
     def get_inst_list(self, script, section, goto_uuid=None):
         cur_sect = self.project.scts[script].sects[section]
