@@ -1722,12 +1722,6 @@ class SCTProjectFacade:
 
         elif new_group_type == 'else':
             # add else group, put required insts into else group
-            group_key = f'{master_inst}{sep}{cur_group_type}'
-            parents, index = self.get_grouped_parents_and_index(group_key, cur_sect.inst_tree)
-
-            cur_group = cur_sect.inst_tree
-            for p in parents:
-                cur_group = cur_group[p]
 
             if new_tgt_inst not in cur_group:
                 raise IndexError('New target should be at same level as if Group')
