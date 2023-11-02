@@ -10,7 +10,7 @@ from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
 from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep, label_name_sep, compound_sect_suffix, \
-    virtual_sect_suffix, label_sect_suffix
+    virtual_sect_suffix, label_sect_suffix, link_sep
 from SALSA.Scripts.scpt_param_codes import get_scpt_override
 from SALSA.Scripts.script_encoder import SCTEncoder
 
@@ -480,26 +480,27 @@ class SCTProjectFacade:
     def get_jmp_section_list(self, script, section):
         return [_ for _ in self.project.scts[script].sect_list if _ != section]
 
-    def get_inst_list(self, script, section, goto_uuid=None):
+    def get_jmp_inst_dict(self, script, section, goto_inst):
         cur_sect = self.project.scts[script].sects[section]
-        inst_list = cur_sect.inst_list
-        if goto_uuid is not None:
-            first_blocked = 0
-            master_uuid = None
-            if len(cur_sect.insts[goto_uuid].my_master_uuids) < 0:
-                master_uuid = cur_sect.insts[goto_uuid].my_master_uuids[0]
-                first_blocked = inst_list.index(master_uuid)
-            last_blocked = cur_sect.inst_list.index(goto_uuid)
-            if master_uuid is not None:
-                if cur_sect.insts[master_uuid].base_id == 3:
-                    last_blocked = max(*[cur_sect.inst_list.index(i) for i in
-                                         cur_sect.insts[master_uuid].my_goto_uuids], last_blocked)
-            inst_list = cur_sect.inst_list[:first_blocked] + cur_sect.inst_list[
-                                                                             last_blocked + 1:]
+        cur_inst = cur_sect.insts[goto_inst]
+        inst_list = [_ for _ in cur_sect.inst_list if _ != goto_inst]
+        if len(cur_inst.my_master_uuids) != 0:
+            goto_master_uuid = cur_inst.my_master_uuids[0]
+            goto_master_jmp_tgt_uuid = cur_sect.insts[goto_master_uuid].links_out[0].target_trace[1]
+            inst_list = inst_list[:inst_list.index(goto_master_uuid)]
 
-        return [f'{cur_sect.insts[i].ungrouped_position}: '
+            parents, index = self.get_grouped_parents_and_index(goto_master_uuid, cur_sect.inst_tree)
+            cur_group = cur_sect.inst_tree
+            for p in parents:
+                cur_group = cur_group[p]
+
+            if index + 1 != len(cur_group):
+                for entry in cur_group[index+1:]:
+                    inst_list.append(self.extract_parent_uuid_from_group(entry))
+
+        return {f'{cur_sect.insts[i].ungrouped_position}{link_sep}'
                 f'{self.base_insts.get_inst(cur_sect.insts[i].base_id).name}'
-                f'{sep}{cur_sect.insts[i].ID}' for i in inst_list]
+                f'{link_sep}{cur_sect.insts[i].base_id}': f'{cur_sect.insts[i].ID}' for i in inst_list}
 
     # ------------------------ #
     # Section analysis methods #
