@@ -973,6 +973,8 @@ class SCTProjectFacade:
         links_out = []
         for inst in cur_sect.insts.values():
             for link in inst.links_out:
+                if link.target_trace is None:
+                    continue
                 if link.target_trace[0] != section:
                     links_out.append(link)
         for link in links_out:
