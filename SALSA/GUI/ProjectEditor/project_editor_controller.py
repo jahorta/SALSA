@@ -620,6 +620,10 @@ class ProjectEditorController:
         sel_iid = self.trees['section'].identify_row(e.y)
         if sel_iid == '':
             return
+
+        self.current['instruction'] = None
+        self.current['parameter'] = None
+
         if sel_iid not in self.trees['section'].selection():
             self.trees['section'].selection_set(sel_iid)
             self.trees['section'].focus(sel_iid)
@@ -628,11 +632,15 @@ class ProjectEditorController:
             is_multiple = True
             row_data = [self.trees['section'].row_data.get(s, None) for s in self.trees['section'].selection()]
             is_group = False
+            self.current['section'] = None
         else:
             is_multiple = False
             row_data = self.trees['section'].row_data.get(sel_iid, None)
             is_group = len(self.trees['section'].get_children(sel_iid)) > 0
             self.current['section'] = row_data
+
+        self.refresh_all_trees(keep_selection=True)
+
         m = tk.Menu(self.view, tearoff=0)
 
         # commands to add section from project
