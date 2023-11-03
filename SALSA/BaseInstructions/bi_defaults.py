@@ -316,7 +316,7 @@ inst_defaults = {
         "Link Type": "String",
         "Parameters": {
             0: {
-                "Type": "int|footer",
+                "Type": "int|footer|string",
                 "Signed": True,
                 "Mask": None,
                 "Default": None
@@ -337,7 +337,7 @@ inst_defaults = {
                 "Mask": None
             },
             1: {
-                "Type": "int|footer",
+                "Type": "int|footer|string",
                 "Signed": False,
                 "Mask": None,
                 "Default": None
