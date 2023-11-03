@@ -938,12 +938,17 @@ class ProjectEditorController:
     # Parameter editor methods #
     # ------------------------ #
 
-    def on_edit_parameter(self, paramID):
+    def on_edit_parameter(self, paramID, e):
         if self.entry_widget is not None:
             self.shake_widget(self.entry_widget)
             return
         paramID = str(paramID)
         self.current['parameter'] = paramID
+        error = self.project.check_param_editable(**self.current)
+        if error is not None:
+            schedule_tooltip(self.trees['parameter'], error, delay=0, min_time=500, is_warning=True,
+                             position='above center', bbox=(e.x_root, e.y_root, 10, 10))
+            return
         param = self.project.get_parameter(**self.current)
         inst_id = self.project.get_inst_id(**self.current)
         base_param = self.project.get_base_parameter(inst_id, paramID)

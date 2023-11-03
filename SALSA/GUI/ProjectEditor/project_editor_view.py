@@ -338,7 +338,7 @@ class ProjectEditorView(ttk.Frame):
             type_column_ind = list(self.param_tree['columns']).index('type')
             if loop_count_name in self.param_tree.item(selected_iid)['values'][type_column_ind]:
                 return
-        self.callbacks['edit_param'](param)
+        self.callbacks['edit_param'](param, e)
 
     def param_right_click(self, e):
         if e.widget.identify('region', e.x, e.y) == 'heading':

@@ -10,7 +10,7 @@ from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
 from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep, label_name_sep, compound_sect_suffix, \
-    virtual_sect_suffix, label_sect_suffix, link_sep, footer_str_id_prefix
+    virtual_sect_suffix, label_sect_suffix, link_sep, footer_str_group_name
 from SALSA.Scripts.scpt_param_codes import get_scpt_override
 from SALSA.Scripts.script_encoder import SCTEncoder
 
@@ -521,6 +521,16 @@ class SCTProjectFacade:
         if string not in self.project.scts[script].string_locations:
             return None
         return self.project.scts[script].string_locations[string]
+
+    def check_param_editable(self, script, section, instruction, parameter):
+        inst = self.project.scts[script].sects[section].insts[instruction]
+        base_param = self.get_base_parameter(inst.base_id, parameter)
+        if 'footer' in base_param.type and 'string' in base_param.type:
+            if footer_str_group_name not in self.project.scts[script].string_groups:
+                return f'No footer string group in the current script. _Footer_ group required'
+            elif len(self.project.scts[script].string_groups[footer_str_group_name]) == 0:
+                return f'No footer strings in _Footer_ group. Cannot select a string'
+        return None
 
     # ------------------------ #
     # Section analysis methods #
