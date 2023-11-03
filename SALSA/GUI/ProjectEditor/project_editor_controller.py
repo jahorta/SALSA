@@ -68,7 +68,7 @@ class ProjectEditorController:
                         'get_instruction_list': self.project.get_jmp_inst_dict,
                         'get_instruction_identifier': self.project.get_inst_desc_info,
                         'adjust_inst_grouping': self.project.adjust_IF_grouping_type,
-                        'get_string_list': self.project.get_string_list
+                        'get_string_list': self.project.get_string_options
                         }
         self.param_editor = ParamEditController(self.view, callbacks=pe_callbacks, theme=theme)
 
