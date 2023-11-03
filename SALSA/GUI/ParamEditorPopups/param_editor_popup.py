@@ -365,6 +365,60 @@ class FooterEditWidget(tk.Frame):
         return self.entry_variable.get()
 
 
+class StringSelectionWidget(tk.Frame):
+
+    def __init__(self, parent, name, options: Dict[str, List[str]], *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+
+        label = ttk.Label(self, text=f'{name}: ')
+        label.grid(row=0, column=0, sticky=tk.W + tk.N + tk.S)
+
+        self.options = options
+
+        self.group_variable = tk.StringVar(self)
+        group_field = ttk.OptionMenu(self, self.group_variable, '---', *list(options.keys()), command=self.set_group)
+        group_field.grid(row=0, column=1)
+
+        self.entry_variable = tk.StringVar(self)
+        self.entry_variable.set('---')
+        self.entry_field = ttk.OptionMenu(self, self.entry_variable, '---', command=self.set_entry)
+        self.entry_field.grid(row=0, column=2, sticky=tk.W)
+        self.entry_field.configure(state='disabled')
+
+    def remove_value(self):
+        self.set_value('')
+
+    def set_value(self, value=None):
+        if value is None or value == '':
+            return
+        if not isinstance(value, tuple):
+            return
+        if len(value) != 2:
+            return
+        self.set_group(value[0])
+        self.set_entry(value[1])
+
+    def set_group(self, group=None):
+        if group is None:
+            group = self.group_variable.get()
+        self.group_variable.set(group)
+        if group not in self.options:
+            return
+
+        self.entry_field['menu'].delete(0, 'end')
+        for entry in self.options[group]:
+            self.entry_field['menu'].add_command(label=entry, command=lambda e=entry: self.set_entry(e))
+
+        self.entry_field.configure(state='normal')
+        self.entry_variable.set('---')
+
+    def set_entry(self, entry):
+        self.entry_variable.set(entry)
+
+    def get_value(self):
+        return self.entry_variable.get()
+
+
 class ObjectSelectionWidget(tk.Frame):
 
     def __init__(self, parent, name, selections: Union[Dict[str, str], List[str]], *args, **kwargs):

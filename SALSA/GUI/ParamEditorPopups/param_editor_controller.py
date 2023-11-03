@@ -5,7 +5,7 @@ from SALSA.Common.constants import sep
 from SALSA.Common.are_same_checker import are_same
 from SALSA.Project.project_container import SCTParameter
 from SALSA.GUI.ParamEditorPopups.param_editor_popup import ParamEditPopup, SCPTEditWidget, IntEditWidget, \
-    FooterEditWidget, ObjectSelectionWidget, VarSelectionWidget
+    FooterEditWidget, ObjectSelectionWidget, VarSelectionWidget, StringSelectionWidget
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 
 
@@ -293,12 +293,19 @@ class ParamEditController:
                                                        self.cur_trace['script'], self.cur_trace['section'],
                                                        self.cur_trace['instruction']))
             value = self.callbacks['get_instruction_identifier'](self.param.link)
+        elif 'string' in self.base_param.type:
+            is_footer = 'footer' in self.base_param.type
+            self.int_field = StringSelectionWidget(self.view.main_frame, name=self.base_param.name,
+                                                   options=self.callbacks['get_string_list'](self.cur_trace[
+                                                                                                    'script'
+                                                                                                ], is_footer))
+            if self.param.linked_string is None:
+                value = None
+            else:
+                group = self.callbacks['get_string_group'](self.cur_trace['script'], self.param.linked_string)
+                value = (group, self.param.linked_string)
         elif 'footer' in self.base_param.type:
             self.int_field = FooterEditWidget(self.view.main_frame, name=self.base_param.name)
-            value = self.param.linked_string
-        elif 'string' in self.base_param.type:
-            self.int_field = ObjectSelectionWidget(self.view.main_frame, name=self.base_param.name,
-                                                   selections=self.callbacks['get_string_list']())
             value = self.param.linked_string
         elif 'var' in self.base_param.type:
             var_type = f'{self.base_param.type.split(sep)[-1].capitalize()}Var: '

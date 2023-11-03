@@ -511,9 +511,16 @@ class SCTProjectFacade:
 
     def get_string_options(self, script, is_footer=False):
         if is_footer:
-            return [_ for _ in list(self.project.scts[script].strings.keys()) if footer_str_id_prefix in _]
+            return {f'{footer_str_group_name}': self.project.scts[script].string_groups[footer_str_group_name]}
         else:
-            return [_ for _ in list(self.project.scts[script].strings.keys()) if footer_str_id_prefix not in _]
+            return {k: v for k, v in self.project.scts[script].string_groups.items() if k != footer_str_group_name}
+
+    def get_string_group(self, script, string):
+        if string is None:
+            return None
+        if string not in self.project.scts[script].string_locations:
+            return None
+        return self.project.scts[script].string_locations[string]
 
     # ------------------------ #
     # Section analysis methods #
