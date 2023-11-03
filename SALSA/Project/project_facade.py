@@ -509,6 +509,12 @@ class SCTProjectFacade:
                 f'{self.base_insts.get_inst(cur_sect.insts[i].base_id).name}'
                 f'{link_sep}{cur_sect.insts[i].base_id}': f'{i}' for i in inst_list}
 
+    def get_string_list(self, script, is_footer=False):
+        if is_footer:
+            return [_ for _ in list(self.project.scts[script].strings.keys()) if footer_str_id_prefix in _]
+        else:
+            return [_ for _ in list(self.project.scts[script].strings.keys()) if footer_str_id_prefix not in _]
+
     # ------------------------ #
     # Section analysis methods #
     # ------------------------ #

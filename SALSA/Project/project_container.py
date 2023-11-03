@@ -8,8 +8,7 @@ from SALSA.Common.constants import sep, uuid_sep
 from SALSA.Scripts import scpt_condition_changes as cond_changes
 
 
-footer_str_group_name = '_Footer_'
-footer_str_id_prefix = 'FOOTER'
+
 
 
 @dataclass
