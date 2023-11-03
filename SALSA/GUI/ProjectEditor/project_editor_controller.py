@@ -835,6 +835,7 @@ class ProjectEditorController:
             'set_inst_id': self.project.change_inst,
             'get_relevant': self.project.base_insts.get_relevant,
             'update_tree': self.refresh_all_trees,
+            'update_inst': self.on_select_tree_entry,
             'destroy_widget': self.delete_entry_widget
         }
         cell_bbox = self.trees['instruction'].bbox(sel_iid, 'name')

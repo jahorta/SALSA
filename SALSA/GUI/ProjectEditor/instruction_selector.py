@@ -116,6 +116,7 @@ class InstructionSelectorWidget(ttk.Frame):
         self.callbacks['set_inst_id'](*self.inst_trace, new_id=new_ID, change_type=result)
         self.cancel()
         self.callbacks['update_tree']()
+        self.callbacks['update_inst']('instruction', self.inst_trace[2])
 
     def move_to_results(self, e):
         children = self.result_dropdown.get_children('')
