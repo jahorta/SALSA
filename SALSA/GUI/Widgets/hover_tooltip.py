@@ -8,7 +8,8 @@ tooltip_offset_y = 1
 
 class HoverToolTip(tk.Toplevel):
 
-    def __init__(self, master, tooltip, x, y, destroy_callback, min_time=None, position='', is_warning=False, *args, **kwargs):
+    def __init__(self, master, tooltip, x, y, destroy_callback, min_time=None, position='', is_warning=False,
+                 bbox=None, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
         self.master = master
@@ -17,6 +18,8 @@ class HoverToolTip(tk.Toplevel):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
         self.destroy_callback = destroy_callback
+        self.master_bbox = bbox if bbox is not None else (self.master.winfo_rootx(), self.master.winfo_rooty(),
+                                                          self.master.winfo_width(), self.master.winfo_height())
 
         tooltip_frame = ttk.Frame(self, style='tooltip.TFrame')
         tooltip_frame.grid(row=0, column=0)
@@ -34,9 +37,9 @@ class HoverToolTip(tk.Toplevel):
         self.after(time, self.check_for_destroy)
 
     def check_for_destroy(self):
-        rel_x = self.master.winfo_pointerx() - self.master.winfo_rootx()
-        rel_y = self.master.winfo_pointery() - self.master.winfo_rooty()
-        if rel_x < 0 or rel_x > self.master.winfo_width() or rel_y < 0 or rel_y > self.master.winfo_height():
+        rel_x = self.master.winfo_pointerx() - self.master_bbox[0]
+        rel_y = self.master.winfo_pointery() - self.master_bbox[1]
+        if rel_x < 0 or rel_x > self.master_bbox[2] or rel_y < 0 or rel_y > self.master_bbox[3]:
             return self.destroy()
         self.after(20, self.check_for_destroy)
 
@@ -49,12 +52,12 @@ class HoverToolTip(tk.Toplevel):
             y += tooltip_offset_y
 
         if 'left' in position:
-            x = self.master.winfo_rootx()
+            x = self.master_bbox[0]
         elif 'center' in position:
-            c = self.master.winfo_rootx() + self.master.winfo_width()//2
+            c = self.master_bbox[0] + self.master_bbox[2]//2
             x = c - self.winfo_width()//2
         elif 'right' in position:
-            r = self.master.winfo_rootx() + self.master.winfo_width()
+            r = self.master_bbox[0] + self.master_bbox[2]
             x = r - self.winfo_width()
         else:
             x += tooltip_offset_x
@@ -81,13 +84,17 @@ def schedule_tooltip(master, tooltip, delay=tooltip_delay, *args, **kwargs):
     if delay > 0:
         check_hover(master, tooltip, delay, args, kwargs)
     else:
-        tooltip_generator(master, tooltip, master.winfo_rootx(), master.winfo_rooty(), args, kwargs)
+        tooltip_generator(master, tooltip, master.winfo_pointerx(), master.winfo_pointery(), args, kwargs)
 
 
 def check_hover(master, tooltip, total_delay, args, kwargs, cur_delay=0):
-    rel_x = master.winfo_pointerx() - master.winfo_rootx()
-    rel_y = master.winfo_pointery() - master.winfo_rooty()
-    if rel_x < 0 or rel_x > master.winfo_width() or rel_y < 0 or rel_y > master.winfo_height():
+    if 'bbox' in kwargs:
+        x, y, w, h = kwargs['bbox']
+    else:
+        x, y, w, h = master.winfo_rootx(), master.winfo_rooty(), master.winfo_width(), master.winfo_height()
+    rel_x = master.winfo_pointerx() - x
+    rel_y = master.winfo_pointery() - y
+    if rel_x < 0 or rel_x > w or rel_y < 0 or rel_y > h:
         global tooltip_is_active
         tooltip_is_active = False
         return
@@ -115,11 +122,11 @@ def destroy_tooltip(tooltip):
 
 
 if __name__ == '__main__':
-    w = tk.Tk()
-    w.geometry('+200+200')
+    win = tk.Tk()
+    win.geometry('+200+200')
 
-    label = tk.Label(w, text='test label for tooltip')
+    label = tk.Label(win, text='test label for tooltip')
     label.pack()
     label.bind('<Enter>', lambda e: schedule_tooltip(label, 'This is a tooltip', e))
 
-    w.mainloop()
+    win.mainloop()
