@@ -319,16 +319,19 @@ class IntEditWidget(tk.Frame):
 
 class VarSelectionWidget(IntEditWidget):
     def __init__(self, parent, callback, var_type, *args, **kwargs):
+        self.var_type = None
         super().__init__(parent, *args, **kwargs)
 
         self.var_alias_label = ttk.Label(self, text='')
-        self.var_alias_label.grid(row=0, column=1)
+        self.var_alias_label.grid(row=0, column=2)
 
         self.get_alias_callback = callback
         self.var_type = var_type
 
     def set_value(self, value):
         super().set_value(value)
+        if self.var_type is None:
+            return
         alias = self.get_alias_callback(self.var_type, value)
         alias_str = 'No alias'
         if alias is not None:
