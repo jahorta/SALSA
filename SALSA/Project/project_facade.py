@@ -384,6 +384,8 @@ class SCTProjectFacade:
         return string_tree
 
     def get_string_to_edit(self, string_id, script=None):
+        if string_id is None:
+            return ''
         script = self.cur_script if script is None else script
         return SAstr_to_head_and_body(self.project.scts[script].strings[string_id])
 
