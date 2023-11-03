@@ -763,12 +763,13 @@ class ProjectEditorController:
                 m.add_command(label='Add Instruction Above', command=lambda: self.rcm_add_inst('above'))
 
             if 'last' not in restrictions:
+                m.add_command(label='Add Instruction Below', command=lambda: self.rcm_add_inst('below'))
                 if group_type == 'if':
                     next_sel_iid = self.trees['instruction'].next(sel_iid)
                     if 'else' not in self.trees['instruction'].item(next_sel_iid)['values'][0]:
-                        m.add_command(label='Add Instruction Below', command=lambda: self.rcm_add_inst('below'))
-                else:
-                    m.add_command(label='Add Instruction Below', command=lambda: self.rcm_add_inst('below'))
+                        m.entryconfig('Add Instruction Below', state='disabled')
+                elif 'goto' in restrictions:
+                    m.entryconfig('Add Instruction Below', state='disabled')
 
             m.add_command(label='Remove Instruction', command=self.rcm_remove_inst)
             if restrictions != '':
