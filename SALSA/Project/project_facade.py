@@ -10,7 +10,7 @@ from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
 from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep, label_name_sep, compound_sect_suffix, \
-    virtual_sect_suffix, label_sect_suffix, link_sep
+    virtual_sect_suffix, label_sect_suffix, link_sep, footer_str_id_prefix
 from SALSA.Scripts.scpt_param_codes import get_scpt_override
 from SALSA.Scripts.script_encoder import SCTEncoder
 

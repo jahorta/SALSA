@@ -75,3 +75,6 @@ uuid_sep = ','
 LOCK = '🔒'
 label_name_sep = '  -  '
 link_sep = ' - '
+
+footer_str_group_name = '_Footer_'
+footer_str_id_prefix = 'FOOTER'
