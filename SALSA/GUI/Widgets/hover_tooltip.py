@@ -88,10 +88,9 @@ def schedule_tooltip(master, tooltip, delay=tooltip_delay, *args, **kwargs):
 
 
 def check_hover(master, tooltip, total_delay, args, kwargs, cur_delay=0):
-    if 'bbox' in kwargs:
-        x, y, w, h = kwargs['bbox']
-    else:
-        x, y, w, h = master.winfo_rootx(), master.winfo_rooty(), master.winfo_width(), master.winfo_height()
+    x, y, w, h = kwargs['bbox'] if 'bbox' in kwargs else (master.winfo_rootx(), master.winfo_rooty(),
+                                                          master.winfo_width(), master.winfo_height())
+
     rel_x = master.winfo_pointerx() - x
     rel_y = master.winfo_pointery() - y
     if rel_x < 0 or rel_x > w or rel_y < 0 or rel_y > h:
