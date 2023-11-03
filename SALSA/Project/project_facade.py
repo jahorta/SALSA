@@ -312,6 +312,8 @@ class SCTProjectFacade:
         return all_vars
 
     def get_var_alias(self, script, var_type, var_id):
+        if ':' in var_type:
+            var_type = var_type.split(':')[0]
         if var_id not in self.project.scts[script].variables[var_type]:
             return 'No Alias'
         return self.project.scts[script].variables[var_type][var_id]['alias']
