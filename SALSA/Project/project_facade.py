@@ -189,7 +189,7 @@ class SCTProjectFacade:
 
         for param in base_inst.params_before:
             if 'string' in base_inst.params[param].type:
-                tree[param]['type'] = 'String'
+                tree[param]['type'] = 'String' if 'footer' not in base_inst.params[param].type else 'Footer String'
                 tree[param]['value'] = inst.params[param].linked_string
             elif 'footer' in base_inst.params[param].type:
                 tree[param]['type'] = 'Footer Entry'
