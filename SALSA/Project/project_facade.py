@@ -82,6 +82,8 @@ class SCTProjectFacade:
             section_list = self.project.scts[script].get_sect_list(style)
             sections = self.project.scts[script].sects
             tree_list = self._create_tree(group=sections, key_list=section_list, headers=headers)
+        elif 'instruction' in kwargs:
+            tree_list = self.get_parameter_tree(script, section, kwargs['instruction'], headers)
         else:
             self.cur_script = script
             self._refresh_inst_positions(script=script, section=section)
