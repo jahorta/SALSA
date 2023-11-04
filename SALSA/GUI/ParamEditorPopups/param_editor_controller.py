@@ -328,6 +328,9 @@ class ParamEditController:
             trace_ind = 1 if 'jump' in self.base_param.type else 0
             cur_value = self.param.link.target_trace[trace_ind]
 
+        if 'footer' in self.base_param.type or 'string' in self.base_param.type:
+            cur_value = self.param.linked_string
+
         if value == 'None':
             value = None
 
