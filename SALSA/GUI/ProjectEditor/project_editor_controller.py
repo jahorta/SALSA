@@ -61,7 +61,7 @@ class ProjectEditorController:
         self.view.add_and_bind_tree_callbacks(view_callbacks)
 
         pe_callbacks = {'get_var_alias': self.get_var_alias,
-                        'refresh_inst': self.on_refresh_inst,
+                        'refresh_inst': self.pe_on_refresh_inst,
                         'update_variables': self.update_var_usage,
                         'get_subscript_list': self.project.get_jmp_section_list,
                         'set_change': self.set_change_flag,
@@ -981,7 +981,7 @@ class ProjectEditorController:
     def update_field(self, field, value):
         self.project.update_inst_field(field=field, value=value, **self.current)
 
-    def on_refresh_inst(self):
+    def pe_on_refresh_inst(self):
         self.project.refresh_condition(**self.current)
         self.on_select_tree_entry('section', self.current['section'])
         self.trees['instruction'].select_by_rowdata(self.current['instruction'])
