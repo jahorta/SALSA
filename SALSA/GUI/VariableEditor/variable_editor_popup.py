@@ -284,7 +284,7 @@ class VariablePopup(tk.Toplevel):
             return
 
         trace = [self.script_tree.item(self.script_tree.focus())['text']]
-        trace += e.widget.get().split(link_sep)
+        trace += e.widget['text'].split(link_sep)
         self.callbacks['goto_link'](*trace)
 
     def show_usage_rcm(self, e):
