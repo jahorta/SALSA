@@ -154,6 +154,7 @@ class GUIController:
             'set_alias': self.project.set_variable_alias,
             'remove_global': self.project.remove_global,
             'get_var_usage': self.project.get_variable_usages,
+            'goto_link': self.prj_cont.resolve_link,
             'close': self.close_popup
         }
         self.popups['variable'] = VariablePopup(self.parent, callbacks=callbacks, name='variable',

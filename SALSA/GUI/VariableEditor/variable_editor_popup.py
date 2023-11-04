@@ -275,7 +275,30 @@ class VariablePopup(tk.Toplevel):
         for usage in usage_list:
             u_label = ttk.Label(self.variable_usage.scroll_frame, text=link_sep.join(usage), style='canvas.TLabel')
             u_label.grid(row=cur_row, column=0, sticky='NSEW')
+            u_label.bind('<Double-ButtonPress-1>', self.goto_usage)
+            u_label.bind('<Button-3>', self.show_usage_rcm)
             cur_row += 1
+
+    def goto_usage(self, e):
+        if self.script_tree.item(self.script_tree.focus())['text'] == global_tag:
+            return
+
+        trace = [self.script_tree.item(self.script_tree.focus())['text']]
+        trace += e.widget.get().split(link_sep)
+        self.callbacks['goto_link'](*trace)
+
+    def show_usage_rcm(self, e):
+        if self.script_tree.item(self.script_tree.focus())['text'] == global_tag:
+            return
+
+        m = tk.Menu(self, tearoff=0)
+        m.add_command(label='Goto this usage', command=lambda: self.goto_usage(e))
+
+        m.bind('<Leave>', m.destroy)
+        try:
+            m.tk_popup(e.x_root, e.y_root)
+        finally:
+            m.grab_release()
 
     def determine_tab(self):
         tab = self.variable_notebook.index('current')
