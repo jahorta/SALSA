@@ -275,7 +275,7 @@ class VariablePopup(tk.Toplevel):
         for usage in usage_list:
             u_label = ttk.Label(self.variable_usage.scroll_frame, text=link_sep.join(usage), style='canvas.TLabel')
             u_label.grid(row=cur_row, column=0, sticky='NSEW')
-            u_label.bind('<Double-ButtonPress-1>', self.goto_usage)
+            u_label.bind('<ButtonPress-1>', self.goto_usage)
             u_label.bind('<Button-3>', self.show_usage_rcm)
             cur_row += 1
 
