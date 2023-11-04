@@ -188,22 +188,22 @@ class SCTProjectFacade:
                                  base_key='ID')
 
         for param in base_inst.params_before:
-            if inst.params[param].link is None:
-                continue
-            link_type = inst.params[param].link.type
-            if link_type == 'Footer':
+            if 'string' in base_inst.params[param].type:
+                tree[param]['type'] = 'String'
+                tree[param]['value'] = inst.params[param].linked_string
+            elif 'footer' in base_inst.params[param].type:
                 tree[param]['type'] = 'Footer Entry'
                 tree[param]['value'] = inst.params[param].linked_string
-            elif link_type in ('Jump', 'Subscript'):
+
+            if 'jump' in base_inst.params[param].type or 'subscript' in base_inst.params[param].type:
                 tree[param]['type'] = 'Jump'
+                if inst.params[param].link is None:
+                    continue
                 tgt_sect = inst.params[param].link.target_trace[0]
                 tgt_inst = inst.params[param].link.target_trace[1]
                 target_inst = self.project.scts[script].sects[tgt_sect].insts[tgt_inst]
                 tgt_name = self.base_insts.get_inst(target_inst.base_id).name
                 tree[param]['value'] = f'{tgt_sect} - {target_inst.ungrouped_position} {tgt_name}'
-            elif link_type == 'String':
-                tree[param]['type'] = 'String'
-                tree[param]['value'] = inst.params[param].linked_string
 
         if base_inst.loop is None:
             return tree
