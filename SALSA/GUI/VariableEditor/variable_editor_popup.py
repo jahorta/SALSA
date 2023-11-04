@@ -194,7 +194,7 @@ class VariablePopup(tk.Toplevel):
 
     def var_double_click(self, e):
         # Find the region clicked, only edit if region is a cell
-        if e.widget.identify_region(e.x, e.y) != 'cell':
+        if e.widget.identify_region(e.x, e.y) not in ('cell', 'tree'):
             return
 
         sel_iid = e.widget.identify_row(e.y)
