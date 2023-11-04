@@ -15,8 +15,8 @@ global_tag = 'global'
 headers = ['id', 'alias']
 
 header_settings = {
-    'id': {'label': 'ID', 'width': 90, 'stretch': True},
-    'alias': {'label': 'Alias', 'width': 150, 'stretch': True}
+    'id': {'label': 'ID', 'width': 50, 'stretch': True},
+    'alias': {'label': 'Alias', 'width': 120, 'stretch': True}
 }
 
 default_tree_width = 100
@@ -29,7 +29,7 @@ default_tree_label = ''
 class VariablePopup(tk.Toplevel):
     t = 'Variable Editor'
     log_key = 'VarEditPopup'
-    width = 800
+    width = 1200
     height = 1000
 
     option_settings = {}
@@ -116,7 +116,7 @@ class VariablePopup(tk.Toplevel):
         variable_usage_frame.columnconfigure(0, weight=1)
         variable_usage_frame.rowconfigure(0, weight=1)
 
-        self.variable_usage = w.ScrollLabelFrame(variable_usage_frame, theme=theme)
+        self.variable_usage = w.ScrollLabelFrame(variable_usage_frame, theme=theme, size={'width': 400, 'height': 400})
         self.variable_usage.grid(row=0, column=0, sticky='NSEW')
 
         self.status_label = ttk.Label(self, text='')
