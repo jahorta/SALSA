@@ -1,7 +1,7 @@
 from typing import Union, Dict
 
 from SALSA.BaseInstructions.bi_container import BaseParam
-from SALSA.Common.constants import sep
+from SALSA.Common.constants import sep, override_str
 from SALSA.Common.are_same_checker import are_same
 from SALSA.Project.project_container import SCTParameter
 from SALSA.GUI.ParamEditorPopups.param_editor_popup import ParamEditPopup, SCPTEditWidget, IntEditWidget, \
@@ -213,7 +213,7 @@ class ParamEditController:
         var_changes = self.get_var_changes(self.param.value, new_scpt_value)
         if var_changes is not None:
             self.callbacks['update_variables'](var_changes)
-        if new_scpt_value == 'override':
+        if new_scpt_value == override_str:
             param_type = self.base_param.type.split(sep)[1]
             value, override_value = self.scpt_codes.overrides[param_type]
             self.param.set_value(value=value, override_value=override_value)

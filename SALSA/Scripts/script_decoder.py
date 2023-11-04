@@ -12,7 +12,7 @@ from SALSA.BaseInstructions.bi_container import BaseInstLib, BaseParam
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 from SALSA.Scripts.default_variables import default_aliases
 from SALSA.Common.byte_array_utils import word2SignedInt, is_a_number, pad_hex, applyHexMask
-from SALSA.Common.constants import sep, footer_str_group_name, footer_str_id_prefix
+from SALSA.Common.constants import sep, footer_str_group_name, footer_str_id_prefix, override_str
 from SALSA.Scripts import scpt_arithmetic_fxns as scpt_arithmetic, scpt_compare_fxns as scpt_compare
 
 ind_entry_len = 0x14
@@ -526,19 +526,12 @@ class SCTDecoder:
         param_type = base_param.type
         if 'scpt' in param_type:
             overrideCompare = [0x7f7fffff]
-            overrideResult = 0x7f7fffff
             if 'int' in param_type:
                 overrideCompare.append(0x7fffffff)
-                overrideResult = 0x7fffffff
-            elif 'short' in param_type:
-                overrideResult = 0xffff
-            elif 'byte' in param_type:
-                overrideResult = 0xff
 
             scriptCompare = self.getInt(self._cursor * 4)
             if scriptCompare in overrideCompare:
-                cur_param.set_value(overrideResult)
-                cur_param.set_override(self.getWord(self._cursor * 4))
+                cur_param.set_value(override_str, self.getWord(self._cursor * 4))
                 self._cursor += 1
                 return cur_param
 

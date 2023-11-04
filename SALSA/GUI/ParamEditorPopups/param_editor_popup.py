@@ -4,8 +4,7 @@ from tkinter import ttk
 from typing import Union, Dict, List
 
 import SALSA.GUI.Widgets.widgets as w
-from SALSA.GUI.themes import light_theme, dark_theme
-from SALSA.Common.constants import sep
+from SALSA.Common.constants import sep, override_str
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 
 
@@ -92,11 +91,11 @@ class SCPTFloatWidget(ttk.Frame):
 
     def get_value(self):
         if self.override_value.get() == 1:
-            return 'override'
+            return override_str
         return self.float_variable.get()
 
     def set_value(self, value):
-        if value == 'override':
+        if value == override_str:
             self.set_override(init=True)
             return
         self.float_variable.set(value)
@@ -267,7 +266,7 @@ class SCPTEditWidget(ttk.Frame):
             self.option_selection.set('float: ')
             self.set_active_input_widget('float')
             if override:
-                value = 'override'
+                value = override_str
             self.input_widgets['float'].set_value(value)
             self.input_option_selection = value
 

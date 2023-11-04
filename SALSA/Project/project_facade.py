@@ -10,7 +10,7 @@ from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
 from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep, label_name_sep, compound_sect_suffix, \
-    virtual_sect_suffix, label_sect_suffix, link_sep, footer_str_group_name
+    virtual_sect_suffix, label_sect_suffix, link_sep, footer_str_group_name, override_str
 from SALSA.Scripts.scpt_param_codes import get_scpt_override
 from SALSA.Scripts.script_encoder import SCTEncoder
 
@@ -1362,8 +1362,8 @@ class SCTProjectFacade:
         for i in [*base_inst.params_before, *base_inst.params_after]:
             base_param = base_inst.params[i]
             new_param = SCTParameter(base_param.param_ID, base_param.type)
-            if base_param.default_value == 'override':
-                new_param.set_value('override', get_scpt_override(base_param.type))
+            if base_param.default_value == override_str:
+                new_param.set_value(override_str, get_scpt_override(base_param.type))
             else:
                 new_param.set_value(base_param.default_value)
             cur_inst.params[i] = new_param
