@@ -363,6 +363,8 @@ class ProjectEditorController:
                 self.view.after(10, self.resolve_link, None, None, None, param)
         elif param is not None:
             sel_iid = self.trees['parameter'].get_iid_from_rowdata(param)
+            if sel_iid is None and isinstance(param, str):
+                sel_iid = self.trees['parameter'].get_iid_from_rowdata(int(param))
             self.trees['parameter'].see(sel_iid)
             self.trees['parameter'].focus(sel_iid)
             self.trees['parameter'].selection_set([sel_iid])
