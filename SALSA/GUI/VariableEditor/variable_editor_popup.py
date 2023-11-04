@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Tuple, List
 
+from SALSA.GUI.fonts_used import SALSAFont
 from SALSA.Common.constants import link_sep
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
 from SALSA.Common.setting_class import settings
@@ -130,6 +131,8 @@ class VariablePopup(tk.Toplevel):
         self.alias_widgets = {}
         self.cur_alias_id = 0
         self.bind('<Configure>', lambda event: self.adjust_edit_alias_entries())
+
+        self.link_font = SALSAFont()
 
     def _populate_script_tree(self):
         self.script_tree.insert_entry(parent='', text='global', values=[], index='end', row_data=None)
@@ -273,8 +276,13 @@ class VariablePopup(tk.Toplevel):
 
         cur_row = 0
         for usage in usage_list:
-            u_label = ttk.Label(self.variable_usage.scroll_frame, text=link_sep.join(usage), style='canvas.TLabel')
-            u_label.grid(row=cur_row, column=0, sticky='NSEW')
+            ul_frame = tk.Frame(self.variable_usage.scroll_frame)
+            ul_frame.grid(row=cur_row, column=0, sticky=tk.N + tk.S + tk.W)
+            ul_frame.bind('<Enter>', self.handle_link_font)
+            ul_frame.bind('<Leave>', self.handle_link_font)
+            u_label = ttk.Label(ul_frame, text=link_sep.join(usage),
+                                style='canvas.TLabel', font=self.link_font.default_font)
+            u_label.grid(row=0, column=0)
             u_label.bind('<ButtonPress-1>', self.goto_usage)
             u_label.bind('<Button-3>', self.show_usage_rcm)
             cur_row += 1
@@ -299,6 +307,12 @@ class VariablePopup(tk.Toplevel):
             m.tk_popup(e.x_root, e.y_root)
         finally:
             m.grab_release()
+
+    def handle_link_font(self, e):
+        font = self.link_font.default_font if e.type == tk.EventType.Leave else self.link_font.hover_font
+        style = 'canvas.TLabel' if e.type == tk.EventType.Leave else 'link.TLabel'
+        for child in e.widget.winfo_children():
+            child.configure(font=font, style=style)
 
     def determine_tab(self):
         tab = self.variable_notebook.index('current')
