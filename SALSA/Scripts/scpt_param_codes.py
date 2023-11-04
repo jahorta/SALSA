@@ -107,4 +107,4 @@ def get_scpt_override(base_type: str):
         return None
     if parts[1] not in overrides.keys():
         return None
-    return overrides[parts[1]][0]
+    return overrides[parts[1]][1]
