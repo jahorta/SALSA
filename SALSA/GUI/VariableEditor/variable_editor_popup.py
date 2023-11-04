@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Tuple, List
 
+from SALSA.Common.constants import link_sep
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
 from SALSA.Common.setting_class import settings
 from SALSA.GUI.Widgets import widgets as w
@@ -272,7 +273,7 @@ class VariablePopup(tk.Toplevel):
 
         cur_row = 0
         for usage in usage_list:
-            u_label = ttk.Label(self.variable_usage.scroll_frame, text=' - '.join(usage), style='canvas.TLabel')
+            u_label = ttk.Label(self.variable_usage.scroll_frame, text=link_sep.join(usage), style='canvas.TLabel')
             u_label.grid(row=cur_row, column=0, sticky='NSEW')
             cur_row += 1
 
