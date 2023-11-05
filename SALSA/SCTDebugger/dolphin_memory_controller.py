@@ -74,7 +74,7 @@ class DolphinMemoryController:
             if proc.name() == process_name and proc.status() == psutil.STATUS_RUNNING:
                 pid = proc.pid
                 procs.append(pid)
-                print(pid)
+                print(f'Dolphin PID: {pid}')
 
         if len(procs) == 0:
             print('No process named Dolphin.exe is running')
