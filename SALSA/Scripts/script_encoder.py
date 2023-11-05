@@ -6,7 +6,7 @@ from SALSA.Common.constants import alt_sep, footer_str_group_name
 from SALSA.Common.script_string_utils import fix_string_encoding_errors
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.byte_array_utils import float2Hex
-from SALSA.Project.project_container import SCTScript
+from SALSA.Project.project_container import SCTScript, SCTParameter
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
 from SALSA.Scripts.scpt_compare_fxns import is_equal, not_equal
 
@@ -379,18 +379,27 @@ class SCTEncoder:
             inst_len = len(self.sct_body) - inst_pos
             self._sct_body_insert_hex(delay_pos, bytearray(self._make_word(inst_len)))
 
-    def _encode_param(self, param, base_param, a_trace, e_trace):
+    def _encode_param(self, param: SCTParameter, base_param, a_trace, e_trace):
         # if needed, setup link and use 0x7fffffff as placeholder
-        if param.link is not None:
-            link_type = param.link.type
-            if link_type == 'Footer':
-                self.footer_links[len(self.sct_body)] = (param.linked_string, e_trace)
-            elif link_type == 'String':
-                self.string_links[len(self.sct_body)] = (param.linked_string, e_trace)
-            elif link_type in ('Jump', 'Switch'):
+        if 'footer' in base_param.type or 'string' in base_param.type or \
+                'jump' in base_param.type or 'subscript' in base_param.type:
+            if 'footer' in base_param.type or 'string' in base_param.type:
+                if param.linked_string in (None, ('',)):
+                    self.script.errors.append(('Encode', 'Parameter', 'No string assigned', alt_sep.join(e_trace)))
+                    return
+                if 'string' in base_param.type:
+                    self.string_links[len(self.sct_body)] = (param.linked_string, e_trace)
+                if 'footer' in base_param.type:
+                    self.footer_links[len(self.sct_body)] = (param.linked_string, e_trace)
+
+            elif 'jump' in base_param.type or 'subscript' in base_param.type:
+                if param.link is None:
+                    self.script.errors.append(('Encode', 'Parameter', 'Jump not setup', alt_sep.join(e_trace)))
+                    return
+                if param.link.target_trace is None:
+                    self.script.errors.append(('Encode', 'Parameter', 'Jump not setup', alt_sep.join(e_trace)))
+                    return
                 self.sct_links[len(self.sct_body)] = (param.link.target_trace, e_trace)
-            else:
-                print(f'{self.log_key}: Unknown param link type: {link_type}')
             self.sct_body.extend(self._placeholder)
             return
 
