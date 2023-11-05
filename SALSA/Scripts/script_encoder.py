@@ -384,7 +384,7 @@ class SCTEncoder:
         if 'footer' in base_param.type or 'string' in base_param.type or \
                 'jump' in base_param.type or 'subscript' in base_param.type:
             if 'footer' in base_param.type or 'string' in base_param.type:
-                if param.linked_string in (None, ('',)):
+                if param.linked_string is None or param.linked_string == ('',):
                     self.script.errors.append(('Encode', 'Parameter', 'No string assigned', alt_sep.join(e_trace)))
                     return
                 if 'string' in base_param.type:
