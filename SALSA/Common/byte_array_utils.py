@@ -262,5 +262,13 @@ def paddingTest():
                 expected[key], out))
 
 
+def ptr2addr(ptr: Union[str, bytearray]) -> bytearray:
+    if isinstance(ptr, bytearray):
+        ptr = ptr.hex()
+    if ptr[0] == '8':
+        ptr = '0'+ptr[1:]
+    return bytearray.fromhex(ptr)
+
+
 if __name__ == '__main__':
     run_tests()
