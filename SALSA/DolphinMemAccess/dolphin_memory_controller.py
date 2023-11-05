@@ -119,7 +119,8 @@ class DolphinMemoryController:
 
     def write_to_memory(self, address: int, value: bytearray, mem_segment: int = 1):
         size = ct.c_size_t(len(value))
-        buffer = ct.create_string_buffer(value)
+        buffer = ct.create_string_buffer(len(value))
+        buffer.raw = bytes(value)
         bytesWritten = ct.c_size_t()
         start_addr = self._mem1_addr
         if mem_segment == 2:
