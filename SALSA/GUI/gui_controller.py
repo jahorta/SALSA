@@ -5,6 +5,7 @@ from tkinter import ttk
 from typing import Union, TypedDict, Literal
 import webbrowser
 
+from GUI.SCTDebugger.debugger_view import SCTDebuggerPopup
 from SALSA.GUI.EncodeErrorPopup.project_error_popup import ProjectErrorPopup
 from SALSA.GUI.ProjectEditor.project_editor_controller import ProjectEditorController
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
@@ -32,6 +33,7 @@ class PopupTypes(TypedDict):
     string: Union[None, StringPopup]
     export: Union[None, SCTExportPopup]
     errors: Union[None, ProjectErrorPopup]
+    debug: Union[None, SCTDebuggerPopup]
 
 
 class GUIController:
@@ -53,7 +55,7 @@ class GUIController:
         self.theme = theme
 
         self.popups: PopupTypes = {'inst': None, 'analysis': None, 'about': None, 'errors': None,
-                                   'variable': None, 'string': None, 'export': None}
+                                   'variable': None, 'string': None, 'export': None, 'debug': None}
 
         self.callbacks = {}
 
@@ -188,13 +190,22 @@ class GUIController:
         self.popups['export'] = SCTExportPopup(self.parent, callbacks=callbacks, name='export', selected=selected,
                                                theme=self.theme)
 
+    def show_sct_debugger_popup(self):
+        if self.popups['debug'] is not None:
+            self.popups['debug'].tkraise()
+            return
+        callbacks = {
+            'update_sct': self.callbacks['export_sct'], 'close': self.close_popup,
+        }
+        self.popups['debug'] = SCTDebuggerPopup(self.parent, callbacks=callbacks, name='debug', theme=self.theme)
+
     # ----------------------- #
     # Popup cleanup functions #
     # ----------------------- #
 
-    def close_popup(self, name: Literal['inst', 'analysis', 'about', 'variable', 'string', 'export', 'errors'],
+    def close_popup(self, name: Literal['inst', 'analysis', 'about', 'variable', 'string', 'export', 'errors', 'debug'],
                     popup: Union[InstructionEditorView, AnalysisView, AboutView, SCTExportPopup,
-                    VariablePopup, StringPopup, ProjectErrorPopup]):
+                    VariablePopup, StringPopup, ProjectErrorPopup, SCTDebuggerPopup]):
         popup.destroy()
         self.popups[name] = None
 
