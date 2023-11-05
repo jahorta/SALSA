@@ -256,6 +256,14 @@ class SCPTEditWidget(ttk.Frame):
                 self.input_vars['var'].set(var_value)
                 self.input_widgets['var'].load_alias(None)
                 self.input_option_selection = f'{var_type}: '
+            elif value == override_str:
+                self.class_selection.set('input')
+                self.update_options()
+                self.option_selection.set('float: ')
+                self.set_active_input_widget('float')
+                self.input_widgets['float'].set_value(value)
+                self.input_option_selection = value
+
             else:
                 print(f'unknown value type: {value}')
 
