@@ -174,7 +174,7 @@ class ProjectUpdater:
             inst_ind = 0
             while not mul_label:
                 inst_ind += 1
-                if len(sect.inst_list) == inst_ind:
+                if len(sect.inst_list) <= inst_ind:
                     break
                 if sect.insts[sect.inst_list[inst_ind]].base_id == 9:
                     mul_label = True
@@ -264,16 +264,23 @@ if __name__ == '__main__':
     os.chdir(cur_dir)
 
     model = ProjectModel()
-    project: SCTProject = model.load_project(filepath=os.path.join('./test', 'test_UwU v3.prj'), ignore_dir=True)
+    project: SCTProject = model.load_project(filepath=os.path.join('./test', 'full.prj'), ignore_dir=True)
     if getattr(project, 'version', None) is None:
         project.version = 1
+
+    specific_script = 'me034c'
+    # specific_script = None
 
     # Only check the first script?
     if 'scripts' in project.__dict__:
         project_first_script_name = list(project.scripts.keys())[0]
+        if specific_script is not None:
+            project_first_script_name = specific_script
         project.scripts = {project_first_script_name: project.scripts[project_first_script_name]}
     else:
         project_first_script_name = list(project.scts.keys())[0]
+        if specific_script is not None:
+            project_first_script_name = specific_script
         project.scts = {project_first_script_name: project.scts[project_first_script_name]}
 
     project = ProjectUpdater.update_project(project)
