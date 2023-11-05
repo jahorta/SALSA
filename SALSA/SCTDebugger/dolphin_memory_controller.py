@@ -15,6 +15,17 @@ GAMECODES = {
 
 process_name = "Dolphin.exe"
 
+
+def ptr2addr(ptr: Union[str, bytearray]) -> bytearray:
+    if isinstance(ptr, bytearray):
+        ptr = ptr.hex()
+    if '0x' in ptr:
+        ptr = ptr[2:]
+    if ptr[0] == '8':
+        ptr = '0'+ptr[1:]
+    return bytearray.fromhex(ptr)
+
+
 @dataclass
 class MemSegment:
     addr: str
