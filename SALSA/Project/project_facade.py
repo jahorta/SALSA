@@ -2018,7 +2018,7 @@ class SCTProjectFacade:
                                                            base_insts=self.base_insts, update_inst_pos=True,
                                                            endian='big')
             for error in self.project.scts[script].errors:
-                if 'Encode' in error:
+                if 'Encoding' in error:
                     error_scts.append(script)
                     break
         return error_scts
@@ -2032,7 +2032,7 @@ class SCTProjectFacade:
         for name, sct in self.project.scts.items():
             sct_errors = []
             for error in sct.errors:
-                if 'Encode' in error:
+                if 'Encoding' in error:
                     sct_errors.append(error)
             if len(sct_errors) > 0:
                 errors[name] = sct_errors

@@ -192,9 +192,9 @@ class GUIController:
     # Popup cleanup functions #
     # ----------------------- #
 
-    def close_popup(self, name: Literal['inst', 'analysis', 'about', 'variable', 'string', 'export'],
-                    popup: Union[
-                        InstructionEditorView, AnalysisView, AboutView, SCTExportPopup, VariablePopup, StringPopup]):
+    def close_popup(self, name: Literal['inst', 'analysis', 'about', 'variable', 'string', 'export', 'errors'],
+                    popup: Union[InstructionEditorView, AnalysisView, AboutView, SCTExportPopup,
+                    VariablePopup, StringPopup, ProjectErrorPopup]):
         popup.destroy()
         self.popups[name] = None
 
