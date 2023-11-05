@@ -5,13 +5,7 @@ import threading
 from dataclasses import dataclass
 import datetime as dt
 import queue as q
-from SALSA.DolphinMemAccess.mem_page_file_access import *
-
-GAMECODES = {
-    'GEAE8P': 'Skies of Arcadia Legends (US)',
-    'GEAP8P': 'Skies of Arcadia Legends (EU)',
-    'GEAJ8P': 'Skies of Arcadia Legends (JP)'
-}
+from SALSA.SCTDebugger.mem_page_file_access import *
 
 process_name = "Dolphin.exe"
 
