@@ -64,6 +64,8 @@ class ProjectErrorPopup(tk.Toplevel):
         close_button = ttk.Button(self, text='Close', command=self.close)
         close_button.grid(row=1, column=0, sticky=tk.E)
 
+        self.protocol('WM_DELETE_WINDOW', self.close)
+
         self.refresh_errors()
 
     def refresh_errors(self):
