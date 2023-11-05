@@ -288,7 +288,10 @@ class SCPTEditWidget(ttk.Frame):
         elif self.active_widget == 'decimal':
             return f'decimal: {self.input_vars["decimal"][0].get()}+{self.input_vars["decimal"][1].get()}/256'
         else:
-            return float(self.input_widgets['float'].get_value())
+            val = self.input_widgets['float'].get_value()
+            if val != override_str:
+                val = float(val)
+            return val
 
 
 # -------------------------- #
