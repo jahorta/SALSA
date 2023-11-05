@@ -20,7 +20,7 @@ class SCTExportPopup(tk.Toplevel):
         'compress_aklz': {'text': 'Compress file using AKLZ compression', 'default': 'False'}
     }
     option_settings_radio = {
-        'system': {'label': 'Select target system:', 'entries': ['Dreamcast', 'Gamecube'], 'default': 'Gamecube'}
+        'system': {'label': 'Select target system:', 'entries': ['Dreamcast', 'GameCube'], 'default': 'GameCube'}
     }
 
     def __init__(self, parent, callbacks, name, selected, theme, *args, **kwargs):
