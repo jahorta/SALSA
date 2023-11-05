@@ -167,7 +167,7 @@ class SCTEncoder:
 
         pops = []
         for i, error in enumerate(self.script.errors):
-            if 'Encode' in error:
+            if 'Encoding' in error:
                 pops.append(i)
 
         for i in reversed(pops):
@@ -187,7 +187,7 @@ class SCTEncoder:
         for link_offset, (jmp_to, trace) in self.sct_links.items():
             if jmp_to[1] not in self.inst_positions:
                 self.script.errors.append(
-                    ('Encode', 'Link', f'No target inst {jmp_to[0]}-{jmp_to[1]}', alt_sep.join(trace)))
+                    ('Encoding', 'Link', f'No target inst {jmp_to[0]}-{jmp_to[1]}', alt_sep.join(trace)))
                 print(f'No target inst{jmp_to[1]}')
                 continue
             jmp_to_pos = self.inst_positions[jmp_to[1]]
@@ -197,7 +197,7 @@ class SCTEncoder:
         # Resolve string links
         for link_offset, (section, trace) in self.string_links.items():
             if section not in self.header_dict:
-                self.script.errors.append(('Encode', 'String', f'No string {section}', alt_sep.join(trace)))
+                self.script.errors.append(('Encoding', 'String', f'No string {section}', alt_sep.join(trace)))
                 print(f'No string {section}')
                 continue
             str_pos = self.header_dict[section]
@@ -385,7 +385,7 @@ class SCTEncoder:
                 'jump' in base_param.type or 'subscript' in base_param.type:
             if 'footer' in base_param.type or 'string' in base_param.type:
                 if param.linked_string is None or param.linked_string == ('',):
-                    self.script.errors.append(('Encode', 'Parameter', 'No string assigned', alt_sep.join(e_trace)))
+                    self.script.errors.append(('Encoding', 'Parameter', 'No string assigned', alt_sep.join(e_trace)))
                     return
                 if 'string' in base_param.type:
                     self.string_links[len(self.sct_body)] = (param.linked_string, e_trace)
@@ -394,10 +394,10 @@ class SCTEncoder:
 
             elif 'jump' in base_param.type or 'subscript' in base_param.type:
                 if param.link is None:
-                    self.script.errors.append(('Encode', 'Parameter', 'Jump not setup', alt_sep.join(e_trace)))
+                    self.script.errors.append(('Encoding', 'Parameter', 'Jump not setup', alt_sep.join(e_trace)))
                     return
                 if param.link.target_trace is None:
-                    self.script.errors.append(('Encode', 'Parameter', 'Jump not setup', alt_sep.join(e_trace)))
+                    self.script.errors.append(('Encoding', 'Parameter', 'Jump not setup', alt_sep.join(e_trace)))
                     return
                 self.sct_links[len(self.sct_body)] = (param.link.target_trace, e_trace)
             self.sct_body.extend(self._placeholder)
@@ -409,7 +409,7 @@ class SCTEncoder:
                 value = param.override
             else:
                 if param.value is None and 'skip' not in base_param.type:
-                    self.script.errors.append(('Encode', 'Parameter', 'Value is None', alt_sep.join(e_trace)))
+                    self.script.errors.append(('Encoding', 'Parameter', 'Value is None', alt_sep.join(e_trace)))
                     return
                 no_loop = False
                 if isinstance(param.value, str):
@@ -427,7 +427,7 @@ class SCTEncoder:
                     value.extend(self._make_word(self.param_code.stop_code))
         else:
             if param.value is None:
-                self.script.errors.append(('Encode', 'Parameter', 'Value is None', alt_sep.join(e_trace)))
+                self.script.errors.append(('Encoding', 'Parameter', 'Value is None', alt_sep.join(e_trace)))
                 return
             if 'var' in base_param.type:
                 value = self._encode_scpt_param(param.value)
