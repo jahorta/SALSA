@@ -64,7 +64,7 @@ def theme_generator(colors: Colors):
         },
         "warning.TLabel": {
             "configure": {
-                "background": colors.bg_internal,
+                "background": colors.bg,
                 "foreground": colors.warning_text
             }
         },
