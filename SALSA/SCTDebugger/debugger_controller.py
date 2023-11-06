@@ -235,9 +235,13 @@ class SCTDebugger:
         addr = int.from_bytes(ptr2addr(ptr_value), byteorder='big')
         return addr
 
-    def _read_addr(self, ba: BaseAddr):
-        cur_ptr = self._get_ptr_value_as_addr(ba)
-        size = self._get_addr_size(ba, cur_ptr=cur_ptr)
+    def _read_addr(self, ba: BaseAddr, ptr_only=False):
+        if ptr_only:
+            cur_ptr = ba.start_addr
+            size = 4
+        else:
+            cur_ptr = self._get_ptr_value_as_addr(ba)
+            size = self._get_addr_size(ba, cur_ptr=cur_ptr)
         return self._cont.read_memory_address(cur_ptr, size)
 
     def _get_addr_size(self, ba: BaseAddr, cur_ptr=None):
@@ -248,8 +252,11 @@ class SCTDebugger:
             ptr = cur_ptr
         return int.from_bytes(self._cont.read_memory_address(ptr + ba.size_offset, 4), byteorder='big') + ba.size_mod
 
-    def _write_to_addr(self, value, ba: BaseAddr):
-        addr = self._get_ptr_value_as_addr(ba)
+    def _write_to_addr(self, value, ba: BaseAddr, ptr_only=False):
+        if ptr_only:
+            addr = ba.start_addr
+        else:
+            addr = self._get_ptr_value_as_addr(ba)
         return self._cont.write_to_memory(addr, value)
 
 
