@@ -1,6 +1,8 @@
 import dataclasses
+import queue
 from typing import List, Union
 
+from SALSA.GUI.SCTDebugger.debugger_view import SCTDebuggerPopup
 from SALSA.SCTDebugger.dolphin_memory_controller import DolphinMemoryController, ptr2addr
 
 gamecodes = {
@@ -66,6 +68,15 @@ class SCTDebugger:
         self.gamecode = None
         self.addrs: Union[None, SOALAddrs] = None
         self._cont = DolphinMemoryController()
+        self.view: Union[None, SCTDebuggerPopup] = None
+        self.view_callbacks = {
+            'attach_controller': self.attach_view, 'attach_dolphin': self.attach_to_dolphin,
+            'update_sct': self.update_sct
+        }
+
+        self.update_queue = queue.SimpleQueue()
+
+    # Setup methods
 
     def attach_to_dolphin(self):
         result = self._cont.attach_to_dolphin()
@@ -73,7 +84,41 @@ class SCTDebugger:
             gamecode_bytes = self._cont.read_memory_address(0, 6)
             self.gamecode = gamecode_bytes.decode()
             self.addrs = SOALAddrs(**addresses[self.gamecode])
-        return result
+            self.view.set_status(stat_type='dolphin', style=success_style, status=attach_success)
+
+    def attach_view(self, view: Union[None, SCTDebuggerPopup]):
+        self.view = view
+
+    # Dolphin update methods
+
+    def update_sct(self):
+        if self.gamecode is None:
+            return
+        sct = self._get_sct_name()
+        if not self.callbacks['check_for_script'](sct):
+            return self.view.set_status(stat_type='update', style=fail_style,
+                                        status=update_fail_no_sct + f' {sct}')
+        self.callbacks['update_sct'](sct)
+
+    def write_sct_to_dolphin(self, result):
+        if isinstance(result, str):
+            return self.view.set_status(stat_type='update', style=fail_style,
+                                        status=update_fail_errors + f' {result}')
+        new_ind, new_sct = result
+        index_size = self._get_index_buf_size()
+        sct_size = self._get_sct_buf_size()
+        if index_size < len(new_ind):
+            return self.view.set_status(stat_type='update', style=fail_style,
+                                        status=update_fail_index_size + f'{len(new_ind) - index_size} bytes over')
+        if sct_size < len(new_sct):
+            return self.view.set_status(stat_type='update', style=fail_style,
+                                        status=update_fail_sct_size + f'{len(new_sct) - sct_size} bytes over')
+        self._write_to_addr(value=new_ind, ba=self.addrs.pSCTIndex)
+        self._write_to_addr(value=new_sct, ba=self.addrs.pSCTStart)
+        self.view.set_status(stat_type='update', status=update_success, style=success_style)
+
+    def start_cur_sct_updater(self):
+        pass
 
     def get_cur_index(self):
         return self._read_addr(self.addrs.pSCTIndex)
@@ -111,6 +156,10 @@ class SCTDebugger:
         if cur_ptr is not None:
             ptr = cur_ptr
         return int.from_bytes(self._cont.read_memory_address(ptr + ba.size_offset, 4), byteorder='big') + ba.size_mod
+
+    def _write_to_addr(self, value, ba: BaseAddr):
+        addr = self._get_ptr_value_as_addr(ba)
+        return self._cont.write_to_memory(addr, value)
 
 
 if __name__ == '__main__':
