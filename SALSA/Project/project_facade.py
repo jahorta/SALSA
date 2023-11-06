@@ -2044,3 +2044,16 @@ class SCTProjectFacade:
             if len(sct_errors) > 0:
                 errors[name] = sct_errors
         return errors
+
+    # # Update SCT Methods # #
+    def get_script(self, script, queue):
+        queue.put({'sub_msg': f'Encoding {script}'})
+        ind, sct = SCTEncoder.encode_sct_file_from_project_script(project_script=self.project.scts[script],
+                                                                  use_garbage=False, combine_footer_links=True,
+                                                                  add_spurious_refresh=False, endian='big',
+                                                                  base_insts=self.base_insts, update_inst_pos=True,
+                                                                  separate_index=True)
+        for error in self.project.scts[script].errors:
+            if 'Encoding' in error:
+                return script
+        return ind, sct
