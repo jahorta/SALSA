@@ -119,6 +119,7 @@ class SCTDebugger:
                 self.view.set_active_button('update')
         else:
             raise ValueError(f'Unknown result from attempting to attach to Dolphin {result}')
+        return result
 
     def attach_view(self, view: Union[None, SCTDebuggerPopup]):
         self.view = view
