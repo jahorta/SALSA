@@ -5,7 +5,7 @@ import threading
 from dataclasses import dataclass
 import datetime as dt
 import queue as q
-from SALSA.SCTDebugger.mem_page_file_access import *
+from SALSA.SCTDebugger import mem_page_file_access as mem
 
 process_name = "Dolphin.exe"
 
@@ -99,7 +99,7 @@ class DolphinMemoryController:
         PROCESS_ALL_ACCESS = 0x1F0FFF
         self._handle = self.OpenProcess(PROCESS_ALL_ACCESS, False, self._pid)
         if self._handle is None:
-            print(WinError(GetLastError()))
+            print(mem.WinError(mem.GetLastError()))
             return 0
         self._last_access = dt.datetime.now()
         return 1
@@ -144,16 +144,16 @@ class DolphinMemoryController:
 
     def _get_dolphin_mems(self):
         MEM1Found = False
-        si = SYSTEM_INFO()
-        psi = byref(si)
-        windll.kernel32.GetSystemInfo(psi)
+        si = mem.SYSTEM_INFO()
+        psi = mem.byref(si)
+        mem.windll.kernel32.GetSystemInfo(psi)
         base_address = si.lpMinimumApplicationAddress
         max_address = si.lpMaximumApplicationAddress
         page_address = base_address
         m_MEM2Present = False
         self._mem1_addr = 0
         while page_address < max_address:
-            info = VirtualQueryEx(self._handle, page_address, False)
+            info = mem.VirtualQueryEx(self._handle, page_address, False)
             page_address += info.RegionSize
             # Check region size so that we know it's MEM2
             if not m_MEM2Present and info.RegionSize == 0x4000000:
@@ -165,7 +165,7 @@ class DolphinMemoryController:
                     # 0x4000000.
                     break
                 # View the comment for MEM1.
-                wsInfo, success = QueryWorkingSetEx(self._handle, info.BaseAddress)
+                wsInfo, success = mem.QueryWorkingSetEx(self._handle, info.BaseAddress)
                 if success:
                     if wsInfo.VirtualAttributes.Valid:
                         self._mem2_addr = regionBaseAddress
@@ -176,7 +176,7 @@ class DolphinMemoryController:
                 # exists and have nothing to do with the emulated memory.Only the right page has valid
                 # working set information so an additional check is required that it is backed by physical
                 # memory.
-                wsInfo, success = QueryWorkingSetEx(self._handle, info.BaseAddress)
+                wsInfo, success = mem.QueryWorkingSetEx(self._handle, info.BaseAddress)
                 if success:
                     if wsInfo.VirtualAttributes.Valid:
                         if not MEM1Found:
