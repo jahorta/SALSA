@@ -2057,3 +2057,94 @@ class SCTProjectFacade:
             if 'Encoding' in error:
                 return script
         return ind, sct
+
+    def find_similar_inst(self, script: str, other_section: SCTSection, inst_offset: int):
+        other_inst = None
+        for inst in other_section.insts.values():
+            if inst_offset == inst.absolute_offset:
+                other_inst = inst
+                break
+        if other_inst is None:
+            return None
+
+        my_script = self.project.scts[script]
+        desired_section = other_section.name
+        if desired_section not in my_script.sects:
+            if desired_section in my_script.folded_sects:
+                desired_section = my_script.folded_sects[desired_section]
+            else:
+                return None
+
+        my_section = my_script.sects[desired_section]
+        my_inst_list = my_section.inst_list
+        if desired_section != other_section.name or my_section.is_compound:
+            i0 = None
+            i1 = -1
+            found_it = False
+            for i, inst in enumerate(my_inst_list):
+                if my_section.insts[inst].base_id != 9:
+                    continue
+                if found_it:
+                    i1 = i
+                if my_section.insts[inst].label == other_section.name:
+                    i0 = i
+                    found_it = True
+            if i0 is None:
+                return None
+            my_inst_list = my_inst_list[i0: i1]
+
+        # find inst (or insts) in my inst list with same base_id and parameter values
+        same_base_inst = []
+        similar_insts = []
+        for inst in my_inst_list:
+            if my_section.insts[inst].base_id != other_inst.base_id:
+                continue
+            same_base_inst.append(inst)
+            if self._insts_are_similar(my_section.insts[inst], other_inst):
+                similar_insts.append(inst)
+
+        if len(similar_insts) == 0:
+            return None
+
+        if len(similar_insts) == 1:
+            return my_section.insts[similar_insts[0]].absolute_offset
+
+        preceeding_insts = 0
+        for inst in other_section.inst_list:
+            if other_section.insts[inst].base_id != other_inst.base_id:
+                continue
+            if other_inst.ID == inst:
+                break
+            if self._insts_are_similar(other_section.insts[inst], other_inst):
+                preceeding_insts += 1
+
+        target_inst = min(len(similar_insts) - 1, preceeding_insts)
+        return my_section.insts[similar_insts[target_inst]].absolute_offset
+
+    def _insts_are_similar(self, inst: SCTInstruction, other_inst: SCTInstruction):
+        if len(inst.params) != len(other_inst.params):
+            return False
+        if len(inst.l_params) != len(other_inst.l_params):
+            return False
+
+        for param_key, param in inst.params.items():
+            if not self._params_are_similar(param, other_inst.params[param_key]):
+                return False
+
+        for i, loop in enumerate(inst.l_params):
+            for param_key, param in loop.items():
+                if not self._params_are_similar(param, other_inst.l_params[i][param_key]):
+                    return False
+        return True
+
+    @staticmethod
+    def _params_are_similar(param, other_param):
+        if param.type != other_param.type:
+            return False
+        if 'string' in param.type or 'footer' in param.type:
+            if param.linked_string != other_param.linked_string:
+                return False
+        else:
+            if not ('jump' in param.type or 'subscript' in param.type) and param.value != other_param.value:
+                return False
+        return True
