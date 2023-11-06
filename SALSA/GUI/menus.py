@@ -49,6 +49,7 @@ class MainMenu(tk.Menu):
 
         self.view_menu = tk.Menu(self, tearoff=False)
         self.view_menu.add_command(label='Instruction editor', command=callbacks['view->inst'])
+        self.view_menu.add_command(label='SCT Debugger (Dolphin)', command=callbacks['view->debug'])
         dark_mode = 1 if dark_mode else 0
         self.dark_mode_var = tk.IntVar(self, dark_mode)
         self.view_menu.add_checkbutton(label='Use Dark Mode', variable=self.dark_mode_var,
@@ -80,6 +81,7 @@ class MainMenu(tk.Menu):
         self.project_menu.entryconfig('Repair', state='disabled')
         self.file_menu.entryconfig('Save Project', state='disabled')
         self.file_menu.entryconfig('Save Project as', state='disabled')
+        self.view_menu.entryconfig('SCT Debugger (Dolphin)', state='disabled')
 
     def enable_script_commands(self):
         self.project_menu.entryconfig('Import SCT file(s)', state='normal')
@@ -90,6 +92,7 @@ class MainMenu(tk.Menu):
         self.project_menu.entryconfig('Repair', state='normal')
         self.file_menu.entryconfig('Save Project', state='normal')
         self.file_menu.entryconfig('Save Project as', state='normal')
+        self.view_menu.entryconfig('SCT Debugger (Dolphin)', state='normal')
 
     def update_recents(self, recent_files):
         self.no_recents = True if len(self.recent_files) == 0 else False
