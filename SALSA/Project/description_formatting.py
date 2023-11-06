@@ -232,16 +232,20 @@ def replace_vars_with_locs(param1: str, **kwargs):
 # ----------------------- #
 
 def get_parameter_string(param_name, inst: SCTInstruction, base_inst: BaseInst, callbacks):
-    string_id = None
+    cur_param = None
     for param in inst.params.values():
         if base_inst.params[param.ID].name == param_name:
-            string_id = param.linked_string
-    if string_id is None:
+            cur_param = param
+    if cur_param is None:
+        return f'No parameter found for {param_name}'
+    if cur_param.linked_string is None:
         return f'No string found for parameter {param_name}'
-    no_head, head, body = callbacks['get_str'](string_id)
+    if 'string' not in cur_param.type:
+        return cur_param.linked_string
+    no_head, head, body = callbacks['get_str'](cur_param.linked_string)
     if head is None:
         head = ''
-    connector = '\n' if no_head else ''
+    connector = '' if no_head else '\n'
     return f'{head}{connector}{body}'
 
 # ------------------------------------------------------------------ #
