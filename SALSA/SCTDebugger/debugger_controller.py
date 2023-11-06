@@ -138,8 +138,9 @@ class SCTDebugger:
             if game_code not in addresses:
                 return self.attach_to_dolphin()
             return self.view.set_status(stat_type='update', style=fail_style,
-                                        status=update_fail_no_sct + f' {sct}')
-        self.callbacks['update_sct'](sct)
+                                        status=update_fail_no_sct + f' {sct_name}')
+        self.cur_sct = sct_name
+        self.callbacks['update_sct'](sct_name)
 
     def write_sct_to_dolphin(self, result):
         if isinstance(result, str):
