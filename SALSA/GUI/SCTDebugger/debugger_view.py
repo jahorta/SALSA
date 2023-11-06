@@ -5,6 +5,9 @@ from typing import Literal, List, Dict
 from SALSA.Common.setting_class import settings
 
 
+cur_script_text = 'Current Script: '
+
+
 class SCTDebuggerPopup(tk.Toplevel):
     t = 'Debug SCTs in Dolphin'
     log_key = 'SCTDebugger'
