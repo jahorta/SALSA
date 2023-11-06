@@ -561,7 +561,7 @@ class SCTProjectFacade:
             i += 1
         return f'untitled{i}'
 
-    def is_sect_name_used(self, script, new_name):
+    def is_sect_name_used(self, script, new_name, code_only=False):
         cur_script = self.project.scts[script]
         for sect in cur_script.sects.values():
             if sect.is_compound:
@@ -571,9 +571,12 @@ class SCTProjectFacade:
                             return True
             else:
                 if sect.name == new_name:
+                    if code_only:
+                        return len(sect.insts) > 1
                     return True
-        if new_name in cur_script.strings.keys():
-            return True
+        if code_only:
+            if new_name in cur_script.strings.keys():
+                return True
         return False
 
     def create_section(self, script, new_name='', location=None, insert_in_group=False, inst_list=None):
