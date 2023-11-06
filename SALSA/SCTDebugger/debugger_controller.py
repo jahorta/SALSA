@@ -96,19 +96,28 @@ class SCTDebugger:
     def attach_to_dolphin(self):
         result = self._cont.attach_to_dolphin()
         if result == 1:
-            self.view.set_status(stat_type='dolphin', style=fail_style, status=attach_fail_pid)
+            if self.view is not None:
+                self.view.set_status(stat_type='dolphin', style=fail_style, status=attach_fail_pid)
+                self.view.set_active_button('attach')
         elif result == 2:
-            self.view.set_status(stat_type='dolphin', style=fail_style, status=attach_fail_mem_block)
+            if self.view is not None:
+                self.view.set_status(stat_type='dolphin', style=fail_style, status=attach_fail_mem_block)
+                self.view.set_active_button('attach')
         elif result == 0:
             gamecode_bytes = self._cont.read_memory_address(0, 6)
             game_code = gamecode_bytes.decode()
             if game_code not in addresses.keys():
-                return self.view.set_status(stat_type='dolphin', style=fail_style,
-                                            status=attach_fail_game + f': {game_code}')
+                if self.view is not None:
+                    self.view.set_status(stat_type='dolphin', style=fail_style,
+                                         status=attach_fail_game + f': {game_code}')
+                    self.view.set_active_button('attach')
+                return
             self.gamecode = game_code
             self.addrs = SOALAddrs(**addresses[self.gamecode])
-            self.view.set_status(stat_type='dolphin', style=success_style,
-                                 status=attach_success + f': {game_titles[game_code]}')
+            if self.view is not None:
+                self.view.set_status(stat_type='dolphin', style=success_style,
+                                     status=attach_success + f': {game_titles[game_code]}')
+                self.view.set_active_button('update')
         else:
             raise ValueError(f'Unknown result from attempting to attach to Dolphin {result}')
 
