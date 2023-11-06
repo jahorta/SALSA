@@ -105,9 +105,14 @@ class Application(tk.Tk):
         recent_files = self.proj_model.get_recent_filenames()
 
         # Create Debugger
+        def inst_lib():
+            return self.base_insts
         debug_callbacks = {
             'update_sct': self.update_script,
-            'check_for_script': self.project.check_script_is_in_project
+            'check_for_script': self.project.check_script_is_in_project,
+            'sect_name_is_used': self.project.is_sect_name_used,
+            'find_similar_inst': self.project.find_similar_inst,
+            'get_inst_lib': inst_lib
         }
         self.dolphin_debugger = SCTDebugger(callbacks=debug_callbacks)
 

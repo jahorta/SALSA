@@ -4,6 +4,7 @@ from typing import List, Union
 
 from SALSA.GUI.SCTDebugger.debugger_view import SCTDebuggerPopup
 from SALSA.SCTDebugger.dolphin_memory_controller import DolphinMemoryController, ptr2addr
+from SALSA.Scripts.script_decoder import SCTDecoder
 
 
 @dataclasses.dataclass
@@ -67,6 +68,7 @@ update_fail_no_sct = 'Current SCT is not in project'
 update_fail_errors = 'Export failed: errors'
 update_fail_index_size = 'Update failed: New index is too large'
 update_fail_sct_size = 'Update failed: New SCT is too large'
+update_fail_no_cur_inst = 'Update failed: Unable to find similar inst'
 update_success = 'Update succeeded'
 
 fail_style = 'warning.TLabel'
@@ -83,10 +85,11 @@ class SCTDebugger:
         self.view: Union[None, SCTDebuggerPopup] = None
         self.view_callbacks = {
             'attach_controller': self.attach_view, 'attach_dolphin': self.attach_to_dolphin,
-            'update_sct': self.update_sct
+            'update_sct': self.update_sct, 'set_cur_inst': self.set_selected_inst_as_current
         }
 
         self.update_queue = queue.SimpleQueue()
+        self.cur_sct = None
 
     # Setup methods
 
@@ -139,8 +142,17 @@ class SCTDebugger:
         if sct_size < len(new_sct):
             return self.view.set_status(stat_type='update', style=fail_style,
                                         status=update_fail_sct_size + f'{len(new_sct) - sct_size} bytes over')
+        new_inst_offset = self._get_offset_of_similar_inst()
+        if new_inst_offset is None or not isinstance(new_inst_offset, int):
+            return self.view.set_status(stat_type='update', style=fail_style,
+                                        status=update_fail_no_cur_inst + f'{len(new_sct) - sct_size} bytes over')
+
+        new_inst_offset += int.from_bytes(self._read_addr(ba=self.addrs.pSCTStart, ptr_only=True), byteorder='big')
+        new_inst_offset = new_inst_offset.to_bytes(length=4, byteorder='big', signed=False)
+
         self._write_to_addr(value=new_ind, ba=self.addrs.pSCTIndex)
         self._write_to_addr(value=new_sct, ba=self.addrs.pSCTStart)
+        self._write_to_addr(value=new_inst_offset, ba=self.addrs.pSCTPos, ptr_only=True)
         self.view.set_status(stat_type='update', status=update_success, style=success_style)
 
     def start_cur_sct_updater(self):
@@ -162,6 +174,39 @@ class SCTDebugger:
         sct_num = int.from_bytes(self._read_addr(self.addrs.curSCTNum), byteorder='big')
         sct_let = self._read_addr(self.addrs.curSCTLet).decode()
         return f'me{sct_num:03d}{sct_let}'
+
+    def _get_offset_of_similar_inst(self):
+        cur_ind = self.get_cur_index()
+        cur_sct_ptr = int.from_bytes(self._read_addr(self.addrs.pSCTStart, ptr_only=True), byteorder='big')
+        cur_inst_ptr = int.from_bytes(self._read_addr(self.addrs.pSCTPos, ptr_only=True), byteorder='big')
+        cur_inst_offset = cur_inst_ptr - cur_sct_ptr
+        if cur_inst_offset < 0:
+            self.attach_to_dolphin()
+            raise ValueError(f'{self.log_name}: Current inst offset is negative. '
+                             f'This should not happen, reattaching to dolphin')
+
+        index = SCTDecoder.generate_index(cur_ind)
+        prev_offset = 0
+        cur_offset = 0
+        for offset in index:
+            cur_offset = offset
+            if cur_inst_offset < offset:
+                break
+            prev_offset = offset
+        sect_name = index[prev_offset]
+        sect_offset = prev_offset
+        sect_size = cur_offset - prev_offset
+
+        if not self.callbacks['sect_name_is_used'](self.cur_sct, sect_name, code_only=True):
+            return None
+
+        cur_sct_addr = cur_sct_ptr - 0x80000000
+        sect_bytes = self._cont.read_memory_address(sect_offset + cur_sct_addr, sect_size)
+        decoded_section = SCTDecoder.decode_section_from_bytes(sect_name, sect_bytes, sect_offset,
+                                                               self.callbacks['get_inst_lib']())
+        desired_inst_offset = self.callbacks['find_similar_inst'](self.cur_sct, decoded_section,
+                                                                  cur_inst_offset - sect_offset)
+        return desired_inst_offset
 
     def _get_ptr_value_as_addr(self, ba: BaseAddr):
         if not ba.is_pointer:
