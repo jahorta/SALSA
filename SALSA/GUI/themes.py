@@ -15,6 +15,7 @@ class Colors:
     border: str
     button: str
     error_button: str
+    disabled_button: str
     link: str
     warning_text: str
     disabled_text: str
@@ -78,6 +79,10 @@ def theme_generator(colors: Colors):
             "configure": {
                 "background": colors.button,
                 "foreground": colors.text
+            },
+            "map": {
+                "background": [('disabled', colors.disabled_button)],
+                "foreground": [('disabled', colors.disabled_text)]
             }
         },
         "error.TButton": {
@@ -320,6 +325,7 @@ themes = {
         border='#5d5d5d',
         button="#3c4f4f",
         error_button="#5c2f2f",
+        disabled_button="#3c3c3c",
         link='#5588ff',
         warning_text='#ee4444',
         disabled_text='#777777',
@@ -337,6 +343,7 @@ themes = {
         border='#888888',
         button="#acafd1",
         error_button="#dcafa1",
+        disabled_button="#9c9c9c",
         link='#0055ee',
         warning_text='#dd1122',
         disabled_text='#eeeeee',
