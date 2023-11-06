@@ -62,6 +62,20 @@ addresses = {
 }
 
 
+attach_fail_pid = 'Dolphin is not Running'
+attach_fail_mem_block = 'No game is running in Dolphin'
+attach_fail_game = 'Wrong game is running'
+attach_success = 'Dolphin is attached'
+update_fail_no_sct = 'Current SCT is not in project'
+update_fail_errors = 'Export failed: errors'
+update_fail_index_size = 'Update failed: New index is too large'
+update_fail_sct_size = 'Update failed: New SCT is too large'
+update_success = 'Update succeeded'
+
+fail_style = 'warning.TLabel'
+success_style = 'success.TLabel'
+
+
 class SCTDebugger:
 
     def __init__(self):
