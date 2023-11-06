@@ -52,8 +52,8 @@ class SCTDecoder:
 
     _last_sect_pos: int
     _cur_endian: Literal['big', 'little'] = endian['gc']
-    _strings_only: bool
-    _is_validation: bool
+    _strings_only: bool = False
+    _is_validation: bool = False
 
     _scpt_arithmetic_fxns: Dict[str, Callable] = {
         '*': scpt_arithmetic.mult,
