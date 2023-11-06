@@ -155,7 +155,6 @@ class SCTDecoder:
         self._name = script_name
         self._sct = sct
         self._inst_lib = inst_lib
-        self._p_codes = SCPTParamCodes(is_decoder=True)
 
         if (int.from_bytes(self._sct[8:12], byteorder='big') <=
                 int.from_bytes(self._sct[8:12], byteorder='little')):
