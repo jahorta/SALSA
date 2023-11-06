@@ -132,8 +132,11 @@ class SCTDebugger:
     def update_sct(self):
         if self.gamecode is None:
             return
-        sct = self._get_sct_name()
-        if not self.callbacks['check_for_script'](sct):
+        sct_name = self._get_sct_name()
+        if not self.callbacks['check_for_script'](sct_name):
+            game_code = self._get_gamecode()
+            if game_code not in addresses:
+                return self.attach_to_dolphin()
             return self.view.set_status(stat_type='update', style=fail_style,
                                         status=update_fail_no_sct + f' {sct}')
         self.callbacks['update_sct'](sct)
