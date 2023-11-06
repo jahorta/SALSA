@@ -87,6 +87,46 @@ class SCTDecoder:
         self._section_groups = {}
         self._section_group_keys = {}
         self._links_to_sections = {}
+        self._p_codes = SCPTParamCodes(is_decoder=True)
+        self._name = ''
+        self._cursor = 0
+
+    @staticmethod
+    def generate_index(index_bytearray: bytearray) -> Dict[int, str]:
+        i = 0
+        first = True
+        index = {}
+        while i + 0x14 < len(index_bytearray):
+            cur_offset = int.from_bytes(index_bytearray[i:i+4], byteorder='big')
+            if cur_offset == 0:
+                if not first:
+                    break
+                else:
+                    first = False
+            first_zero_ind = index_bytearray.index(b'\x00', i+4)
+            sect_name_bytes = index_bytearray[i+4:first_zero_ind]
+            if len(sect_name_bytes) > 0x10:
+                sect_name_bytes = sect_name_bytes[:0x10]
+            sect_name = sect_name_bytes.decode(encoding='shiftjis', errors='ignore')
+            index[cur_offset] = sect_name
+            i += 0x14
+        return index
+
+    @classmethod
+    def decode_section_from_bytes(cls, name, sect_bytes: bytearray, sect_offset: int, inst_lib: BaseInstLibFacade):
+        decoder = cls()
+        decoder._init()
+        decoder._sct = sect_bytes
+        decoder._sctLength = len(sect_bytes)
+        decoder._last_sect_pos = len(sect_bytes)
+        decoder._base_endian = 'big'
+        decoder._other_endian = 'little'
+        decoder._cur_endian = decoder._base_endian
+        decoder._inst_lib = inst_lib
+        section = decoder._decode_sct_section(name, bounds=(0, len(sect_bytes)))
+        # May want to generate links to make sure all potential instructions are decoded
+        decoder._setup_scpt_links(sect_info={'section': section, 'offset': sect_offset, 'bounds': (0, len(sect_bytes))})
+        return section
 
     @classmethod
     def decode_sct_from_file(cls, name, sct, inst_lib: BaseInstLibFacade, status: queue.SimpleQueue = None,
