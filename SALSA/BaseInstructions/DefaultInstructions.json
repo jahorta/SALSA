@@ -211,7 +211,7 @@
   },
   "23": {
     "Name": "Load *.mld file",
-    "Description": "Loads file from disk:\n*lnk[Offset,<Offset>]*",
+    "Description": "Loads file from disk:\n*str[Offset]*\n",
     "Notes": "Dependancy on param1\nif param1 & 1 == 1:\n\tLoads the model file from the footer\n\nNot sure what it does yet or when it is called.\n\nWas called just before a cutscene on 103b",
     "Parameters": {
       "0": {
@@ -221,7 +221,7 @@
   },
   "24": {
     "Name": "??Print",
-    "Description": "\n*str[Offset]*\n\n",
+    "Description": "Displays a string from the footer:\n*str[Offset]*\n\n\n",
     "Notes": "Dependency on param1:\n\nHas Debug Messages:\n\"scptPRINT: malloc failed 1\"\n\"scptPRINT: message post timed out\"",
     "Parameters": {
       "0": {
@@ -615,7 +615,7 @@
   },
   "43": {
     "Name": "Load Script",
-    "Description": "Switches the main active script file\n*lnk[Offset,<Offset>]*",
+    "Description": "Switches the main active script file:\n*str[Offset]*\n",
     "Notes": "Seems to pass a pointer to some sort of string, maybe links to the footer?\n\nPoints to script names, and is used at the end of a win/loss condition in ship battles. Probably points to the next script to load",
     "Parameters": {
       "0": {
@@ -829,7 +829,7 @@
   },
   "54": {
     "Name": "??Load Music",
-    "Description": "Uses string: \n*lnk[unknown1,<unknown1>]*",
+    "Description": "Uses string: \n*str[Offset]*\n",
     "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: int\n\nGets an Offset to a string\n\n(1) might be for duration of the music\n\nLooks like if it were to use 80218d84 instead of 80218d80, it would load some music.",
     "Parameters": {
       "0": {
@@ -986,7 +986,7 @@
   },
   "69": {
     "Name": "??Load Sound",
-    "Description": "Load from file:\n/sound/\n*lnk[Offset,<Offset>]*",
+    "Description": "Load from file:\n/sound/\n*str[Offset]*\n",
     "Notes": "",
     "Parameters": {
       "0": {
@@ -1824,7 +1824,7 @@
   },
   "110": {
     "Name": "?? no name",
-    "Description": "Offset to a string/filename\n*lnk[Offset,<Offset>]*",
+    "Description": "Offset to a string/filename\n*str[Offset]*\n",
     "Notes": "",
     "Parameters": {
       "0": {
@@ -1866,7 +1866,7 @@
   },
   "113": {
     "Name": "?? No Name",
-    "Description": "Refers to:\n*lnk[Offset,<Offset>]*",
+    "Description": "Refers to:\n*str[Offset]*\n",
     "Notes": "If param1 & 1 == 1:\n\n1: int\n\nstores pointer: SCPTpointer + 4 + Offset*4\n\nIf param1 & 2 == 1:\n\nruns 8010038c(pointer, (1)",
     "Parameters": {
       "0": {
@@ -3334,7 +3334,7 @@
   },
   "210": {
     "Name": "Load script w/ GS=12",
-    "Description": "Loads new script with gamestate change to gamestate 12\n\n*lnk[Offset,<Offset>]*",
+    "Description": "Loads new script with gamestate change to gamestate 12\n\n*str[Offset]*\n",
     "Notes": "",
     "Parameters": {
       "0": {
@@ -3429,7 +3429,7 @@
   },
   "214": {
     "Name": "??Warp areas?",
-    "Description": "Appears to warp to another area while setting some things up.\n\n*lnk*[Offset,<Offset>]",
+    "Description": "Appears to warp to another area while setting some things up.\n\n*str[Offset]*\n",
     "Notes": "iVar1 = *(int *)(param_2 + 0x1c);\nFUN_801002d0(iVar1 + 4 + *(int *)(iVar1 + 4));\n*(int *)(param_2 + 0x1c) = iVar1 + 8;\nFUN_801f7b04(40000);\nDAT_80347474 = 1;\n\nparam_2 is the current worksheet (with param_2 + 0x1c being the current scpt pointer\n\nThat means that the current script pointer (SP) + 4 + \nthe value at SP + 4 (Offset) is the target warp point.\n\nAfter the setup, the warp occurs? \n - 8030e420 is set to 40000",
     "Parameters": {
       "0": {
@@ -3439,7 +3439,7 @@
   },
   "215": {
     "Name": "??Load Sound",
-    "Description": "Load from disc:\n*lnk[Offset,<Offset>]*\nwith parameter1 <SCPT>",
+    "Description": "Load from disc:\n*str[Offset]*\n\nwith parameter0 <SCPT>\n",
     "Notes": "Seems to activate a read from disc after loading a filename from the footer.\n\nThe one from the end of the battle with baltor appeared to load a sound file.\nSomething to do with strings",
     "Parameters": {
       "0": {
@@ -4066,7 +4066,7 @@
   },
   "248": {
     "Name": "??Sound ?",
-    "Description": "Loads something for sound with this path: \"/sound/\"\n\n*lnk[Offset,<Offset>]*\n\nUses param1&1 only",
+    "Description": "Loads something for sound with this path: \"/sound/\"\n\n*str[Offset]*\n\nUses param1&1 only\n",
     "Notes": "",
     "Parameters": {
       "0": {
@@ -4089,7 +4089,7 @@
   },
   "250": {
     "Name": "?? Sound ?",
-    "Description": "Loads something for sound with this path: \"/sound/\"\n\n*lnk[Offset,<Offset>]*\n\nUses param1&1 to get location of sound name\nThen uses param2&1 to load sound",
+    "Description": "Loads something for sound with this path: \"/sound/\"\n\n*str[Offset]*\n\nUses param1&1 to get location of sound name\nThen uses param2&1 to load sound\n",
     "Notes": "Has",
     "Parameters": {
       "0": {
@@ -4158,7 +4158,7 @@
   },
   "257": {
     "Name": "Load Script w/ GS=7",
-    "Description": "goes to: *lnk[Offset,<Offset>]*",
+    "Description": "goes to: *str[Offset]*\n",
     "Notes": "",
     "Parameters": {
       "0": {
@@ -4261,7 +4261,7 @@
   },
   "265": {
     "Name": "Valuan Piracy List Dialog",
-    "Description": "Gets current reputation, puts it on and sorts a list of reputations to display on a custom \nAfter displaying the reputation list, displays the following message:\n*lnk[Offset,<Offset>]*",
+    "Description": "Gets current reputation, puts it on and sorts a list of reputations to display on a custom \nAfter displaying the reputation list, displays the following message:\n*str[Offset]*\n",
     "Notes": "",
     "Parameters": {
       "0": {
