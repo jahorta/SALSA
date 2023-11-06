@@ -534,6 +534,13 @@ class SCTProjectFacade:
                 return f'No footer strings in _Footer_ group. Cannot select a string'
         return None
 
+    # ----------------------- #
+    # Script analysis methods #
+    # ----------------------- #
+
+    def check_script_is_in_project(self, name):
+        return name.lower() in [_.lower() for _ in self.project.scts.keys()]
+
     # ------------------------ #
     # Section analysis methods #
     # ------------------------ #
