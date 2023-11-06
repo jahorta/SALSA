@@ -259,6 +259,11 @@ class SCTDebugger:
             addr = self._get_ptr_value_as_addr(ba)
         return self._cont.write_to_memory(addr, value)
 
+    def test_SOAL(self):
+        print(f'Current SCT: {self._get_sct_name()}')
+        print(f'Index size: {self._get_index_buf_size()}')
+        print(f'SCT size: {self._get_sct_buf_size()}')
+
 
 if __name__ == '__main__':
     dbg = SCTDebugger()
@@ -266,6 +271,4 @@ if __name__ == '__main__':
     if attached != 1:
         print('Dolphin was not attached')
         exit()
-    print(f'Current SCT: {dbg._get_sct_name()}')
-    print(f'Index size: {dbg._get_index_buf_size()}')
-    print(f'SCT size: {dbg._get_sct_buf_size()}')
+    dbg.test_SOAL()
