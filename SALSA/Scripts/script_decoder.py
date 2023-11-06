@@ -71,7 +71,7 @@ class SCTDecoder:
     _debug_log: List[str] = []
     _EU_encoding = False
 
-    def _init(self, strings_only=False, is_validation=False):
+    def _init(self):
         self._str_sect_links = []
         self._str_foot_links = []
         self._scpt_links = []
