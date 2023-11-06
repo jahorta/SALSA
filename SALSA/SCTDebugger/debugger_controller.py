@@ -112,6 +112,9 @@ class SCTDebugger:
     def attach_view(self, view: Union[None, SCTDebuggerPopup]):
         self.view = view
 
+    def release_handle(self):
+        self._cont.shutdown()
+
     # Dolphin update methods
 
     def update_sct(self):
