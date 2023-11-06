@@ -92,11 +92,11 @@ class SCTDebugger:
 
     def attach_to_dolphin(self):
         result = self._cont.attach_to_dolphin()
-        if result == 0:
+        if result == 1:
             self.view.set_status(stat_type='dolphin', style=fail_style, status=attach_fail_pid)
         elif result == 2:
             self.view.set_status(stat_type='dolphin', style=fail_style, status=attach_fail_mem_block)
-        elif result == 1:
+        elif result == 0:
             gamecode_bytes = self._cont.read_memory_address(0, 6)
             game_code = gamecode_bytes.decode()
             if game_code not in addresses.keys():
@@ -106,7 +106,8 @@ class SCTDebugger:
             self.addrs = SOALAddrs(**addresses[self.gamecode])
             self.view.set_status(stat_type='dolphin', style=success_style,
                                  status=attach_success + f': {game_titles[game_code]}')
-
+        else:
+            raise ValueError(f'Unknown result from attempting to attach to Dolphin {result}')
 
     def attach_view(self, view: Union[None, SCTDebuggerPopup]):
         self.view = view
