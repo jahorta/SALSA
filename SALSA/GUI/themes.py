@@ -329,7 +329,7 @@ themes = {
         link='#5588ff',
         warning_text='#ee4444',
         disabled_text='#777777',
-        success_text='#44ee44'
+        success_text='#44cc44'
     )),
     'light': theme_generator(Colors(
         bg='#eeeeee',
