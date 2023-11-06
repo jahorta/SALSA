@@ -104,8 +104,7 @@ class SCTDebugger:
                 self.view.set_status(stat_type='dolphin', style=fail_style, status=attach_fail_mem_block)
                 self.view.set_active_button('attach')
         elif result == 0:
-            gamecode_bytes = self._cont.read_memory_address(0, 6)
-            game_code = gamecode_bytes.decode()
+            game_code = self._get_gamecode()
             if game_code not in addresses.keys():
                 if self.view is not None:
                     self.view.set_status(stat_type='dolphin', style=fail_style,
@@ -166,6 +165,10 @@ class SCTDebugger:
 
     def start_cur_sct_updater(self):
         pass
+
+    def _get_gamecode(self):
+        gamecode = self._cont.read_memory_address(0, 6)
+        return gamecode.decode(errors='ignore')
 
     def get_cur_index(self):
         return self._read_addr(self.addrs.pSCTIndex)
