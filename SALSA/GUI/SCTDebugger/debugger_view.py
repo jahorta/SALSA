@@ -58,6 +58,11 @@ class SCTDebuggerPopup(tk.Toplevel):
         self.buttons['update'].grid(row=row, column=0, sticky=tk.W)
         self.buttons['update'].state(['disabled'])
 
+        self.buttons['select'] = ttk.Button(self, text='Set Selected Instruction as Current in Dolphin',
+                                            command=self.callbacks['set_cur_inst'])
+        self.buttons['select'].grid(row=row+1, column=0, sticky=tk.W)
+        self.buttons['select'].state(['disabled'])
+
         self.callbacks['attach_controller'](self)
 
     def set_status(self, stat_type: Literal['dolphin', 'update', 'cur_sct'], status, style=None):
