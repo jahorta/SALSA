@@ -5,15 +5,6 @@ from typing import List, Union
 from SALSA.GUI.SCTDebugger.debugger_view import SCTDebuggerPopup
 from SALSA.SCTDebugger.dolphin_memory_controller import DolphinMemoryController, ptr2addr
 
-gamecodes = {
-    'GEAE8P': 'Skies of Arcadia Legends (US)',
-    'GEAP8P': 'Skies of Arcadia Legends (EU)',
-    'GEAJ8P': 'Skies of Arcadia Legends (JP)'
-}
-
-
-sct_buf_size_offset = -0x1c
-
 
 @dataclasses.dataclass
 class BaseAddr:
@@ -33,6 +24,12 @@ class SOALAddrs:
         self.curSCTNum = BaseAddr(curSCTNum)
         self.curSCTLet = BaseAddr(curSCTLet, size=1)
 
+
+game_titles = {
+    'GEAE8P': 'SOAL (US)',
+    'GEAP8P': 'SOAL (EU)',
+    'GEAJ8P': 'SOAL (JP)'
+}
 
 addresses = {
     # US version
