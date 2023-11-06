@@ -128,6 +128,7 @@ class Application(tk.Tk):
             'prj->repair->textbox': self.textbox_fadeout_repair,
             # 'analysis->export': self.gui.show_analysis_view,
             'view->inst': self.gui.show_instruction_view,
+            'view->debug': lambda: self.gui.show_sct_debugger_popup(callbacks=self.dolphin_debugger.view_callbacks),
             'view->theme': self.change_theme,
             'help->help': self.gui.show_help,
             'help->about': self.gui.show_about,
