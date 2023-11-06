@@ -981,20 +981,29 @@ class SCTDecoder:
 
         return decoded_sct
 
-    def _setup_scpt_links(self, decoded_sct):
+    def _setup_scpt_links(self, decoded_sct=None, sect_info=None):
+        if decoded_sct is None and sect_info is None:
+            raise ValueError(f'{self.log_key}: setup scpt links requires either a decoded sct or sect info')
         blank_section = SCTSection()
         self.successful_scpt_links = []
         for link in self._scpt_links:
-            target_sect = blank_section
-            for sect_name, bounds in self._index.items():
-                if bounds[0] <= link.target < bounds[1]:
-                    target_sect = decoded_sct.sects[sect_name]
-                    break
+            target_sect = blank_section if decoded_sct is not None else sect_info['section']
+            target_pos = link.target
+            if sect_info is None:
+                for sect_name, bounds in self._index.items():
+                    if bounds[0] <= link.target < bounds[1]:
+                        target_sect = decoded_sct.sects[sect_name]
+                        break
+            elif (target_pos - sect_info['offset']) < sect_info['bounds'][0] \
+                    or (target_pos - sect_info['offset']) >= sect_info['bounds'][1]:
+                continue
+            else:
+                target_pos -= sect_info['offset']
             target_inst_ind = 0
             inst = None
             while target_inst_ind < len(target_sect.insts):
                 inst = target_sect.get_inst_by_index(target_inst_ind)
-                if inst.absolute_offset == link.target:
+                if inst.absolute_offset == target_pos:
                     break
 
                 if target_inst_ind == len(target_sect.insts) - 1:
@@ -1002,7 +1011,7 @@ class SCTDecoder:
                 else:
                     inst_end = target_sect.get_inst_by_index(target_inst_ind + 1).absolute_offset
 
-                if inst.absolute_offset < link.target < inst_end:
+                if inst.absolute_offset < target_pos < inst_end:
                     internal = True
                     new_error = None
                     for i, e in enumerate(inst.errors):
@@ -1010,10 +1019,10 @@ class SCTDecoder:
                             continue
                         internal = False
                         first_start = inst_end - len(e[1])
-                        if link.target < first_start:
+                        if target_pos < first_start:
                             internal = True
                             break
-                        new_error = e[1][:link.target - first_start]
+                        new_error = e[1][:target_pos - first_start]
                         break
 
                     if internal:
@@ -1024,7 +1033,7 @@ class SCTDecoder:
                         break
 
                     inst_num_before = len(target_sect.inst_list)
-                    self._decode_garbage(sect=target_sect, inst=inst, start=link.target, end=inst_end,
+                    self._decode_garbage(sect=target_sect, inst=inst, start=target_pos, end=inst_end,
                                          delete_if_insts_created=True)
 
                     if new_error is not None and inst_num_before < len(target_sect.inst_list):
