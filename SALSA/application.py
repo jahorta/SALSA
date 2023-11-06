@@ -401,6 +401,32 @@ class Application(tk.Tk):
         self.project_edit_controller.check_encoding_errors()
         self.project_edit_controller.refresh_all_trees()
 
+    # --------------------- #
+    # Update SCT in Dolphin #
+    # --------------------- #
+
+    def update_script(self, sct_name):
+        done_queue = queue.SimpleQueue()
+        self.gui.show_status_popup(f'Update SCT: {sct_name}', 'Refreshing positions:')
+        thread = threading.Thread(target=self._threaded_update_script, args=(sct_name, self.gui.status_queue, done_queue))
+        thread.start()
+        self.after(20, self._update_script_listener, done_queue)
+
+    def _threaded_update_script(self, script, message_queue, done_queue):
+        result = self.project.get_script(script, message_queue)
+        if isinstance(result, str):
+            self.project_edit_controller.encoding_errors = [result]
+        done_queue.put(result)
+
+    def _update_script_listener(self, dq: queue.SimpleQueue):
+        if dq.empty():
+            return self.after(20, self._update_script_listener, dq)
+        result = dq.get()
+        self.gui.stop_status_popup()
+        self.project_edit_controller.check_encoding_errors()
+        self.project_edit_controller.refresh_all_trees()
+        self.dolphin_debugger.write_sct_to_dolphin(result)
+
     # ------------- #
     # Other methods #
     # ------------- #
