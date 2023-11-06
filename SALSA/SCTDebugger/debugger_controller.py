@@ -267,7 +267,7 @@ class SCTDebugger:
 
 
 if __name__ == '__main__':
-    dbg = SCTDebugger()
+    dbg = SCTDebugger(None)
     attached = dbg.attach_to_dolphin()
     if attached != 1:
         print('Dolphin was not attached')
