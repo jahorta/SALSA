@@ -11,18 +11,8 @@ cur_script_text = 'Current Script: '
 class SCTDebuggerPopup(tk.Toplevel):
     t = 'Debug SCTs in Dolphin'
     log_key = 'SCTDebugger'
-    w = 250
-    h = 400
-
-    option_settings_check = {
-        'use_garbage': {'text': 'Add garbage from original files', 'default': 'True'},
-        'combine_footer': {'text': 'Combine footer entries', 'default': 'False'},
-        'all_refresh': {'text': 'Add unnecessary refresh skips', 'default': 'True'},
-        'compress_aklz': {'text': 'Compress file using AKLZ compression', 'default': 'False'}
-    }
-    option_settings_radio = {
-        'system': {'label': 'Select target system:', 'entries': ['Dreamcast', 'GameCube'], 'default': 'GameCube'}
-    }
+    w = 400
+    h = 600
 
     def __init__(self, parent, callbacks, name, theme, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
