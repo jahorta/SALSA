@@ -43,19 +43,19 @@ addresses = {
     },
     # EU version
     'GEAP8P': {
-        'pSCTStart': -1,
-        'pSCTIndex': -1,
-        'pSCTPos': -1,
-        'curSCTNum': -1,
-        'curSCTLet': -1
+        'pSCTStart': 0x00310520,
+        'pSCTIndex': 0x00310d40,
+        'pSCTPos': 0x00310524,
+        'curSCTNum': 0x00315154,
+        'curSCTLet': 0x00315158
     },
     # JP version
     'GEAJ8P': {
-        'pSCTStart': -1,
-        'pSCTIndex': -1,
-        'pSCTPos': -1,
-        'curSCTNum': -1,
-        'curSCTLet': -1
+        'pSCTStart': 0x0030c920,
+        'pSCTIndex': 0x0030d140,
+        'pSCTPos': 0x0030c924,
+        'curSCTNum': 0x00311544,
+        'curSCTLet': 0x00311548
     }
 }
 
