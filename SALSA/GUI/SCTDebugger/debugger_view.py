@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import Literal
+from typing import Literal, List, Dict
 
 from SALSA.Common.setting_class import settings
 
@@ -42,27 +42,41 @@ class SCTDebuggerPopup(tk.Toplevel):
         if self.log_key not in settings:
             settings[self.log_key] = {}
 
+        self.buttons: Dict[str, ttk.Button] = {
+            'attach': ttk.Button(self, text='Attach Dolphin', command=self.callbacks['attach_dolphin'])
+        }
+        self.buttons['attach'].grid(row=0, column=0)
+
         status_label = ttk.Label(self, text='Debugger Status:')
-        status_label.grid(row=0, column=0)
+        status_label.grid(row=1, column=0)
 
         self.status_widgets = {
-            'dolphin': ttk.Label(self, text=''),
-            'export': ttk.Label(self, text=''),
-            'cur_sct': ttk.Label(self, text='')
+            'dolphin': ttk.Label(self, text='', style='warning.TLabel'),
+            'cur_sct': ttk.Label(self, text=''),
+            'update': ttk.Label(self, text='', style='warning.TLabel')
         }
 
-        row = 1
+        row = 2
         for w in self.status_widgets.values():
             w.grid(row=row, column=0, sticky=tk.E+tk.W)
             row += 1
 
-        self.load_sct = ttk.Button(self, text='Update Current SCT in Dolphin', command=self.callbacks['update_sct'])
-        self.load_sct.grid(row=row, column=0, sticky=tk.E)
+        self.buttons['update'] = ttk.Button(self, text='Update Current SCT in Dolphin',
+                                            command=self.callbacks['update_sct'])
+        self.buttons['update'].grid(row=row, column=0, sticky=tk.E)
+        self.buttons['update'].state(['disabled'])
 
-    def set_status(self, stat_type: Literal['dolphin', 'export', 'cur_sct'], status):
-        self.status_widgets[stat_type].configure(text=status)
+        self.callbacks['attach_controller'](self)
+
+    def set_status(self, stat_type: Literal['dolphin', 'update', 'cur_sct'], status, style=None):
+        self.status_widgets[stat_type].configure(style=style, text=status)
+
+    def update_button_state(self, button: Literal['attach', 'update'],
+                            state: List[Literal['disabled', '!disabled']]):
+        self.buttons[button].state(state)
 
     def close(self):
+        self.callbacks['attach_controller'](None)
         self.callbacks['close'](self.name, self)
 
     def change_theme(self, theme):
