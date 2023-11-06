@@ -62,7 +62,7 @@ addresses = {
 attach_fail_pid = 'Dolphin is not Running'
 attach_fail_mem_block = 'No game is running in Dolphin'
 attach_fail_game = 'Wrong game is running'
-attach_success = 'Dolphin is attached'
+attach_success = 'Dolphin is running'
 update_fail_no_sct = 'Current SCT is not in project'
 update_fail_errors = 'Export failed: errors'
 update_fail_index_size = 'Update failed: New index is too large'
@@ -104,7 +104,9 @@ class SCTDebugger:
                                             status=attach_fail_game + f': {game_code}')
             self.gamecode = game_code
             self.addrs = SOALAddrs(**addresses[self.gamecode])
-            self.view.set_status(stat_type='dolphin', style=success_style, status=attach_success)
+            self.view.set_status(stat_type='dolphin', style=success_style,
+                                 status=attach_success + f': {game_titles[game_code]}')
+
 
     def attach_view(self, view: Union[None, SCTDebuggerPopup]):
         self.view = view
