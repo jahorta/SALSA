@@ -120,7 +120,7 @@ class DolphinMemoryController:
             self._last_access = dt.datetime.now()
             # print(hex(address), "Success:", buffer)
         else:
-            print(hex(address), "Read Failed.", result, error)
+            print(f'Read Failed: {hex(address)} Result: {result}, Error: {error}')
 
         return bytearray.fromhex(buffer.raw.hex())
 
@@ -140,7 +140,7 @@ class DolphinMemoryController:
             self._last_access = dt.datetime.now()
             # print(hex(address), "Success:", buffer)
         else:
-            print(hex(address), "Write Failed.", result, error)
+            print(f'Write Failed: {hex(address)} Result: {result}, Error: {error}')
 
         return bytearray.fromhex(buffer.raw.hex())
 
