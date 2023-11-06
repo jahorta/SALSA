@@ -190,13 +190,11 @@ class GUIController:
         self.popups['export'] = SCTExportPopup(self.parent, callbacks=callbacks, name='export', selected=selected,
                                                theme=self.theme)
 
-    def show_sct_debugger_popup(self):
+    def show_sct_debugger_popup(self, callbacks):
         if self.popups['debug'] is not None:
             self.popups['debug'].tkraise()
             return
-        callbacks = {
-            'update_sct': self.callbacks['export_sct'], 'close': self.close_popup,
-        }
+        callbacks |= {'close': self.close_popup}
         self.popups['debug'] = SCTDebuggerPopup(self.parent, callbacks=callbacks, name='debug', theme=self.theme)
 
     # ----------------------- #
