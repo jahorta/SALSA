@@ -1,5 +1,7 @@
 import ctypes.wintypes as win
 import ctypes as ct
+from typing import Union
+
 import psutil
 import threading
 from dataclasses import dataclass
