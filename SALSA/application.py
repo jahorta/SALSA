@@ -17,7 +17,7 @@ from SALSA.GUI.gui_controller import GUIController
 from SALSA.GUI import menus
 from SALSA.GUI.themes import themes, theme_non_color_maps
 from SALSA.Project.project_facade import SCTProjectFacade
-from SCTDebugger.debugger_controller import SCTDebugger
+from SALSA.SCTDebugger.debugger_controller import SCTDebugger
 
 default_style = 'clam'
 
