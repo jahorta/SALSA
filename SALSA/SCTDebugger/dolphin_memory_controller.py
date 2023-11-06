@@ -80,11 +80,11 @@ class DolphinMemoryController:
     def attach_to_dolphin(self):
         if self._pid is None:
             if self.get_process_info() == 0:
-                return 0
+                return 1
 
         if self._handle is None:
             if self._get_handle() != 1:
-                return 0
+                return 1
 
         self._get_dolphin_mems()
         if self._mem1_addr == 0:
@@ -93,7 +93,7 @@ class DolphinMemoryController:
 
         self.connected = True
 
-        return 1
+        return 0
 
     def _get_handle(self):
         PROCESS_ALL_ACCESS = 0x1F0FFF
