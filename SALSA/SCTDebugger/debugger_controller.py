@@ -269,7 +269,7 @@ class SCTDebugger:
 if __name__ == '__main__':
     dbg = SCTDebugger(None)
     attached = dbg.attach_to_dolphin()
-    if attached != 1:
+    if attached != 0:
         print('Dolphin was not attached')
         exit()
     dbg.test_SOAL()
