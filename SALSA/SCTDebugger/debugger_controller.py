@@ -76,6 +76,7 @@ success_style = 'success.TLabel'
 
 
 class SCTDebugger:
+    log_name = 'SCTDebugController'
 
     def __init__(self, callbacks):
         self.callbacks = callbacks
