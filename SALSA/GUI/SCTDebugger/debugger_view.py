@@ -11,8 +11,8 @@ cur_script_text = 'Current Script: '
 class SCTDebuggerPopup(tk.Toplevel):
     t = 'Debug SCTs in Dolphin'
     log_key = 'SCTDebugger'
-    w = 400
-    h = 600
+    w = 200
+    h = 300
 
     def __init__(self, parent, callbacks, name, theme, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
@@ -32,13 +32,15 @@ class SCTDebuggerPopup(tk.Toplevel):
         pos = f'{self.w}x{self.h}+{posX}+{posY}'
         self.geometry(pos)
 
+        self.columnconfigure(0, weight=1)
+
         self.buttons: Dict[str, ttk.Button] = {
             'attach': ttk.Button(self, text='Attach Dolphin', command=self.callbacks['attach_dolphin'])
         }
-        self.buttons['attach'].grid(row=0, column=0)
+        self.buttons['attach'].grid(row=0, column=0, sticky=tk.W)
 
         status_label = ttk.Label(self, text='Debugger Status:')
-        status_label.grid(row=1, column=0)
+        status_label.grid(row=1, column=0, sticky=tk.W)
 
         self.status_widgets = {
             'dolphin': ttk.Label(self, text='', style='warning.TLabel'),
@@ -53,7 +55,7 @@ class SCTDebuggerPopup(tk.Toplevel):
 
         self.buttons['update'] = ttk.Button(self, text='Update Current SCT in Dolphin',
                                             command=self.callbacks['update_sct'])
-        self.buttons['update'].grid(row=row, column=0, sticky=tk.E)
+        self.buttons['update'].grid(row=row, column=0, sticky=tk.W)
         self.buttons['update'].state(['disabled'])
 
         self.callbacks['attach_controller'](self)
