@@ -17,6 +17,7 @@ from SALSA.GUI.gui_controller import GUIController
 from SALSA.GUI import menus
 from SALSA.GUI.themes import themes, theme_non_color_maps
 from SALSA.Project.project_facade import SCTProjectFacade
+from SCTDebugger.debugger_controller import SCTDebugger
 
 default_style = 'clam'
 
@@ -103,6 +104,14 @@ class Application(tk.Tk):
         self.sct_model = SCTModel()
         recent_files = self.proj_model.get_recent_filenames()
 
+        # Create Debugger
+        debug_callbacks = {
+            'update_sct': self.update_script,
+            'check_for_script': self.project.check_script_is_in_project
+        }
+        self.dolphin_debugger = SCTDebugger(callbacks=debug_callbacks)
+
+        # Implement Menu
         self.menu_callbacks = {
             'file->new_prj': self.on_new_project,
             'file->save_prj': self.on_save_project,
