@@ -149,13 +149,13 @@ class SCTDebugger:
     def get_cur_sct(self):
         return self._read_addr(self.addrs.pSCTStart)
 
-    def get_index_buf_size(self):
+    def _get_index_buf_size(self):
         return self._get_addr_size(self.addrs.pSCTIndex, cur_ptr=self._get_ptr_value_as_addr(self.addrs.pSCTIndex))
 
-    def get_sct_buf_size(self):
+    def _get_sct_buf_size(self):
         return self._get_addr_size(self.addrs.pSCTStart, cur_ptr=self._get_ptr_value_as_addr(self.addrs.pSCTStart))
 
-    def get_sct_name(self):
+    def _get_sct_name(self):
         sct_num = int.from_bytes(self._read_addr(self.addrs.curSCTNum), byteorder='big')
         sct_let = self._read_addr(self.addrs.curSCTLet).decode()
         return f'me{sct_num:03d}{sct_let}'
@@ -191,6 +191,6 @@ if __name__ == '__main__':
     if attached != 1:
         print('Dolphin was not attached')
         exit()
-    print(f'Current SCT: {dbg.get_sct_name()}')
-    print(f'Index size: {dbg.get_index_buf_size()}')
-    print(f'SCT size: {dbg.get_sct_buf_size()}')
+    print(f'Current SCT: {dbg._get_sct_name()}')
+    print(f'Index size: {dbg._get_index_buf_size()}')
+    print(f'SCT size: {dbg._get_sct_buf_size()}')
