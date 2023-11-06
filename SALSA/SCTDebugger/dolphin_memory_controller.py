@@ -60,8 +60,8 @@ class DolphinMemoryController:
         self.WriteProcessMemory.restype = win.BOOL
 
         self.CloseHandle = ct.windll.kernel32.CloseHandle
-        self.CloseHandle.argtypes = [HANDLE]
-        self.CloseHandle.restype = BOOL
+        self.CloseHandle.argtypes = [win.HANDLE]
+        self.CloseHandle.restype = win.BOOL
 
     def get_process_info(self):
         procs = []
