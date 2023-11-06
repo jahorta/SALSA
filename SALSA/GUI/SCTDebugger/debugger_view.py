@@ -63,9 +63,10 @@ class SCTDebuggerPopup(tk.Toplevel):
     def set_status(self, stat_type: Literal['dolphin', 'update', 'cur_sct'], status, style=None):
         self.status_widgets[stat_type].configure(style=style, text=status)
 
-    def update_button_state(self, button: Literal['attach', 'update'],
-                            state: List[Literal['disabled', '!disabled']]):
-        self.buttons[button].state(state)
+    def set_active_button(self, button: Literal['attach', 'update', 'select']):
+        for b_name, b in self.buttons.items():
+            state_spec = ['!disabled'] if b_name == button else ['disabled']
+            self.buttons[b_name].state(state_spec)
 
     def close(self):
         self.callbacks['attach_controller'](None)
