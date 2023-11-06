@@ -168,6 +168,9 @@ class SCTDebugger:
         self._write_to_addr(value=new_inst_offset, ba=self.addrs.pSCTPos, ptr_only=True)
         self.view.set_status(stat_type='update', status=update_success, style=success_style)
 
+    def set_selected_inst_as_current(self):
+        pass
+
     def start_cur_sct_updater(self):
         pass
 
