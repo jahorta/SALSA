@@ -78,7 +78,8 @@ success_style = 'success.TLabel'
 
 class SCTDebugger:
 
-    def __init__(self):
+    def __init__(self, callbacks):
+        self.callbacks = callbacks
         self.gamecode = None
         self.addrs: Union[None, SOALAddrs] = None
         self._cont = DolphinMemoryController()
@@ -94,9 +95,17 @@ class SCTDebugger:
 
     def attach_to_dolphin(self):
         result = self._cont.attach_to_dolphin()
-        if result == 1:
+        if result == 0:
+            self.view.set_status(stat_type='dolphin', style=fail_style, status=attach_fail_pid)
+        elif result == 2:
+            self.view.set_status(stat_type='dolphin', style=fail_style, status=attach_fail_mem_block)
+        elif result == 1:
             gamecode_bytes = self._cont.read_memory_address(0, 6)
-            self.gamecode = gamecode_bytes.decode()
+            game_code = gamecode_bytes.decode()
+            if game_code not in addresses.keys():
+                return self.view.set_status(stat_type='dolphin', style=fail_style,
+                                            status=attach_fail_game + f': {game_code}')
+            self.gamecode = game_code
             self.addrs = SOALAddrs(**addresses[self.gamecode])
             self.view.set_status(stat_type='dolphin', style=success_style, status=attach_success)
 
