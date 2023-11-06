@@ -32,9 +32,6 @@ class SCTDebuggerPopup(tk.Toplevel):
         pos = f'{self.w}x{self.h}+{posX}+{posY}'
         self.geometry(pos)
 
-        if self.log_key not in settings:
-            settings[self.log_key] = {}
-
         self.buttons: Dict[str, ttk.Button] = {
             'attach': ttk.Button(self, text='Attach Dolphin', command=self.callbacks['attach_dolphin'])
         }
