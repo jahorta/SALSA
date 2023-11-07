@@ -85,7 +85,7 @@ class MainMenu(tk.Menu):
         self.file_menu.entryconfig('Save Project', state='disabled')
         self.file_menu.entryconfig('Save Project as', state='disabled')
         if self.has_debug:
-            self.view_menu.entryconfig('SCT Debugger (Dolphin)', state='disabled')
+            self.view_menu.entryconfig('Dolphin Link', state='disabled')
 
     def enable_script_commands(self):
         self.project_menu.entryconfig('Import SCT file(s)', state='normal')
@@ -97,7 +97,7 @@ class MainMenu(tk.Menu):
         self.file_menu.entryconfig('Save Project', state='normal')
         self.file_menu.entryconfig('Save Project as', state='normal')
         if self.has_debug and self.can_debug:
-            self.view_menu.entryconfig('SCT Debugger (Dolphin)', state='normal')
+            self.view_menu.entryconfig('Dolphin Link', state='normal')
 
     def update_recents(self, recent_files):
         self.no_recents = True if len(self.recent_files) == 0 else False
