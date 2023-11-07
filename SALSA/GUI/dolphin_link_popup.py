@@ -9,10 +9,10 @@ cur_script_text = 'Current Script: '
 
 
 class DolphinLinkPopup(tk.Toplevel):
-    t = 'Send SCTs to Dolphin'
+    t = 'Dolphin Link'
     log_key = 'DolphinLinkPopup'
-    w = 200
-    h = 300
+    w = 250
+    h = 145
 
     def __init__(self, parent, callbacks, name, theme, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
@@ -39,7 +39,7 @@ class DolphinLinkPopup(tk.Toplevel):
         }
         self.buttons['attach'].grid(row=0, column=0, sticky=tk.W)
 
-        status_label = ttk.Label(self, text='Debugger Status:')
+        status_label = ttk.Label(self, text='Dolphin Link Status:')
         status_label.grid(row=1, column=0, sticky=tk.W)
 
         self.status_widgets = {
@@ -53,12 +53,12 @@ class DolphinLinkPopup(tk.Toplevel):
             w.grid(row=row, column=0, sticky=tk.E+tk.W)
             row += 1
 
-        self.buttons['update'] = ttk.Button(self, text='Update Current SCT in Dolphin',
+        self.buttons['update'] = ttk.Button(self, text='Update Current SCT',
                                             command=self.callbacks['update_sct'])
         self.buttons['update'].grid(row=row, column=0, sticky=tk.W)
         self.buttons['update'].state(['disabled'])
 
-        self.buttons['select'] = ttk.Button(self, text='Set Selected Instruction as Current in Dolphin',
+        self.buttons['select'] = ttk.Button(self, text='Set Selected Inst as Current',
                                             command=self.callbacks['set_cur_inst'])
         self.buttons['select'].grid(row=row+1, column=0, sticky=tk.W)
         self.buttons['select'].state(['disabled'])
