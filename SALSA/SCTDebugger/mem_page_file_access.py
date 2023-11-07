@@ -4,7 +4,7 @@
 # https://github.com/nccgroup/memaddressanalysis
 # Released under AGPL. See LICENSE for more information
 #
-# Modified by Kenneth Trimmer
+# Modified by Jahorta
 from ctypes import *
 from ctypes.wintypes import *
 import sys
