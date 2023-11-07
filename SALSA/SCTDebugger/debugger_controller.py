@@ -1,5 +1,5 @@
 import dataclasses
-import queue
+import threading
 from typing import List, Union
 
 from SALSA.GUI.SCTDebugger.debugger_view import SCTDebuggerPopup
@@ -70,6 +70,7 @@ update_fail_index_size = 'Update failed: New index is too large'
 update_fail_sct_size = 'Update failed: New SCT is too large'
 update_fail_no_cur_inst = 'Update failed: Unable to find similar inst'
 update_success = 'Update succeeded'
+cur_sct_success = 'Current SCT is: '
 
 fail_style = 'warning.TLabel'
 success_style = 'success.TLabel'
@@ -78,7 +79,7 @@ success_style = 'success.TLabel'
 class SCTDebugger:
     log_name = 'SCTDebugController'
 
-    def __init__(self, callbacks):
+    def __init__(self, callbacks, tk_parent):
         self.callbacks = callbacks
         self.gamecode = None
         self.addrs: Union[None, SOALAddrs] = None
@@ -89,8 +90,8 @@ class SCTDebugger:
             'update_sct': self.update_sct, 'set_cur_inst': self.set_selected_inst_as_current
         }
 
-        self.update_queue = queue.SimpleQueue()
         self.cur_sct = None
+        self.tk_pt = tk_parent
 
     # Setup methods
 
@@ -118,6 +119,7 @@ class SCTDebugger:
                 self.view.set_status(stat_type='dolphin', style=success_style,
                                      status=attach_success + f': {game_titles[game_code]}')
                 self.view.set_active_button('update')
+            self.start_cur_sct_updater()
         else:
             raise ValueError(f'Unknown result from attempting to attach to Dolphin {result}')
         return result
@@ -173,7 +175,19 @@ class SCTDebugger:
         pass
 
     def start_cur_sct_updater(self):
-        pass
+        sct_updater = threading.Thread(target=self.threaded_cur_sect_updater)
+        sct_updater.start()
+
+    def threaded_cur_sect_updater(self):
+        game_code = self._get_gamecode()
+        if game_code not in addresses:
+            if self.view is not None:
+                self.view.set_status('cur_sct', status='', style=success_style)
+            return self.attach_to_dolphin()
+        cur_sct = self._get_sct_name()
+        if self.view is not None:
+            self.view.set_status('cur_sct', status=cur_sct_success + cur_sct, style=success_style)
+        self.tk_pt.after(1000, self.threaded_cur_sect_updater)
 
     def _get_gamecode(self):
         gamecode = self._cont.read_memory_address(0, 6)
