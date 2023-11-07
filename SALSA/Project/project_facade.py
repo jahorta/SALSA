@@ -765,6 +765,9 @@ class SCTProjectFacade:
     def inst_is_label(self, script, section, instruction):
         return self.project.scts[script].sects[section].insts[instruction].base_id == 9
 
+    def get_inst_offset(self, script, section, instruction, **kwargs):
+        return self.project.scts[script].sects[section].insts[instruction].absolute_offset
+
     # ------------------------ #
     # Group based manipulation #
     # ------------------------ #

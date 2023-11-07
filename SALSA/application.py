@@ -119,7 +119,8 @@ class Application(tk.Tk):
                 'check_for_script': self.project.check_script_is_in_project,
                 'sect_name_is_used': self.project.is_sect_name_used,
                 'find_similar_inst': self.project.find_similar_inst,
-                'get_inst_lib': inst_lib
+                'get_inst_lib': inst_lib,
+                'get_sel_inst_offset': self.get_selected_inst_offset
             }
             self.dolphin_debugger = DolphinLink(callbacks=debug_callbacks, tk_parent=self)
 
@@ -470,3 +471,8 @@ class Application(tk.Tk):
             if 'map' not in arg_dict:
                 continue
             self.style.map(item_key, **arg_dict['map'])
+
+    def get_selected_inst_offset(self):
+        if self.project_edit_controller.current['instruction'] is None:
+            return None
+        return self.project.get_inst_offset(**self.project_edit_controller.current)

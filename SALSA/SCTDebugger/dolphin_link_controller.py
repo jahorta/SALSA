@@ -74,6 +74,7 @@ update_fail_errors = 'Export failed: errors'
 update_fail_index_size = 'Update failed: New index is too large'
 update_fail_sct_size = 'Update failed: New SCT is too large'
 update_fail_no_cur_inst = 'Update failed: Unable to find similar inst'
+update_fail_no_sel_inst = 'Update failed: No instruction is selected'
 update_success = 'Update succeeded'
 cur_sct_success = 'Current SCT'
 
@@ -97,6 +98,7 @@ class DolphinLink:
 
         self.cur_sct = None
         self.tk_pt = tk_parent
+        self.selected_inst_offset = False
 
     # Setup methods
 
@@ -167,10 +169,14 @@ class DolphinLink:
         if sct_size < len(new_sct):
             return self.view.set_status(stat_type='update', style=fail_style,
                                         status=update_fail_sct_size + f'{len(new_sct) - sct_size} bytes over')
-        new_inst_offset = self._get_offset_of_similar_inst()
-        if new_inst_offset is None or not isinstance(new_inst_offset, int):
-            return self.view.set_status(stat_type='update', style=fail_style,
-                                        status=update_fail_no_cur_inst + f'{len(new_sct) - sct_size} bytes over')
+
+        if self.selected_inst_offset is None:
+            new_inst_offset = self._get_offset_of_similar_inst()
+            if new_inst_offset is None or not isinstance(new_inst_offset, int):
+                return self.view.set_status(stat_type='update', style=fail_style,
+                                            status=update_fail_no_cur_inst + f'{len(new_sct) - sct_size} bytes over')
+        else:
+            new_inst_offset = self.selected_inst_offset
 
         new_inst_offset += int.from_bytes(self._read_addr(ba=self.addrs.pSCTStart, ptr_only=True), byteorder='big')
         new_inst_offset = new_inst_offset.to_bytes(length=4, byteorder='big', signed=False)
@@ -181,7 +187,13 @@ class DolphinLink:
         self.view.set_status(stat_type='update', status=update_success, style=success_style)
 
     def set_selected_inst_as_current(self):
-        pass
+        self.selected_inst_offset = None
+        inst_offset = self.callbacks['get_sel_inst_offset']()
+        if inst_offset is None:
+            if self.view is not None:
+                return self.view.set_status(stat_type='update', status=update_fail_no_sel_inst, style=fail_style)
+        self.selected_inst_offset = inst_offset
+        self.update_sct()
 
     def start_cur_sct_updater(self):
         sct_updater = threading.Thread(target=self.threaded_cur_sct_updater)
