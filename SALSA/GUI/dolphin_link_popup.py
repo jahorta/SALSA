@@ -9,8 +9,8 @@ cur_script_text = 'Current Script: '
 
 
 class DolphinLinkPopup(tk.Toplevel):
-    t = 'Debug SCTs in Dolphin'
-    log_key = 'SCTDebugger'
+    t = 'Send SCTs to Dolphin'
+    log_key = 'DolphinLinkPopup'
     w = 200
     h = 300
 

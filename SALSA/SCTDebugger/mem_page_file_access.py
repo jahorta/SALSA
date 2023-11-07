@@ -225,7 +225,7 @@ def add_to_array(address, permission, size, modifier):
     list.extend(l)
 
 
-def VirtualQueryEx (hProcess, lpAddress, process_is32):
+def VirtualQueryEx(hProcess, lpAddress, process_is32):
     if process_is32:
         lpBuffer = MEMORY_BASIC_INFORMATION32()
     else:

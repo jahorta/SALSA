@@ -20,7 +20,7 @@ from SALSA.Project.project_facade import SCTProjectFacade
 
 has_debugger = True
 try:
-    from SALSA.SCTDebugger.debugger_controller import SCTDebugger
+    from SALSA.SCTDebugger.dolphin_link_controller import DolphinLink
 except ImportError as e:
     print(e)
     has_debugger = False
