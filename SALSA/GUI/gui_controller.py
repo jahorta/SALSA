@@ -5,7 +5,7 @@ from tkinter import ttk
 from typing import Union, TypedDict, Literal
 import webbrowser
 
-from SALSA.GUI.SCTDebugger.debugger_view import SCTDebuggerPopup
+from GUI.dolphin_link_popup import DolphinLinkPopup
 from SALSA.GUI.EncodeErrorPopup.project_error_popup import ProjectErrorPopup
 from SALSA.GUI.ProjectEditor.project_editor_controller import ProjectEditorController
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
@@ -33,7 +33,7 @@ class PopupTypes(TypedDict):
     string: Union[None, StringPopup]
     export: Union[None, SCTExportPopup]
     errors: Union[None, ProjectErrorPopup]
-    debug: Union[None, SCTDebuggerPopup]
+    d_link: Union[None, DolphinLinkPopup]
 
 
 class GUIController:
@@ -55,7 +55,7 @@ class GUIController:
         self.theme = theme
 
         self.popups: PopupTypes = {'inst': None, 'analysis': None, 'about': None, 'errors': None,
-                                   'variable': None, 'string': None, 'export': None, 'debug': None}
+                                   'variable': None, 'string': None, 'export': None, 'd_link': None}
 
         self.callbacks = {}
 
@@ -191,19 +191,19 @@ class GUIController:
                                                theme=self.theme)
 
     def show_sct_debugger_popup(self, callbacks):
-        if self.popups['debug'] is not None:
-            self.popups['debug'].tkraise()
+        if self.popups['d_link'] is not None:
+            self.popups['d_link'].tkraise()
             return
         callbacks |= {'close': self.close_popup}
-        self.popups['debug'] = SCTDebuggerPopup(self.parent, callbacks=callbacks, name='debug', theme=self.theme)
+        self.popups['d_link'] = DolphinLinkPopup(self.parent, callbacks=callbacks, name='debug', theme=self.theme)
 
     # ----------------------- #
     # Popup cleanup functions #
     # ----------------------- #
 
-    def close_popup(self, name: Literal['inst', 'analysis', 'about', 'variable', 'string', 'export', 'errors', 'debug'],
+    def close_popup(self, name: Literal['inst', 'analysis', 'about', 'variable', 'string', 'export', 'errors', 'd_link'],
                     popup: Union[InstructionEditorView, AnalysisView, AboutView, SCTExportPopup,
-                    VariablePopup, StringPopup, ProjectErrorPopup, SCTDebuggerPopup]):
+                    VariablePopup, StringPopup, ProjectErrorPopup, DolphinLinkPopup]):
         popup.destroy()
         self.popups[name] = None
 

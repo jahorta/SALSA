@@ -52,7 +52,7 @@ class MainMenu(tk.Menu):
         self.view_menu.add_command(label='Instruction editor', command=callbacks['view->inst'])
         self.has_debug = False
         if 'view->debug' in callbacks:
-            self.view_menu.add_command(label='SCT Debugger (Dolphin)', command=callbacks['view->debug'])
+            self.view_menu.add_command(label='Dolphin Link', command=callbacks['view->debug'])
             self.has_debug = True
         dark_mode = 1 if dark_mode else 0
         self.dark_mode_var = tk.IntVar(self, dark_mode)

@@ -2,7 +2,7 @@ import dataclasses
 import threading
 from typing import List, Union
 
-from SALSA.GUI.SCTDebugger.debugger_view import SCTDebuggerPopup
+from GUI.dolphin_link_popup import DolphinLinkPopup
 from SALSA.Scripts.script_decoder import SCTDecoder
 
 try:
@@ -81,8 +81,8 @@ fail_style = 'warning.TLabel'
 success_style = 'success.TLabel'
 
 
-class SCTDebugger:
-    log_name = 'SCTDebugController'
+class DolphinLink:
+    log_name = 'DolphinLink'
 
     def __init__(self, callbacks, tk_parent):
         self.callbacks = callbacks
@@ -286,7 +286,7 @@ class SCTDebugger:
 
 
 if __name__ == '__main__':
-    dbg = SCTDebugger(None)
+    dbg = DolphinLink(None, None)
     attached = dbg.attach_to_dolphin()
     if attached != 0:
         print('Dolphin was not attached')
