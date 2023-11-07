@@ -1,13 +1,17 @@
 SALSA - Skies of Arcadia Legends Script Assistant
 ===================================================
-SALSA is a GUI-based tool to assist in editing sct files in Skies of Arcadia Legends. Currently, SALSA allows for .sct file import and export and  
-
+SALSA is a GUI-based tool to assist in editing sct files in Skies of Arcadia Legends. Currently, SALSA allows for .sct file import, export, and testing in Dolphin
 
 Requirements
 ------------
 * [Python](https://www.python.org/) 3.10+
 * Skies of Arcadia Legends script files (.sct).
   * Supports aklz compressed files
+ 
+Python Dependencies
+-------------------
+* [psutil](https://github.com/giampaolo/psutil)
+  * For testing scripts by sending the current one to Dolphin as a live update
 
 Getting Started
 ---------------
@@ -16,8 +20,8 @@ With Python 3.10+ installed, running SALSA.py should run the program. In the eve
 Upon startup, a project should first be created or loaded. A project can contain an arbitrary number of scripts. Scripts can be imported using Project->Import Script, and exported using Project-> Export Script. If a script is imported, but a script with the same name is already present, the imported script will overwrite the current one. A project can also be saved for later use.
 
 Features (Completed)
---------
-* Instructions with editable paramter names and default parameters
+--------------------
+* Instructions with editable parameter names and default values
 * Parameter values can be displayed within instruction descriptions
 * Script file import and export
 * Script file addressing by setting starting memory address for script file for use with Dolphin Emulator. (right-click headers and include offset to view memory address)
@@ -25,19 +29,29 @@ Features (Completed)
 * Moving instructions around within a section
 * Grouping and moving sections around within a script
 * Ability to navigate using instruction detail links
-* Adding, removing, and changing instructions (Adding and removing instructions mostly works, though there are some bugs with adding and removing instruction groups)
+* Adding, removing, and changing instructions
+* Editing parameter values
+
+* NEW: Ability to send scripts to Dolphin when running Skies of Arcadia Legends
+  * Only works on Windows at the moment and requires psutil
 
 Features (In Progress)
---------
-* Editing parameter values (most work, except jumps and some other types of parameters)
+----------------------
 * Program help (Opens into a webpage. Only skeleton is implemented)
-* Ability to name script variables (Variable alias editor. Not fully tested)
+* Ability to name script variables (Variable alias editor. Mostly works except for globals)
 
 Features (Planned)
---------
+------------------
 * Saving groups of sections separately
 * Saving groups of instructions separately
 
+Using Dolphin Link
+------------------
+Dolphin Link allows SALSA to send scripts to a running instance of Dolphin. This is best used when Dolphin is run with the debugging UI. 
+
+To use prepare for sending a new version of the script, first run Skies of Arcadia Legends in Dolphin, then press the 'Connect to Dolphin' button. While Skies of Arcadia remains running, the current script and ptr to the current instruction will be displayed as well. To send your version of the current script in Dolphin, the game must be paused. It is best if it is paused in the main function. To do this, on the code tab of Dolphin, first click on the second to last entry in the call stack box. Then set a breakpoint at the instruction immediately following the current one by clicking in the column to the left of the address column. Then press play on Dolphin again. It should stop when that breakpoint is hit and the breakpoint can be removed.
+
+To update the current SCT in Dolphin, press the 'Update Current SCT' button. If you have a script with the same name as the current script in Dolphin, SALSA will encode your script into the sct format. Since the size of the updated script will almost always be different, just sending the updated script would cause a desync in the script interpreter, so SALSA needs to set the current script position as well. To do this, SALSA will try to find a similar instruction to the one Dolphin is currently running. This will only work if: 1) there is a section with the same name as the currently running section, and 2) there is an instruction with the same instruction ID and parameter values in that section. If SALSA is unable to find an appropriate instruction to set, the currently selected instruction in SALSA can be sent to Dolphin instead by pressing the 'Set Selected Inst as Current' button.
 
 Credits
 -------
