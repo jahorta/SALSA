@@ -88,7 +88,7 @@ class DolphinLink:
         self.gamecode = None
         self.addrs: Union[None, SOALAddrs] = None
         self._cont = DolphinMemoryController()
-        self.view: Union[None, SCTDebuggerPopup] = None
+        self.view: Union[None, DolphinLinkPopup] = None
         self.view_callbacks = {
             'attach_controller': self.attach_view, 'attach_dolphin': self.attach_to_dolphin,
             'update_sct': self.update_sct, 'set_cur_inst': self.set_selected_inst_as_current
@@ -128,7 +128,7 @@ class DolphinLink:
             raise ValueError(f'Unknown result from attempting to attach to Dolphin {result}')
         return result
 
-    def attach_view(self, view: Union[None, SCTDebuggerPopup]):
+    def attach_view(self, view: Union[None, DolphinLinkPopup]):
         self.view = view
 
     def release_handle(self):
