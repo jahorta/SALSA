@@ -4,7 +4,7 @@ import tkinter as tk
 class MainMenu(tk.Menu):
     """The application's main menu"""
 
-    def __init__(self, parent, callbacks, recent_files, dark_mode, **kwargs):
+    def __init__(self, parent, callbacks, recent_files, dark_mode, can_debug, **kwargs):
         super().__init__(parent, **kwargs)
 
         self.recent_files = recent_files
@@ -12,6 +12,7 @@ class MainMenu(tk.Menu):
         self.recent_files = ['No Recent Files'] if len(self.recent_files) == 0 else recent_files
 
         self.callbacks = callbacks
+        self.can_debug = can_debug
 
         self.parent = parent
         self.file_menu = tk.Menu(self, tearoff=False)
@@ -96,7 +97,7 @@ class MainMenu(tk.Menu):
         self.project_menu.entryconfig('Repair', state='normal')
         self.file_menu.entryconfig('Save Project', state='normal')
         self.file_menu.entryconfig('Save Project as', state='normal')
-        if self.has_debug:
+        if self.has_debug and self.can_debug:
             self.view_menu.entryconfig('SCT Debugger (Dolphin)', state='normal')
 
     def update_recents(self, recent_files):

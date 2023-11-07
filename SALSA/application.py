@@ -17,7 +17,13 @@ from SALSA.GUI.gui_controller import GUIController
 from SALSA.GUI import menus
 from SALSA.GUI.themes import themes, theme_non_color_maps
 from SALSA.Project.project_facade import SCTProjectFacade
-from SALSA.SCTDebugger.debugger_controller import SCTDebugger
+
+has_debugger = True
+try:
+    from SALSA.SCTDebugger.debugger_controller import SCTDebugger
+except ImportError as e:
+    print(e)
+    has_debugger = False
 
 default_style = 'clam'
 
@@ -105,7 +111,7 @@ class Application(tk.Tk):
         recent_files = self.proj_model.get_recent_filenames()
 
         # Create Debugger
-        if os.name == 'nt':
+        if os.name == 'nt' and has_debugger:
             def inst_lib():
                 return self.base_insts
             debug_callbacks = {
@@ -145,7 +151,8 @@ class Application(tk.Tk):
             }
 
         # Implement Menu
-        self.menu = menus.MainMenu(parent=self, callbacks=self.menu_callbacks, recent_files=recent_files, dark_mode=self.is_darkmode)
+        self.menu = menus.MainMenu(parent=self, callbacks=self.menu_callbacks, recent_files=recent_files,
+                                   dark_mode=self.is_darkmode, can_debug=has_debugger)
         self.config(menu=self.menu)
 
         # Connect recent files in proj_model to menu

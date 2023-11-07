@@ -3,8 +3,13 @@ import threading
 from typing import List, Union
 
 from SALSA.GUI.SCTDebugger.debugger_view import SCTDebuggerPopup
-from SALSA.SCTDebugger.dolphin_memory_controller import DolphinMemoryController, ptr2addr
 from SALSA.Scripts.script_decoder import SCTDecoder
+
+try:
+    from SALSA.SCTDebugger.dolphin_memory_controller import DolphinMemoryController, ptr2addr
+except ImportError as e:
+    raise ImportError(e)
+
 
 
 @dataclasses.dataclass

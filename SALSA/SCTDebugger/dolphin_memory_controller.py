@@ -9,8 +9,10 @@ import queue as q
 try:
     import psutil
 except ImportError as error:
-    print(error)
-    print('please install the following package: psutil')
+    print(f'\n\033[38;5;166mWARNING: {error}')
+    print('\033[38;5;208mTo send scripts to Dolphin, please install psutil\033[0m\n')
+    raise ImportError(error)
+
 from SALSA.SCTDebugger import mem_page_file_access as mem
 
 process_name = "Dolphin.exe"
