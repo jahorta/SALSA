@@ -210,7 +210,7 @@ class DolphinLink:
         cur_sct_ptr = int.from_bytes(self._read_addr(self.addrs.pSCTStart, ptr_only=True), byteorder='big')
         if cur_sct_ptr != 0:
             cur_inst_ptr = int.from_bytes(self._read_addr(self.addrs.pSCTPos, ptr_only=True), byteorder='big')
-            inst_offset = cur_inst_ptr - cur_sct_ptr if cur_sct_ptr is not 0 else 0
+            inst_offset = cur_inst_ptr - cur_sct_ptr if cur_sct_ptr != 0 else 0
         else:
             inst_offset = cur_inst_ptr = '---'
         status = f'{cur_sct_success}: {cur_sct if cur_sct_ptr != 0 else "---"} at ' \
