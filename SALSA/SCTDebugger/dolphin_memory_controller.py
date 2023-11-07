@@ -6,11 +6,11 @@ from dataclasses import dataclass
 import datetime as dt
 import queue as q
 
-import psutil
-import threading
-from dataclasses import dataclass
-import datetime as dt
-import queue as q
+try:
+    import psutil
+except ImportError as error:
+    print(error)
+    print('please install the following package: psutil')
 from SALSA.SCTDebugger import mem_page_file_access as mem
 
 process_name = "Dolphin.exe"
