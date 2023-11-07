@@ -68,6 +68,7 @@ attach_fail_pid = 'Dolphin is not Running'
 attach_fail_mem_block = 'No game is running in Dolphin'
 attach_fail_game = 'Wrong game is running'
 attach_success = 'Dolphin is running'
+update_fail_no_sct_in_game = 'SOAL currently has no SCT to replace'
 update_fail_no_sct = 'Current SCT is not in project'
 update_fail_errors = 'Export failed: errors'
 update_fail_index_size = 'Update failed: New index is too large'
@@ -139,6 +140,10 @@ class DolphinLink:
     def update_sct(self):
         if self.gamecode is None:
             return
+        cur_sct_ptr = int.from_bytes(self._read_addr(self.addrs.pSCTStart, ptr_only=True), byteorder='big')
+        if cur_sct_ptr == 0:
+            return self.view.set_status(stat_type='update', style=fail_style,
+                                        status=update_fail_no_sct_in_game)
         sct_name = self._get_sct_name()
         if not self.callbacks['check_for_script'](sct_name):
             game_code = self._get_gamecode()
