@@ -35,7 +35,7 @@ class DolphinLinkPopup(tk.Toplevel):
         self.columnconfigure(0, weight=1)
 
         self.buttons: Dict[str, ttk.Button] = {
-            'attach': ttk.Button(self, text='Attach Dolphin', command=self.callbacks['attach_dolphin'])
+            'attach': ttk.Button(self, text='Connect to Dolphin', command=self.callbacks['attach_dolphin'])
         }
         self.buttons['attach'].grid(row=0, column=0, sticky=tk.W)
 
