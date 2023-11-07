@@ -315,7 +315,8 @@ class Application(tk.Tk):
                                           message='There are unsaved changes remaining.\nWould you like to save them?')
             if save:
                 return self.on_save_project(quit_program=True)
-        self.dolphin_debugger.release_handle()
+        if has_debugger and os.name == 'nt':
+            self.dolphin_debugger.release_handle()
         self.destroy()
 
     def quit_await(self, quit_queue):
