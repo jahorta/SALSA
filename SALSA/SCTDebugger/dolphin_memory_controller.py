@@ -40,8 +40,8 @@ class MemObject:
 
 class DolphinMemoryController:
 
-    _pid: int = None
-    _handle: win.HANDLE = None
+    _pid: Union[None, int] = None
+    _handle: Union[None, win.HANDLE] = None
     _mem1_addr: int = 0
     _mem2_addr: int = 0
 
