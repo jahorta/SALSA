@@ -354,6 +354,8 @@ class DataTreeview(ttk.Treeview):
         self.selection_bounds = None
 
     def bMove(self, event):
+        if self.identify_region(event.x, event.y) == 'heading':
+            return
         if len(self.get_children('')) == 0:
             return
         if self.has_shift:
