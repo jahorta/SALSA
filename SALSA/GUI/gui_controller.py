@@ -195,7 +195,7 @@ class GUIController:
             self.popups['d_link'].tkraise()
             return
         callbacks |= {'close': self.close_popup}
-        self.popups['d_link'] = DolphinLinkPopup(self.parent, callbacks=callbacks, name='debug', theme=self.theme)
+        self.popups['d_link'] = DolphinLinkPopup(self.parent, callbacks=callbacks, name='d_link', theme=self.theme)
 
     # ----------------------- #
     # Popup cleanup functions #
