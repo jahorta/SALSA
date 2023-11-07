@@ -105,16 +105,17 @@ class Application(tk.Tk):
         recent_files = self.proj_model.get_recent_filenames()
 
         # Create Debugger
-        def inst_lib():
-            return self.base_insts
-        debug_callbacks = {
-            'update_sct': self.update_script,
-            'check_for_script': self.project.check_script_is_in_project,
-            'sect_name_is_used': self.project.is_sect_name_used,
-            'find_similar_inst': self.project.find_similar_inst,
-            'get_inst_lib': inst_lib
-        }
-        self.dolphin_debugger = SCTDebugger(callbacks=debug_callbacks)
+        if os.name == 'nt':
+            def inst_lib():
+                return self.base_insts
+            debug_callbacks = {
+                'update_sct': self.update_script,
+                'check_for_script': self.project.check_script_is_in_project,
+                'sect_name_is_used': self.project.is_sect_name_used,
+                'find_similar_inst': self.project.find_similar_inst,
+                'get_inst_lib': inst_lib
+            }
+            self.dolphin_debugger = SCTDebugger(callbacks=debug_callbacks, tk_parent=self)
 
         # Implement Menu
         self.menu_callbacks = {
@@ -133,11 +134,15 @@ class Application(tk.Tk):
             'prj->repair->textbox': self.textbox_fadeout_repair,
             # 'analysis->export': self.gui.show_analysis_view,
             'view->inst': self.gui.show_instruction_view,
-            'view->debug': lambda: self.gui.show_sct_debugger_popup(callbacks=self.dolphin_debugger.view_callbacks),
             'view->theme': self.change_theme,
             'help->help': self.gui.show_help,
             'help->about': self.gui.show_about,
         }
+
+        if os.name == 'nt':
+            self.menu_callbacks |= {
+                'view->debug': lambda: self.gui.show_sct_debugger_popup(callbacks=self.dolphin_debugger.view_callbacks)
+            }
 
         # Implement Menu
         self.menu = menus.MainMenu(parent=self, callbacks=self.menu_callbacks, recent_files=recent_files, dark_mode=self.is_darkmode)
