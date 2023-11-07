@@ -5,7 +5,7 @@ from tkinter import ttk
 from typing import Union, TypedDict, Literal
 import webbrowser
 
-from GUI.dolphin_link_popup import DolphinLinkPopup
+from SALSA.GUI.dolphin_link_popup import DolphinLinkPopup
 from SALSA.GUI.EncodeErrorPopup.project_error_popup import ProjectErrorPopup
 from SALSA.GUI.ProjectEditor.project_editor_controller import ProjectEditorController
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
