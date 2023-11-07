@@ -55,6 +55,10 @@ class DolphinMemoryController:
         self.OpenProcess.argtypes = win.DWORD, win.BOOL, win.DWORD
         self.OpenProcess.restype = win.HANDLE
 
+        self.GetExitCodeProcess = ct.windll.kernel32.GetExitCodeProcess
+        self.GetExitCodeProcess.argtypes = win.HANDLE, win.LPDWORD
+        self.GetExitCodeProcess.restype = win.BOOL
+
         self.ReadProcessMemory = ct.windll.kernel32.ReadProcessMemory
         self.ReadProcessMemory.argtypes = win.HANDLE, win.LPCVOID, win.LPVOID, ct.c_size_t, ct.POINTER(ct.c_size_t)
         self.ReadProcessMemory.restype = win.BOOL
@@ -92,6 +96,12 @@ class DolphinMemoryController:
             if self._get_handle() != 1:
                 return 1
 
+        if self._check_process_active() == 1:
+            self.shutdown()
+            self._pid = None
+            self._handle = None
+            return 1
+
         self._get_dolphin_mems()
         if self._mem1_addr == 0:
             print('Unable to find regions, likely emulation has not started yet')
@@ -108,6 +118,16 @@ class DolphinMemoryController:
             print(mem.WinError(mem.GetLastError()))
             return 0
         self._last_access = dt.datetime.now()
+        return 1
+
+    def _check_process_active(self):
+        ret_code = win.DWORD()
+        result = self.GetExitCodeProcess(self._handle, ret_code)
+        error = ct.GetLastError()
+        if not result:
+            print(f'Check Dolphin is Active Failed, Result: {result}, Error: {error}')
+        if ret_code.value == 259:
+            return 0
         return 1
 
     def read_memory_address(self, address: int, size: int = 1, mem_segment: int = 1) -> bytearray:
