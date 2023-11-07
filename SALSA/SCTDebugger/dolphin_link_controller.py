@@ -152,7 +152,8 @@ class DolphinLink:
             if game_code not in addresses:
                 return self.attach_to_dolphin()
             return self.view.set_status(stat_type='update', style=fail_style,
-                                        status=update_fail_no_sct + f' {sct_name}')
+                                        status=update_fail_no_sct)
+        # Maybe add check for if game is paused and require a paused game
         self.cur_sct = sct_name
         self.callbacks['update_sct'](sct_name)
 
