@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import Literal, List, Dict
-
-from SALSA.Common.setting_class import settings
+from typing import Literal, Dict
 
 
 cur_script_text = 'Current Script: '
