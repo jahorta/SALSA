@@ -74,7 +74,7 @@ update_fail_index_size = 'Update failed: New index is too large'
 update_fail_sct_size = 'Update failed: New SCT is too large'
 update_fail_no_cur_inst = 'Update failed: Unable to find similar inst'
 update_success = 'Update succeeded'
-cur_sct_success = 'Current SCT is: '
+cur_sct_success = 'Current SCT'
 
 fail_style = 'warning.TLabel'
 success_style = 'success.TLabel'
@@ -179,19 +179,28 @@ class DolphinLink:
         pass
 
     def start_cur_sct_updater(self):
-        sct_updater = threading.Thread(target=self.threaded_cur_sect_updater)
+        sct_updater = threading.Thread(target=self.threaded_cur_sct_updater)
         sct_updater.start()
 
-    def threaded_cur_sect_updater(self):
+    def threaded_cur_sct_updater(self):
         game_code = self._get_gamecode()
         if game_code not in addresses:
             if self.view is not None:
                 self.view.set_status('cur_sct', status='', style=success_style)
             return self.attach_to_dolphin()
         cur_sct = self._get_sct_name()
+        cur_sct_ptr = int.from_bytes(self._read_addr(self.addrs.pSCTStart, ptr_only=True), byteorder='big')
+        if cur_sct_ptr != 0:
+            cur_inst_ptr = int.from_bytes(self._read_addr(self.addrs.pSCTPos, ptr_only=True), byteorder='big')
+            inst_offset = cur_inst_ptr - cur_sct_ptr if cur_sct_ptr is not 0 else 0
+        else:
+            inst_offset = cur_inst_ptr = '---'
+        status = f'{cur_sct_success}: {cur_sct if cur_sct_ptr != 0 else "---"} at ' \
+                 f'{hex(cur_inst_ptr) if not isinstance(cur_inst_ptr, str) else cur_inst_ptr} ' \
+                 f'({hex(inst_offset) if not isinstance(inst_offset, str) else inst_offset})'
         if self.view is not None:
-            self.view.set_status('cur_sct', status=cur_sct_success + cur_sct, style=success_style)
-        self.tk_pt.after(1000, self.threaded_cur_sect_updater)
+            self.view.set_status('cur_sct', status=status, style=success_style)
+        self.tk_pt.after(50, self.threaded_cur_sct_updater)
 
     def _get_gamecode(self):
         gamecode = self._cont.read_memory_address(0, 6)
