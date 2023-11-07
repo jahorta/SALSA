@@ -121,7 +121,7 @@ class Application(tk.Tk):
                 'find_similar_inst': self.project.find_similar_inst,
                 'get_inst_lib': inst_lib
             }
-            self.dolphin_debugger = SCTDebugger(callbacks=debug_callbacks, tk_parent=self)
+            self.dolphin_debugger = DolphinLink(callbacks=debug_callbacks, tk_parent=self)
 
         # Implement Menu
         self.menu_callbacks = {
