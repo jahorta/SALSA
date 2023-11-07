@@ -61,7 +61,6 @@ class MainMenu(tk.Menu):
         self.add_cascade(label='View', menu=self.view_menu)
 
         help_menu = tk.Menu(self, tearoff=False)
-        # help_menu.add_command(label='Print debug to console', command=callbacks['help->debug'])
         help_menu.add_command(label='Help', command=callbacks['help->help'])
         help_menu.add_command(label='About', command=callbacks['help->about'])
         self.add_cascade(label='Help', menu=help_menu)
