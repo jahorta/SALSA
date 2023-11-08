@@ -2154,7 +2154,6 @@ class SCTProjectFacade:
     def get_sect_preditor_offset(self, script, inst_sect_name, inst_offset, tgt_sect_name):
         tgt_sect = self.project.scts[script].sects[tgt_sect_name]
         tgt_links = tgt_sect.insts[tgt_sect.inst_list[0]].links_in
-        print('pause here')
 
         if len(tgt_links) == 0:
             return None
