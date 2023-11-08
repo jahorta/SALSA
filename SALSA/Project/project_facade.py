@@ -2147,10 +2147,6 @@ class SCTProjectFacade:
     def _params_are_similar(param, other_param):
         if param.type != other_param.type:
             return False
-        if 'string' in param.type or 'footer' in param.type:
-            if param.linked_string != other_param.linked_string:
-                return False
-        else:
-            if not ('jump' in param.type or 'subscript' in param.type) and param.value != other_param.value:
-                return False
+        if 'scpt' in param.type and param.value != other_param.value:
+            return False
         return True
