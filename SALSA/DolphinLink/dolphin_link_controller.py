@@ -54,7 +54,7 @@ addresses = {
         'pSCTPos': 0x00310524,
         'curSCTNum': 0x00315154,
         'curSCTLet': 0x00315158,
-        'subScriptStack': -1
+        'subScriptStack': 0x0031da0
     },
     # JP version
     'GEAJ8P': {
@@ -63,7 +63,7 @@ addresses = {
         'pSCTPos': 0x0030c924,
         'curSCTNum': 0x00311544,
         'curSCTLet': 0x00311548,
-        'subScriptStack': -1
+        'subScriptStack': 0x0030e1a0
     }
 }
 
