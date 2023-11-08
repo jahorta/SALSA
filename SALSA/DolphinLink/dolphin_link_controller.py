@@ -190,6 +190,7 @@ class DolphinLink:
         self._write_to_addr(value=new_sct, ba=self.addrs.pSCTStart)
         self._write_to_addr(value=new_inst_offset, ba=self.addrs.pSCTPos, ptr_only=True)
         self.view.set_status(stat_type='update', status=update_success, style=success_style)
+        self.view.after(3000, self.view.set_status, 'update', '', success_style)
 
     def set_selected_inst_as_current(self):
         self.selected_inst_offset = None
