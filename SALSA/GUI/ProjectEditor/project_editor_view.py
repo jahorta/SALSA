@@ -11,8 +11,8 @@ from SALSA.BaseInstructions.bi_defaults import loop_count_name
 
 default_headers = {
     'script': ['name'],
-    'section': ['name'],
-    'instruction': ['ungrouped_position', 'name', 'condition', 'delay_param', 'skip_refresh', 'base_id'],
+    'section': ['name', 'absolute_offset'],
+    'instruction': ['ungrouped_position', 'name', 'condition', 'delay_param', 'skip_refresh', 'base_id', 'absolute_offset'],
     'parameter': ['ID', 'name', 'type', 'value']
 }
 
