@@ -22,12 +22,13 @@ class BaseAddr:
 
 
 class SOALAddrs:
-    def __init__(self, pSCTIndex, pSCTStart, pSCTPos, curSCTNum, curSCTLet):
+    def __init__(self, pSCTIndex, pSCTStart, pSCTPos, curSCTNum, curSCTLet, subScriptStack):
         self.pSCTIndex = BaseAddr(pSCTIndex, size_offset=-0x38, size_mod=-0x40, is_pointer=True)
         self.pSCTStart = BaseAddr(pSCTStart, size_offset=-0x38, size_mod=-0x40, is_pointer=True)
         self.pSCTPos = BaseAddr(pSCTPos, is_pointer=True)
         self.curSCTNum = BaseAddr(curSCTNum)
         self.curSCTLet = BaseAddr(curSCTLet, size=1)
+        self.subScriptStack = BaseAddr(subScriptStack, size=0x7c)
 
 
 game_titles = {
@@ -43,7 +44,8 @@ addresses = {
         'pSCTIndex': 0x0030d6c0,
         'pSCTPos': 0x0030cea4,
         'curSCTNum': 0x00311ac4,
-        'curSCTLet': 0x00311ac8
+        'curSCTLet': 0x00311ac8,
+        'subScriptStack': 0x0030e720
     },
     # EU version
     'GEAP8P': {
@@ -51,7 +53,8 @@ addresses = {
         'pSCTIndex': 0x00310d40,
         'pSCTPos': 0x00310524,
         'curSCTNum': 0x00315154,
-        'curSCTLet': 0x00315158
+        'curSCTLet': 0x00315158,
+        'subScriptStack': -1
     },
     # JP version
     'GEAJ8P': {
@@ -59,7 +62,8 @@ addresses = {
         'pSCTIndex': 0x0030d140,
         'pSCTPos': 0x0030c924,
         'curSCTNum': 0x00311544,
-        'curSCTLet': 0x00311548
+        'curSCTLet': 0x00311548,
+        'subScriptStack': -1
     }
 }
 
