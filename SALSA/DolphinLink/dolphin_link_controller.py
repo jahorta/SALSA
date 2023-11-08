@@ -144,6 +144,8 @@ class DolphinLink:
     # Dolphin update methods
 
     def update_sct(self):
+        self.view.set_status(stat_type='update', style=fail_style,
+                             status='')
         if self.gamecode is None:
             return
         cur_sct_ptr = int.from_bytes(self._read_addr(self.addrs.pSCTStart, ptr_only=True), byteorder='big')
