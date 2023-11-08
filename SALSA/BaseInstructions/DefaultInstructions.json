@@ -116,8 +116,8 @@
   },
   "11": {
     "Name": "Load Subscript",
-    "Description": "Load a subscript, while placing a return position in the subscript stack.\n\n*lnk[Offset,<Offset>]*",
-    "Notes": "No dependancy on param1\nFunctional at all times\n\nIncrements 8030e71a by 1\n\tThis is the counter for the depth of the current substack\n\nAdds a pointer to the current position to the subscript stack\n\nAdds the Offset to the current instruction pointer to go to the subscript.",
+    "Description": "Load a subscript, while placing a return position in the subscript stack.\n\nGame supports a maximum of 31 jumps.\n\n*lnk[Offset,<Offset>]*",
+    "Notes": "No dependancy on param1\nFunctional at all times\n\nIncrements 8030e71a by 1\nThis is the counter for the depth of the current substack\n\nAdds a pointer to the current position to the subscript stack\n\nAdds the Offset to the current instruction pointer to go to the subscript.",
     "Parameters": {
       "0": {
         "Name": "Offset"
