@@ -221,6 +221,26 @@ class DolphinLink:
         self.selected_inst_offset = inst_offset
         self.update_sct()
 
+    def _get_offset_of_similar_inst(self, index, sct_ptr):
+        cur_inst_ptr = int.from_bytes(self._read_addr(self.addrs.pSCTPos, ptr_only=True), byteorder='big')
+        cur_inst_offset = cur_inst_ptr - sct_ptr
+        if cur_inst_offset < 0:
+            self.attach_to_dolphin()
+            raise ValueError(f'{self.log_name}: Current inst offset is negative. '
+                             f'This should not happen, reattaching to dolphin')
+
+        sect_info = self._find_sect_info_from_inst(index, cur_inst_offset)
+        if not self.callbacks['sect_name_is_used'](self.cur_sct, sect_info['name'], code_only=True):
+            return None
+
+        cur_sct_addr = sct_ptr - 0x80000000
+        sect_bytes = self._cont.read_memory_address(sect_info['offset'] + cur_sct_addr, sect_info['size'])
+        decoded_section = SCTDecoder.decode_section_from_bytes(sect_info['name'], sect_bytes, sect_info['offset'],
+                                                               self.callbacks['get_inst_lib']())
+        desired_inst_offset = self.callbacks['find_similar_inst'](self.cur_sct, decoded_section,
+                                                                  cur_inst_offset - sect_info['offset'])
+        return desired_inst_offset
+
     def start_cur_sct_updater(self):
         sct_updater = threading.Thread(target=self.threaded_cur_sct_updater)
         sct_updater.start()
@@ -300,39 +320,6 @@ class DolphinLink:
         sct_num = int.from_bytes(self._read_addr(self.addrs.curSCTNum), byteorder='big')
         sct_let = self._read_addr(self.addrs.curSCTLet).decode()
         return f'me{sct_num:03d}{sct_let}'
-
-    def _get_offset_of_similar_inst(self):
-        cur_ind = self.get_cur_index()
-        cur_sct_ptr = int.from_bytes(self._read_addr(self.addrs.pSCTStart, ptr_only=True), byteorder='big')
-        cur_inst_ptr = int.from_bytes(self._read_addr(self.addrs.pSCTPos, ptr_only=True), byteorder='big')
-        cur_inst_offset = cur_inst_ptr - cur_sct_ptr
-        if cur_inst_offset < 0:
-            self.attach_to_dolphin()
-            raise ValueError(f'{self.log_name}: Current inst offset is negative. '
-                             f'This should not happen, reattaching to dolphin')
-
-        index = SCTDecoder.generate_index(cur_ind)
-        prev_offset = 0
-        cur_offset = 0
-        for offset in index:
-            cur_offset = offset
-            if cur_inst_offset < offset:
-                break
-            prev_offset = offset
-        sect_name = index[prev_offset]
-        sect_offset = prev_offset
-        sect_size = cur_offset - prev_offset
-
-        if not self.callbacks['sect_name_is_used'](self.cur_sct, sect_name, code_only=True):
-            return None
-
-        cur_sct_addr = cur_sct_ptr - 0x80000000
-        sect_bytes = self._cont.read_memory_address(sect_offset + cur_sct_addr, sect_size)
-        decoded_section = SCTDecoder.decode_section_from_bytes(sect_name, sect_bytes, sect_offset,
-                                                               self.callbacks['get_inst_lib']())
-        desired_inst_offset = self.callbacks['find_similar_inst'](self.cur_sct, decoded_section,
-                                                                  cur_inst_offset - sect_offset)
-        return desired_inst_offset
 
     def _get_ptr_value_as_addr(self, ba: BaseAddr):
         if not ba.is_pointer:
