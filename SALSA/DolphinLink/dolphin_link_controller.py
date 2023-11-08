@@ -22,13 +22,14 @@ class BaseAddr:
 
 
 class SOALAddrs:
-    def __init__(self, pSCTIndex, pSCTStart, pSCTPos, curSCTNum, curSCTLet, subScriptStack):
+    def __init__(self, pSCTIndex, pSCTStart, pSCTPos, curSCTNum, curSCTLet, subScriptStack, subScriptNum):
         self.pSCTIndex = BaseAddr(pSCTIndex, size_offset=-0x38, size_mod=-0x40, is_pointer=True)
         self.pSCTStart = BaseAddr(pSCTStart, size_offset=-0x38, size_mod=-0x40, is_pointer=True)
         self.pSCTPos = BaseAddr(pSCTPos, is_pointer=True)
         self.curSCTNum = BaseAddr(curSCTNum)
         self.curSCTLet = BaseAddr(curSCTLet, size=1)
         self.subScriptStack = BaseAddr(subScriptStack, size=0x7c)
+        self.subScriptNum = BaseAddr(subScriptNum, size=0x2)
 
 
 game_titles = {
@@ -45,7 +46,8 @@ addresses = {
         'pSCTPos': 0x0030cea4,
         'curSCTNum': 0x00311ac4,
         'curSCTLet': 0x00311ac8,
-        'subScriptStack': 0x0030e720
+        'subScriptStack': 0x0030e720,
+        'subScriptNum': 0x0030e71a
     },
     # EU version
     'GEAP8P': {
@@ -54,7 +56,8 @@ addresses = {
         'pSCTPos': 0x00310524,
         'curSCTNum': 0x00315154,
         'curSCTLet': 0x00315158,
-        'subScriptStack': 0x0031da0
+        'subScriptStack': 0x0031da0,
+        'subScriptNum': 0x0031d9a
     },
     # JP version
     'GEAJ8P': {
@@ -63,7 +66,8 @@ addresses = {
         'pSCTPos': 0x0030c924,
         'curSCTNum': 0x00311544,
         'curSCTLet': 0x00311548,
-        'subScriptStack': 0x0030e1a0
+        'subScriptStack': 0x0030e1a0,
+        'subScriptNum': 0x0030e19a
     }
 }
 
@@ -190,9 +194,16 @@ class DolphinLink:
         new_inst_offset += int.from_bytes(self._read_addr(ba=self.addrs.pSCTStart, ptr_only=True), byteorder='big')
         new_inst_offset = new_inst_offset.to_bytes(length=4, byteorder='big', signed=False)
 
+        # Fix subscript stack
+        new_subscript_stack = self.get_new_subscript_stack(index, sct_ptr)
+        if not isinstance(new_subscript_stack, bytearray):
+            return self.view.set_status(stat_type='update', style=fail_style,
+                                        status=update_fail_ss_stack)
+
         self._write_to_addr(value=new_ind, ba=self.addrs.pSCTIndex)
         self._write_to_addr(value=new_sct, ba=self.addrs.pSCTStart)
         self._write_to_addr(value=new_inst_offset, ba=self.addrs.pSCTPos, ptr_only=True)
+        self._write_to_addr(value=new_subscript_stack, ba=self.addrs.subScriptStack)
         self.view.set_status(stat_type='update', status=update_success, style=success_style)
         self.view.after(3000, self.view.set_status, 'update', '', success_style)
 
@@ -228,6 +239,41 @@ class DolphinLink:
         if self.view is not None:
             self.view.set_status('cur_sct', status=status, style=success_style)
         self.tk_pt.after(50, self.threaded_cur_sct_updater)
+
+    def get_new_subscript_stack(self, index, sct_ptr):
+        cur_subscript_stack = self._read_addr(self.addrs.subScriptStack)
+        cur_subscript_num = int.from_bytes(self._read_addr(self.addrs.subScriptNum), byteorder='big')
+        cur_subscript_stack = cur_subscript_stack[:cur_subscript_num*4]
+
+        out_subscript_stack = bytearray()
+        for i in range(0, len(cur_subscript_stack), 4):
+            cur_addr = int.from_bytes(cur_subscript_stack[i:i+4], byteorder='big') - 0x80000000
+            cur_inst = self._cont.read_memory_address(cur_addr - 8, 8)
+            inst_base_id = int.from_bytes(cur_inst[:4], byteorder='big')
+            if not inst_base_id == 11:
+                raise ValueError(f'Unknown subscript stack inst: {inst_base_id}')
+            inst_param = int.from_bytes(cur_inst[4:], byteorder='big')
+            inst_offset = cur_addr - (sct_ptr - 0x80000000) - 8
+            inst_sect = self._find_sect_info_from_inst(index, inst_offset)['name']
+            tgt_sect_offset = inst_offset + inst_param + 4
+            tgt_sect = index[tgt_sect_offset]
+            new_inst_offset = self.callbacks['get_sect_preditor'](self.cur_sct, inst_sect, inst_offset, tgt_sect)
+            if new_inst_offset is None:
+                return inst_sect, inst_offset, tgt_sect
+            out_subscript_stack += (new_inst_offset + sct_ptr + 8).to_bytes(4, byteorder='big')
+
+        return out_subscript_stack
+
+    @staticmethod
+    def _find_sect_info_from_inst(index, inst_offset):
+        prev_offset = 0
+        cur_offset = 0
+        for offset in index:
+            cur_offset = offset
+            if inst_offset < offset:
+                break
+            prev_offset = offset
+        return {'name': index[prev_offset], 'offset': prev_offset, 'size': cur_offset - prev_offset}
 
     def _get_gamecode(self):
         gamecode = self._cont.read_memory_address(0, 6)

@@ -120,7 +120,8 @@ class Application(tk.Tk):
                 'sect_name_is_used': self.project.is_sect_name_used,
                 'find_similar_inst': self.project.find_similar_inst,
                 'get_inst_lib': inst_lib,
-                'get_sel_inst_offset': self.get_selected_inst_offset
+                'get_sel_inst_offset': self.get_selected_inst_offset,
+                'get_sect_preditor': self.project.get_sect_preditor_offset
             }
             self.dolphin_debugger = DolphinLink(callbacks=debug_callbacks, tk_parent=self)
 

@@ -2150,3 +2150,34 @@ class SCTProjectFacade:
         if 'scpt' in param.type and param.value != other_param.value:
             return False
         return True
+
+    def get_sect_preditor_offset(self, script, inst_sect_name, inst_offset, tgt_sect_name):
+        tgt_sect = self.project.scts[script].sects[tgt_sect_name]
+        tgt_links = tgt_sect.insts[tgt_sect.inst_list[0]].links_in
+        print('pause here')
+
+        if len(tgt_links) == 0:
+            return None
+
+        backup_links = []
+        links = []
+        for link in tgt_links:
+            if link.target_trace[0] == tgt_sect_name:
+                backup_links.append(link)
+                if link.origin_trace[0] == inst_sect_name:
+                    links.append(link)
+
+        if len(links) == 0:
+            links = backup_links
+
+        if len(links) == 0:
+            return None
+
+        if len(links) == 1:
+            link = links[0]
+        else:
+            link_dists = [abs(self.project.scts[script].sects[link.origin_trace[0]]
+                              .insts[link.origin_trace[1]].absolute_offset - inst_offset) for link in links]
+            link = links[link_dists.index(min(link_dists))]
+
+        return self.project.scts[script].sects[link.origin_trace[0]].insts[link.origin_trace[1]].absolute_offset
