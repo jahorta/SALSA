@@ -13,7 +13,7 @@ except ImportError as error:
     print('\033[38;5;208mTo send scripts to Dolphin, please install psutil\033[0m\n')
     raise ImportError(error)
 
-from SALSA.SCTDebugger import mem_page_file_access as mem
+from SALSA.DolphinLink import mem_page_file_access as mem
 
 process_name = "Dolphin.exe"
 

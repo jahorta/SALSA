@@ -6,7 +6,7 @@ from SALSA.GUI.dolphin_link_popup import DolphinLinkPopup
 from SALSA.Scripts.script_decoder import SCTDecoder
 
 try:
-    from SALSA.SCTDebugger.dolphin_memory_controller import DolphinMemoryController, ptr2addr
+    from SALSA.DolphinLink.dolphin_memory_controller import DolphinMemoryController, ptr2addr
 except ImportError as e:
     raise ImportError(e)
 
