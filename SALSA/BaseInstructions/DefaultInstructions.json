@@ -692,8 +692,8 @@
     }
   },
   "50": {
-    "Name": "??Set Globals",
-    "Description": "8030e79c = <unknown0>\n8030e7a0 = <unknown1>\n8030e7a4 = <unknown2>\n8030e7a8 = <unknown3> * 182.04445\n8030e7ac = <unknown4> * 182.04445\n8030e7b0 = <unknown5> * 182.04445",
+    "Name": "Set Camera",
+    "Description": "8030e79c (X position) (left-right) = <unknown0>\n8030e7a0 (Z position) (down-up)    = <unknown1>\n8030e7a4 (Y position) (front-back) = <unknown2>\n\n8030e7a8 (X rotation) (up, down)   = <unknown3>\u00b0\n8030e7ac (Z rotation) (left, right)= <unknown4>\u00b0\n8030e7b0 (Y rotation) (rotate)     = <unknown5>\u00b0",
     "Notes": "Dependent on param1:\nonly functions if bit 1 == 1:\nGets SCPT parameters:\n1: float\n2: float\n3: float\n4: float\n5: float\n6: float\n\n8030e7a8 = (4) * 182.04445\n8030e79c = (1)\n8030e7ac = (5) * 182.04445\n8030e7b0 = (6) * 182.04445\n8030e7a0 = (2)\n8030e7a4 = (3)",
     "Parameters": {
       "0": {
