@@ -102,7 +102,7 @@ class DolphinLink:
 
         self.cur_sct = None
         self.tk_pt = tk_parent
-        self.selected_inst_offset = False
+        self.selected_inst_offset = None
 
     # Setup methods
 
