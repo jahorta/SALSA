@@ -107,6 +107,8 @@ class DolphinLink:
     # Setup methods
 
     def attach_to_dolphin(self):
+        if self.view is not None:
+            self.view.set_status(stat_type='update', style=fail_style, status='')
         result = self._cont.attach_to_dolphin()
         if result == 1:
             if self.view is not None:
