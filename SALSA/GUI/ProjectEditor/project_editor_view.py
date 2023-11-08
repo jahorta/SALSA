@@ -30,16 +30,16 @@ header_settings = {
         'section_num': {'label': 'Section #', 'width': 50, 'stretch': True}
     },
     'section': {
-        'name': {'label': 'Name', 'width': 300, 'stretch': True},
+        'name': {'label': 'Name', 'width': 200, 'stretch': True},
         'absolute_offset': {'label': 'Offset', 'width': 100, 'stretch': True}
     },
     'instruction': {
         'ungrouped_position': {'label': 'Pos', 'width': 180, 'stretch': True},
         'name': {'label': 'Name', 'width': 180, 'stretch': True},
-        'condition': {'label': 'Condition', 'width': 300, 'stretch': True},
+        'condition': {'label': 'Condition', 'width': 250, 'stretch': True},
         'base_id': {'label': 'ID', 'width': 40, 'stretch': False},
-        'delay_param': {'label': 'Delay', 'width': 50, 'stretch': False},
-        'skip_refresh': {'label': 'SR', 'width': 50, 'stretch': False},
+        'delay_param': {'label': 'Delay', 'width': 40, 'stretch': False},
+        'skip_refresh': {'label': 'SR', 'width': 40, 'stretch': False},
         'synopsis': {'label': 'Synopsis', 'width': 50, 'stretch': True},
         'absolute_offset': {'label': 'Offset', 'width': 100, 'stretch': True}
     },
