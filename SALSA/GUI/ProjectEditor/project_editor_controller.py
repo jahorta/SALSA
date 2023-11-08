@@ -981,6 +981,7 @@ class ProjectEditorController:
 
     def update_field(self, field, value):
         self.project.update_inst_field(field=field, value=value, **self.current)
+        self.refresh_all_trees()
 
     def pe_on_refresh_inst(self):
         self.project.refresh_condition(**self.current)

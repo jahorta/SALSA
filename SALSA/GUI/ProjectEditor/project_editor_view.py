@@ -228,7 +228,7 @@ class ProjectEditorView(ttk.Frame):
 
         self.skip_ckeck_var = tk.IntVar()
         skip_check = ttk.Checkbutton(skip_frame, variable=self.skip_ckeck_var,
-                                     command=lambda: self.callbacks['update_field']('skip_frame_refresh',
+                                     command=lambda: self.callbacks['update_field']('skip_refresh',
                                                                                     (self.skip_ckeck_var.get() == 1)))
         skip_check.grid(row=0, column=0)
         skip_label = ttk.Label(skip_frame, text='Skip Frame Refresh')
