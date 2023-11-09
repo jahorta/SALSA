@@ -301,15 +301,15 @@
     }
   },
   "30": {
-    "Name": "??Face",
-    "Description": "unknown0: <unknown0>\nunknown1: <unknown1>",
+    "Name": "Set Expression",
+    "Description": "Sets the face texture on a specific character\n\nCharacter TblID: <Character TblID>\nExpression: <Expression>",
     "Notes": "Dependent on param1:\nbit is 1:\n1: \nScript allocates memory, then calls a number of parameters through SCPT analyze:\n1: short [6]\n2: int   [7]\nThis is used as a parameter in function 80211058.\n\n2:\n\nShows this error if the message display times out:\ns_scptFace:_message_post_time_out_802d5260",
     "Parameters": {
       "0": {
-        "Name": "unknown0"
+        "Name": "Character TblID"
       },
       "1": {
-        "Name": "unknown1"
+        "Name": "Expression"
       }
     }
   },
