@@ -9,7 +9,7 @@ class DolphinLinkPopup(tk.Toplevel):
     t = 'Dolphin Link'
     log_key = 'DolphinLinkPopup'
     w = 250
-    h = 145
+    h = 160
 
     def __init__(self, parent, callbacks, name, theme, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
