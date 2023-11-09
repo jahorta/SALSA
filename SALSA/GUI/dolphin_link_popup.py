@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Literal, Dict
 
-
 cur_script_text = 'Current Script: '
 
 
@@ -25,8 +24,8 @@ class DolphinLinkPopup(tk.Toplevel):
         self.title(self.t)
         self.resizable(width=False, height=False)
 
-        posX = self.parent.winfo_x() + (self.parent.winfo_width() - self.w)//2
-        posY = self.parent.winfo_y() + (self.parent.winfo_height() - self.h)//2
+        posX = self.parent.winfo_x() + (self.parent.winfo_width() - self.w) // 2
+        posY = self.parent.winfo_y() + (self.parent.winfo_height() - self.h) // 2
         pos = f'{self.w}x{self.h}+{posX}+{posY}'
         self.geometry(pos)
 
