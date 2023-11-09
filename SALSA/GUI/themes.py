@@ -20,6 +20,7 @@ class Colors:
     warning_text: str
     disabled_text: str
     success_text: str
+    dim_success_text: str
 
 
 def theme_generator(colors: Colors):
@@ -73,6 +74,12 @@ def theme_generator(colors: Colors):
             "configure": {
                 "background": colors.bg,
                 "foreground": colors.success_text
+            }
+        },
+        "dim_success.TLabel": {
+            "configure": {
+                "background": colors.bg,
+                "foreground": colors.dim_success_text
             }
         },
         "TButton": {
@@ -329,7 +336,8 @@ themes = {
         link='#5588ff',
         warning_text='#ee4444',
         disabled_text='#777777',
-        success_text='#44cc44'
+        success_text='#39bb39',
+        dim_success_text='#339933'
     )),
     'light': theme_generator(Colors(
         bg='#eeeeee',
@@ -347,7 +355,8 @@ themes = {
         link='#0055ee',
         warning_text='#dd1122',
         disabled_text='#eeeeee',
-        success_text='#11dd22'
+        success_text='#11dd22',
+        dim_success_text='#11aa22'
     )),
 }
 
