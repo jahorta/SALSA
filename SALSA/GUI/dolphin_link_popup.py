@@ -34,10 +34,10 @@ class DolphinLinkPopup(tk.Toplevel):
         self.buttons: Dict[str, ttk.Button] = {
             'attach': ttk.Button(self, text='Connect to Dolphin', command=self.callbacks['attach_dolphin'])
         }
-        self.buttons['attach'].grid(row=0, column=0, sticky=tk.W)
+        self.buttons['attach'].grid(row=0, column=0, sticky=tk.W, padx=5, pady='5 0')
 
         status_label = ttk.Label(self, text='Dolphin Link Status:')
-        status_label.grid(row=1, column=0, sticky=tk.W)
+        status_label.grid(row=1, column=0, sticky=tk.W, padx=5)
 
         self.status_widgets = {
             'dolphin': ttk.Label(self, text='', style='warning.TLabel'),
@@ -47,12 +47,11 @@ class DolphinLinkPopup(tk.Toplevel):
 
         row = 2
         for w in self.status_widgets.values():
-            w.grid(row=row, column=0, sticky=tk.E+tk.W)
+            w.grid(row=row, column=0, sticky=tk.E + tk.W, padx=5)
             row += 1
 
-        self.buttons['update'] = ttk.Button(self, text='Update Current SCT',
-                                            command=self.callbacks['update_sct'])
-        self.buttons['update'].grid(row=row, column=0, sticky=tk.W)
+        self.buttons['update'] = ttk.Button(self, text='Update Current SCT', command=self.callbacks['update_sct'])
+        self.buttons['update'].grid(row=row, column=0, sticky=tk.W, padx=5)
         self.buttons['update'].state(['disabled'])
 
         self.set_cur_inst = tk.IntVar(self, 0)
