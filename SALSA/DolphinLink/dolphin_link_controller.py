@@ -82,7 +82,7 @@ update_fail_errors = 'Export failed: errors'
 update_fail_index_size = 'Update failed: New index is too large'
 update_fail_sct_size = 'Update failed: New SCT is too large'
 update_fail_no_cur_inst = 'Update failed: Unable to find similar inst'
-update_fail_ss_stack = 'Update failed: Unable to update subscript stack'
+update_fail_ss_stack = 'Update failed: Unable to update section callstack: '
 update_fail_no_sel_inst = 'Update failed: No instruction is selected'
 update_success = 'Update succeeded'
 cur_sct_success = 'Current SCT'
@@ -206,8 +206,9 @@ class DolphinLink:
         # Fix subscript stack
         new_subscript_stack = self.get_new_subscript_stack(index, sct_ptr)
         if not isinstance(new_subscript_stack, bytearray):
-            return self.view.set_status(stat_type='update', style=fail_style,
-                                        status=update_fail_ss_stack)
+            if self.view is not None:
+                return self.view.set_status(stat_type='update', style=fail_style,
+                                            status=update_fail_ss_stack + str(new_subscript_stack))
 
         self._write_to_addr(value=new_ind, ba=self.addrs.pSCTIndex)
         self._write_to_addr(value=new_sct, ba=self.addrs.pSCTStart)
@@ -280,7 +281,7 @@ class DolphinLink:
             tgt_sect = index[tgt_sect_offset]
             new_inst_offset = self.callbacks['get_sect_preditor'](self.cur_sct, inst_sect, inst_offset, tgt_sect)
             if new_inst_offset is None:
-                return inst_sect, inst_offset, tgt_sect
+                return f'inst (ID==11) in {inst_sect} should target {tgt_sect}'
             out_subscript_stack += (new_inst_offset + sct_ptr + 8).to_bytes(4, byteorder='big')
 
         return out_subscript_stack
