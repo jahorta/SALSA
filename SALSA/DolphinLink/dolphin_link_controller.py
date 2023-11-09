@@ -89,6 +89,7 @@ cur_sct_success = 'Current SCT'
 
 fail_style = 'warning.TLabel'
 success_style = 'success.TLabel'
+dimmed_success_style = 'dim_success.TLabel'
 
 
 class DolphinLink:
@@ -212,17 +213,9 @@ class DolphinLink:
         self._write_to_addr(value=new_sct, ba=self.addrs.pSCTStart)
         self._write_to_addr(value=new_inst_offset, ba=self.addrs.pSCTPos, ptr_only=True)
         self._write_to_addr(value=new_subscript_stack, ba=self.addrs.subScriptStack)
-        self.view.set_status(stat_type='update', status=update_success, style=success_style)
-        self.view.after(3000, self.view.set_status, 'update', '', success_style)
-
-    def set_selected_inst_as_current(self):
-        self.selected_inst_offset = None
-        inst_offset = self.callbacks['get_sel_inst_offset']()
-        if inst_offset is None:
-            if self.view is not None:
-                return self.view.set_status(stat_type='update', status=update_fail_no_sel_inst, style=fail_style)
-        self.selected_inst_offset = inst_offset
-        self.update_sct()
+        if self.view is not None:
+            self.view.set_status(stat_type='update', status=update_success, style=success_style)
+            self.view.after(3000, self.view.set_status, 'update', update_success, dimmed_success_style)
 
     def _get_offset_of_similar_inst(self, index, sct_ptr):
         cur_inst_ptr = int.from_bytes(self._read_addr(self.addrs.pSCTPos, ptr_only=True), byteorder='big')
