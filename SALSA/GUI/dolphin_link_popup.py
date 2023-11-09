@@ -56,10 +56,10 @@ class DolphinLinkPopup(tk.Toplevel):
         self.buttons['update'].grid(row=row, column=0, sticky=tk.W)
         self.buttons['update'].state(['disabled'])
 
-        self.buttons['select'] = ttk.Button(self, text='Set Selected Inst as Current',
-                                            command=self.callbacks['set_cur_inst'])
-        self.buttons['select'].grid(row=row+1, column=0, sticky=tk.W)
-        self.buttons['select'].state(['disabled'])
+        self.set_cur_inst = tk.IntVar(self, 0)
+        set_cur_inst_button = ttk.Checkbutton(self, text=' Set Selected Inst as Next Scheduled Inst\n in Dolphin',
+                                              variable=self.set_cur_inst, onvalue=1, offvalue=0)
+        set_cur_inst_button.grid(row=row+1, column=0, sticky=tk.W, ipadx=5, padx=5)
 
         self.callbacks['attach_controller'](self)
 

@@ -102,7 +102,7 @@ class DolphinLink:
         self.view: Union[None, DolphinLinkPopup] = None
         self.view_callbacks = {
             'attach_controller': self.attach_view, 'attach_dolphin': self.attach_to_dolphin,
-            'update_sct': self.update_sct, 'set_cur_inst': self.set_selected_inst_as_current
+            'update_sct': self.update_sct
         }
 
         self.cur_sct = None
@@ -188,13 +188,16 @@ class DolphinLink:
         sct_ptr = int.from_bytes(self._read_addr(self.addrs.pSCTStart, ptr_only=True), byteorder='big')
 
         # fix next scheduled inst
-        if self.selected_inst_offset is None:
+        if self.view.set_cur_inst.get() == 0:
             new_inst_offset = self._get_offset_of_similar_inst(index, sct_ptr)
             if new_inst_offset is None or not isinstance(new_inst_offset, int):
                 return self.view.set_status(stat_type='update', style=fail_style,
                                             status=update_fail_no_cur_inst)
         else:
-            new_inst_offset = self.selected_inst_offset
+            new_inst_offset = self.callbacks['get_sel_inst_offset']()
+            if new_inst_offset is None:
+                if self.view is not None:
+                    return self.view.set_status(stat_type='update', status=update_fail_no_sel_inst, style=fail_style)
 
         new_inst_offset += int.from_bytes(self._read_addr(ba=self.addrs.pSCTStart, ptr_only=True), byteorder='big')
         new_inst_offset = new_inst_offset.to_bytes(length=4, byteorder='big', signed=False)
