@@ -200,7 +200,7 @@ class DolphinLink:
                 if self.view is not None:
                     return self.view.set_status(stat_type='update', status=update_fail_no_sel_inst, style=fail_style)
 
-        new_inst_offset += int.from_bytes(self._read_addr(ba=self.addrs.pSCTStart, ptr_only=True), byteorder='big')
+        new_inst_offset += sct_ptr
         new_inst_offset = new_inst_offset.to_bytes(length=4, byteorder='big', signed=False)
 
         # Fix subscript stack
