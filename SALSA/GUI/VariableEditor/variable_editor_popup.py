@@ -44,8 +44,6 @@ class VariablePopup(tk.Toplevel):
         self.script_ids = {}
         self.protocol('WM_DELETE_WINDOW', self.on_close)
         self.configure(**theme['Ttoplevel']['configure'])
-        tree_text_color = theme['Treeview']['configure']['foreground']
-        self.global_text_color = '#' + ''.join([str(max(0, int(_, 16) - 4)) for _ in tree_text_color[1:]])
 
         if self.log_key not in settings:
             settings[self.log_key] = {}
@@ -345,5 +343,3 @@ class VariablePopup(tk.Toplevel):
     def change_theme(self, theme):
         self.configure(**theme['Ttoplevel']['configure'])
         self.variable_usage.change_theme(theme)
-        tree_text_color = theme['Treeview']['configure']['foreground']
-        self.global_text_color = '#' + ''.join([str(max(0, int(_) - 2)) for _ in tree_text_color[1:]])
