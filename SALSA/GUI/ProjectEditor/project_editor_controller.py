@@ -783,7 +783,7 @@ class ProjectEditorController:
 
         # if rightclicked row is a case, add option for delete case
         if group_type != 'case':
-            if group_type != 'else' and 'first' not in restrictions:
+            if 'first' not in restrictions:
                 m.add_command(label='Add Instruction Above', command=lambda: self.rcm_add_inst('above'))
                 if group_type == 'else' or is_multiple:
                     m.entryconfig('Add Instruction Above', state='disabled')
@@ -792,14 +792,14 @@ class ProjectEditorController:
                 m.add_command(label='Add Instruction Below', command=lambda: self.rcm_add_inst('below'))
                 if group_type == 'if':
                     next_sel_iid = self.trees['instruction'].next(sel_iid)
-                    if 'else' not in self.trees['instruction'].item(next_sel_iid)['values'][0]:
+                    if 'else' in self.trees['instruction'].item(next_sel_iid)['values'][0]:
                         m.entryconfig('Add Instruction Below', state='disabled')
-                elif 'goto' in restrictions:
+                elif 'goto' in restrictions or is_multiple:
                     m.entryconfig('Add Instruction Below', state='disabled')
 
-            m.add_command(label='Remove Instruction', command=self.rcm_remove_inst)
+            m.add_command(label='Remove Instructions', command=self.rcm_remove_inst)
             if restrictions != '':
-                m.entryconfig('Remove Instruction', state='disabled')
+                m.entryconfig('Remove Instructions', state='disabled')
 
             m.add_command(label='Change Instruction', command=self.rcm_change_inst)
             if restrictions != '' or is_multiple:
