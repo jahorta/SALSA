@@ -166,7 +166,14 @@ class VariablePopup(tk.Toplevel):
                 if v_entry['is_global'] and not is_global:
                     kwargs['tags'] = [global_tag]
                 self.var_trees[tree_key].insert_entry(**kwargs)
-            self.var_trees[tree_key].tag_configure(global_tag, foreground=self.global_text_color)
+
+    def refresh_all_trees(self):
+        selections = {x: _.selection() for x, _ in self.var_trees.items()}
+        self.script_select('', self.cur_script)
+        for name, tree in self.var_trees.items():
+            if len(selections[name]) > 0:
+                tree.selection_set(selections[name])
+                tree.focus(selections[name][0])
 
     def var_right_click(self, e):
         if e.widget.identify('region', e.x, e.y) == 'heading':
@@ -271,10 +278,9 @@ class VariablePopup(tk.Toplevel):
         # Set alias via callback
         self.callbacks['set_alias'](self.cur_script, f'{tree_key}Var', row_id, new_alias)
         self.var_trees[tree_key].item(sel_iid, values=[new_alias])
-
-    def copy_alias(self, row):
-        # Popup to select scripts to copy to?
-        pass
+        self.refresh_all_trees()
+        self.callbacks['set_change_flag']()
+        self.callbacks['refresh_prj_trees']()
 
     def get_usages(self, tree_key, sel_iid, script=None):
         # Get variable usages from the active script for the variable selected
@@ -331,11 +337,17 @@ class VariablePopup(tk.Toplevel):
         for sel_iid in selection:
             sel_item = self.var_trees[tree_key].item(sel_iid)
             self.callbacks['set_alias'](None, f'{tree_key}Var', sel_item['text'], sel_item['values'][0])
+        self.refresh_all_trees()
+        self.callbacks['set_change_flag']()
+        self.callbacks['refresh_prj_trees']()
 
     def remove_global(self, tree_key, selection):
         for sel_iid in selection:
             sel_item = self.var_trees[tree_key].item(sel_iid)
             self.callbacks['remove_global'](f'{tree_key}Var', sel_item['text'])
+        self.refresh_all_trees()
+        self.callbacks['set_change_flag']()
+        self.callbacks['refresh_prj_trees']()
 
     def on_close(self):
         self.callbacks['close'](self.name, self)
