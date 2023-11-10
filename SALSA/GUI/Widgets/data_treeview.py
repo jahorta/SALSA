@@ -257,6 +257,8 @@ class DataTreeview(ttk.Treeview):
         if len(self.get_children('')) == 0:
             return
         self.has_shift = True
+        if self.first_selected is None:
+            return self.bDown_move(event)
 
         clicked_iid = self.identify_row(event.y)
         if clicked_iid in self.first_selected:
