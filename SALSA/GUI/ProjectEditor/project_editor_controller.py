@@ -748,8 +748,10 @@ class ProjectEditorController:
         sel_iid = self.trees['instruction'].identify_row(e.y)
         if sel_iid == '':
             return
-        self.trees['instruction'].selection_set(sel_iid)
-        self.trees['instruction'].focus(sel_iid)
+        if sel_iid not in self.trees['instruction'].selection():
+            self.trees['instruction'].selection_set(sel_iid)
+            self.trees['instruction'].focus(sel_iid)
+        is_multiple = len(self.trees['instruction'].selection()) > 1
         inst_label = self.trees['instruction'].item(sel_iid)['values'][0]
         group_type = ''
         if '(' in inst_label and ')' in inst_label:
@@ -770,15 +772,21 @@ class ProjectEditorController:
         # if rightclicked row is group, add option for "Add Instruction in group"
         if group_type in ('if', 'else', 'while', 'case'):
             m.add_command(label='Add Instruction Inside Group', command=lambda: self.rcm_add_inst('inside'))
+            if is_multiple:
+                m.entryconfig('Add Instruction Inside Group', state='disabled')
 
         # if rightclicked row is a switch or case, add option for "Add Switch Case"
         if group_type in ('case', 'switch'):
             m.add_command(label='Add Switch Case', command=self.rcm_add_switch_case)
+            if is_multiple:
+                m.entryconfig('Add Switch Case', state='disabled')
 
         # if rightclicked row is a case, add option for delete case
         if group_type != 'case':
             if group_type != 'else' and 'first' not in restrictions:
                 m.add_command(label='Add Instruction Above', command=lambda: self.rcm_add_inst('above'))
+                if group_type == 'else' or is_multiple:
+                    m.entryconfig('Add Instruction Above', state='disabled')
 
             if 'last' not in restrictions:
                 m.add_command(label='Add Instruction Below', command=lambda: self.rcm_add_inst('below'))
@@ -793,13 +801,18 @@ class ProjectEditorController:
             if restrictions != '':
                 m.entryconfig('Remove Instruction', state='disabled')
 
-            if restrictions == '':
-                m.add_command(label='Change Instruction', command=self.rcm_change_inst)
+            m.add_command(label='Change Instruction', command=self.rcm_change_inst)
+            if restrictions != '' or is_multiple:
+                m.entryconfig('Change Instruction', state='disabled')
         else:
             m.add_command(label='Remove Case', command=self.rcm_remove_switch_case)
+            if is_multiple:
+                m.entryconfig('Remove Case', state='disabled')
 
         if self.project.inst_is_label(self.current['script'], self.current['section'], self.current['instruction']):
             m.add_command(label='Change Label Section Name', command=lambda: self.show_sect_rename_widget('instruction', e))
+            if is_multiple:
+                m.entryconfig('Change Label Section Name', state='disabled')
 
         if len(self.trees['instruction'].selection()) < 2:
             m.add_separator()
