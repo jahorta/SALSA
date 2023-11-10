@@ -337,9 +337,10 @@ class SCTProjectFacade:
         if script is not None:
             return self.project.scts[script].variables[var_type][var_id]['usage']
         usage = []
-        for name, cur_script in self.project.scts.values():
+        for name, cur_script in self.project.scts.items():
             if var_id in cur_script.variables[var_type]:
-                usage.append((name, *cur_script.variables[var_type][var_id]['usage']))
+                usage += [(name, *_) for _ in list(cur_script.variables[var_type][var_id]['usage'])]
+        return usage
 
     def update_var_usage(self, changes, script, section, instruction, parameter):
         trace = (section, instruction, parameter)
