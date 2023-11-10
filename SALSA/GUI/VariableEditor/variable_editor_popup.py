@@ -15,8 +15,8 @@ global_tag = 'globals'
 headers = ['id', 'alias']
 
 header_settings = {
-    'id': {'label': 'ID', 'width': 50, 'stretch': True},
-    'alias': {'label': 'Alias', 'width': 120, 'stretch': True}
+    'id': {'label': 'ID', 'width': 63, 'stretch': True},
+    'alias': {'label': 'Alias', 'width': 180, 'stretch': True}
 }
 
 default_tree_width = 100
