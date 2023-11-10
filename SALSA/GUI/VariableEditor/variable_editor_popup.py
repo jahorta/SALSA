@@ -176,6 +176,7 @@ class VariablePopup(tk.Toplevel):
         if sel_iid not in cur_selection:
             e.widget.selection_set(sel_iid)
             e.widget.focus(sel_iid)
+            cur_selection = [sel_iid]
 
         m = tk.Menu(self, tearoff=0)
         var_type = self.determine_tab()
