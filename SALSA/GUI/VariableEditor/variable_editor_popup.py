@@ -299,11 +299,8 @@ class VariablePopup(tk.Toplevel):
             cur_row += 1
 
     def goto_usage(self, e):
-        if self.script_tree.item(self.script_tree.focus())['text'] == global_tag:
-            return
-
-        trace = [self.script_tree.item(self.script_tree.focus())['text']]
-        trace += e.widget['text'].split(link_sep)
+        trace = e.widget['text'].split(link_sep)
+        trace = [self.script_tree.item(self.script_tree.focus())['text']] + trace if len(trace) < 4 else trace
         self.callbacks['goto_link'](*trace)
 
     def show_usage_rcm(self, e):
