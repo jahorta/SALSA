@@ -209,6 +209,7 @@ class DataTreeview(ttk.Treeview):
         self.row_data = {}
         self.first_entry = None
         self.last_entry = None
+        self.first_selected = None
 
     def get_selection(self):
         return [self.row_data[self.get_children()[int(s)]] for s in self.cur_selection]
