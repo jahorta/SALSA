@@ -166,6 +166,7 @@ class VariablePopup(tk.Toplevel):
                 if v_entry['is_global'] and not is_global:
                     kwargs['tags'] = [global_tag]
                 self.var_trees[tree_key].insert_entry(**kwargs)
+            self.var_trees[tree_key].tag_configure(global_tag, foreground=self.global_text_color)
 
     def var_right_click(self, e):
         if e.widget.identify('region', e.x, e.y) == 'heading':
