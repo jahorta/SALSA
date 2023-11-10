@@ -297,7 +297,6 @@ class SCTProjectFacade:
         for inst in self.project.scts[script].sects[section].insts.values():
             inst.generate_condition(self.get_script_variables_with_aliases(script))
 
-
     # ----------------------- #
     # Script variable methods #
     # ----------------------- #
