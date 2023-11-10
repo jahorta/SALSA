@@ -217,7 +217,7 @@ class VariablePopup(tk.Toplevel):
         # get column that was clicked
         column = e.widget.identify_column(e.x)
         if column == '#0':
-            return self.get_usages(tree_key=tree_key, sel_iid=sel_iid)
+            return self.get_usages(tree_key=tree_key, sel_iid=sel_iid, script=self.cur_script)
 
         if global_tag not in e.widget.item(sel_iid)['tags']:
             self.edit_alias(tree_key=tree_key, sel_iid=sel_iid, column=column)
@@ -276,10 +276,10 @@ class VariablePopup(tk.Toplevel):
         # Popup to select scripts to copy to?
         pass
 
-    def get_usages(self, tree_key, sel_iid):
+    def get_usages(self, tree_key, sel_iid, script=None):
         # Get variable usages from the active script for the variable selected
         row_id = int(self.var_trees[tree_key].item(sel_iid)['text'])
-        self.populate_usages(self.callbacks['get_var_usage'](self.cur_script, f'{tree_key}Var', row_id))
+        self.populate_usages(self.callbacks['get_var_usage'](script, f'{tree_key}Var', row_id))
 
     def populate_usages(self, usage_list: List[Tuple[str, int, str]]):
         for child in self.variable_usage.scroll_frame.winfo_children():
