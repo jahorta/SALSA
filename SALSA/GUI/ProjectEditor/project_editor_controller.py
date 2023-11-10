@@ -814,10 +814,9 @@ class ProjectEditorController:
             if is_multiple:
                 m.entryconfig('Change Label Section Name', state='disabled')
 
-        if len(self.trees['instruction'].selection()) < 2:
-            m.add_separator()
-            m.add_command(label='Open all groups', command=self.trees['instruction'].open_all_groups)
-            m.add_command(label='Close all groups', command=self.trees['instruction'].close_all_groups)
+        m.add_separator()
+        m.add_command(label='Open all groups', command=self.trees['instruction'].open_all_groups)
+        m.add_command(label='Close all groups', command=self.trees['instruction'].close_all_groups)
 
         m.bind('<Escape>', m.destroy)
         try:
