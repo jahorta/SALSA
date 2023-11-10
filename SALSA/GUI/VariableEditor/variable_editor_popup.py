@@ -269,7 +269,6 @@ class VariablePopup(tk.Toplevel):
         if e.widget.cur_alias != '':
             self.cur_var_aliases.remove(e.widget.cur_alias)
         self.delete_alias_entry(e)
-        self.unbind()
         if new_alias == '':
             return
         self.cur_var_aliases.append(new_alias)
