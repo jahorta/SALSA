@@ -154,6 +154,8 @@ class VariablePopup(tk.Toplevel):
         for var_type, v_dict in var_dict.items():
             tree_key = var_type[:-3]
             for v_id, v_entry in v_dict.items():
+                if v_entry['is_global'] and not is_global:
+                    v_id = f'{v_id} (G)'
                 kwargs = {'parent': '', 'index': 'end', 'text': v_id}
                 values = []
                 for col in headers[1:]:
