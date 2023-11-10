@@ -173,7 +173,7 @@ class VariablePopup(tk.Toplevel):
             return
         sel_iid = e.widget.identify_row(e.y)
         cur_selection = e.widget.selection()
-        if len(cur_selection) == 0:
+        if sel_iid not in cur_selection:
             e.widget.selection_set(sel_iid)
             e.widget.focus(sel_iid)
 
