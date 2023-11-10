@@ -10,7 +10,7 @@ from SALSA.GUI.Widgets import widgets as w
 
 no_alias = '               '
 
-global_tag = 'global'
+global_tag = 'globals'
 
 headers = ['id', 'alias']
 
@@ -135,7 +135,7 @@ class VariablePopup(tk.Toplevel):
         self.link_font = SALSAFont()
 
     def _populate_script_tree(self):
-        self.script_tree.insert_entry(parent='', text='global', values=[], index='end', row_data=None)
+        self.script_tree.insert_entry(parent='', text=global_tag, values=[], index='end', row_data=None)
         all_scripts = self.callbacks['get_scripts']()
         for script in all_scripts:
             self.script_tree.insert_entry(parent='', text=script['name'], values=[], index='end', row_data=script['name'])
