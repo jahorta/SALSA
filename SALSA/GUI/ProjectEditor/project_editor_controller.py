@@ -123,6 +123,9 @@ class ProjectEditorController:
         if script not in self.script_refresh_offset_queue and script is not None:
             self.script_refresh_offset_queue.append(script)
 
+        self.set_has_changes()
+
+    def set_has_changes(self):
         self.has_changes = True
         self.view.save_button.configure(state='normal')
 
