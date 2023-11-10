@@ -652,37 +652,41 @@ class ProjectEditorController:
         m = tk.Menu(self.view, tearoff=0)
 
         # commands to add section from project
-        if not is_multiple:
-            m.add_command(label='Rename Section', command=lambda ev=e: self.show_sect_rename_widget('section', ev))
-            m.add_command(label='Add New Section Above', command=lambda: self.rcm_add_sect('above', row_data))
-            m.add_command(label='Add New Section Below', command=lambda: self.rcm_add_sect('below', row_data))
 
+        m.add_command(label='Rename Section', command=lambda ev=e: self.show_sect_rename_widget('section', ev))
+        m.add_command(label='Add New Section Above', command=lambda: self.rcm_add_sect('above', row_data))
+        m.add_command(label='Add New Section Below', command=lambda: self.rcm_add_sect('below', row_data))
         # command to remove section from project
-        label = 'Delete Section'
-        label += 's' if is_multiple else ''
+        label = 'Delete Sections' if is_multiple else 'Delete Section'
         m.add_command(label=label, command=lambda: self.rcm_del_sect(row_data))
 
-        if is_group or is_multiple:
-            m.add_separator()
+        m.add_separator()
+        m.add_command(label='Ungroup sections', command=lambda: self.rcm_ungroup_sections(row_data))
+        m.add_command(label='Group sections', command=lambda: self.rcm_group_sections(row_data))
 
-        if is_group and not is_multiple:
-            m.add_command(label='Ungroup sections', command=lambda: self.rcm_ungroup_sections(row_data))
+        m.add_separator()
+        m.add_command(label='Open all groups', command=self.trees['section'].open_all_groups)
+        m.add_command(label='Close all groups', command=self.trees['section'].close_all_groups)
+
+        m.add_separator()
+        s_type = tk.Menu(m, tearoff=0)
+        s_type.add_command(label='Virtual', command=lambda: self.rcm_change_sect_type('virtual'))
+        s_type.add_command(label='Label', command=lambda: self.rcm_change_sect_type('label'))
+        s_type.add_command(label='Code', command=lambda: self.rcm_change_sect_type('code'))
+        m.add_cascade(label='Change section type', menu=s_type)
 
         if is_multiple:
-            m.add_command(label='Group sections', command=lambda: self.rcm_group_sections(row_data))
-
-        if not is_multiple:
-            m.add_separator()
-            m.add_command(label='Open all groups', command=self.trees['section'].open_all_groups)
-            m.add_command(label='Close all groups', command=self.trees['section'].close_all_groups)
-
-        if not is_group and not is_multiple:
-            m.add_separator()
-            s_type = tk.Menu(m, tearoff=0)
-            s_type.add_command(label='Virtual', command=lambda: self.rcm_change_sect_type('virtual'))
-            s_type.add_command(label='Label', command=lambda: self.rcm_change_sect_type('label'))
-            s_type.add_command(label='Code', command=lambda: self.rcm_change_sect_type('code'))
-            m.add_cascade(label='Change section type', menu=s_type)
+            m.entryconfigure('Rename Section', state='disabled')
+            m.entryconfigure('Add New Section Above', state='disabled')
+            m.entryconfigure('Add New Section Below', state='disabled')
+            m.entryconfigure('Ungroup sections', state='disabled')
+            m.entryconfigure('Change section type', state='disabled')
+        else:
+            m.entryconfigure('Group sections', state='disabled')
+        if is_group:
+            m.entryconfigure('Change section type', state='disabled')
+        else:
+            m.entryconfigure('Ungroup sections', state='disabled')
 
         m.bind('<Escape>', m.destroy)
         try:
