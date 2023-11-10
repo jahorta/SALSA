@@ -181,17 +181,24 @@ class VariablePopup(tk.Toplevel):
         m = tk.Menu(self, tearoff=0)
         var_type = self.determine_tab()
         can_change = global_tag not in e.widget.item(sel_iid)['tags']
-        if len(cur_selection) == 1 and can_change:
-            m.add_command(label='Change variable alias', command=lambda: self.edit_alias(var_type, sel_iid, '#1'))
+        m.add_command(label='Change variable alias', command=lambda: self.edit_alias(var_type, sel_iid, '#1'))
+        m.add_command(label='Find variable usages', command=lambda: self.get_usages(var_type, sel_iid,
+                                                                                    script=self.cur_script))
+        m.add_command(label='Find all variable usages', command=lambda: self.get_usages(var_type, sel_iid))
 
-        if len(cur_selection) == 1:
-            m.add_command(label='Find variable usages', command=lambda: self.get_usages(var_type, sel_iid))
+        m.add_command(label='Set Global', command=lambda: self.set_global(var_type, cur_selection))
+        m.add_command(label='Remove Global', command=lambda: self.remove_global(var_type, cur_selection))
+
+        if len(cur_selection) != 1:
+            m.entryconfig('Change variable alias', state='disabled')
+            m.entryconfig('Find variable usages', state='disabled')
+            m.entryconfig('Find all variable usages', state='disabled')
 
         if can_change:
-            m.add_command(label='Set Global', command=lambda: self.set_global(var_type, cur_selection))
+            m.entryconfig('Remove Global', state='disabled')
         else:
             m.entryconfig('Change variable alias', state='disabled')
-            m.add_command(label='Remove Global', command=lambda: self.remove_global(var_type, cur_selection))
+            m.entryconfig('Set Global', state='disabled')
 
         m.bind('<Leave>', m.destroy)
         try:
