@@ -87,6 +87,7 @@ class SCTProjectFacade:
         else:
             self.cur_script = script
             self._refresh_inst_positions(script=script, section=section)
+            self._refresh_all_conditions(script=script, section=section)
             inst_list = self.project.scts[script].sects[section].get_inst_list(style)
             instructions = self.project.scts[script].sects[section].insts
             tree_list = self._create_tree(group=instructions, key_list=inst_list, headers=headers,
@@ -291,6 +292,11 @@ class SCTProjectFacade:
         section = self.project.scts[script].sects[section]
         for i, inst_id in enumerate(section.inst_list):
             section.insts[inst_id].ungrouped_position = i
+
+    def _refresh_all_conditions(self, script, section):
+        for inst in self.project.scts[script].sects[section].insts.values():
+            inst.generate_condition(self.get_script_variables_with_aliases(script))
+
 
     # ----------------------- #
     # Script variable methods #
