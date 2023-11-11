@@ -40,8 +40,8 @@ class ProjectEditorController:
 
         self.project: SCTProjectFacade = facade
         self.project.set_callback('confirm_remove_inst_group', self.confirm_change_inst_group)
-        self.project.set_callback('set_change', self.set_change_flag)
-        self.project.set_callback('delay_set_change', self.delay_set_change_flag)
+        self.project.set_callback('set_change', self.set_refresh_flag)
+        self.project.set_callback('delay_set_change', self.delay_set_refresh_flag)
 
         self.view: ProjectEditorView = view
         view_callbacks = {
@@ -64,7 +64,7 @@ class ProjectEditorController:
                         'refresh_inst': self.pe_on_refresh_inst,
                         'update_variables': self.update_var_usage,
                         'get_subscript_list': self.project.get_jmp_section_list,
-                        'set_change': self.set_change_flag,
+                        'set_change': self.set_refresh_flag,
                         'get_instruction_list': self.project.get_jmp_inst_dict,
                         'get_instruction_identifier': self.project.get_inst_desc_info,
                         'adjust_inst_grouping': self.project.adjust_IF_grouping_type,
@@ -115,10 +115,10 @@ class ProjectEditorController:
 
         self.entry_widget: Union[None, InstructionSelectorWidget, LabelNameEntry, ttk.Frame] = None
 
-    def delay_set_change_flag(self, delay):
-        self.view.after(delay, self.set_change_flag)
+    def delay_set_refresh_flag(self, delay):
+        self.view.after(delay, self.set_refresh_flag)
 
-    def set_change_flag(self, script=None):
+    def set_refresh_flag(self, script=None):
         script = self.current.get('script', None) if script is None else script
         if script not in self.script_refresh_offset_queue and script is not None:
             self.script_refresh_offset_queue.append(script)
