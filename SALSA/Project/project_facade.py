@@ -1877,8 +1877,20 @@ class SCTProjectFacade:
         return None, None
 
     def get_inst_group_bounds(self, cur_group) -> (str, str):
-        first = self.get_inst_uuid_from_group_entry(cur_group[0])
-        last = self.get_inst_uuid_from_group_entry(cur_group[-1], last=True)
+        if isinstance(cur_group, dict):
+            cur_group = list(cur_group.values())
+        first = None
+        last = None
+        i = 0
+        while first is None:
+            first = self.get_inst_uuid_from_group_entry(cur_group[i])
+            i += 1
+            if i == len(cur_group):
+                return first, last
+        j = len(cur_group) - 1
+        while last is None:
+            last = self.get_inst_uuid_from_group_entry(cur_group[j], last=True)
+            j -= 1
         return first, last
 
     @staticmethod
