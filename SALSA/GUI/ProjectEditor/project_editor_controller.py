@@ -879,22 +879,40 @@ class ProjectEditorController:
         for tree in self.trees.values():
             tree.bind_events()
 
-    def rcm_remove_inst(self):
-        sel_iid = self.trees['instruction'].focus()
-        cur_inst_uuid = self.trees['instruction'].row_data[sel_iid]
-        end_kwargs = {'result': None, 'cur_inst_uuid': cur_inst_uuid}
-        if self.project.inst_is_group(**self.current):
-            children = self.project.get_inst_group(self.current['script'], self.current['section'], cur_inst_uuid)
-            return self.confirm_change_inst_group(children=children, end_callback=self.finish_remove_inst,
-                                                  end_kwargs=end_kwargs)
-        self.finish_remove_inst(**end_kwargs)
+    def rcm_remove_inst(self, remaining_sel_iids=None):
+        if remaining_sel_iids is None:
+            remaining_sel_iids = list(self.trees['instruction'].selection())
 
-    def finish_remove_inst(self, result, cur_inst_uuid):
-        if result is not None:
-            if result == 'cancel':
-                return
-        self.project.remove_inst(self.current['script'], self.current['section'], cur_inst_uuid, result)
+        while len(remaining_sel_iids) > 0:
+            sel_iid = remaining_sel_iids.pop(-1)
+            new_selection_set = list(self.trees['instruction'].selection())
+            new_selection_set.remove(sel_iid)
+            self.trees['instruction'].selection_set(new_selection_set)
+
+            cur_inst_uuid = self.trees['instruction'].row_data[sel_iid]
+            is_else = '(else)' in self.trees['instruction'].item(sel_iid)['values'][0]
+            if cur_inst_uuid is None or is_else:
+                continue
+
+            end_kwargs = {'result': None, 'cur_inst_uuid': cur_inst_uuid, 'remaining_sel_iids': remaining_sel_iids}
+            if self.project.inst_is_group(self.current['script'], self.current['section'], cur_inst_uuid):
+                children = self.project.get_inst_group(self.current['script'], self.current['section'], cur_inst_uuid)
+                return self.confirm_change_inst_group(children=children, end_callback=self.finish_remove_inst,
+                                                      end_kwargs=end_kwargs,
+                                                      force_delete_all=self.project.group_is_empty(
+                                                          self.current['script'], self.current['section'],
+                                                          cur_inst_uuid))
+            self.project.remove_inst(self.current['script'], self.current['section'], cur_inst_uuid, None)
+        self.set_refresh_flag(self.current['script'])
+
+    def finish_remove_inst(self, result, cur_inst_uuid, remaining_sel_iids):
+        if result is None:
+            self.project.remove_inst(self.current['script'], self.current['section'], cur_inst_uuid, result)
+        elif result != 'cancel':
+            self.project.remove_inst(self.current['script'], self.current['section'], cur_inst_uuid, result)
         self.refresh_all_trees()
+        if len(remaining_sel_iids) > 0:
+            self.rcm_remove_inst(remaining_sel_iids)
 
     def rcm_change_inst(self):
         sel_iid = self.trees['instruction'].focus()
