@@ -31,6 +31,7 @@ Features (Completed)
 * Ability to navigate using instruction detail links
 * Adding, removing, and changing instructions
 * Editing parameter values
+* Ability to name script variables (Variable alias editor)
 
 * NEW: Ability to send scripts to Dolphin when running Skies of Arcadia Legends
   * Only works on Windows at the moment and requires psutil
@@ -38,7 +39,6 @@ Features (Completed)
 Features (In Progress)
 ----------------------
 * Program help (Opens into a webpage. Only skeleton is implemented)
-* Ability to name script variables (Variable alias editor. Mostly works except for globals)
 
 Features (Planned)
 ------------------
