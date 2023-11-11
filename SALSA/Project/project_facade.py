@@ -1311,10 +1311,7 @@ class SCTProjectFacade:
         if cur_inst.base_id in self.base_insts.group_inst_list:
             if change_type is None:
                 raise ValueError('Current inst is a group type, but no group resolution was given')
-            inst_group = self.get_inst_group(script, section, inst)
-            if cur_inst.base_id == 3:
-                inst_group = (inst_group[f'{inst}{sep}switch'] if case is None
-                              else {case: inst_group[f'{inst}{sep}switch'][case]})
+
             new_id = None if new_id is None else int(new_id)
 
             custom_link_tgt = self.get_next_grouped_uuid(script, section, inst)
@@ -1326,6 +1323,10 @@ class SCTProjectFacade:
 
                 if goto in cur_section.insts:
                     self.remove_inst(script, section, goto, custom_link_tgt=custom_link_tgt, result=None)
+
+            inst_group = self.get_inst_group(script, section, inst)
+            if cur_inst.base_id == 3:
+                inst_group = inst_group if case is None else {case: inst_group[f'{inst}{sep}switch'][case]}
 
             if case is None:
                 self.remove_inst_links(script, section, inst, custom_tgt=custom_link_tgt)
