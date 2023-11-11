@@ -772,6 +772,29 @@ class SCTProjectFacade:
     def inst_is_group(self, script, section, instruction, **kwargs):
         return self.project.scts[script].sects[section].insts[instruction].base_id in (0, 3)
 
+    def group_is_empty(self, script, section, instruction, **kwargs):
+        cur_sect = self.project.scts[script].sects[section]
+        parents, index = self.get_grouped_parents_and_index(instruction, cur_sect.inst_tree)
+        cur_group = cur_sect.inst_tree
+        for p in parents:
+            cur_group = cur_group[p]
+        if not isinstance(cur_group[index], dict):
+            return True
+        k, v = list(cur_group[index].items())[0]
+        if 'switch' in k:
+            for k1, v1 in v.items():
+                if len(v) == 1:
+                    if v[0] not in cur_sect.insts[instruction].my_goto_uuids:
+                        return False
+                elif len(v1) > 0:
+                    return False
+        elif len(v) == 1:
+            if v[0] not in cur_sect.insts[instruction].my_goto_uuids:
+                return False
+        elif len(v) > 0:
+            return False
+        return True
+
     def inst_is_label(self, script, section, instruction):
         return self.project.scts[script].sects[section].insts[instruction].base_id == 9
 
