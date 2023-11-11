@@ -1954,7 +1954,9 @@ class SCTProjectFacade:
                 item_key = list(entry.keys())[-1]
                 item_uuid = self.get_inst_uuid_from_group_entry(entry[item_key], last)
         elif isinstance(entry, list):
-            if last:
+            if len(entry) == 0:
+                item_uuid = None
+            elif last:
                 item_uuid = self.get_inst_uuid_from_group_entry(entry[-1], last)
             else:
                 item_uuid = self.get_inst_uuid_from_group_entry(entry[0], last)
