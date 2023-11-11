@@ -954,7 +954,8 @@ class ProjectEditorController:
 
     def confirm_change_inst_group(self, children, end_callback, end_kwargs, warning_suffix='', new_id=None, force_delete_all=False):
         # Create message to confirm change of instruction (separate method)
-        cur_inst_id = self.project.get_inst_id(**self.current)
+        cur_inst_uuid = list(children.keys())[0].split(sep)[0]
+        cur_inst_id = self.project.get_inst_id(self.current['script'], self.current['section'], cur_inst_uuid)
         new_id = None if new_id is None else int(new_id)
 
         if not force_delete_all:
@@ -1067,7 +1068,7 @@ class ProjectEditorController:
         if change == 'remove':
             has_changed = self.project.remove_loop_param(**self.current, loop_num=loop_num)
         if has_changed:
-            self.set_change_flag()
+            self.set_refresh_flag()
             self.refresh_tree('instruction', keep_selection=True)
             param_tree = self.project.get_parameter_tree(headings=self.view.get_headers('parameter'), **self.current)
             self.update_tree('parameter', param_tree)
