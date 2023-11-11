@@ -1836,15 +1836,16 @@ class SCTProjectFacade:
         for parent in parents:
             cur_level = cur_level[parent]
 
-        group = cur_level[index]
+        group = copy.deepcopy(cur_level[index])
 
         if not isinstance(group, dict):
             return None
 
-        next_element = cur_level[index + 1]
-        if isinstance(next_element, dict):
-            if inst_uuid in list(next_element.keys())[0]:
-                group |= next_element
+        if index + 1 < len(cur_level):
+            next_element = cur_level[index + 1]
+            if isinstance(next_element, dict):
+                if inst_uuid in list(next_element.keys())[0]:
+                    group |= copy.deepcopy(next_element)
 
         return group
 
