@@ -952,24 +952,25 @@ class ProjectEditorController:
     # Group Change Confirmation Messageboxes #
     # -------------------------------------- #
 
-    def confirm_change_inst_group(self, children, end_callback, end_kwargs, warning_suffix='', new_id=None):
+    def confirm_change_inst_group(self, children, end_callback, end_kwargs, warning_suffix='', new_id=None, force_delete_all=False):
         # Create message to confirm change of instruction (separate method)
         cur_inst_id = self.project.get_inst_id(**self.current)
         new_id = None if new_id is None else int(new_id)
 
-        message = f'Are you sure you want to'
+        if not force_delete_all:
+            message = f'Are you sure you want to'
 
-        message += ' change ' if new_id is not None else ' remove '
-        message += f'this instruction: {self.project.get_inst_id_name(cur_inst_id)} {warning_suffix}'
-        if new_id is not None:
-            message += f' to {self.project.get_inst_id_name(new_id)}?'
-            message += '\nThis will remove the instruction group.' if new_id not in self.project.base_insts.group_inst_list else '\nThis will change the instruction group type.'
+            message += ' change ' if new_id is not None else ' remove '
+            message += f'this instruction: {self.project.get_inst_id_name(cur_inst_id)} {warning_suffix}'
+            if new_id is not None:
+                message += f' to {self.project.get_inst_id_name(new_id)}?'
+                message += '\nThis will remove the instruction group.' if new_id not in self.project.base_insts.group_inst_list else '\nThis will change the instruction group type.'
 
-        cancel = not tk.messagebox.askokcancel(title='Confirm Instruction Group Removal', message=message)
-        if cancel:
-            end_kwargs['result'] = cancel
-            return end_callback(**end_kwargs)
-        return self.view.inst_group_handling(cur_inst_id, new_id, children, end_callback, end_kwargs)
+            cancel = not tk.messagebox.askokcancel(title='Confirm Instruction Group Removal', message=message)
+            if cancel:
+                end_kwargs['result'] = 'cancel'
+                return end_callback(**end_kwargs)
+        return self.view.inst_group_handling(cur_inst_id, new_id, children, end_callback, end_kwargs, force_delete_all)
 
     def confirm_remove_sect_group(self, children, end_callback, end_kwargs, warning_suffix='', new_id=None):
         pass
