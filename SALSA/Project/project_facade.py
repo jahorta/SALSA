@@ -1387,6 +1387,10 @@ class SCTProjectFacade:
 
         if new_id is None:
             cur_group.pop(index)
+            if not index >= len(cur_group):
+                if isinstance(cur_group[index], dict):
+                    if f'{inst}{sep}else' in cur_group[index]:
+                        cur_group.pop(index)
             return True
 
         if cur_inst.base_id in self.base_insts.group_inst_list:
