@@ -1572,6 +1572,8 @@ class SCTProjectFacade:
         cur_sect = self.project.scts[script].sects[section]
 
         start_inst_key, end_inst_key = self.get_inst_group_bounds(cur_group)
+        if start_inst_key is None:
+            return
 
         # Remove Instructions from current place in ungrouped in new temp ungrouped
         start_inst_uuid = start_inst_key if sep not in start_inst_key else start_inst_key.split(sep)[0]
