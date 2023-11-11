@@ -376,7 +376,7 @@ class ProjectEditorView(ttk.Frame):
         for k, v in width_ratios.items():
             cur_tree.column(k, width=int(v * widget_width))
 
-    def inst_group_handling(self, cur_inst_id, new_id, children, end_callback, end_kwargs):
+    def inst_group_handling(self, cur_inst_id, new_id, children, end_callback, end_kwargs, force_delete_all):
         # create message to decide how to handle group entries
         children = [{k: children[k]} for k in children.keys()]
         if cur_inst_id == 0:
@@ -406,6 +406,9 @@ class ProjectEditorView(ttk.Frame):
                                head_labels=labels, row_labels=row_labels, inst_id=cur_inst_id, new_inst_id=new_id,
                                theme=self.theme, end_callback=end_callback,
                                end_kwargs=end_kwargs)
+
+        if force_delete_all:
+            handler.close(cancel=False)
 
     def change_theme(self, theme):
         self.theme = theme
