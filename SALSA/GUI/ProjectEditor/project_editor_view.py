@@ -402,10 +402,10 @@ class ProjectEditorView(ttk.Frame):
             if new_id == 3:
                 entry_vars.append(tk.IntVar(self))
 
-        InstGroupHandlerDialog(self, title='Group Handling', radio_vars=radio_vars, entry_vars=entry_vars,
-                               head_labels=labels, row_labels=row_labels, inst_id=cur_inst_id, new_inst_id=new_id,
-                               theme=self.theme, end_callback=end_callback,
-                               end_kwargs=end_kwargs)
+        handler = InstGroupHandlerDialog(self, title='Group Handling', radio_vars=radio_vars, entry_vars=entry_vars,
+                                         head_labels=labels, row_labels=row_labels, inst_id=cur_inst_id,
+                                         new_inst_id=new_id, theme=self.theme, end_callback=end_callback,
+                                         end_kwargs=end_kwargs)
 
         if force_delete_all:
             handler.close(cancel=False)
