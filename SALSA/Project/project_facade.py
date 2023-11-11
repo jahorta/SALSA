@@ -2044,6 +2044,8 @@ class SCTProjectFacade:
 
         if 'out' in direction:
             for link in cur_inst.links_out:
+                if link.target_trace is None:
+                    continue
                 tgt_sect = link.target_trace[0]
                 tgt_inst_uuid = link.target_trace[1]
                 self.project.scts[script].sects[tgt_sect].insts[tgt_inst_uuid].links_in.remove(link)
