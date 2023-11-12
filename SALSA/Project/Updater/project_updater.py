@@ -110,6 +110,13 @@ class ProjectUpdater:
         return cur_piece
 
     @staticmethod
+    def _add_attr(cur_piece, *attrs):
+        for new_attr in attrs:
+            if new_attr[0] not in cur_piece.__dict__:
+                setattr(cur_piece, new_attr[0], new_attr[1])
+        return cur_piece
+
+    @staticmethod
     def _change_attribute_names(cur_piece, *changes):
         for change in changes:
             old_attr = change[0]
@@ -264,12 +271,12 @@ if __name__ == '__main__':
     os.chdir(cur_dir)
 
     model = ProjectModel()
-    project: SCTProject = model.load_project(filepath=os.path.join('./test', 'full.prj'), ignore_dir=True)
+    project: SCTProject = model.load_project(filepath=os.path.join('./test', 'test_UwU v3.prj'), ignore_dir=True)
     if getattr(project, 'version', None) is None:
         project.version = 1
 
-    specific_script = 'me034c'
-    # specific_script = None
+    # specific_script = 'me034c'
+    specific_script = None
 
     # Only check the first script?
     if 'scripts' in project.__dict__:

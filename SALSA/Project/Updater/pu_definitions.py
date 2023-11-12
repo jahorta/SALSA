@@ -1,5 +1,14 @@
 from SALSA.Project.Updater.pu_constants import PP, UP
 
+v6 = {
+    PP.instruction: {
+        1: {
+            UP.callable: '_add_attr',
+            UP.arguments: [('do_not_encode', False)]
+        }
+    }
+}
+
 v5 = {
     PP.parameter: {
         1: {
@@ -95,12 +104,14 @@ update_tasks = {
     1: v2,
     2: v3,
     3: v4,
-    4: v5
+    4: v5,
+    5: v6
 }
 
 p_max_depth = {
     1: PP.parameter,
     2: PP.instruction,
     3: PP.script,
-    4: PP.parameter
+    4: PP.parameter,
+    5: PP.instruction
 }
