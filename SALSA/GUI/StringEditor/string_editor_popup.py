@@ -456,10 +456,12 @@ class StringPopup(tk.Toplevel):
             m.add_command(label='Change String ID', command=lambda: self.show_rename_widget(sel_iid))
             m.add_separator()
             m.add_command(label='Delete String', command=lambda: self.string_delete(sel_iid))
-        else:
-            if sel_iid != '' and row_data is None and len(self.strings.get_children(sel_iid)) == 0:
-                m.add_separator()
-                m.add_command(label='Delete String Group', command=lambda: self.string_group_delete(sel_iid))
+
+        elif sel_iid != '' and row_data is None:
+            m.add_separator()
+            m.add_command(label='Delete String Group', command=lambda: self.string_group_delete(sel_iid))
+            if len(self.string_tree.get_children(sel_iid)) > 0:
+                m.entryconfigure('Delete String Group', state='disabled')
 
         m.bind('<Escape>', m.destroy)
         try:
