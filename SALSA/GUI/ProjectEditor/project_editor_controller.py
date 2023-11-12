@@ -138,6 +138,9 @@ class ProjectEditorController:
 
     def save_project(self):
         self.callbacks['save_project']()
+        self.save_complete()
+
+    def save_complete(self):
         self.has_changes = False
         self.view.save_button.configure(state='disabled')
 
