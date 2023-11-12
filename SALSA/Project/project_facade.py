@@ -1517,6 +1517,9 @@ class SCTProjectFacade:
             return
         cur_inst.l_params = []
 
+    def set_encode_flag(self, script, section, instruction, setting):
+        self.project.scts[script].sects[section].insts[instruction].encode_inst = setting
+
     # ------------------------------- #
     # Inst group manipulation methods #
     # ------------------------------- #
