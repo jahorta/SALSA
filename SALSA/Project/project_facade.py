@@ -1056,6 +1056,7 @@ class SCTProjectFacade:
             cur_script.sects[t_t[0]].insts[t_t[1]].links_in.remove(link)
 
         cur_script.sects.pop(section)
+        self.callbacks['set_change'](script)
 
     def group_sections(self, script, section_bounds):
         cur_script = self.project.scts[script]
