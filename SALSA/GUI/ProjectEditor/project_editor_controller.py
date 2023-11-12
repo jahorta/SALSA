@@ -960,6 +960,7 @@ class ProjectEditorController:
             if inst_uuid is None:
                 continue
             self.project.set_encode_flag(self.current['script'], self.current['section'], inst_uuid, value)
+        self.set_refresh_flag(self.current['script'])
         self.refresh_tree('instruction')
 
     # -------------------------------------- #
