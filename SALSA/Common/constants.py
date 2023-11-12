@@ -80,3 +80,4 @@ footer_str_group_name = '_Footer_'
 footer_str_id_prefix = 'FOOTER'
 
 override_str = 'Overridden'
+do_not_encode_str = '// '
