@@ -10,7 +10,8 @@ from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
 from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep, label_name_sep, compound_sect_suffix, \
-    virtual_sect_suffix, label_sect_suffix, link_sep, footer_str_group_name, override_str, do_not_encode_str
+    virtual_sect_suffix, label_sect_suffix, link_sep, footer_str_group_name, override_str, do_not_encode_str, \
+    string_group_sect_suffix
 from SALSA.Scripts.scpt_param_codes import get_scpt_override
 from SALSA.Scripts.script_encoder import SCTEncoder
 
@@ -174,14 +175,16 @@ class SCTProjectFacade:
                         value_dict[header_key])
                 if isinstance(element, SCTSection):
                     if element.is_compound:
-                        values['name'] += f' {compound_sect_suffix}'
+                        values['name'] += compound_sect_suffix
                     elif len(element.inst_list) == 0:
-                        values['name'] += f' {virtual_sect_suffix}'
+                        values['name'] += virtual_sect_suffix
                     elif len(element.inst_list) == 1:
-                        values['name'] += f' {label_sect_suffix}'
+                        values['name'] += label_sect_suffix
+                    if element.name in self.project.scts[self.cur_script].string_groups:
+                        values['name'] += string_group_sect_suffix
                 if isinstance(element, SCTInstruction):
                     if element.base_id == 9:
-                        values['name'] += f'{label_name_sep}{element.label}'
+                        values['name'] += label_name_sep + element.label
                     if not element.encode_inst:
                         values['name'] = do_not_encode_str + values['name']
                 tree_list.append(values)
