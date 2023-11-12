@@ -436,19 +436,8 @@ class SCTProjectFacade:
 
     def rename_string_group(self, script, group_name, new_group_name):
         cur_script = self.project.scts[script]
-        cur_script.strings[new_group_name] = cur_script.strings.pop(group_name)
-
-        ind = cur_script.sect_list.index(group_name)
-        cur_script.sect_list[ind] = new_group_name
-
-        parents, ind = self.get_grouped_parents_and_index(group_name, cur_script.sect_tree)
-        cur_group = cur_script.sect_tree
-        for p in parents:
-            cur_group = cur_group[p]
-        cur_group[ind] = new_group_name
-
-        cur_script.sects[group_name].insts[cur_script.sects[group_name].inst_list[0]].label = new_group_name
-        cur_script.sects[new_group_name] = cur_script.sects.pop(group_name)
+        cur_script.string_groups[new_group_name] = cur_script.string_groups.pop(group_name)
+        self.change_section_name(script, group_name, None, new_group_name)
 
     def add_string(self, script, string_group, string_id='', string=None):
         if string_id == '':
