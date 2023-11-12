@@ -322,7 +322,13 @@ class DataTreeview(ttk.Treeview):
         if len(self.get_children('')) == 0:
             return
         if not self.in_motion:
+            sel = self.identify_row(event.y)
+            if sel == '':
                 return
+            self.first_selected = sel
+            self.selected = sel
+            self.after(10, self.selection_set, sel)
+            return
 
         final_index = self.index(self.placeholder)
         final_parent = self.parent(self.placeholder)
