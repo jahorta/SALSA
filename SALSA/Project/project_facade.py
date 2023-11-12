@@ -10,7 +10,7 @@ from SALSA.Project.project_container import SCTProject, SCTSection, SCTParameter
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
 from SALSA.Common.constants import sep, alt_sep, alt_alt_sep, uuid_sep, label_name_sep, compound_sect_suffix, \
-    virtual_sect_suffix, label_sect_suffix, link_sep, footer_str_group_name, override_str
+    virtual_sect_suffix, label_sect_suffix, link_sep, footer_str_group_name, override_str, do_not_encode_str
 from SALSA.Scripts.scpt_param_codes import get_scpt_override
 from SALSA.Scripts.script_encoder import SCTEncoder
 
@@ -182,6 +182,8 @@ class SCTProjectFacade:
                 if isinstance(element, SCTInstruction):
                     if element.base_id == 9:
                         values['name'] += f'{label_name_sep}{element.label}'
+                    if not element.encode_inst:
+                        values['name'] = do_not_encode_str + values['name']
                 tree_list.append(values)
         return tree_list
 
