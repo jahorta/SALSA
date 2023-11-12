@@ -529,6 +529,17 @@ class SCTProjectFacade:
                 return f'No footer strings in _Footer_ group. Cannot select a string'
         return None
 
+    def get_string_group_length(self, script, group_name):
+        if group_name not in self.project.scts[script].string_groups:
+            return None
+        return len(self.project.scts[script].string_groups[group_name])
+
+    def set_is_string_group(self, script, section, change):
+        if change == 'add':
+            self.project.scts[script].string_groups[section] = []
+        elif change == 'remove':
+            self.project.scts[script].string_groups.pop(section)
+
     # ----------------------- #
     # Script analysis methods #
     # ----------------------- #
