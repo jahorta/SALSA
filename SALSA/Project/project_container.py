@@ -150,6 +150,7 @@ class SCTInstruction:
         self.my_goto_uuids = []
         self.my_master_uuids = []
         self.label = ''
+        self.do_not_encode = False
 
     def set_inst_id(self, inst_id):
         self.base_id = inst_id
@@ -370,7 +371,7 @@ class SCTProject:
     file_name: str
     scts: Dict[str, SCTScript]
 
-    cur_version = 5
+    cur_version = 6
 
     def __init__(self):
         self.scts = {}
