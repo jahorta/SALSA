@@ -749,6 +749,13 @@ class ProjectEditorController:
         self.refresh_all_trees()
         self.on_select_tree_entry('section', self.current['section'])
 
+    def modify_string_groups(self, change: Literal['add', 'remove']):
+        if self.current['section'] is None:
+            return
+        self.project.set_is_string_group(self.current['script'], self.current['section'], change)
+        self.refresh_all_trees()
+        self.callbacks['refresh_popup']('string')
+
     # # Instruction Options # #
 
     def show_instruction_right_click_menu(self, e):
