@@ -917,6 +917,8 @@ class ProjectEditorController:
         self.refresh_all_trees()
         if len(remaining_sel_iids) > 0:
             self.rcm_remove_inst(remaining_sel_iids)
+        else:
+            self.set_refresh_flag(self.current['script'])
 
     def rcm_change_inst(self):
         sel_iid = self.trees['instruction'].focus()
