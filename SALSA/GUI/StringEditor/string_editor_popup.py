@@ -100,8 +100,8 @@ class StringPopup(tk.Toplevel):
         script_tree_frame.rowconfigure(0, weight=1)
 
         columns = list(tree_settings['script'].keys())[1:]
-        self.scripts = DataTreeview(script_tree_frame, name='script', columns=columns)
-        self.scripts.grid(row=0, column=0, sticky='NSEW')
+        self.scripts_tree = DataTreeview(script_tree_frame, name='script', columns=columns)
+        self.scripts_tree.grid(row=0, column=0, sticky='NSEW')
         first = True
         for name, d in tree_settings['script'].items():
             label = d.get('label', default_tree_label)
@@ -112,13 +112,13 @@ class StringPopup(tk.Toplevel):
             if first:
                 name = '#0'
                 first = False
-            self.scripts.heading(name, text=label, anchor=anchor)
-            self.scripts.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
-        script_tree_scrollbar = ttk.Scrollbar(script_tree_frame, orient='vertical', command=self.scripts.yview)
+            self.scripts_tree.heading(name, text=label, anchor=anchor)
+            self.scripts_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
+        script_tree_scrollbar = ttk.Scrollbar(script_tree_frame, orient='vertical', command=self.scripts_tree.yview)
         script_tree_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
-        self.scripts.config(yscrollcommand=script_tree_scrollbar.set)
-        self.scripts.config(show='tree')
-        self.scripts.add_callback('select', self.on_script_select)
+        self.scripts_tree.config(yscrollcommand=script_tree_scrollbar.set)
+        self.scripts_tree.config(show='tree')
+        self.scripts_tree.add_callback('select', self.on_script_select)
 
         string_tree_frame = ttk.LabelFrame(upper_frame, text='Strings')
         string_tree_frame.grid(row=0, column=1, sticky='NSEW', padx=5)
@@ -126,8 +126,8 @@ class StringPopup(tk.Toplevel):
         string_tree_frame.rowconfigure(0, weight=1)
 
         columns = list(tree_settings['string'].keys())[1:]
-        self.strings = DataTreeview(string_tree_frame, name='strings', columns=columns)
-        self.strings.grid(row=0, column=0, sticky='NSEW')
+        self.string_tree = DataTreeview(string_tree_frame, name='strings', columns=columns)
+        self.string_tree.grid(row=0, column=0, sticky='NSEW')
         first = True
         for name, d in tree_settings['string'].items():
             label = d.get('label', default_tree_label)
@@ -138,16 +138,16 @@ class StringPopup(tk.Toplevel):
             if first:
                 name = '#0'
                 first = False
-            self.strings.heading(name, text=label, anchor=anchor)
-            self.strings.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
-        string_tree_scrollbar = ttk.Scrollbar(string_tree_frame, orient='vertical', command=self.strings.yview)
+            self.string_tree.heading(name, text=label, anchor=anchor)
+            self.string_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
+        string_tree_scrollbar = ttk.Scrollbar(string_tree_frame, orient='vertical', command=self.string_tree.yview)
         string_tree_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
-        self.strings.config(yscrollcommand=string_tree_scrollbar.set)
-        self.strings.config(show='tree')
-        self.strings.add_callback('select', self.edit_string)
-        self.strings.bind('<ButtonRelease-3>', self.on_string_right_click)
-        self.strings.bind('<Double-Button-1>', self.double_click_rename)
-        self.strings.bind('<Double-Button-1>', lambda e: 'break', add='+')
+        self.string_tree.config(yscrollcommand=string_tree_scrollbar.set)
+        self.string_tree.config(show='tree')
+        self.string_tree.add_callback('select', self.edit_string)
+        self.string_tree.bind('<ButtonRelease-3>', self.on_string_right_click)
+        self.string_tree.bind('<Double-Button-1>', self.double_click_rename)
+        self.string_tree.bind('<Double-Button-1>', lambda e: 'break', add='+')
 
         lower_frame = ttk.Frame(self)
         lower_frame.grid(row=2, column=0, sticky='NSEW', padx=5)
@@ -233,19 +233,19 @@ class StringPopup(tk.Toplevel):
         self.body_entry.delete(1.0, tk.END)
 
     def update_scripts(self):
-        cur_tree_height = self.scripts.yview()[0]
+        cur_tree_height = self.scripts_tree.yview()[0]
         script_tree = self.callbacks['get_scripts']()
         for entry in script_tree:
-            self.scripts.insert_entry(parent='', index='end', text=entry['name'], values=[], row_data=entry['row_data'])
+            self.scripts_tree.insert_entry(parent='', index='end', text=entry['name'], values=[], row_data=entry['row_data'])
         if self.cur_script != '':
-            cur_row = self.scripts.get_iid_from_rowdata(self.cur_script)
+            cur_row = self.scripts_tree.get_iid_from_rowdata(self.cur_script)
             if cur_row is not None:
-                self.scripts.selection_set((cur_row, ))
+                self.scripts_tree.selection_set((cur_row,))
             else:
                 self._clear_editor_fields()
                 self._change_editor_state('disabled')
                 self.cur_script = ''
-            self.scripts.yview_moveto(cur_tree_height)
+            self.scripts_tree.yview_moveto(cur_tree_height)
         else:
             self._clear_editor_fields()
             self._change_editor_state('disabled')
@@ -253,21 +253,21 @@ class StringPopup(tk.Toplevel):
     def on_script_select(self, name, script):
         self.cur_script = script
         self.cur_string_id = ''
-        self.strings.clear_all_entries()
+        self.string_tree.clear_all_entries()
         self.update_strings()
 
     def update_strings(self):
         if self.cur_script == '':
             return
-        cur_tree_height = self.strings.yview()[0]
+        cur_tree_height = self.string_tree.yview()[0]
         open_elements = []
-        if len(self.strings.get_children('')) > 0:
-            open_elements = self.strings.get_open_elements()
+        if len(self.string_tree.get_children('')) > 0:
+            open_elements = self.string_tree.get_open_elements()
         self._populate_string_tree()
         if self.cur_string_id != '':
-            cur_row = self.strings.get_iid_from_rowdata(self.cur_string_id)
+            cur_row = self.string_tree.get_iid_from_rowdata(self.cur_string_id)
             if cur_row is not None:
-                self.strings.selection_set((cur_row, ))
+                self.string_tree.selection_set((cur_row,))
             else:
                 self._clear_editor_fields()
                 self._change_editor_state('disabled')
@@ -275,11 +275,11 @@ class StringPopup(tk.Toplevel):
         else:
             self._clear_editor_fields()
             self._change_editor_state('disabled')
-        self.strings.open_tree_elements(open_elements)
-        self.strings.yview_moveto(cur_tree_height)
+        self.string_tree.open_tree_elements(open_elements)
+        self.string_tree.yview_moveto(cur_tree_height)
 
     def _populate_string_tree(self):
-        self.strings.clear_all_entries()
+        self.string_tree.clear_all_entries()
         headers = list(tree_settings['string'].keys())
         string_tree = self.callbacks['get_string_tree'](self.cur_script, headers)
         parent_list = ['']
@@ -330,7 +330,7 @@ class StringPopup(tk.Toplevel):
         self._clear_editor_fields()
 
         self.cur_string_id = string_id
-        self.strings.selection_set((self.strings.get_iid_from_rowdata(string_id), ))
+        self.string_tree.selection_set((self.string_tree.get_iid_from_rowdata(string_id),))
         no_head, head, body = self.callbacks['get_string_to_edit'](string_id, self.cur_script)
         self.header_invalid = False
         self.body_entry.insert(tk.INSERT, body)
@@ -420,12 +420,12 @@ class StringPopup(tk.Toplevel):
     # ---------------- #
 
     def on_string_right_click(self, e):
-        if len(self.strings.get_children('')) == 0:
+        if len(self.string_tree.get_children('')) == 0:
             return
-        sel_iid = self.strings.identify_row(e.y)
-        self.strings.focus(sel_iid)
-        self.strings.selection_set([sel_iid])
-        row_data = self.strings.row_data[sel_iid]
+        sel_iid = self.string_tree.identify_row(e.y)
+        self.string_tree.focus(sel_iid)
+        self.string_tree.selection_set([sel_iid])
+        row_data = self.string_tree.row_data[sel_iid]
 
         m = tk.Menu(self, tearoff=0)
         if row_data is None:
@@ -454,23 +454,23 @@ class StringPopup(tk.Toplevel):
         self.callbacks['refresh_sections']()
 
     def string_group_delete(self, sel_iid):
-        group_name = self.strings.item(sel_iid)['text']
+        group_name = self.string_tree.item(sel_iid)['text']
         self.callbacks['delete_string_group'](self.cur_script, group_name)
         self.cur_string_id = ''
         self.update_strings()
         self.callbacks['refresh_sections']()
 
     def string_add(self, sel_iid):
-        if self.strings.parent(sel_iid) != '':
-            group_iid = self.strings.parent(sel_iid)
+        if self.string_tree.parent(sel_iid) != '':
+            group_iid = self.string_tree.parent(sel_iid)
         else:
             group_iid = sel_iid
-        string_group = self.strings.item(group_iid)['text']
+        string_group = self.string_tree.item(group_iid)['text']
         self.callbacks['add_string'](self.cur_script, string_group)
         self.update_strings()
 
     def string_delete(self, sel_iid):
-        string_id = self.strings.row_data[sel_iid]
+        string_id = self.string_tree.row_data[sel_iid]
         self.callbacks['delete_string'](self.cur_script, string_id)
         self.cur_string_id = ''
         self.update_strings()
@@ -480,22 +480,22 @@ class StringPopup(tk.Toplevel):
     # ---------------------------------- #
 
     def double_click_rename(self, e):
-        if self.strings.identify_region(e.x, e.y) == 'heading':
+        if self.string_tree.identify_region(e.x, e.y) == 'heading':
             return
-        if self.strings.identify_column(e.x) != '#0':
+        if self.string_tree.identify_column(e.x) != '#0':
             return
-        sel_iid = self.strings.identify_row(e.y)
+        sel_iid = self.string_tree.identify_row(e.y)
         self.show_rename_widget(sel_iid)
 
     def show_rename_widget(self, sel_iid):
         if self.rename_active:
             return
         self.rename_active = True
-        name = self.strings.item(sel_iid)['text']
-        bbox = list(self.strings.bbox(sel_iid, '#0'))
+        name = self.string_tree.item(sel_iid)['text']
+        bbox = list(self.string_tree.bbox(sel_iid, '#0'))
         bbox[0] += rename_widget_offset
         bbox[2] -= rename_widget_offset
-        widget = w.LabelNameEntry(self.strings)
+        widget = w.LabelNameEntry(self.string_tree)
         widget.insert(0, name)
         widget.place(x=bbox[0], y=bbox[1], width=bbox[2], height=bbox[3])
         widget.columnconfigure(1, weight=1)
@@ -506,10 +506,10 @@ class StringPopup(tk.Toplevel):
         widget.bind('<Escape>', lambda event: self.destroy_rename_widget(widget))
 
     def try_rename(self, widget, sel_iid):
-        old_name = self.strings.row_data.get(sel_iid, None)
+        old_name = self.string_tree.row_data.get(sel_iid, None)
         is_section = False
         if old_name is None:
-            old_name = self.strings.item(sel_iid)['text']
+            old_name = self.string_tree.item(sel_iid)['text']
             is_section = True
         new_name = widget.get()
         if new_name == old_name:
@@ -526,21 +526,21 @@ class StringPopup(tk.Toplevel):
             self.callbacks['rename_string_group'](self.cur_script, old_name, new_name)
         else:
             self.callbacks['rename_string'](self.cur_script, old_name, new_name)
-            self.strings.row_data[sel_iid] = new_name
+            self.string_tree.row_data[sel_iid] = new_name
             if self.cur_string_id == old_name:
                 self.cur_string_id = new_name
-        self.strings.item(sel_iid, text=new_name)
+        self.string_tree.item(sel_iid, text=new_name)
         self.callbacks['refresh_sections']()
 
     def shake_widget(self, widget):
         shake_speed = 70
         shake_intensity = 2
         widget_x = widget.winfo_x()
-        self.strings.after(shake_speed * 1, lambda: widget.place_configure(x=widget_x + shake_intensity))
-        self.strings.after(shake_speed * 2, lambda: widget.place_configure(x=widget_x - shake_intensity))
-        self.strings.after(shake_speed * 3, lambda: widget.place_configure(x=widget_x + shake_intensity))
-        self.strings.after(shake_speed * 4, lambda: widget.place_configure(x=widget_x - shake_intensity))
-        self.strings.after(shake_speed * 5, lambda: widget.place_configure(x=widget_x))
+        self.string_tree.after(shake_speed * 1, lambda: widget.place_configure(x=widget_x + shake_intensity))
+        self.string_tree.after(shake_speed * 2, lambda: widget.place_configure(x=widget_x - shake_intensity))
+        self.string_tree.after(shake_speed * 3, lambda: widget.place_configure(x=widget_x + shake_intensity))
+        self.string_tree.after(shake_speed * 4, lambda: widget.place_configure(x=widget_x - shake_intensity))
+        self.string_tree.after(shake_speed * 5, lambda: widget.place_configure(x=widget_x))
 
     def destroy_rename_widget(self, widget):
         self.rename_active = False
