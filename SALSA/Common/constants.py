@@ -64,9 +64,10 @@ class ReservedVars:
     }
 
 
-compound_sect_suffix = '(C)'
-label_sect_suffix = '(L)'
-virtual_sect_suffix = '(V)'
+compound_sect_suffix = ' (C)'
+label_sect_suffix = ' (L)'
+virtual_sect_suffix = ' (V)'
+string_group_sect_suffix = ' (S)'
 
 sep = '|'
 alt_sep = ':'
