@@ -621,14 +621,6 @@ class SCTProjectFacade:
     def change_section_name(self, script, section, instruction, new_name):
         cur_script = self.project.scts[script]
         cur_section = cur_script.sects[section]
-        if instruction is None:
-            instruction = cur_section.inst_list[0]
-        cur_label = cur_section.insts[instruction]
-
-        cur_label.label = new_name
-
-        if cur_section.inst_list.index(instruction) != 0:
-            return
 
         old_sect_name = cur_section.name
         cur_section.name = new_name
@@ -662,6 +654,14 @@ class SCTProjectFacade:
                 link.target_trace[0] = new_name
             for link in inst.links_out:
                 link.origin_trace[0] = new_name
+
+        if len(cur_section.inst_list) == 0:
+            return
+        if instruction is None:
+            instruction = cur_section.inst_list[0]
+        cur_label = cur_section.insts[instruction]
+
+        cur_label.label = new_name
 
     def _recursive_sect_name_replacer(self, tree, old, new):
         if isinstance(tree, list):
