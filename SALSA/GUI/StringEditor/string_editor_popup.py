@@ -323,7 +323,26 @@ class StringPopup(tk.Toplevel):
                 entry.pop(col)
             kwargs['values'] = values
             kwargs = {**kwargs, **entry}
-            prev_iid = self.strings.insert_entry(**kwargs)
+            prev_iid = self.string_tree.insert_entry(**kwargs)
+
+    def refresh_popup(self):
+        self.scripts_tree.clear_all_entries()
+        self.update_scripts()
+        if self.cur_script == '':
+            return
+        scr_iid = self.scripts_tree.get_iid_from_rowdata(self.cur_script)
+        self.scripts_tree.selection_set(scr_iid)
+        self.scripts_tree.focus(scr_iid)
+        open_elements = self.string_tree.get_open_elements()
+        self.string_tree.clear_all_entries()
+        self.update_strings()
+        self.string_tree.open_tree_elements(open_elements)
+        if self.cur_string_id == '':
+            return
+        str_iid = self.string_tree.get_iid_from_rowdata(self.cur_string_id)
+        self.string_tree.see(str_iid)
+        self.string_tree.selection_set(str_iid)
+        self.string_tree.focus(str_iid)
 
     def edit_string(self, name, string_id):
         self._change_editor_state('normal')
