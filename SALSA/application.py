@@ -103,6 +103,7 @@ class Application(tk.Tk):
                                  project_facade=self.project, inst_lib_facade=self.base_insts, theme=theme)
 
         self.project_edit_controller.add_callback('toggle_frame_state', self.gui.toggle_frame_state)
+        self.project_edit_controller.add_callback('refresh_popup', self.gui.refresh_popup)
         self.project_edit_view.add_callback('show_project_errors', self.gui.show_project_errors)
 
         # Create Models
