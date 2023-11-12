@@ -818,6 +818,10 @@ class ProjectEditorController:
         m.add_command(label='Open all groups', command=self.trees['instruction'].open_all_groups)
         m.add_command(label='Close all groups', command=self.trees['instruction'].close_all_groups)
 
+        m.add_separator()
+        m.add_command(label='Inactivate Instructions', command=lambda: self.activate_insts(False))
+        m.add_command(label='Activate Instructions', command=lambda: self.activate_insts(True))
+
         m.bind('<Escape>', m.destroy)
         try:
             m.tk_popup(e.x_root, e.y_root)
@@ -946,6 +950,14 @@ class ProjectEditorController:
         if kwargs['result'] == 'cancel':
             return
         self.project.remove_switch_case(script=self.current['script'], section=self.current['section'], **kwargs)
+        self.refresh_tree('instruction')
+
+    def activate_insts(self, value):
+        for sel_iid in self.trees['instruction'].selection():
+            inst_uuid = self.trees['instruction'].row_data.get(sel_iid, None)
+            if inst_uuid is None:
+                continue
+            self.project.set_encode_flag(self.current['script'], self.current['section'], inst_uuid, value)
         self.refresh_tree('instruction')
 
     # -------------------------------------- #
