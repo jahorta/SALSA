@@ -432,16 +432,7 @@ class SCTProjectFacade:
     def remove_string_group(self, script, string_group):
         cur_script = self.project.scts[script]
         cur_script.string_groups.pop(string_group)
-        cur_script.sects.pop(string_group)
-        cur_script.sect_list.remove(string_group)
-
-        parents, index = self.get_grouped_parents_and_index(string_group, cur_script.sect_tree)
-        cur_group = cur_script.sect_tree
-        for p in parents:
-            cur_group = cur_group[p]
-        cur_group.pop(index)
-
-        self.callbacks['set_change'](script)
+        self.remove_section(script, string_group)
 
     def rename_string_group(self, script, group_name, new_group_name):
         cur_script = self.project.scts[script]
