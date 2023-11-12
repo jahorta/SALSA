@@ -36,6 +36,10 @@ Features (Completed)
 * NEW: Ability to send scripts to Dolphin when running Skies of Arcadia Legends
   * Only works on Windows at the moment and requires psutil
 
+* NEW: Instructions can be disabled from encoding
+  * This effectively causes the encoder to "skip" these instructions when encoding
+  * Instructions can be disabled via the right click menu and will have a "//" prefix when disabled
+
 Features (In Progress)
 ----------------------
 * Program help (Opens into a webpage. Only skeleton is implemented)
