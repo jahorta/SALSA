@@ -269,12 +269,16 @@ class SCTEncoder:
                 self.sct_body.extend(section.garbage['end'])
 
     def _encode_instruction(self, instruction, a_trace, e_trace):
-        base_inst = self.bi.get_inst(instruction.base_id)
-        a_trace.append(str(instruction.base_id))
-        e_trace.append(str(instruction.ID))
         self.inst_positions[instruction.ID] = len(self.sct_body)
         if self.update_inst_pos:
             instruction.absolute_offset = len(self.sct_body)
+
+        if instruction.do_not_encode:
+            return
+
+        base_inst = self.bi.get_inst(instruction.base_id)
+        a_trace.append(str(instruction.base_id))
+        e_trace.append(str(instruction.ID))
 
         # add 13 code if needed or wanted
         if instruction.skip_refresh:
