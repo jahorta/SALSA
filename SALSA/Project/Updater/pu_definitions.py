@@ -4,7 +4,7 @@ v6 = {
     PP.instruction: {
         1: {
             UP.callable: '_add_attr',
-            UP.arguments: [('do_not_encode', False)]
+            UP.arguments: [('encode_inst', True)]
         }
     }
 }

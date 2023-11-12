@@ -273,7 +273,7 @@ class SCTEncoder:
         if self.update_inst_pos:
             instruction.absolute_offset = len(self.sct_body)
 
-        if instruction.do_not_encode:
+        if not instruction.encode_inst:
             return
 
         base_inst = self.bi.get_inst(instruction.base_id)
