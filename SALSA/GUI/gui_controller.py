@@ -199,6 +199,16 @@ class GUIController:
         callbacks |= {'close': self.close_popup}
         self.popups['d_link'] = DolphinLinkPopup(self.parent, callbacks=callbacks, name='d_link', theme=self.theme)
 
+    # ------------- #
+    # Popup refresh #
+    # ------------- #
+
+    def refresh_popup(self,
+                      name: Literal['inst', 'analysis', 'about', 'variable', 'string', 'export', 'errors', 'd_link']):
+        if self.popups[name] is None:
+            return
+        self.popups[name].refresh_popup()
+
     # ----------------------- #
     # Popup cleanup functions #
     # ----------------------- #
