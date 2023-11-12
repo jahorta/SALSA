@@ -840,8 +840,8 @@ class ProjectEditorController:
         m.add_command(label='Close all groups', command=self.trees['instruction'].close_all_groups)
 
         m.add_separator()
-        m.add_command(label='Inactivate Instructions', command=lambda: self.activate_insts(False))
-        m.add_command(label='Activate Instructions', command=lambda: self.activate_insts(True))
+        m.add_command(label='Disable Instructions', command=lambda: self.activate_insts(False))
+        m.add_command(label='Enable Instructions', command=lambda: self.activate_insts(True))
 
         m.bind('<Escape>', m.destroy)
         try:
