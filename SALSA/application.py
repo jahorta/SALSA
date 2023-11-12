@@ -215,7 +215,7 @@ class Application(tk.Tk):
     def _save_project(self, filepath, quit_program, quit_queue):
         self.proj_model.save_project(proj=self.project.project, filepath=filepath)
         self.proj_model.add_recent_file(filepath=filepath)
-        self.project_edit_controller.has_changes = False
+        self.project_edit_controller.save_complete()
         self.gui.stop_status_popup()
         self.gui.enable_project_view()
         if quit_program:
