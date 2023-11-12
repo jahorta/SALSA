@@ -5,7 +5,7 @@ from tkinter import messagebox, ttk
 from SALSA.GUI.Widgets.widgets import LabelNameEntry
 from SALSA.GUI.Widgets.hover_tooltip import schedule_tooltip
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
-from SALSA.Common.constants import sep, label_name_sep, link_sep
+from SALSA.Common.constants import sep, label_name_sep, link_sep, string_group_sect_suffix, label_sect_suffix
 from SALSA.GUI.fonts_used import SALSAFont
 from SALSA.GUI.ProjectEditor.instruction_selector import InstructionSelectorWidget
 from SALSA.GUI.ParamEditorPopups.param_editor_controller import ParamEditController
@@ -674,6 +674,17 @@ class ProjectEditorController:
         s_type.add_command(label='Label', command=lambda: self.rcm_change_sect_type('label'))
         s_type.add_command(label='Code', command=lambda: self.rcm_change_sect_type('code'))
         m.add_cascade(label='Change section type', menu=s_type)
+
+        if not is_multiple:
+            item_text = self.trees['section'].item(sel_iid)['text']
+            if label_sect_suffix in item_text:
+                m.add_separator()
+                if string_group_sect_suffix in item_text:
+                    m.add_command(label='Remove from String Groups', command=lambda: self.modify_string_groups('remove'))
+                    if self.project.get_string_group_length(self.current['script'], row_data) > 0:
+                        m.entryconfigure('Remove from String Groups', state='disabled')
+                else:
+                    m.add_command(label='Add to String Groups', command=lambda: self.modify_string_groups('add'))
 
         if is_multiple:
             m.entryconfigure('Rename Section', state='disabled')
