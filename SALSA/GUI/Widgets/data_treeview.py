@@ -303,13 +303,13 @@ class DataTreeview(ttk.Treeview):
             sel_uuid = self.row_data[sel]
             sel_ind = self.index(sel)
             sel_siblings = self.get_children(self.parent(sel))
-            if self.index(sel) > 0 and self.row_data[sel] is not None:
+            if self.index(sel) > 0 and sel_uuid is not None:
                 prev_sel = sel_siblings[sel_ind - 1]
                 prev_uuid = self.row_data[prev_sel]
                 if sel_uuid == prev_uuid:
                     sel = [prev_sel, sel]
             if not isinstance(sel, list):
-                if self.index(sel) + 1 < len(sel_siblings) and self.row_data[sel] is not None:
+                if self.index(sel) + 1 < len(sel_siblings) and sel_uuid is not None:
                     next_sel = sel_siblings[sel_ind + 1]
                     next_uuid = self.row_data[next_sel]
                     if sel_uuid == next_uuid:
