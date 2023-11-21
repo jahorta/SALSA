@@ -18,7 +18,10 @@ def dicts_are_same(dict1, dict2):
     for key in dict1_keys:
         if not isinstance(dict1[key], type(dict2[key])):
             return False
-        if not check_same_fxns[type(dict1[key])](dict1[key], dict2[key]):
+        if dict1[key] is None or dict2[key] is None:
+            if not (dict1[key] is None and dict2[key] is None):
+                return False
+        elif not check_same_fxns[type(dict1[key])](dict1[key], dict2[key]):
             return False
     return True
 
