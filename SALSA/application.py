@@ -434,6 +434,9 @@ class Application(tk.Tk):
         thread.start()
         self.after(20, self._update_script_listener, done_queue)
 
+        if sct_name in self.project_edit_controller.script_refresh_offset_queue:
+            self.project_edit_controller.script_refresh_offset_queue.remove(sct_name)
+
     def _threaded_update_script(self, script, message_queue, done_queue):
         result = self.project.get_script(script, message_queue)
         if isinstance(result, str):
