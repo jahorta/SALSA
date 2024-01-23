@@ -325,7 +325,7 @@ class ProjectEditorController:
             tgt_label = ttk.Label(tgt_frame, text=f'{tgt_sect}{link_sep}{tgt_inst}',
                                   font=self.link_font.default_font, style='canvas.TLabel')
             tgt_label.grid(row=0, column=0, sticky=tk.E + tk.W)
-            tgt_label.bind('<ButtonRelease-1>', self.goto_link)
+            tgt_label.bind('<ButtonRelease-1>', self.use_link_widget)
 
         for i, link in enumerate(details['links_in']):
             link: SCTLink
@@ -344,7 +344,7 @@ class ProjectEditorController:
             ori_label = ttk.Label(ori_frame, text=f'{ori_sect}{link_sep}{ori_inst}',
                                   font=self.link_font.default_font, style='canvas.TLabel')
             ori_label.grid(row=0, column=0, sticky=tk.E + tk.W)
-            ori_label.bind('<ButtonRelease-1>', self.goto_link)
+            ori_label.bind('<ButtonRelease-1>', self.use_link_widget)
 
     def handle_link_font(self, e):
         font = self.link_font.default_font if e.type == tk.EventType.Leave else self.link_font.hover_font
@@ -352,16 +352,16 @@ class ProjectEditorController:
         for child in e.widget.winfo_children():
             child.configure(font=font, style=style)
 
-    def goto_link(self, e):
+    def use_link_widget(self, e):
         if self.entry_widget is not None:
             self.shake_widget(self.entry_widget)
             return
         link_parts = e.widget['text'].split(link_sep)
         sect = link_parts[0]
         inst = self.project.get_inst_uuid_by_ind(script=self.current['script'], section=sect, inst_ind=link_parts[1])
-        self.resolve_link(sect=sect, inst=inst)
+        self.goto_link_target(sect=sect, inst=inst)
 
-    def resolve_link(self, script=None, sect=None, inst=None, param=None):
+    def goto_link_target(self, script=None, sect=None, inst=None, param=None):
         if script is None:
             script = self.current['script']
         if sect is None:
@@ -375,14 +375,14 @@ class ProjectEditorController:
             self.trees['script'].focus(sel_iid)
             self.trees['script'].selection_set([sel_iid])
             self.on_select_tree_entry('script', script)
-            self.view.after(10, self.resolve_link, None, sect, inst, param)
+            self.view.after(10, self.goto_link_target, None, sect, inst, param)
         elif sect != self.current['section']:
             sel_iid = self.trees['section'].get_iid_from_rowdata(sect)
             self.trees['section'].see(sel_iid)
             self.trees['section'].focus(sel_iid)
             self.trees['section'].selection_set([sel_iid])
             self.on_select_tree_entry('section', sect)
-            self.view.after(10, self.resolve_link, None, None, inst, param)
+            self.view.after(10, self.goto_link_target, None, None, inst, param)
         elif inst != self.current['instruction']:
             sel_iid = self.trees['instruction'].get_iid_from_rowdata(inst)
             self.trees['instruction'].see(sel_iid)
@@ -390,7 +390,7 @@ class ProjectEditorController:
             self.trees['instruction'].selection_set([sel_iid])
             self.on_select_tree_entry('instruction', inst)
             if param is not None:
-                self.view.after(10, self.resolve_link, None, None, None, param)
+                self.view.after(10, self.goto_link_target, None, None, None, param)
         elif param is not None:
             sel_iid = self.trees['parameter'].get_iid_from_rowdata(param)
             if sel_iid is None and isinstance(param, str):

@@ -140,7 +140,7 @@ class GUIController:
             return
         callbacks = {
             'get_errors': self.project.get_project_encode_errors,
-            'goto_error': self.prj_cont.resolve_link,
+            'goto_error': self.prj_cont.goto_link_target,
             'close': self.close_popup
         }
         self.popups['errors'] = ProjectErrorPopup(self.parent, callbacks=callbacks, name='errors',
@@ -156,7 +156,7 @@ class GUIController:
             'set_alias': self.project.set_variable_alias,
             'remove_global': self.project.remove_global,
             'get_var_usage': self.project.get_variable_usages,
-            'goto_link': self.prj_cont.resolve_link,
+            'goto_link': self.prj_cont.goto_link_target,
             'refresh_prj_trees': self.prj_cont.refresh_all_trees,
             'set_change_flag': self.prj_cont.set_has_changes,
             'close': self.close_popup
