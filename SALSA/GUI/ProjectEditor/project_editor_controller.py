@@ -178,6 +178,7 @@ class ProjectEditorController:
         if self.entry_widget is not None:
             self.shake_widget(self.entry_widget)
             return
+        self.save_child_dataview_state(tree_key)
         self.clear_inst_details()
         if tree_key == 'instruction':
             self.callbacks['toggle_frame_state'](self.view.inst_frame, 'normal')
@@ -195,6 +196,7 @@ class ProjectEditorController:
         kwargs['headers'] = self.view.get_headers(tree_key=child_tree)
         tree_list = self.project.get_tree(**kwargs)
         self.update_tree(child_tree, tree_list)
+        self.load_child_dataview_state(tree_key)
 
     def on_select_instruction(self, instructID):
         if self.entry_widget is not None:
@@ -209,6 +211,7 @@ class ProjectEditorController:
         details['parameter_tree'] = self.project.get_parameter_tree(headings=self.view.get_headers('parameter'),
                                                                     **self.current)
         self.set_instruction_details(details)
+        self.load_child_dataview_state('instruction')
 
     def update_tree(self, tree, tree_dict: Union[dict, None], clear_other_trees=True):
         if tree is None:
