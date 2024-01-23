@@ -24,6 +24,12 @@ tree_children = {
 
 tree_parents = {v: k for k, v in tree_children.items()}
 
+tree_and_parent_lists = {
+    'script': ['script'],
+    'section': ['script', 'section'],
+    'instruction': ['script', 'section', 'instruction']
+}
+
 group_handle_width = 20
 
 
