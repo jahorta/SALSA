@@ -163,6 +163,17 @@ class ProjectEditorController:
             self.encoding_errors = ['True']
         self.check_encoding_errors()
 
+    def save_child_dataview_state(self, tree_key):
+        state = DataViewState(open_items=self.trees[tree_children[tree_key]].get_open_elements(),
+                              scroll_height=self.trees[tree_children[tree_key]].yview()[0])
+        self.tree_states.set_state(state, **{k: v for k, v in self.current.items() if k in tree_and_parent_lists[tree_key]})
+
+    def load_child_dataview_state(self, tree_key):
+        state = self.tree_states.get_state(**{k: v for k, v in self.current.items() if k in tree_and_parent_lists[tree_key]})
+        if state is not None:
+            self.trees[tree_children[tree_key]].open_tree_elements(state.open_items)
+            self.trees[tree_children[tree_key]].yview_moveto(state.scroll_height)
+
     def on_select_tree_entry(self, tree_key, entry):
         if self.entry_widget is not None:
             self.shake_widget(self.entry_widget)
