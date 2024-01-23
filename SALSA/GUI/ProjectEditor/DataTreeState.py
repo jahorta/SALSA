@@ -49,11 +49,21 @@ class ChildViewStateTree:
         cur_level[section].children[new_name] = cur_level[section].children.pop(instruction)
 
     def get_state(self, script, section=None, instruction=None):
+        if script not in self._states:
+            return None
+
         cur_level = self._states[script]
         if section is not None:
+            if section not in cur_level.children:
+                return None
+
             cur_level = cur_level.children[section]
             if instruction is not None:
+                if instruction not in cur_level.children:
+                    return None
+
                 cur_level = cur_level.children[instruction]
+
         return cur_level.state
 
     def reset(self):
