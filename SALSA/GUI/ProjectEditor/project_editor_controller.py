@@ -2,6 +2,7 @@ from typing import Union, Dict, Literal
 import tkinter as tk
 from tkinter import messagebox, ttk
 
+from SALSA.GUI.ProjectEditor.DataTreeState import ChildViewStateTree, DataViewState
 from SALSA.GUI.Widgets.widgets import LabelNameEntry
 from SALSA.GUI.Widgets.hover_tooltip import schedule_tooltip
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
@@ -114,6 +115,8 @@ class ProjectEditorController:
         self.trees['section'].add_callback('move_items', self.on_move_items)
         self.trees['instruction'].add_callback('select', self.on_select_tree_entry)
         self.trees['instruction'].add_callback('move_items', self.on_move_items)
+
+        self.tree_states = ChildViewStateTree()
 
         self.has_changes = False
 
