@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Dict
 
 from SALSA.Common.constants import sep
 
@@ -96,7 +96,7 @@ class DataTreeview(ttk.Treeview):
         self._parent = parent
         self.name = name
         self.callbacks = callbacks if callbacks is not None else {}
-        self.row_data = {}
+        self.row_data: Dict[str, str] = {}
         self.group_types = {}
         self.cur_selection = []
         self.selection_order = []
