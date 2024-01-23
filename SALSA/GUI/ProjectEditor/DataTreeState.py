@@ -35,19 +35,6 @@ class ChildViewStateTree:
         if instruction not in self._states[script].children[section].children:
             self._states[script].children[section].children[instruction] = DataViewNode(None, None)
 
-    def rename_state(self, new_name, script, section=None, instruction=None):
-        cur_level = self._states
-        if section is None:
-            cur_level[new_name] = cur_level.pop(script)
-            return
-
-        cur_level = cur_level[script].children
-        if instruction is None:
-            cur_level[new_name] = cur_level.pop(section)
-            return
-
-        cur_level[section].children[new_name] = cur_level[section].children.pop(instruction)
-
     def get_state(self, script, section=None, instruction=None):
         if script not in self._states:
             return None
