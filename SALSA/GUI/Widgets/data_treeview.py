@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk
 from typing import List, Tuple, Union
 
-from SALSA.GUI.themes import dark_theme, light_theme
 from SALSA.Common.constants import sep
 
 drag_tree_info = {
