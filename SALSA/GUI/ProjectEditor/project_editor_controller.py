@@ -162,6 +162,7 @@ class ProjectEditorController:
         if len(self.project.get_project_encode_errors()) > 0:
             self.encoding_errors = ['True']
         self.check_encoding_errors()
+        self.tree_states.reset()
 
     def save_child_dataview_state(self, tree_key):
         state = DataViewState(open_items=self.trees[tree_children[tree_key]].get_open_elements(),
