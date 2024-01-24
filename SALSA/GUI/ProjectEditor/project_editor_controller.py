@@ -2,7 +2,7 @@ from typing import Union, Dict, Literal
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from SALSA.GUI.ProjectEditor.DataTreeState import ChildViewStateTree, DataViewState
+from SALSA.GUI.ProjectEditor.data_tree_state import ChildViewStateTree, DataViewState
 from SALSA.GUI.Widgets.widgets import LabelNameEntry
 from SALSA.GUI.Widgets.hover_tooltip import schedule_tooltip
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
