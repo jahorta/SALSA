@@ -165,7 +165,8 @@ class ProjectEditorController:
 
     def save_child_dataview_state(self, tree_key):
         state = DataViewState(open_items=self.trees[tree_children[tree_key]].get_open_elements(),
-                              scroll_height=self.trees[tree_children[tree_key]].yview()[0])
+                              scroll_height=self.trees[tree_children[tree_key]].yview()[0],
+                              selected_iid=self.trees[tree_children[tree_key]].selection())
         self.tree_states.set_state(state, **{k: v for k, v in self.current.items() if k in tree_and_parent_lists[tree_key]})
 
     def load_child_dataview_state(self, tree_key):
@@ -173,6 +174,7 @@ class ProjectEditorController:
         if state is not None:
             self.trees[tree_children[tree_key]].open_tree_elements(state.open_items)
             self.trees[tree_children[tree_key]].yview_moveto(state.scroll_height)
+            self.trees[tree_children[tree_key]].selection_set(state.selected_iid)
 
     def on_select_tree_entry(self, tree_key, entry):
         if self.entry_widget is not None:

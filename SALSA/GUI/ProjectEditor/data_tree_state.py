@@ -7,6 +7,7 @@ from typing import Union, Dict
 class DataViewState:
     open_items: list
     scroll_height: float
+    selected_iid: tuple[str]
 
 @dataclass
 class DataViewNode:
