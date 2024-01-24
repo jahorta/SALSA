@@ -19,6 +19,9 @@ class ChildViewStateTree:
     _states: Dict[str, DataViewNode] = {}
 
     def set_state(self, state: DataViewState, script, section=None, instruction=None):
+        if script is None:
+            return
+
         if script not in self._states:
             self._states[script] = DataViewNode(None, {})
 
