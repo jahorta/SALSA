@@ -190,7 +190,9 @@ class ProjectEditorController:
         if self.entry_widget is not None:
             self.shake_widget(self.entry_widget)
             return
-        self.save_child_dataview_state(tree_key)
+        if self.current[tree_key] is not None:
+            self.save_child_dataview_state(tree_key)
+        self.clear_current_children(tree_key)
         self.clear_inst_details()
         if tree_key == 'instruction':
             self.callbacks['toggle_frame_state'](self.view.inst_frame, 'normal')
