@@ -196,15 +196,10 @@ class ProjectEditorController:
             self.callbacks['toggle_frame_state'](self.view.inst_frame, 'normal')
             return self.on_select_instruction(entry)
         self.callbacks['toggle_frame_state'](self.view.inst_frame, 'disabled')
+        child_tree = tree_children[tree_key]
         kwargs = {'style': settings[self.log_name]['style']}
         self.current[tree_key] = entry
-        cur_key = tree_key
-        while True:
-            kwargs[cur_key] = self.current[cur_key]
-            cur_key = tree_parents[cur_key]
-            if cur_key == '':
-                break
-        child_tree = tree_children[tree_key]
+        kwargs |= {k: v for k, v in self.current.items() if k in tree_and_parent_lists[tree_key]}
         kwargs['headers'] = self.view.get_headers(tree_key=child_tree)
         tree_list = self.project.get_tree(**kwargs)
         self.update_tree(child_tree, tree_list)
