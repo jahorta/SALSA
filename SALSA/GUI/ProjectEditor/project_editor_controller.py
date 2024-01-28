@@ -165,6 +165,9 @@ class ProjectEditorController:
         self.tree_states.reset()
 
     def save_child_dataview_state(self, tree_key):
+        if tree_children[tree_key] != 'parameter':
+            if self.current[tree_children[tree_key]] is not None:
+                self.save_child_dataview_state(tree_children[tree_key])
         state = DataViewState(open_items=self.trees[tree_children[tree_key]].get_open_elements(),
                               scroll_height=self.trees[tree_children[tree_key]].yview()[0],
                               selected_iid=self.trees[tree_children[tree_key]].selection())
