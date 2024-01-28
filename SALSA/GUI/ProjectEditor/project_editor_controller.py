@@ -180,6 +180,12 @@ class ProjectEditorController:
             self.trees[tree_children[tree_key]].yview_moveto(state.scroll_height)
             self.trees[tree_children[tree_key]].selection_set(state.selected_iid)
 
+    def clear_current_children(self, key):
+        key = tree_children[key]
+        while key != '':
+            self.current[key] = None
+            key = tree_children[key]
+
     def on_select_tree_entry(self, tree_key, entry):
         if self.entry_widget is not None:
             self.shake_widget(self.entry_widget)
@@ -209,7 +215,6 @@ class ProjectEditorController:
             self.shake_widget(self.entry_widget)
             return
         self.current['instruction'] = instructID
-        self.current['parameter'] = None
         self.view.param_tree.clear_all_entries()
         details = self.project.get_instruction_details(**self.current)
         if details is None:
