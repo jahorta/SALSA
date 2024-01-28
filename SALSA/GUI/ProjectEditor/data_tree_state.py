@@ -39,6 +39,8 @@ class ChildViewStateTree:
         if instruction not in self._states[script].children[section].children:
             self._states[script].children[section].children[instruction] = DataViewNode(None, None)
 
+        self._states[script].children[section].children[instruction].state = state
+
     def get_state(self, script, section=None, instruction=None):
         if script not in self._states:
             return None
