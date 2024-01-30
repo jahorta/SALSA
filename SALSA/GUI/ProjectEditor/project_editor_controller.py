@@ -206,6 +206,12 @@ class ProjectEditorController:
         tree_list = self.project.get_tree(**kwargs)
         self.update_tree(child_tree, tree_list)
         self.load_child_dataview_state(tree_key)
+        selected = self.trees[child_tree].selection()
+        if len(selected) == 1 and child_tree in tree_and_parent_lists['instruction']:
+            next_item = self.trees[child_tree].row_data.get(selected[0], None)
+            if next_item is not None:
+                if self.tree_states.has_state(next_item, **{k: v for k, v in self.current.items() if k in tree_and_parent_lists[tree_key]}):
+                    self.on_select_tree_entry(child_tree, next_item)
 
     def on_select_instruction(self, instructID):
         if self.entry_widget is not None:
