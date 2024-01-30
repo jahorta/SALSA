@@ -180,7 +180,7 @@ class ProjectEditorController:
             self.trees[tree_children[tree_key]].yview_moveto(state.scroll_height)
             self.trees[tree_children[tree_key]].selection_set(state.selected_iid)
 
-    def clear_current_children(self, key):
+    def clear_child_currents(self, key):
         key = tree_children[key]
         while key != '':
             self.current[key] = None
@@ -192,7 +192,7 @@ class ProjectEditorController:
             return
         if self.current[tree_key] is not None:
             self.save_child_dataview_state(tree_key)
-        self.clear_current_children(tree_key)
+        self.clear_child_currents(tree_key)
         self.clear_inst_details()
         if tree_key == 'instruction':
             self.callbacks['toggle_frame_state'](self.view.inst_frame, 'normal')
