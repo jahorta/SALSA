@@ -61,3 +61,18 @@ class ChildViewStateTree:
 
     def reset(self):
         self._states = {}
+
+    def has_state(self, entry, script=None, section=None):
+        if script is None:
+            return entry in self._states
+
+        if script not in self._states:
+            return False
+
+        if section is None:
+            return entry in self._states[script].children
+
+        if section not in self._states[script].children:
+            return False
+
+        return entry in self._states[script].children[section].children
