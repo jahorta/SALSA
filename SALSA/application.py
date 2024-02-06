@@ -141,6 +141,7 @@ class Application(tk.Tk):
             'prj->string': self.gui.show_strings_popup,
             'prj->refresh_pos': self.refresh_offsets,
             'prj->repair->textbox': self.textbox_fadeout_repair,
+            'prj->search': self.gui.show_project_search_popup,
             # 'analysis->export': self.gui.show_analysis_view,
             'view->inst': self.gui.show_instruction_view,
             'view->theme': self.change_theme,
