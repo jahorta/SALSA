@@ -1,6 +1,7 @@
 import copy
 from typing import Union, Tuple, Literal
 
+from SALSA.Project.project_searcher import ProjectSearcher
 from SALSA.Project.RepairTools.texbox_disappear_repair import TBStringToParamRepair
 from SALSA.Project.Updater.project_updater import ProjectUpdater
 from SALSA.BaseInstructions.bi_defaults import loop_count_name
@@ -32,6 +33,7 @@ class SCTProjectFacade:
             'get_inst': self.get_inst_desc_info
         }
         self.cur_script = None
+        self.searcher = None
 
     def load_project(self, prj: SCTProject):
         # version numbers were not given for the first version
@@ -50,6 +52,7 @@ class SCTProjectFacade:
                 return False
 
         self.project = prj
+        self.searcher = ProjectSearcher(self.base_insts, self.project)
         return True
 
     def create_new_project(self):
@@ -2237,3 +2240,8 @@ class SCTProjectFacade:
             link = links[link_dists.index(min(link_dists))]
 
         return self.project.scts[script].sects[link.origin_trace[0]].insts[link.origin_trace[1]].absolute_offset
+
+    # # Project Search Methods # #
+
+    def search(self, search_entry, filters=None):
+        pass
