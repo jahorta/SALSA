@@ -5,6 +5,7 @@ from tkinter import ttk
 from typing import Union, TypedDict, Literal
 import webbrowser
 
+from SALSA.GUI.ProjectSearch.project_search_popup import ProjectSearchPopup
 from SALSA.GUI.dolphin_link_popup import DolphinLinkPopup
 from SALSA.GUI.EncodeErrorPopup.project_error_popup import ProjectErrorPopup
 from SALSA.GUI.ProjectEditor.project_editor_controller import ProjectEditorController
@@ -34,6 +35,7 @@ class PopupTypes(TypedDict):
     export: Union[None, SCTExportPopup]
     errors: Union[None, ProjectErrorPopup]
     d_link: Union[None, DolphinLinkPopup]
+    search: Union[None, ProjectSearchPopup]
 
 
 class GUIController:
@@ -55,7 +57,7 @@ class GUIController:
         self.theme = theme
 
         self.popups: PopupTypes = {'inst': None, 'analysis': None, 'about': None, 'errors': None,
-                                   'variable': None, 'string': None, 'export': None, 'd_link': None}
+                                   'variable': None, 'string': None, 'export': None, 'd_link': None, 'search': None}
 
         self.callbacks = {}
 
@@ -198,6 +200,18 @@ class GUIController:
             return
         callbacks |= {'close': self.close_popup}
         self.popups['d_link'] = DolphinLinkPopup(self.parent, callbacks=callbacks, name='d_link', theme=self.theme)
+
+    def show_project_search_popup(self):
+        if self.popups['search'] is not None:
+            self.popups['search'].tkraise()
+            return
+        callbacks = {
+            'search': self.project.search,
+            'goto_result': self.prj_cont.goto_link_target,
+            'close': self.close_popup
+        }
+        self.popups['search'] = ProjectSearchPopup(self.parent, callbacks=callbacks, name='search',
+                                                   theme=self.theme)
 
     # ------------- #
     # Popup refresh #
