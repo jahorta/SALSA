@@ -61,7 +61,7 @@ class ProjectSearchPopup(tk.Toplevel):
         self.filter_button.grid(row=0, column=2, sticky=tk.N + tk.S + tk.E)
 
         tree_frame = ttk.Frame(self)
-        tree_frame.grid(row=0, column=0, sticky='NSEW')
+        tree_frame.grid(row=1, column=0, sticky='NSEW')
         tree_frame.columnconfigure(0, weight=1)
         tree_frame.rowconfigure(0, weight=1)
 
@@ -86,7 +86,7 @@ class ProjectSearchPopup(tk.Toplevel):
         self.result_tree.config(yscrollcommand=error_tree_scrollbar.set)
 
         close_button = ttk.Button(self, text='Close', command=self.close)
-        close_button.grid(row=1, column=0, sticky=tk.E)
+        close_button.grid(row=2, column=0, sticky=tk.E)
 
         self.protocol('WM_DELETE_WINDOW', self.close)
 
