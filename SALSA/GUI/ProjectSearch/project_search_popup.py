@@ -112,3 +112,7 @@ class ProjectSearchPopup(tk.Toplevel):
 
     def change_theme(self, theme):
         self.configure(**theme['Ttoplevel']['configure'])
+        self.search_icon.configure(foreground=theme['TButton']['configure']['foreground'],
+                                   background=theme['TButton']['configure']['background'])
+        self.filter_icon.configure(foreground=theme['TButton']['configure']['foreground'],
+                                   background=theme['TButton']['configure']['background'])
