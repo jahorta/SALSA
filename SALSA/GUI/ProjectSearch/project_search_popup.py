@@ -70,7 +70,7 @@ class ProjectSearchPopup(tk.Toplevel):
                                         callbacks={'select': self.on_result_select})
         self.result_tree.grid(row=0, column=0, sticky='NSEW')
         first = True
-        for name, d in header_settings['search'].items():
+        for name, d in header_settings['results'].items():
             label = d.get('label', default_tree_label)
             anchor = d.get('anchor', default_tree_anchor)
             minwidth = d.get('minwidth', default_tree_minwidth)
