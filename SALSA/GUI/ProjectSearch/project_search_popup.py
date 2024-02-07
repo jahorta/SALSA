@@ -46,6 +46,7 @@ class ProjectSearchPopup(tk.Toplevel):
 
         search_frame = ttk.Frame(self)
         search_frame.grid(row=0, column=0, sticky='NSEW')
+        search_frame.columnconfigure(0, weight=1)
 
         if search_string is None:
             search_string = ""
