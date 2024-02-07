@@ -66,7 +66,7 @@ class ProjectSearchPopup(tk.Toplevel):
 
         columns = list(header_settings['results'].keys())[1:]
         self.result_tree = DataTreeview(tree_frame, name='results', columns=columns, can_open=True, can_move=False,
-                                        callbacks={'select': self.on_error_select})
+                                        callbacks={'select': self.on_result_select})
         self.result_tree.grid(row=0, column=0, sticky='NSEW')
         first = True
         for name, d in header_settings['search'].items():
@@ -101,7 +101,7 @@ class ProjectSearchPopup(tk.Toplevel):
             for error in results:
                 self.result_tree.insert_entry(parent='', index='end', text=name, values=error[1:], row_data=error[3])
 
-    def on_error_select(self, name, row_data):
+    def on_result_select(self, name, row_data):
         sel_iid = self.result_tree.focus()
         script = self.result_tree.item(sel_iid)['text']
         section, inst, param = row_data.split(alt_sep)
