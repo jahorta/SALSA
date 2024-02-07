@@ -1,3 +1,4 @@
+import os.path
 import tkinter as tk
 from tkinter import ttk
 
@@ -34,7 +35,14 @@ class ProjectSearchPopup(tk.Toplevel):
         self.callbacks = callbacks
         self.configure(**theme['Ttoplevel']['configure'])
         self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
+
+        self.search_icon = tk.BitmapImage(file=os.path.join(os.path.dirname(__file__), "search_icon_20x20.xbm"),
+                                          foreground=theme['TButton']['configure']['foreground'],
+                                          background=theme['TButton']['configure']['background'])
+        self.filter_icon = tk.BitmapImage(file=os.path.join(os.path.dirname(__file__), "filtering_icon_20x20.xbm"),
+                                          foreground=theme['TButton']['configure']['foreground'],
+                                          background=theme['TButton']['configure']['background'])
 
         search_frame = ttk.Frame(self)
         search_frame.grid(row=0, column=0, sticky='NSEW')
@@ -45,11 +53,11 @@ class ProjectSearchPopup(tk.Toplevel):
         self.search_entry = ttk.Entry(search_frame, textvariable=self.search_string)
         self.search_entry.grid(row=0, column=0, sticky='NSEW')
 
-        self.search_button = ttk.Button(search_frame, image="", command=self.search)
+        self.search_button = ttk.Button(search_frame, image=self.search_icon, command=self.search)
         self.search_button.grid(row=0, column=1, sticky=tk.N + tk.S + tk.E)
 
-        self.filter_button = ttk.Button(search_frame, image="", command=self.open_filters)
-        self.filter_button.grid(row=0, column=3, sticky=tk.N + tk.S + tk.E)
+        self.filter_button = ttk.Button(search_frame, image=self.filter_icon, command=self.open_filters)
+        self.filter_button.grid(row=0, column=2, sticky=tk.N + tk.S + tk.E)
 
         tree_frame = ttk.Frame(self)
         tree_frame.grid(row=0, column=0, sticky='NSEW')
