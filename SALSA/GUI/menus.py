@@ -95,7 +95,7 @@ class MainMenu(tk.Menu):
         self.project_menu.entryconfig('Variable alias editor', state='normal')
         self.project_menu.entryconfig('String editor', state='normal')
         self.project_menu.entryconfig('Refresh Sect/Inst Offsets', state='normal')
-        self.project_menu.entryconfig('Project Search', state='disabled')
+        self.project_menu.entryconfig('Project Search', state='normal')
         self.project_menu.entryconfig('Repair', state='normal')
         self.file_menu.entryconfig('Save Project', state='normal')
         self.file_menu.entryconfig('Save Project as', state='normal')
