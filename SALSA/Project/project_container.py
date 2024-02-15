@@ -132,6 +132,7 @@ class SCTInstruction:
     params: Dict[int, SCTParameter]
     l_params: List[Dict[int, SCTParameter]]
     ungrouped_position: int
+    delay_param: Union[None, SCTParameter]
 
     def __init__(self):
         self.ID: str = str(uuid.uuid4()).replace('-', uuid_sep)
