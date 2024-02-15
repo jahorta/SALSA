@@ -96,11 +96,18 @@ class ProjectSearchPopup(tk.Toplevel):
     def search(self):
         # refresh errors in each script
         self.result_tree.clear_all_entries()
-        results = self.callbacks['search']()
+        results = self.callbacks['search'](self.search_string.get())
 
-        for name, results in results.items():
-            for error in results:
-                self.result_tree.insert_entry(parent='', index='end', text=name, values=error[1:], row_data=error[3])
+        if results is None:
+            return
+
+        for loc, scts in results.items():
+            g_id = self.result_tree.insert_entry(parent='', index='end', text=loc, values=[], row_data=None)
+            for sct, results in scts.items():
+                s_id = self.result_tree.insert_entry(parent=g_id, index='end', text=sct, values=[], row_data=None)
+                for r in results:
+                    l = alt_sep.join(r)
+                    self.result_tree.insert_entry(parent=s_id, index='end', text=l, values=[], row_data=l)
 
     def on_result_select(self, name, row_data):
         sel_iid = self.result_tree.focus()
