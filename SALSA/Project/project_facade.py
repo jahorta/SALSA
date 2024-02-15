@@ -2243,5 +2243,12 @@ class SCTProjectFacade:
 
     # # Project Search Methods # #
 
-    def search(self, search_entry, filters=None):
+    def search(self, search_entry, headers=None):
+        if self.searcher is None:
+            return None
+        links = self.searcher.search(search_entry)
+
+        return links
+
+    def format_search_results(self, links, headers):
         pass
