@@ -208,6 +208,7 @@ class GUIController:
         callbacks = {
             'search': self.project.search,
             'goto_result': self.prj_cont.goto_link_target,
+            'goto_dialog': self.goto_string_helper,
             'close': self.close_popup
         }
         self.popups['search'] = ProjectSearchPopup(self.parent, callbacks=callbacks, name='search',
@@ -299,3 +300,14 @@ class GUIController:
             if isinstance(item, dict):
                 self.change_status_msg(**item)
         self.status_popup.after(20, self.status_listener)
+
+    # ------------------ #
+    # Goto String Helper #
+    # ------------------ #
+
+    def goto_string_helper(self, script, group, string, string_popup_up=False):
+        if string_popup_up:
+            self.popups['string'].goto_string(script, group, string)
+        else:
+            self.show_strings_popup()
+            self.prj_view.after(10, self.goto_string_helper, script, group, string, True)
