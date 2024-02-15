@@ -110,9 +110,23 @@ class ProjectSearchPopup(tk.Toplevel):
                     self.result_tree.insert_entry(parent=s_id, index='end', text=l, values=[], row_data=l)
 
     def on_result_select(self, name, row_data):
+        if row_data is None:
+            return
         sel_iid = self.result_tree.focus()
-        script = self.result_tree.item(sel_iid)['text']
-        section, inst, param = row_data.split(alt_sep)
+        script_entry = self.result_tree.parent(sel_iid)
+        script = self.result_tree.item(script_entry)['text']
+        location = self.result_tree.item(self.result_tree.parent(script_entry))['text']
+        if location == 'dialog':
+            group, s_id = row_data.split(alt_sep)
+            self.callbacks['goto_dialog'](script, group, s_id)
+            return
+        pts = row_data.split(alt_sep)
+        section = pts[0]
+        inst = pts[1]
+        if len(pts) > 2:
+            param = pts[3]
+        else:
+            param = None
         self.callbacks['goto_result'](script=script, sect=section, inst=inst, param=param)
 
     def close(self):
