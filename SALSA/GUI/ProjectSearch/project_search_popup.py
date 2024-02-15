@@ -7,10 +7,7 @@ from SALSA.GUI.Widgets.data_treeview import DataTreeview
 
 header_settings = {
     'results': {
-        'script': {'label': 'Script', 'width': 80, 'stretch': False},
-        'type': {'label': 'Type', 'width': 100, 'stretch': False},
-        'error': {'label': 'Error', 'width': 150, 'stretch': False},
-        'info': {'label': 'Information', 'width': 300, 'stretch': True}
+        'link': {'label': 'Script', 'width': 300, 'stretch': False}
     }
 }
 
