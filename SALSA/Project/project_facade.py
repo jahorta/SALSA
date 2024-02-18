@@ -1,6 +1,7 @@
 import copy
 from typing import Union, Tuple, Literal
 
+from SALSA.Common.string_utils import get_padding_for_number
 from SALSA.Project.project_searcher import ProjectSearcher
 from SALSA.Project.RepairTools.texbox_disappear_repair import TBStringToParamRepair
 from SALSA.Project.Updater.project_updater import ProjectUpdater
@@ -2252,3 +2253,22 @@ class SCTProjectFacade:
 
     def format_search_results(self, links, headers):
         pass
+
+    def get_search_filter_trees(self):
+        scripts = []
+        sections = []
+        inst_ids = []
+
+        for key, script in self.project.scts.items():
+            scripts.append((key, key))
+            sections += [(k, k) for k in script.sects]
+            for sect_name, sect in script.sects.items():
+                inst_ids += [v.base_id for v in sect.insts.values()]
+
+        inst_ids = [(f'{i}:{get_padding_for_number(i, 4, " ")}{self.base_insts.get_inst(i).name}', i) for i in sorted(list(set(inst_ids)))]
+
+        return {
+            'sct:': sorted(list(set(scripts))),
+            'sect:': sorted(list(set(sections))),
+            'inst:': inst_ids
+        }
