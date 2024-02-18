@@ -45,7 +45,7 @@ class BaseInstLibFacade:
     def _get_default_inst_details(self):
         return {k: v.get_default_inst_details() for k, v in enumerate(self.lib.insts)}
 
-    def get_all_insts(self) -> Dict[int, BaseInst]:
+    def get_all_insts(self) -> List[BaseInst]:
         return self.lib.insts
 
     # Used to set details from a json file
