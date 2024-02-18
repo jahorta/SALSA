@@ -30,7 +30,7 @@ class SpecialCharSelectWidget(tk.Frame):
         if len(self.recents) >= button_num:
             self.recents = self.recents[:button_num]
 
-        self.cur_enc: Literal['EU','US/JP'] = cur_enc if cur_enc is not None else 'US/JP'
+        self.cur_enc: Literal['EU', 'US/JP'] = cur_enc if cur_enc is not None else 'US/JP'
         self.insert_callback = insert_callback
 
         self.expand_button = ttk.Button(self, text='Other chars...', command=lambda: self.toggle_widget(location=location))
