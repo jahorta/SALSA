@@ -26,12 +26,9 @@ class SpecialCharSelectWidget(tk.Frame):
     def __init__(self, master, insert_callback: Callable, recents=None, theme=None, cur_enc=None, location=None, button_num=recent_num, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
-        global recent_num
-        recent_num = button_num
-
         self.recents = recents if recents is not None else []
-        if len(self.recents) >= recent_num:
-            self.recents = self.recents[:recent_num]
+        if len(self.recents) >= button_num:
+            self.recents = self.recents[:button_num]
 
         self.cur_enc: Literal['EU','US/JP'] = cur_enc if cur_enc is not None else 'US/JP'
         self.insert_callback = insert_callback
@@ -43,14 +40,14 @@ class SpecialCharSelectWidget(tk.Frame):
         self.recent_buttons = []
         i = 0
         for char in self.recents:
-            if i >= recent_num:
+            if i >= button_num:
                 break
             b = ttk.Button(self, text=char, command=lambda ind=i: self.select_recent(ind), width=button_width)
             b.grid(row=0, column=i+1, padx=button_pad)
             self.recent_buttons.append(b)
             i += 1
 
-        while i < recent_num:
+        while i < button_num:
             b = ttk.Button(self, text='', state='disabled', width=button_width)
             b.grid(row=0, column=i+1, padx=button_pad)
             self.recent_buttons.append(b)
@@ -126,7 +123,7 @@ class SpecialCharSelectWidget(tk.Frame):
             if char in self.recents:
                 self.recents.remove(char)
             self.recents.insert(0, char)
-            if len(self.recents) > recent_num:
+            if len(self.recents) > len(self.recent_buttons):
                 self.recents.pop(-1)
         for i, c in enumerate(self.recents):
             self.recent_buttons[i].configure(text=c)
