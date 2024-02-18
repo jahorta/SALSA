@@ -2,6 +2,7 @@ import enum
 from dataclasses import dataclass
 from typing import Union
 
+from SALSA.Common.constants import sep
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Project.project_container import SCTProject
 
@@ -121,6 +122,9 @@ filter_tokens = {
         'inst:': 'Searches within a specific instruction(s)'
     }
 
+
+class ProjectSearcher:
+
     def __init__(self, base_insts: BaseInstLibFacade, project: SCTProject):
         self.b_insts = base_insts
         self.prj = project
@@ -132,7 +136,7 @@ filter_tokens = {
         }
 
     def search(self, search_string):
-        tokens = SearchTokens.tokenize(search_string, list(self.loc_tokens.keys()), list(self.filter_tokens.keys()))
+        tokens = SearchTokens.tokenize(search_string, list(loc_tokens.keys()), list(filter_tokens.keys()))
 
         search_locs = []
         if TokenType.flag not in tokens:
@@ -144,7 +148,9 @@ filter_tokens = {
 
         links = {}
         for loc in search_locs:
-            links[loc[4:]] = self.search_loc_fxns[loc](tokens)
+            results = self.search_loc_fxns[loc](tokens)
+            if len(results) > 0:
+                links[loc[4:]] = results
 
         return links
 
@@ -152,27 +158,37 @@ filter_tokens = {
         r_insts = [int(t.value[5:]) for t in tokens.get_filter_list('inst:')]
 
         if len(r_insts) == 0:
-            r_insts = []
-            for token in tokens.search:
-                for ind, inst in self.b_insts.get_all_insts().items():
-                    if token.value in inst.name:
-                        r_insts.append(ind)
-                    elif token.value in inst.instruction_id:
-                        r_insts.append(ind)
-                    elif token.value in inst.description:
-                        r_insts.append(ind)
-                    elif token.value in inst.default_notes:
-                        r_insts.append(ind)
-                    elif token.value in inst.link_type:
-                        r_insts.append(ind)
-                    else:
-                        for param in inst.params.values():
-                            if token.value in param.name:
+            if len(tokens.search) > 0:
+                r_insts = []
+                for token in tokens.search:
+                    for ind, inst in enumerate(self.b_insts.get_all_insts()):
+                        if token.value in inst.name:
+                            r_insts.append(ind)
+                        elif token.value == str(inst.instruction_id):
+                            r_insts.append(ind)
+                        elif token.value in inst.description:
+                            r_insts.append(ind)
+                        elif token.value in inst.default_notes:
+                            r_insts.append(ind)
+                        elif inst.link_type is not None:
+                            if token.value in inst.link_type:
                                 r_insts.append(ind)
-                                break
-                            if token.value in param.default_value:
-                                r_insts.append(ind)
-                                break
+                        else:
+                            for param in inst.params.values():
+                                if token.value in param.name:
+                                    r_insts.append(ind)
+                                    break
+                                if param.default_value is not None:
+                                    if isinstance(param.default_value, str):
+                                        if token.value in param.default_value:
+                                            r_insts.append(ind)
+                                            break
+                                    elif token.value == param.default_value:
+                                        r_insts.append(ind)
+                                        break
+
+            else:
+                r_insts = [i for i, _ in enumerate(self.b_insts.get_all_insts())]
 
         sct_filters = tokens.get_filter_list('sct:')
         sect_filters = tokens.get_filter_list('sect:')
@@ -195,6 +211,9 @@ filter_tokens = {
         return links
 
     def search_params(self, tokens: SearchTokens):
+        if len(tokens.search) == 0:
+            return {}
+
         sct_filters = tokens.get_filter_list('sct:')
         sect_filters = tokens.get_filter_list('sect:')
         inst_filters = tokens.get_filter_list('inst:')
@@ -215,21 +234,24 @@ filter_tokens = {
                             continue
 
                     for token in tokens.search:
-                        if token.value in str(inst.delay_param.value):
-                            if sct_name not in links:
-                                links[sct_name] = []
-                            links[sct_name].append((sect_name, inst_id, 'delay'))
+                        if inst.delay_param is not None:
+                            if token.value in str(inst.delay_param.value):
+                                if sct_name not in links:
+                                    links[sct_name] = []
+                                links[sct_name].append((sect_name, inst_id, 'delay'))
                         for param_id, param in inst.params.items():
-                            if token.value in str(param.value):
+                            if 'string' in param.type or 'jump' in param.type:
+                                continue
+                            if token.value == str(param.value):
                                 if sct_name not in links:
                                     links[sct_name] = []
                                 links[sct_name].append((sect_name, inst_id, param_id))
-                        for loop in inst.l_params:
+                        for loop_ind, loop in enumerate(inst.l_params):
                             for param_id, param in loop.items():
-                                if token.value in str(param.value):
+                                if token.value == str(param.value):
                                     if sct_name not in links:
                                         links[sct_name] = []
-                                    links[sct_name].append((sect_name, inst_id, param_id))
+                                    links[sct_name].append((sect_name, inst_id, f'{loop_ind}{sep}{param_id}'))
 
         return links
 
