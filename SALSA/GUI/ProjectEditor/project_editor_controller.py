@@ -406,6 +406,8 @@ class ProjectEditorController:
             if param is not None:
                 self.view.after(10, self.goto_link_target, None, None, None, param)
         elif param is not None:
+            if param == 'delay':
+                return
             sel_iid = self.trees['parameter'].get_iid_from_rowdata(param)
             if sel_iid is None and isinstance(param, str):
                 sel_iid = self.trees['parameter'].get_iid_from_rowdata(int(param))
