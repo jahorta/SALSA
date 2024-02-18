@@ -108,18 +108,17 @@ class SearchTokens:
         return [i for i in self.filters if key in i]
 
 
-class ProjectSearcher:
-
-    loc_tokens = {
-        'loc:inst': 'Searches inst details',
-        'loc:param': 'Searches parameter values',
-        'loc:dialog': 'Searches dialogue strings'
+loc_tokens = {
+        'loc:inst': 'Search base inst details',
+        'loc:param': 'Search parameter values',
+        'loc:dialog': 'Search dialogue strings'
     }
 
-    filter_tokens = {
-        'sct:': 'Searches within specific script with name equal to suffix',
-        'sect:': 'Searches within specific sections with name equal to suffix',
-        'inst:': 'Searches within a specific instructions with instruction ID equal to suffix'
+
+filter_tokens = {
+        'sct:': 'Search within specific script(s)',
+        'sect:': 'Searches within specific section(s)',
+        'inst:': 'Searches within a specific instruction(s)'
     }
 
     def __init__(self, base_insts: BaseInstLibFacade, project: SCTProject):
