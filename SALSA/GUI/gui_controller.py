@@ -209,6 +209,7 @@ class GUIController:
             'search': self.project.search,
             'goto_result': self.prj_cont.goto_link_target,
             'goto_dialog': self.goto_string_helper,
+            'get_filters': self.project.get_search_filter_trees,
             'close': self.close_popup
         }
         self.popups['search'] = ProjectSearchPopup(self.parent, callbacks=callbacks, name='search',
