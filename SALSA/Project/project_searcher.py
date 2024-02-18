@@ -57,6 +57,10 @@ class SearchTokens:
         combined_part = ''
         combine_level = 0
         for part in string.strip().split(' '):
+            if len(part) == 0:
+                if combine_level > 0:
+                    combined_part += ' '
+                continue
 
             if part[0] == '"':
                 combine_level += 1
