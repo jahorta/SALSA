@@ -52,6 +52,8 @@ class SearchTokens:
         self.search = TokenList()
         self.locs = TokenList()
         self.filters = TokenList()
+        if len(string) == 0:
+            return
         combined_part = ''
         combine_level = 0
         for part in string.strip().split(' '):
