@@ -105,6 +105,7 @@ class Application(tk.Tk):
         self.project_edit_controller.add_callback('toggle_frame_state', self.gui.toggle_frame_state)
         self.project_edit_controller.add_callback('refresh_popup', self.gui.refresh_popup)
         self.project_edit_view.add_callback('show_project_errors', self.gui.show_project_errors)
+        self.project_edit_view.add_callback('show_search', self.gui.show_project_search_popup)
 
         # Create Models
         self.proj_model = ProjectModel()
