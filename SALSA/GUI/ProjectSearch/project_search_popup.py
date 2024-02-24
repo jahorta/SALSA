@@ -2,8 +2,8 @@ import os.path
 import tkinter as tk
 from tkinter import ttk
 
-from SALSA.Project.project_searcher import loc_tokens, filter_tokens
-from SALSA.Common.constants import alt_sep
+from SALSA.Project.project_searcher import loc_tokens, filter_tokens, PrjResult, PrjResultGroup
+from SALSA.Common.constants import alt_sep, sep
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
 
 header_settings = {
@@ -132,6 +132,8 @@ class ProjectSearchPopup(tk.Toplevel):
             clear_button.grid(row=1, column=0, sticky=tk.NW, pady='2 0')
             column += 1
 
+        self.keep_case = False
+
         self.result_frame = ttk.Frame(self)
         self.result_frame.grid(row=1, column=0, sticky='NSEW')
         self.result_frame.columnconfigure(0, weight=1)
@@ -203,7 +205,7 @@ class ProjectSearchPopup(tk.Toplevel):
         search_string = self.search_string.get() + self.get_filter_items()
         if len(search_string) == 0:
             return
-        results = self.callbacks['search'](search_string)
+        results = self.callbacks['search'](search_string, self.keep_case)
 
         if len(results) == 0:
             results = None
@@ -234,14 +236,17 @@ class ProjectSearchPopup(tk.Toplevel):
         if results is None:
             self.result_tree.insert_entry(parent='', index='end', text='', values=[], row_data=None)
             self.result_tree.insert_entry(parent='', index='end', text='No Results Found', values=[], row_data=None)
-        for loc, scts in results.items():
-            g_id = self.result_tree.insert_entry(parent='', index='end', text=loc, values=[], row_data=None)
-            for sct, results in scts.items():
-                s_id = self.result_tree.insert_entry(parent=g_id, index='end', text=sct, values=[], row_data=None)
-                for r in results:
-                    l = [str(e) for e in r]
-                    l = alt_sep.join(l)
-                    self.result_tree.insert_entry(parent=s_id, index='end', text=l, values=[], row_data=l)
+            return
+        for result in results:
+            self.insert_result_group(result)
+
+    def insert_result_group(self, entry, parent=''):
+        if isinstance(entry, PrjResult):
+            self.result_tree.insert_entry(parent=parent, index='end', text=entry.display, values=[], row_data=entry.row_data)
+        elif isinstance(entry, PrjResultGroup):
+            p_iid = self.result_tree.insert_entry(parent=parent, index='end', text=entry.name, values=[], row_data=None)
+            for e in entry.contents:
+                self.insert_result_group(e, p_iid)
 
     def on_result_select(self, name, row_data):
         if row_data is None:
@@ -251,10 +256,10 @@ class ProjectSearchPopup(tk.Toplevel):
         script = self.result_tree.item(script_entry)['text']
         location = self.result_tree.item(self.result_tree.parent(script_entry))['text']
         if location == 'dialog':
-            group, s_id = row_data.split(alt_sep)
+            group, s_id = row_data.split(sep)
             self.callbacks['goto_dialog'](script, group, s_id)
             return
-        pts = row_data.split(alt_sep)
+        pts = row_data.split(sep)
         section = pts[0]
         inst = pts[1]
         if len(pts) > 2:

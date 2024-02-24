@@ -2244,15 +2244,12 @@ class SCTProjectFacade:
 
     # # Project Search Methods # #
 
-    def search(self, search_entry, headers=None):
+    def search(self, search_entry, keep_case, headers=None):
         if self.searcher is None:
             return None
-        links = self.searcher.search(search_entry)
+        links = self.searcher.search(search_entry, keep_case)
 
         return links
-
-    def format_search_results(self, links, headers):
-        pass
 
     def get_search_filter_trees(self):
         scripts = []

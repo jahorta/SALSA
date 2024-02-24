@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import enum
 from dataclasses import dataclass
-from typing import Union
+from typing import Union, List
 
 from SALSA.Common.constants import sep
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
@@ -123,6 +125,34 @@ filter_tokens = {
     }
 
 
+dialog_result_string_width = 30
+
+
+@dataclass
+class PrjResult:
+    row_data: str
+    display: str
+
+    def __repr__(self):
+        return self.display
+
+
+@dataclass
+class PrjResultGroup:
+    name: str
+    contents: List[Union[PrjResultGroup, PrjResult]]
+
+    def __repr__(self):
+        return self.name
+
+    def __eq__(self, other: Union[str, PrjResultGroup]):
+        if isinstance(other, str):
+            return self.name == other
+        if not isinstance(other, PrjResultGroup):
+            return False
+        return self.name == other.name
+
+
 class ProjectSearcher:
 
     def __init__(self, base_insts: BaseInstLibFacade, project: SCTProject):
@@ -135,7 +165,10 @@ class ProjectSearcher:
             'loc:dialog': self.search_dialogue
         }
 
-    def search(self, search_string):
+        self.keep_case = False
+
+    def search(self, search_string, keep_case):
+        self.keep_case = keep_case
         tokens = SearchTokens.tokenize(search_string, list(loc_tokens.keys()), list(filter_tokens.keys()))
 
         search_locs = []
@@ -146,11 +179,11 @@ class ProjectSearcher:
                 if token.value in self.search_loc_fxns.keys():
                     search_locs.append(token.value)
 
-        links = {}
+        links = []
         for loc in search_locs:
             results = self.search_loc_fxns[loc](tokens)
             if len(results) > 0:
-                links[loc[4:]] = results
+                links.append(PrjResultGroup(loc[4:], results))
 
         return links
 
@@ -162,25 +195,25 @@ class ProjectSearcher:
                 r_insts = []
                 for token in tokens.search:
                     for ind, inst in enumerate(self.b_insts.get_all_insts()):
-                        if token.value in inst.name:
+                        if self.str_comp(token.value, inst.name, in_=True):
                             r_insts.append(ind)
-                        elif token.value == str(inst.instruction_id):
+                        elif self.str_comp(token.value, str(inst.instruction_id)):
                             r_insts.append(ind)
-                        elif token.value in inst.description:
+                        elif self.str_comp(token.value, inst.description, in_=True):
                             r_insts.append(ind)
-                        elif token.value in inst.default_notes:
+                        elif self.str_comp(token.value, inst.default_notes, in_=True):
                             r_insts.append(ind)
                         elif inst.link_type is not None:
-                            if token.value in inst.link_type:
+                            if self.str_comp(token.value, inst.link_type, in_=True):
                                 r_insts.append(ind)
                         else:
                             for param in inst.params.values():
-                                if token.value in param.name:
+                                if self.str_comp(token.value, param.name, in_=True):
                                     r_insts.append(ind)
                                     break
                                 if param.default_value is not None:
                                     if isinstance(param.default_value, str):
-                                        if token.value in param.default_value:
+                                        if self.str_comp(token.value, param.default_value, in_=True):
                                             r_insts.append(ind)
                                             break
                                     elif token.value == param.default_value:
@@ -192,7 +225,7 @@ class ProjectSearcher:
 
         sct_filters = tokens.get_filter_list('sct:')
         sect_filters = tokens.get_filter_list('sect:')
-        links = {}
+        links = []
         for sct_name, sct in self.prj.scts.items():
             if len(sct_filters) > 0:
                 if sct_name not in sct_filters:
@@ -203,10 +236,12 @@ class ProjectSearcher:
                         continue
                 for inst_id, inst in sect.insts.items():
                     if inst.base_id in r_insts:
-                        if sct_name not in links:
-                            links[sct_name] = [(sect_name, inst_id)]
+                        row_data = f'{sect_name}{sep}{inst_id}'
+                        display = f'{sect_name} - {sect.inst_list.index(inst_id)}'
+                        if PrjResultGroup(sct_name, []) not in links:
+                            links.append(PrjResultGroup(sct_name, [PrjResult(row_data, display)]))
                         else:
-                            links[sct_name].append((sect_name, inst_id))
+                            links[(links.index(sct_name))].contents.append(PrjResult(row_data, display))
 
         return links
 
@@ -217,7 +252,7 @@ class ProjectSearcher:
         sct_filters = tokens.get_filter_list('sct:')
         sect_filters = tokens.get_filter_list('sect:')
         inst_filters = tokens.get_filter_list('inst:')
-        links = {}
+        links = []
         for sct_name, sct in self.prj.scts.items():
             if len(sct_filters) > 0:
                 if sct_name not in sct_filters:
@@ -235,28 +270,37 @@ class ProjectSearcher:
 
                     for token in tokens.search:
                         if inst.delay_param is not None:
-                            if token.value in str(inst.delay_param.value):
-                                if sct_name not in links:
-                                    links[sct_name] = []
-                                links[sct_name].append((sect_name, inst_id, 'delay'))
+                            if self.str_comp(token.value, str(inst.delay_param.value), in_=True):
+                                row_data = f'{sect_name}{sep}{inst_id}{sep}delay'
+                                display = f'{sect_name} - {sect.inst_list.index(inst_id)}'
+                                if PrjResultGroup(sct_name, []) not in links:
+                                    links.append(PrjResultGroup(sct_name, [PrjResult(row_data, display)]))
+                                else:
+                                    links[(links.index(sct_name))].contents.append(PrjResult(row_data, display))
                         for param_id, param in inst.params.items():
                             if 'string' in param.type or 'jump' in param.type:
                                 continue
-                            if token.value == str(param.value):
-                                if sct_name not in links:
-                                    links[sct_name] = []
-                                links[sct_name].append((sect_name, inst_id, param_id))
+                            if self.str_comp(token.value, str(param.value)):
+                                row_data = f'{sect_name}{sep}{inst_id}{sep}{param_id}'
+                                display = f'{sect_name} - {sect.inst_list.index(inst_id)}'
+                                if PrjResultGroup(sct_name, []) not in links:
+                                    links.append(PrjResultGroup(sct_name, [PrjResult(row_data, display)]))
+                                else:
+                                    links[(links.index(sct_name))].contents.append(PrjResult(row_data, display))
                         for loop_ind, loop in enumerate(inst.l_params):
                             for param_id, param in loop.items():
-                                if token.value == str(param.value):
-                                    if sct_name not in links:
-                                        links[sct_name] = []
-                                    links[sct_name].append((sect_name, inst_id, f'{loop_ind}{sep}{param_id}'))
+                                if self.str_comp(token.value, str(param.value)):
+                                    row_data = f'{sect_name}{sep}{inst_id}{sep}{loop_ind}{sep}{param_id}'
+                                    display = f'{sect_name} - {sect.inst_list.index(inst_id)} - {loop_ind} {param_id}'
+                                    if PrjResultGroup(sct_name, []) not in links:
+                                        links.append(PrjResultGroup(sct_name, [PrjResult(row_data, display)]))
+                                    else:
+                                        links[(links.index(sct_name))].contents.append(PrjResult(row_data, display))
 
         return links
 
     def search_dialogue(self, tokens: SearchTokens):
-        d_strings = {}
+        d_strings = []
         sct_filters = tokens.get_filter_list('sct:')
         for sct_name, sct in self.prj.scts.items():
             if len(sct_filters) > 0:
@@ -265,9 +309,36 @@ class ProjectSearcher:
 
             for sid, s in sct.strings.items():
                 for token in tokens.search:
-                    if sid == token.value or token.value in s:
-                        if sct_name not in d_strings:
-                            d_strings[sct_name] = []
-                        d_strings[sct_name].append((sct.string_locations[sid], sid))
+                    if self.str_comp(token.value, sid) or self.str_comp(token.value, s, in_=True):
+                        row_data = f'{sct.string_locations[sid]}{sep}{sid}'
+                        if sid == token.value:
+                            display = f'{sct.string_locations[sid]} - {sid}'
+                        else:
+                            s_ind = s if self.keep_case else s.lower()
+                            v = token.value if self.keep_case else token.value.lower()
+                            t_index = s_ind.index(v)
+                            outer_char_num = dialog_result_string_width - len(token.value) // 2
+                            if outer_char_num > 0:
+                                t_start = t_index - outer_char_num
+                                t_end = t_index + len(token.value) + outer_char_num
+                                substring = f'{"... "if t_start < 0 else ""}' \
+                                            f'{s[max(t_start, 0): min(t_end, len(s))]}' \
+                                            f'{" ..."if t_end > len(s) else ""}'
+                            else:
+                                substring = token.value
+                            display = f'{sct.string_locations[sid]} - {substring}'
+
+                        if PrjResultGroup(sct_name, []) not in d_strings:
+                            d_strings.append(PrjResultGroup(sct_name, [PrjResult(row_data, display)]))
+                        else:
+                            d_strings[(d_strings.index(sct_name))].contents.append(PrjResult(row_data, display))
 
         return d_strings
+
+    def str_comp(self, s1, s2, in_=False):
+        if not self.keep_case:
+            s1 = s1.lower()
+            s2 = s2.lower()
+        if in_:
+            return s1 in s2
+        return s1 == s2
