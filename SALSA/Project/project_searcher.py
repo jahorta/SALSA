@@ -4,6 +4,7 @@ import enum
 from dataclasses import dataclass
 from typing import Union, List
 
+from SALSA.Common.script_string_utils import SAstr_to_visible
 from SALSA.Common.constants import sep
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Project.project_container import SCTProject
@@ -307,7 +308,8 @@ class ProjectSearcher:
                 if sct_name not in sct_filters:
                     continue
 
-            for sid, s in sct.strings.items():
+            for sid, str_ in sct.strings.items():
+                s = SAstr_to_visible(str_).replace('\n', ' ')
                 for token in tokens.search:
                     if self.str_comp(token.value, sid) or self.str_comp(token.value, s, in_=True):
                         row_data = f'{sct.string_locations[sid]}{sep}{sid}'
