@@ -51,7 +51,7 @@ class ProjectSearchPopup(tk.Toplevel):
         self.callbacks = callbacks
         self.configure(**theme['Ttoplevel']['configure'])
         self.columnconfigure(0, weight=1)
-        self.rowconfigure(1, weight=1)
+        self.rowconfigure(2, weight=1)
 
         self.search_icon = tk.BitmapImage(file=os.path.join(os.path.dirname(__file__),
                                                             "button_icons/search_icon_20x20.xbm"),
