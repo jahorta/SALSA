@@ -323,9 +323,9 @@ class ProjectSearcher:
                             if outer_char_num > 0:
                                 t_start = t_index - outer_char_num
                                 t_end = t_index + len(token.value) + outer_char_num
-                                substring = f'{"... "if t_start < 0 else ""}' \
+                                substring = f'{"... " if t_start > 0 else ""}' \
                                             f'{s[max(t_start, 0): min(t_end, len(s))]}' \
-                                            f'{" ..."if t_end > len(s) else ""}'
+                                            f'{" ..." if t_end < len(s) else ""}'
                             else:
                                 substring = token.value
                             display = f'{sct.string_locations[sid]} - {substring}'
