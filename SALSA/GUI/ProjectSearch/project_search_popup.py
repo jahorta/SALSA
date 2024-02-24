@@ -162,7 +162,7 @@ class ProjectSearchPopup(tk.Toplevel):
         self.result_tree.config(yscrollcommand=error_tree_scrollbar.set)
 
         close_button = ttk.Button(self, text='Close', command=self.close)
-        close_button.grid(row=2, column=0, sticky=tk.E)
+        close_button.grid(row=3, column=0, sticky=tk.E)
 
         self.protocol('WM_DELETE_WINDOW', self.close)
 
