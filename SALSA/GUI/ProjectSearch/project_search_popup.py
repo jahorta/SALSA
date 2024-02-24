@@ -82,7 +82,7 @@ class ProjectSearchPopup(tk.Toplevel):
         self.filter_is_up = False
 
         self.filter_frame = ttk.Frame(self)
-        self.filter_frame.grid(row=1, column=0, sticky='NSEW')
+        self.filter_frame.grid(row=2, column=0, sticky='NSEW')
 
         fw_upper = ttk.Frame(self.filter_frame)
         fw_upper.grid(row=0, column=0, padx=10, pady='10 0', sticky=tk.N)
@@ -132,10 +132,12 @@ class ProjectSearchPopup(tk.Toplevel):
             clear_button.grid(row=1, column=0, sticky=tk.NW, pady='2 0')
             column += 1
 
-        self.keep_case = False
+        self.keep_case = tk.IntVar(self, 0)
+        keep_case_checkbox = ttk.Checkbutton(self, offvalue=0, onvalue=1, text='Keep Case', variable=self.keep_case)
+        keep_case_checkbox.grid(row=1, column=0, sticky=tk.W)
 
         self.result_frame = ttk.Frame(self)
-        self.result_frame.grid(row=1, column=0, sticky='NSEW')
+        self.result_frame.grid(row=2, column=0, sticky='NSEW')
         self.result_frame.columnconfigure(0, weight=1)
         self.result_frame.rowconfigure(0, weight=1)
 
@@ -205,7 +207,7 @@ class ProjectSearchPopup(tk.Toplevel):
         search_string = self.search_string.get() + self.get_filter_items()
         if len(search_string) == 0:
             return
-        results = self.callbacks['search'](search_string, self.keep_case)
+        results = self.callbacks['search'](search_string, self.keep_case.get() == 1)
 
         if len(results) == 0:
             results = None
