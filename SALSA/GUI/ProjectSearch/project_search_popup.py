@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from SALSA.Project.project_searcher import loc_tokens, filter_tokens, PrjResult, PrjResultGroup
-from SALSA.Common.constants import alt_sep, sep
+from SALSA.Common.constants import alt_sep
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
 
 header_settings = {
@@ -259,10 +259,10 @@ class ProjectSearchPopup(tk.Toplevel):
         script = self.result_tree.item(script_entry)['text']
         location = self.result_tree.item(self.result_tree.parent(script_entry))['text']
         if location == 'dialog':
-            group, s_id = row_data.split(sep)
+            group, s_id = row_data.split(alt_sep)
             self.callbacks['goto_dialog'](script, group, s_id)
             return
-        pts = row_data.split(sep)
+        pts = row_data.split(alt_sep)
         section = pts[0]
         inst = pts[1]
         if len(pts) > 2:

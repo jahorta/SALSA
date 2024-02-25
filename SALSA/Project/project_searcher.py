@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Union, List
 
 from SALSA.Common.script_string_utils import SAstr_to_visible
-from SALSA.Common.constants import sep
+from SALSA.Common.constants import sep, alt_sep
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Project.project_container import SCTProject
 
@@ -237,7 +237,7 @@ class ProjectSearcher:
                         continue
                 for inst_id, inst in sect.insts.items():
                     if inst.base_id in r_insts:
-                        row_data = f'{sect_name}{sep}{inst_id}'
+                        row_data = f'{sect_name}{alt_sep}{inst_id}'
                         display = f'{sect_name} - {sect.inst_list.index(inst_id)}'
                         if PrjResultGroup(sct_name, []) not in links:
                             links.append(PrjResultGroup(sct_name, [PrjResult(row_data, display)]))
@@ -272,7 +272,7 @@ class ProjectSearcher:
                     for token in tokens.search:
                         if inst.delay_param is not None:
                             if self.str_comp(token.value, str(inst.delay_param.value), in_=True):
-                                row_data = f'{sect_name}{sep}{inst_id}{sep}delay'
+                                row_data = f'{sect_name}{alt_sep}{inst_id}{alt_sep}delay'
                                 display = f'{sect_name} - {sect.inst_list.index(inst_id)}'
                                 if PrjResultGroup(sct_name, []) not in links:
                                     links.append(PrjResultGroup(sct_name, [PrjResult(row_data, display)]))
@@ -282,7 +282,7 @@ class ProjectSearcher:
                             if 'string' in param.type or 'jump' in param.type:
                                 continue
                             if self.str_comp(token.value, str(param.value)):
-                                row_data = f'{sect_name}{sep}{inst_id}{sep}{param_id}'
+                                row_data = f'{sect_name}{alt_sep}{inst_id}{alt_sep}{param_id}'
                                 display = f'{sect_name} - {sect.inst_list.index(inst_id)}'
                                 if PrjResultGroup(sct_name, []) not in links:
                                     links.append(PrjResultGroup(sct_name, [PrjResult(row_data, display)]))
@@ -291,7 +291,7 @@ class ProjectSearcher:
                         for loop_ind, loop in enumerate(inst.l_params):
                             for param_id, param in loop.items():
                                 if self.str_comp(token.value, str(param.value)):
-                                    row_data = f'{sect_name}{sep}{inst_id}{sep}{loop_ind}{sep}{param_id}'
+                                    row_data = f'{sect_name}{alt_sep}{inst_id}{alt_sep}{loop_ind}{sep}{param_id}'
                                     display = f'{sect_name} - {sect.inst_list.index(inst_id)} - {loop_ind} {param_id}'
                                     if PrjResultGroup(sct_name, []) not in links:
                                         links.append(PrjResultGroup(sct_name, [PrjResult(row_data, display)]))
@@ -312,7 +312,7 @@ class ProjectSearcher:
                 s = SAstr_to_visible(str_).replace('\n', ' ')
                 for token in tokens.search:
                     if self.str_comp(token.value, sid) or self.str_comp(token.value, s, in_=True):
-                        row_data = f'{sct.string_locations[sid]}{sep}{sid}'
+                        row_data = f'{sct.string_locations[sid]}{alt_sep}{sid}'
                         if sid == token.value:
                             display = f'{sct.string_locations[sid]} - {sid}'
                         else:
