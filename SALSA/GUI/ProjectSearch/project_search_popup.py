@@ -209,8 +209,9 @@ class ProjectSearchPopup(tk.Toplevel):
             return
         results = self.callbacks['search'](search_string, self.keep_case.get() == 1)
 
-        if len(results) == 0:
-            results = None
+        if results is not None:
+            if len(results) == 0:
+                results = None
 
         self.populate_result_tree(results)
 
