@@ -2,6 +2,7 @@ import os.path
 import tkinter as tk
 from tkinter import ttk
 
+from SALSA.GUI.ProjectSearch.filter_widgets import SearchableToggleDataTreeview, FilterSearchWidget
 from SALSA.Project.project_searcher import loc_tokens, filter_tokens, PrjResult, PrjResultGroup
 from SALSA.Common.constants import alt_sep
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
@@ -116,7 +117,7 @@ class ProjectSearchPopup(tk.Toplevel):
             ff.rowconfigure(0, weight=1)
 
             columns = list(filter_trees[k].keys())[1:]
-            self.filter_trees[k] = DataTreeview(ff, name='results', columns=columns, can_open=False, can_select_multiple=True)
+            self.filter_trees[k] = SearchableToggleDataTreeview(ff, name='results', columns=columns)
             self.filter_trees[k].grid(row=0, column=0, sticky='NSEW')
             first = True
             for name, d in filter_trees[k].items():
