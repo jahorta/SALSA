@@ -290,13 +290,22 @@ class ProjectSearcher:
                         for param_id, param in inst.params.items():
                             if 'string' in param.type or 'jump' in param.type:
                                 continue
-                            if self.str_comp(token.value, str(param.value)):
-                                row_data = f'{sect_name}{alt_sep}{inst_id}{alt_sep}{param_id}'
-                                display = f'{sect_name} - {sect.inst_list.index(inst_id)}'
-                                if PrjResultGroup(sct_name, []) not in links:
-                                    links.append(PrjResultGroup(sct_name, [PrjResult(row_data, display)]))
-                                else:
-                                    links[(links.index(sct_name))].contents.append(PrjResult(row_data, display))
+                            if 'footer' in param.type:
+                                if self.str_comp(token.value, str(param.linked_string), in_=True):
+                                    row_data = f'{sect_name}{alt_sep}{inst_id}{alt_sep}{param_id}'
+                                    display = f'{sect_name} - {sect.inst_list.index(inst_id)}'
+                                    if PrjResultGroup(sct_name, []) not in links:
+                                        links.append(PrjResultGroup(sct_name, [PrjResult(row_data, display)]))
+                                    else:
+                                        links[(links.index(sct_name))].contents.append(PrjResult(row_data, display))
+                            else:
+                                if self.str_comp(token.value, str(param.value)):
+                                    row_data = f'{sect_name}{alt_sep}{inst_id}{alt_sep}{param_id}'
+                                    display = f'{sect_name} - {sect.inst_list.index(inst_id)}'
+                                    if PrjResultGroup(sct_name, []) not in links:
+                                        links.append(PrjResultGroup(sct_name, [PrjResult(row_data, display)]))
+                                    else:
+                                        links[(links.index(sct_name))].contents.append(PrjResult(row_data, display))
                         for loop_ind, loop in enumerate(inst.l_params):
                             for param_id, param in loop.items():
                                 if self.str_comp(token.value, str(param.value)):
