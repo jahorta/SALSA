@@ -245,7 +245,7 @@ class ProjectSearchPopup(tk.Toplevel):
             if len(tree.selection()) == 0:
                 continue
             for item in tree.selection():
-                filters.append(f'{key}{tree.row_data.get(item)}')
+                filters.append(f'{key}{tree.row_data.get(tree.item(item)["text"])}')
 
         if len(filters) == 0:
             return ''
