@@ -84,9 +84,9 @@ class ProjectSearchPopup(tk.Toplevel):
         self.filter_frame = ttk.Frame(self)
         self.filter_frame.grid(row=2, column=0, sticky='NSEW')
 
-        fw_upper = ttk.Frame(self.filter_frame)
-        fw_upper.grid(row=0, column=0, padx=10, pady='10 0', sticky=tk.N)
-        fw_up_label = ttk.Label(fw_upper, text='Search Locations:')
+        ff_upper = ttk.Frame(self.filter_frame)
+        ff_upper.grid(row=0, column=0, padx=10, pady='10 0', sticky='NSEW')
+        fw_up_label = ttk.Label(ff_upper, text='Search Locations:')
         fw_up_label.grid(row=0, column=0)
 
         self.loc_checkbutton_vars = {}
@@ -94,18 +94,26 @@ class ProjectSearchPopup(tk.Toplevel):
         column = 1
         for k, v in loc_tokens.items():
             self.loc_checkbutton_vars[k] = tk.IntVar(self, 0)
-            loc_checkbuttons[k] = ttk.Checkbutton(fw_upper, offvalue=0, onvalue=1, text=filter_labels[k],
+            loc_checkbuttons[k] = ttk.Checkbutton(ff_upper, offvalue=0, onvalue=1, text=filter_labels[k],
                                                   variable=self.loc_checkbutton_vars[k])
             loc_checkbuttons[k].grid(row=0, column=column)
+            ff_upper.columnconfigure(column, weight=1)
             column += 1
 
+        self.filter_frame.columnconfigure(0, weight=1)
+        self.filter_frame.rowconfigure(1, weight=1)
         fw_lower = ttk.Frame(self.filter_frame)
-        fw_lower.grid(row=1, column=0, sticky=tk.N, padx=10, pady=10)
-        column = 1
+        fw_lower.grid(row=1, column=0, padx=10, pady=10, sticky='NSEW')
+        fw_lower.rowconfigure(0, weight=1)
+        column = 0
         self.filter_trees = {}
         for k, v in filter_tokens.items():
+            fw_lower.columnconfigure(column, weight=1)
+
             ff = ttk.Frame(fw_lower)
-            ff.grid(row=0, column=column, padx=2, pady=2)
+            ff.grid(row=0, column=column, padx=2, pady=2, sticky='NSEW')
+            ff.columnconfigure(0, weight=1)
+            ff.rowconfigure(0, weight=1)
 
             columns = list(filter_trees[k].keys())[1:]
             self.filter_trees[k] = DataTreeview(ff, name='results', columns=columns, can_open=False, can_select_multiple=True)
