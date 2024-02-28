@@ -111,6 +111,14 @@ def theme_generator(colors: Colors):
                 "insertcolor": colors.insert_indicator,
             },
         },
+        "tooltip.TEntry": {
+            "configure": {
+                "background": colors.bg_internal,
+                "foreground": colors.disabled_text,
+                "fieldbackground": colors.bg_internal,
+                "lightcolor": colors.border,
+            },
+        },
         "TCheckbutton": {
             "configure": {
                 "background": colors.bg,
