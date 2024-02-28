@@ -19,20 +19,29 @@ class TokenType (enum.Enum):
 @dataclass
 class Token:
     type_: TokenType
+    subtype: Union[None, str]
     value: str
 
     def __contains__(self, item: Union[TokenType, str]):
         if isinstance(item, str):
+            if item == self.subtype:
+                return True
             return item in self.value
         return item == self.type_
 
     def __eq__(self, other):
         if isinstance(other, Token):
             return self.value == other.value and self.type_ == other.type_
-        if isinstance(other, str):
-            return other in self.value
         if isinstance(other, TokenType):
             return self.type_ == other
+        if isinstance(other, int):
+            if self.value.isdecimal():
+                return other == int(self.value)
+            other = str(other)
+        if isinstance(other, str):
+            if other == self.subtype:
+                return True
+            return other == self.value
         return False
 
 
@@ -83,7 +92,7 @@ class SearchTokens:
                 continue
 
             if part in special_tokens:
-                self.locs.append(Token(TokenType.flag, part))
+                self.locs.append(Token(TokenType.flag, None, part))
                 continue
 
             is_search = True
@@ -91,12 +100,12 @@ class SearchTokens:
                 if len(part) <= len(f_token):
                     continue
                 if f_token == part[:len(f_token)]:
-                    self.filters.append(Token(TokenType.filter, part))
+                    self.filters.append(Token(TokenType.filter, f_token, part[len(f_token):]))
                     is_search = False
                     break
 
             if is_search:
-                self.search.append(Token(TokenType.search, part))
+                self.search.append(Token(TokenType.search, None, part))
 
     @classmethod
     def tokenize(cls, string, type_tokens, filter_tokens):
@@ -189,7 +198,7 @@ class ProjectSearcher:
         return links
 
     def search_insts(self, tokens: SearchTokens):
-        r_insts = [int(t.value[5:]) for t in tokens.get_filter_list('inst:')]
+        r_insts = [int(t.value) for t in tokens.get_filter_list('inst:')]
 
         if len(r_insts) == 0:
             if len(tokens.search) > 0:
