@@ -25,6 +25,12 @@ filter_trees = {
     },
 }
 
+default_text = {
+    'sct:': 'Look for Scripts',
+    'sect:': 'Look for Sections',
+    'inst:': 'Look for Insts'
+}
+
 default_tree_width = 100
 default_tree_minwidth = 10
 default_tree_anchor = tk.W
@@ -108,6 +114,7 @@ class ProjectSearchPopup(tk.Toplevel):
         fw_lower.rowconfigure(0, weight=1)
         column = 0
         self.filter_trees = {}
+        self.filter_searches = {}
         for k, v in filter_tokens.items():
             fw_lower.columnconfigure(column, weight=1)
 
@@ -136,9 +143,13 @@ class ProjectSearchPopup(tk.Toplevel):
             filter_scroll.grid(row=0, column=1, sticky=tk.N + tk.S)
             self.filter_trees[k].config(yscrollcommand=filter_scroll.set)
 
+            self.filter_searches[k] = FilterSearchWidget(ff, callbacks={'search': self.filter_trees[k].filter_entries},
+                                                         default_text=default_text[k])
+            self.filter_searches[k].grid(row=1, column=0, columnspan=2, sticky=tk.E+tk.W, pady=2)
+
             clear_button = ttk.Button(ff, text=f'Clear {filter_trees[k]["filter"]["label"]} filters',
-                                      command=self.filter_trees[k].selection_clear)
-            clear_button.grid(row=1, column=0, sticky=tk.NW, pady='2 0')
+                                      command=self.filter_trees[k].clear_selection)
+            clear_button.grid(row=2, column=0, sticky=tk.NW)
             column += 1
 
         self.keep_case = tk.IntVar(self, 0)
