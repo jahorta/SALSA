@@ -58,6 +58,9 @@ default_tree_anchor = tk.W
 default_tree_stretch = False
 default_tree_label = ''
 
+flash_count = 3
+flash_dur = 600
+
 
 class ProjectEditorView(ttk.Frame):
     log_name = 'PrjEditorView'
@@ -414,6 +417,19 @@ class ProjectEditorView(ttk.Frame):
 
         if force_delete_all:
             handler.close(cancel=False)
+
+    def flash_delay_param(self, count=flash_count, in_flash=False):
+        if in_flash:
+            self.delay_frame_label.configure(style='TLabel')
+            self.delay_frame.configure(style='TLabelframe')
+            self.delay_label.configure(style='TLabel')
+            if count > 1:
+                self.after(flash_dur//2, self.flash_delay_param, count - 1, False)
+        else:
+            self.delay_frame_label.configure(style='flash.TLabel')
+            self.delay_frame.configure(style='flash.TLabelframe')
+            self.delay_label.configure(style='flash.TLabel')
+            self.after(flash_dur//2, self.flash_delay_param, count, True)
 
     def change_theme(self, theme):
         self.theme = theme
