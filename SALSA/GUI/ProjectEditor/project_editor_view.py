@@ -240,10 +240,11 @@ class ProjectEditorView(ttk.Frame):
         self.skip_error_label = ttk.Label(skip_frame, text='')
         self.skip_error_label.grid(row=1, column=0, columnspan=2, sticky='NSEW')
 
-        delay_frame = ttk.LabelFrame(inst_top_frame, text='Instruction Delay')
-        delay_frame.grid(row=2, column=0, columnspan=2, sticky='NSEW')
+        self.delay_frame_label = ttk.Label(inst_top_frame, text='Instruction Delay')
+        self.delay_frame = ttk.LabelFrame(inst_top_frame, labelwidget=self.delay_frame_label)
+        self.delay_frame.grid(row=2, column=0, columnspan=2, sticky='NSEW')
 
-        self.delay_label = ttk.Label(delay_frame, text=' ')
+        self.delay_label = ttk.Label(self.delay_frame, text=' ')
         self.delay_label.grid(row=0, column=0, sticky='NSEW')
         self.delay_label.bind('<Double-1>', lambda e: self.on_param_double_click('delay', e))
 
