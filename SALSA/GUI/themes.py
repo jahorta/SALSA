@@ -41,6 +41,18 @@ def theme_generator(colors: Colors):
                 "highlightbackground": colors.bg_highlight,
                 "highlightcolor": colors.bg_highlight,
                 "highlightthickness": 2,
+                "background": colors.bg,
+                "bordercolor": colors.bg_highlight,
+                "lightcolor": colors.bg_highlight,
+                "darkcolor": colors.bg_internal
+            }
+        },
+        "flash.TLabelframe": {
+            "configure": {
+                "highlightbackground": colors.bg_highlight,
+                "highlightcolor": colors.bg_highlight,
+                "highlightthickness": 2,
+                "background": colors.bg_highlight,
                 "bordercolor": colors.bg_highlight,
                 "lightcolor": colors.bg_highlight,
                 "darkcolor": colors.bg_internal
@@ -49,6 +61,12 @@ def theme_generator(colors: Colors):
         "TLabel": {
             "configure": {
                 "background": colors.bg,
+                "foreground": colors.text
+            }
+        },
+        "flash.TLabel": {
+            "configure": {
+                "background": colors.bg_highlight,
                 "foreground": colors.text
             }
         },
