@@ -4,6 +4,8 @@ import os
 import ctypes
 from typing import Union
 
+aklz_lib = 'AKLZ.dll' if os.name == 'nt' else 'AKLZ.lib'
+
 
 class BufWSize(ctypes.Structure):
     _fields_ = [("size", ctypes.c_int),
@@ -12,7 +14,7 @@ class BufWSize(ctypes.Structure):
 
 class Aklz:
     def __init__(self):
-        dll_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'LIB', 'AKLZ.dll')
+        dll_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'LIB', aklz_lib)
         self.dll = ctypes.cdll.LoadLibrary(dll_path)
 
         self.Decompress = self.dll.decompress
