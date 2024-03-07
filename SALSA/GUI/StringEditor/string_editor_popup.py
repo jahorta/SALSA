@@ -433,6 +433,7 @@ class StringPopup(tk.Toplevel):
         self.body_entry.configure(**self.theme['text']['configure'])
         self.configure(**self.theme['Ttoplevel']['configure'])
         self.str_encode_toggle.change_theme(self.theme)
+        self.sp_chars.change_theme(theme)
 
     # ---------------- #
     # Right Click Menu #

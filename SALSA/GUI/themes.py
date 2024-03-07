@@ -269,7 +269,7 @@ def theme_generator(colors: Colors):
                 "background": colors.bg_internal,
             }
         },
-        "lightCanvas": {
+        "light.TCanvas": {
             'configure': {
                 "background": colors.bg,
             }
@@ -369,7 +369,7 @@ themes = {
         bg='#eeeeee',
         bg_internal='white',
         bg_highlight='#dddddd',
-        text='black',
+        text='#000000',
         selector='#4444dd',
         bright_selector='#3333bb',
         selector_text='white',

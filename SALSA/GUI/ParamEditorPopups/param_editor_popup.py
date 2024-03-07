@@ -482,7 +482,7 @@ class ParamEditPopup(tk.Toplevel):
         self.rowconfigure(0, weight=1)
 
         self.main_frame_label = w.ScrollLabelFrame(self, text='', relief=tk.FLAT, labelanchor='n', theme=theme,
-                                                   canvas_style='lightCanvas')
+                                                   canvas_style='light.TCanvas')
         self.main_frame_label.grid(row=0, column=0, sticky='NSEW')
         self.main_frame = self.main_frame_label.scroll_frame
 
