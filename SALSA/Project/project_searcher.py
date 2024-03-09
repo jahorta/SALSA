@@ -288,9 +288,9 @@ class ProjectSearcher:
                                 else:
                                     links[(links.index(sct_name))].contents.append(PrjResult(row_data, display))
                         for param_id, param in inst.params.items():
-                            if 'string' in param.type or 'jump' in param.type:
+                            if 'jump' in param.type:
                                 continue
-                            if 'footer' in param.type:
+                            if 'footer' in param.type or 'string' in param.type:
                                 if self.str_comp(token.value, str(param.linked_string), in_=True):
                                     row_data = f'{sect_name}{alt_sep}{inst_id}{alt_sep}{param_id}'
                                     display = f'{sect_name} - {sect.inst_list.index(inst_id)}'
