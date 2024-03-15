@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import ctypes
 
-from AKLZ.LIB import aklz_fast, aklz_slow
+from AKLZ.LIB import aklz_dll, aklz_py
 
 aklz_lib = 'AKLZ.dll'
 
