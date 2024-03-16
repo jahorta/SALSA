@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import sys
 import os
-import ctypes
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 from AKLZ.LIB import aklz_dll, aklz_py
 
