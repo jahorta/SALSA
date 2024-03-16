@@ -37,7 +37,7 @@ class SCTModel:
 
         print(f'{self.log_key}: Compressing sct file')
         if compress:
-            sct_file = Aklz().compress(sct_file)
+            sct_file = Aklz.compress(sct_file)
         print(f'{self.log_key}: Finished compressing sct file')
 
         with open(filepath, 'wb') as sct:
@@ -72,6 +72,6 @@ class SCTModel:
             raise FileExistsError(f'{self.log_key}: {filename} does not exist.')
 
         if Aklz.is_compressed(ba):
-            ba = Aklz().decompress(ba)
+            ba = Aklz.decompress(ba)
 
         return filename, ba
