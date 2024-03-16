@@ -15,14 +15,14 @@ class Aklz:
     def __init__(self, use_slow=False):
         self.use_slow = use_slow
         if os.name != 'nt' or use_slow:
-            self._decompress = aklz_slow.decompress
-            self._compress = aklz_slow.compress
-            self._is_compressed = aklz_slow.is_compressed
+            self._decompress = aklz_py.decompress
+            self._compress = aklz_py.compress
+            self._is_compressed = aklz_py.is_compressed
 
         else:
-            self._decompress = aklz_fast.decompress
-            self._compress = aklz_fast.compress
-            self._is_compressed = aklz_fast.is_compressed
+            self._decompress = aklz_dll.decompress
+            self._compress = aklz_dll.compress
+            self._is_compressed = aklz_dll.is_compressed
 
     @classmethod
     def decompress(cls, buffer_in: bytearray, use_slow=False):
