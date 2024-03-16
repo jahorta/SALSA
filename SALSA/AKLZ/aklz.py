@@ -8,11 +8,6 @@ from AKLZ.LIB import aklz_dll, aklz_py
 aklz_lib = 'AKLZ.dll'
 
 
-class BufWSize(ctypes.Structure):
-    _fields_ = [("size", ctypes.c_int),
-                ("buffer", ctypes.POINTER(ctypes.c_char))]
-
-
 class Aklz:
     def __init__(self, use_slow=False):
         self.use_slow = use_slow
