@@ -16,6 +16,13 @@ class BufWSize(ctypes.Structure):
 # ################ #
 
 
+def get_dll_path():
+    dll_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), aklz_lib)
+    if not os.path.exists(dll_path):
+        return ''
+    return dll_path
+
+
 # ----------------- #
 # Compression Check #
 # ----------------- #
