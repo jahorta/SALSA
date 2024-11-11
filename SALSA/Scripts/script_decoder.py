@@ -137,6 +137,7 @@ class SCTDecoder:
         decoded_sct = sct_decoder._decode_sct(name, sct, inst_lib, strings_only=strings_only,
                                               is_validation=is_validation)
         if strings_only:
+            decoded_sct = sct_decoder._organize_strings(decoded_sct)
             return decoded_sct
         decoded_sct = sct_decoder._organize_sct(decoded_sct)
         if status is not None:
@@ -219,16 +220,13 @@ class SCTDecoder:
 
             new_section = self._decode_sct_section(sect_name, bounds)
 
-            if new_section is None and self._strings_only:
-                continue
-
             decoded_sct.add_section(new_section)
 
         print(f'{self.log_key}: All sections decoded!!!')
 
         return decoded_sct
 
-    def _decode_sct_section(self, sect_name, bounds) -> SCTSection:
+    def _decode_sct_section(self, sect_name, bounds) -> Union[SCTSection, None]:
 
         sct_start_pos = bounds[0]
         length = bounds[1] - bounds[0]
@@ -251,10 +249,9 @@ class SCTDecoder:
             garbage = self._get_garbage_after_string(bounds=bounds)
             if len(garbage) > 0:
                 section.add_garbage('end', garbage)
+            if section.string[:2] == '//':
+                section.set_type('Label')
             return section
-
-        if self._strings_only:
-            return None
 
         section = self._create_insts_from_region(bounds, section, 0)
 
@@ -940,7 +937,16 @@ class SCTDecoder:
     # -------------------------- #
     # Organize newly decoded sct #
     # -------------------------- #
+    def _organize_strings(self, decoded_sct) -> SCTScript:
+        self._reassign_empty_strings(decoded_sct)
+        self._create_string_groups(decoded_sct=decoded_sct)
+        self._setup_string_links(decoded_sct=decoded_sct)
+        self._detect_and_move_footer_dialog(decoded_sct=decoded_sct)
+        return decoded_sct
+
     def _organize_sct(self, decoded_sct) -> SCTScript:
+        # Identify empty strings and reassign them as strings
+        self._reassign_empty_strings(decoded_sct)
 
         # Setup links
         print(f'{self.log_key}: Setting Up Links...', end='\r')
@@ -980,6 +986,28 @@ class SCTDecoder:
         self._detect_and_move_footer_dialog(decoded_sct=decoded_sct)
 
         return decoded_sct
+
+    def _reassign_empty_strings(self, decoded_sct: SCTScript):
+        for sect in decoded_sct.sect_list:
+            if decoded_sct.sects[sect].type == 'Label' and len(sect) >= 9:
+                sect_number = self._get_longest_numerical_substring(sect)
+                if len(sect_number) > 5:
+                    decoded_sct.sects[sect].set_type('String')
+                    decoded_sct.sects[sect].string = ''
+
+    def _get_longest_numerical_substring(self, string: str):
+        cur_digits = ''
+        max_digits = ''
+        cur_char_ind = 0
+        while cur_char_ind < len(string):
+            if string[cur_char_ind] in '0123456789':
+                cur_digits += string[cur_char_ind]
+                if len(cur_digits) >= len(max_digits):
+                    max_digits = cur_digits
+            else:
+                cur_digits = ''
+            cur_char_ind += 1
+        return max_digits
 
     def _setup_scpt_links(self, decoded_sct=None, sect_info=None):
         if decoded_sct is None and sect_info is None:
@@ -1388,7 +1416,7 @@ class SCTDecoder:
                 decoded_sct.string_locations[section.name] = cur_group_name
                 decoded_sct.strings[section.name] = section.string
                 new_section_order.append(name)
-            elif section.type == 'Script':
+            elif section.type == 'Script' or section.type == '':
                 has_header = False
                 new_section_order.append(name)
 
