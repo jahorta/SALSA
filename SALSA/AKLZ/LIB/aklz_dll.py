@@ -22,6 +22,8 @@ class BufWSize(ctypes.Structure):
 
 def is_compressed(buffer_in: bytearray):
     dll_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), aklz_lib)
+    if not os.path.exists(dll_path):
+        raise FileExistsError(dll_path + ' does not exist')
     dll = ctypes.cdll.LoadLibrary(dll_path)
 
     IsCompressed = dll.is_compressed
@@ -67,6 +69,8 @@ def _file_decompress(source: Union[bytearray, str] = None, filepath_out: Union[N
 
 def _decompress(buffer_in):
     dll_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), aklz_lib)
+    if not os.path.exists(dll_path):
+        raise FileExistsError(dll_path + ' does not exist')
     dll = ctypes.cdll.LoadLibrary(dll_path)
 
     Decompress = dll.decompress
