@@ -41,8 +41,8 @@ class Aklz:
 
 
 if __name__ == '__main__':
-    filename = os.path.join(os.path.curdir, "a002a.mld")
-    file_out = os.path.join(os.path.curdir, "a002a_d.mld")
+    filename = os.path.join(os.path.curdir, "ME005A.SCT")
+    file_out = os.path.join(os.path.curdir, "ME005A_D.SCT")
     if not os.path.exists(filename):
         print('Please put a002a.mld in this directory if you wish to test this module')
 
