@@ -252,7 +252,6 @@ class SCTSection:
 
     insts: Dict[str, SCTInstruction]
     inst_tree: List[Union[str, Dict[str, Union[list, dict, str]]]]
-    type: str
     inst_errors: List[int]
     errors: List[str]
     strings: Dict[int, str]
@@ -276,6 +275,7 @@ class SCTSection:
         self.internal_sections_inst = {}
         self.internal_sections_curs = {}
         self.is_compound = False
+        self.type = ''
 
     def set_name(self, name):
         self.name = name
