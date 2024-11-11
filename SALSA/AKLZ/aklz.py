@@ -10,11 +10,13 @@ from AKLZ.LIB import aklz_dll, aklz_py
 
 aklz_lib = 'AKLZ.dll'
 
+aklz_slow = False
+
 
 class Aklz:
     def __init__(self, use_slow=False):
         self.use_slow = use_slow
-        if os.name != 'nt' or use_slow:
+        if os.name != 'nt' or use_slow or aklz_slow:
             self._decompress = aklz_py.decompress
             self._compress = aklz_py.compress
             self._is_compressed = aklz_py.is_compressed
@@ -38,6 +40,11 @@ class Aklz:
     def is_compressed(cls, buffer_in: bytearray, use_slow=False):
         a = cls(use_slow)
         return a._is_compressed(buffer_in)
+
+
+def set_aklz_slow(b: bool):
+    global aklz_slow
+    aklz_slow = b
 
 
 if __name__ == '__main__':

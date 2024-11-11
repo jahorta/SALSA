@@ -55,7 +55,7 @@ class SCTModel:
         sct_out = SCTDecoder.decode_sct_from_file(name=name, sct=sct_raw, inst_lib=insts, status=status)
         return name, sct_out
 
-    def read_sct_file(self, filepath: str) -> (str, bytearray):
+    def read_sct_file(self, filepath: str, use_slow=False) -> (str, bytearray):
         if '/' not in filepath:
             filename = filepath.split('.')[0]
             if 'directory' not in settings[self.log_key]:

@@ -17,6 +17,7 @@ from SALSA.GUI.gui_controller import GUIController
 from SALSA.GUI import menus
 from SALSA.GUI.themes import themes, theme_non_color_maps
 from SALSA.Project.project_facade import SCTProjectFacade
+from SALSA.AKLZ.aklz import set_aklz_slow
 
 has_debugger = True
 try:
@@ -143,6 +144,7 @@ class Application(tk.Tk):
             'prj->refresh_pos': self.refresh_offsets,
             'prj->repair->textbox': self.textbox_fadeout_repair,
             'prj->search': self.gui.show_project_search_popup,
+            'prj->aklz_style': self.set_aklz_decoder,
             # 'analysis->export': self.gui.show_analysis_view,
             'view->inst': self.gui.show_instruction_view,
             'view->theme': self.change_theme,
@@ -480,3 +482,6 @@ class Application(tk.Tk):
         if self.project_edit_controller.current['instruction'] is None:
             return None
         return self.project.get_inst_offset(**self.project_edit_controller.current)
+
+    def set_aklz_decoder(self):
+        set_aklz_slow(self.menu.aklz_var.get() == 1)
