@@ -35,10 +35,10 @@ class SCTModel:
             print(f'{self.log_key}: Unable to save, directory does not exist: {path_dir}')
             return
 
-        print(f'{self.log_key}: Compressing sct file')
         if compress:
+            print(f'{self.log_key}: Compressing sct file')
             sct_file = Aklz.compress(sct_file)
-        print(f'{self.log_key}: Finished compressing sct file')
+            print(f'{self.log_key}: Finished compressing sct file')
 
         with open(filepath, 'wb') as sct:
             sct.write(sct_file)
