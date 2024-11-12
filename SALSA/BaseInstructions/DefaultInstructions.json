@@ -156,7 +156,7 @@
   },
   "17": {
     "Name": "Set Bit",
-    "Description": "Sets a bit in the bit field at 0x80310b3c\nBitVar: <Offset>\n",
+    "Description": "Sets a bit in the bit field at 0x80310b3c\nBitVar: <Offset>\n\nLocation in US GC:\n*hex[*add[*flr[*div[<Offset>,8]*]*,*int[80310b3c]*]*]*\n\nBit:\n*hex[*mod[<Offset>,8]*]*\n\nor\n*bit[*hex[*mod[<Offset>,8]*]*]*",
     "Notes": "No dependancy on param1\nFunctional at all times\n\nFirst, it checks that the next value is not \n7F7FFFFF. If it is, it moves the scpt pointer up two and sets uvar1 to be 0x7FFFFFFF\n\nOtherwise, it enters scptAnalyze to generate uvar1\n\nA byte Offset is generated from  the upper 15 bits of uvar1, while the bit to set is generated from masking uVar1 with 0x1f",
     "Parameters": {
       "0": {
