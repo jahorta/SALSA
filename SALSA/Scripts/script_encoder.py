@@ -198,6 +198,8 @@ class SCTEncoder:
 
         # Resolve string links
         for link_offset, (section, trace) in self.string_links.items():
+            if 'FOOTER' in section:
+                continue
             if section not in self.header_dict:
                 self.script.errors.append(('Encoding', 'String', f'No string {section}', alt_sep.join(trace)))
                 print(f'No string {section}')
@@ -211,7 +213,6 @@ class SCTEncoder:
         has_footer_dialogue = footer_str_group_name in self.script.string_groups
         added_footer_entries = {}
         for offset, (string, trace) in self.footer_links.items():
-
             if has_footer_dialogue:
                 if string in self.script.string_groups[footer_str_group_name]:
                     string = self.script.strings[string]
