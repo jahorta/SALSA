@@ -225,6 +225,7 @@ class SCTEncoder:
                 str_pos = added_footer_entries[string]
             else:
                 str_pos = len(self.sct_body) + len(self.sct_foot)
+                added_footer_entries[string] = str_pos
             str_offset = str_pos - offset
             str_offset_word = self._make_word(i=str_offset)
             self.sct_foot.extend(self._encode_string(string=string, align=False))
