@@ -18,7 +18,8 @@ class SCTEncoder:
     endian_struct_format = {'big': '>', 'little': '<'}
     _header_offset_length = 0x4
     _header_name_length = 0x10
-    _default_header_start = bytearray(b'\x07\xd2\x00\x06\x00\x0e\x00\x00')
+    _default_header_starts = {'little': bytearray(b'\x07\xd2\x06\x00\x0e\x00\x00\x00'),
+                              'big': bytearray(b'\x07\xd2\x00\x06\x00\x0e\x00\x00')}
 
     use_garbage: bool
     combine_footer_links: bool
@@ -33,6 +34,8 @@ class SCTEncoder:
         # for decoder, encoder validation only
         self.validation = validation
         self._EU_validation = eu_validation
+
+        self._default_header_start = self._default_header_starts[endian]
 
         self._str_label = b'\x00\x00\x00\x09\x04\x00\x00\x00\x3f\x80\x00\x00\x00\x00\x00\x1d'
         if endian == 'little' and re.search('5[0-9]{2}A', script.name) and self.validation:
