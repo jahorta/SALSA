@@ -38,6 +38,7 @@ class SCTEncoder:
         self._default_header_start = self._default_header_starts[endian]
 
         self._str_label = b'\x00\x00\x00\x09\x04\x00\x00\x00\x3f\x80\x00\x00\x00\x00\x00\x1d'
+        self._str_label = b'\x09\x00\x00\x00\x00\x00\x00\x04\x00\x00\x80\x3f\x1d\x00\x00\x00' if endian == 'little' else self._str_label
         if endian == 'little' and re.search('5[0-9]{2}A', script.name) and self.validation:
             self._str_label = b'\x00\x00\x00\x09\x08\x00\x01\x00\x00\x00\x00\x1d'
 
