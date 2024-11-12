@@ -99,6 +99,7 @@ def parse_desc_func(desc, char_ind, inst, base_inst, callbacks):
             if result is None:
                 return result, cur_pos
             cur_param = result
+            continue
         else:
             cur_param += next_char
         cur_pos += 1
@@ -114,7 +115,9 @@ def check_params_are_numeric(paramlist: List[str]):
     result = ''
     numeric = True
     for param in paramlist:
-        if not param.lstrip('-').isnumeric():
+        if param.count('.') > 1:
+            numeric = False
+        if not param.replace('.', '').lstrip('-').isnumeric():
             numeric = False
         result += f'{param},'
 
@@ -160,6 +163,37 @@ def multiply_desc_params(param1: str, param2: str, **kwargs):
     return result
 
 
+def divide_desc_params(param1: str, param2: str, **kwargs):
+    result = check_params_are_numeric([param1, param2])
+    if result is not None:
+        return result
+
+    result_type = getTypeFromString(param1)
+    result = toFloat(param1) / toFloat(param2)
+    result = asStringOfType(result, result_type)
+    return result
+
+
+def mod_desc_params(param1: str, param2: str, **kwargs):
+    result = check_params_are_numeric([param1, param2])
+    if result is not None:
+        return result
+
+    result = int(toFloat(param1) % toFloat(param2))
+    result = asStringOfType(result, 'int')
+    return result
+
+
+def floor_desc_params(param1: str, **kwargs):
+    result = check_params_are_numeric([param1])
+    if result is not None:
+        return result
+
+    result = int(math.floor(toFloat(param1)))
+    result = asStringOfType(result, 'int')
+    return result
+
+
 # ----------------------- #
 # Hex conversion function #
 # ----------------------- #
@@ -174,6 +208,43 @@ def hex_desc_params(param1: str, form='>', **kwargs):
     else:
         result = padded_hex(int(param1), 8)
     return result
+
+
+def int_desc_params(param1: str, endian='big', **kwargs):
+    if not is_hex(param1):
+        return param1
+    if endian not in ['little', 'big']:
+        return param1
+
+    return asStringOfType(int.from_bytes(bytes.fromhex(param1), byteorder=endian), 'int')
+
+
+def bin_desc_params(param1: str, endian='big', **kwargs):
+    if not is_hex(param1):
+        return param1
+    if 'x' in param1 and len(param1) > 2:
+        param1 = param1[2:]
+    return bin(int.from_bytes(bytes.fromhex(param1), byteorder=endian))
+
+
+def bit_desc_params(param1: str, **kwargs):
+    if is_hex(param1):
+        if 'x' in param1 and len(param1) > 2:
+            param1 = param1[2:]
+        p1_int = int.from_bytes(bytes.fromhex(param1), byteorder='big')
+    elif not param1.isnumeric():
+        return param1
+    else:
+        p1_int = toInt(param1)
+
+    if p1_int > 7 or p1_int < 0:
+        return param1
+    param1 = p1_int
+
+    result = '0' * param1
+    result = '0b1' + result
+    return result
+
 
 
 # ---------------------------------------------------------------------- #
@@ -256,16 +327,28 @@ desc_code_funcs = {
     'add': add_desc_params,
     'sub': subtract_desc_params,
     'mul': multiply_desc_params,
+    'div': divide_desc_params,
+    'mod': mod_desc_params,
+    'flr': floor_desc_params,
     'hex': hex_desc_params,
+    'int': int_desc_params,
+    'bin': bin_desc_params,
+    'bit': bit_desc_params,
     'loc': replace_vars_with_locs,
-    'str': get_parameter_string
+    'str': get_parameter_string,
 }
 
 desc_code_param_nums = {
     'add': [2],
     'sub': [2],
     'mul': [2],
+    'div': [2],
+    'mod': [2],
+    'flr': [1],
     'hex': [1, 2],
+    'int': [1, 2],
+    'bin': [1, 2],
+    'bit': [1],
     'loc': [1],
     'str': [1]
 }
