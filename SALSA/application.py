@@ -338,8 +338,6 @@ class Application(tk.Tk):
     def on_export_scts(self, directory, scripts, options):
         compress = options['compress_aklz']
         options.pop('compress_aklz')
-        if options['endian'] == 'little':
-            compress = False
 
         script_dict = {}
         for script in scripts:
