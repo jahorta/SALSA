@@ -158,14 +158,14 @@ class SCTExportPopup(tk.Toplevel):
         if not os.path.exists(directory):
             return
         compress = self.option_vars['compress_aklz'].get() == 'True'
-        if self.option_vars['system'] == 'Dreamcast':
+        if self.option_vars['system'].get() == 'Dreamcast':
             compress = False
         options = {
             'use_garbage': self.option_vars['use_garbage'].get() == 'True',
             'combine_footer_links': self.option_vars['combine_footer'].get() == 'True',
             'add_spurious_refresh': self.option_vars['all_refresh'].get() == 'True',
             'compress_aklz': compress,
-            'endian': 'little' if self.option_vars['system'] == 'Dreamcast' else 'big'
+            'endian': 'little' if self.option_vars['system'].get() == 'Dreamcast' else 'big'
         }
         scripts = [self.script_ids[int(s)] for s in self.scripts.selection()]
         if len(scripts) > 0:
