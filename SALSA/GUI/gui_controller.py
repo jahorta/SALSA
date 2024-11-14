@@ -177,8 +177,8 @@ class GUIController:
             'add_string_group': self.project.add_string_group, 'delete_string_group': self.project.remove_string_group,
             'rename_string_group': self.project.rename_string_group, 'add_string': self.project.add_string,
             'delete_string': self.project.delete_string, 'rename_string': self.project.change_string_id,
-            'is_sect_name_used': self.project.is_sect_name_used,
-            'refresh_sections': lambda: self.prj_cont.refresh_tree('section')
+            'is_sect_name_used': self.project.is_sect_name_used, 'find_usage': self.send_string_to_search,
+            'refresh_sections': lambda: self.prj_cont.refresh_tree('section'),
         }
         self.popups['string'] = StringPopup(self.parent, callbacks=callbacks, name='string',
                                             theme=self.theme)
@@ -214,6 +214,13 @@ class GUIController:
         }
         self.popups['search'] = ProjectSearchPopup(self.parent, callbacks=callbacks, name='search',
                                                    theme=self.theme)
+
+    def send_string_to_search(self, string, **options):
+        self.show_project_search_popup()
+        self.popups['search'].search_entry.delete(0, tk.END)
+        self.popups['search'].search_entry.insert(0, string)
+        # self.popups['search'].set_options(options)
+        self.popups['search'].start_search()
 
     # ------------- #
     # Popup refresh #
