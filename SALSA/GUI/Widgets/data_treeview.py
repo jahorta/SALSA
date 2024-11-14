@@ -182,11 +182,11 @@ class DataTreeview(ttk.Treeview):
         elif self.return_none:
             self.callbacks['select'](self.name, row_data)
 
-    def insert_entry(self, parent, text, values, group_type=None, row_data=None, **kwargs):
+    def insert_entry(self, parent, text, values, index='end', group_type=None, row_data=None, **kwargs):
         iid = str(len(self.row_data))
         self.row_data[iid] = row_data
         self.group_types[iid] = group_type
-        super().insert(parent=parent, iid=iid, text=text, values=values, **kwargs)
+        super().insert(parent=parent, index=index, iid=iid, text=text, values=values, **kwargs)
         self.last_entry = iid
         self.first_entry = '0'
         return iid
