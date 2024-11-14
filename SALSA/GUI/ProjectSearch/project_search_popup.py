@@ -221,6 +221,9 @@ class ProjectSearchPopup(tk.Toplevel):
             self.toggle_filter_frame()
 
         self.result_tree.clear_all_entries()
+        self.result_tree.insert_entry('', '', [])
+        self.result_tree.insert_entry('', 'Searching...', [])
+
         self.after(10, self.continue_search)
 
     def continue_search(self):
@@ -228,6 +231,7 @@ class ProjectSearchPopup(tk.Toplevel):
         if len(search_string) == 0:
             return
         results = self.callbacks['search'](search_string, self.keep_case.get() == 1)
+        self.result_tree.clear_all_entries()
 
         if results is not None:
             if len(results) == 0:
