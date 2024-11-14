@@ -241,7 +241,7 @@ def bit_desc_params(param1: str, **kwargs):
         return param1
     param1 = p1_int
 
-    result = '0' * param1
+    result = '0' * (param1 - 1)
     result = '0b1' + result
     return result
 
