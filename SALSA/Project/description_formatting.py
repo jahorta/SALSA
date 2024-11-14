@@ -237,12 +237,13 @@ def bit_desc_params(param1: str, **kwargs):
     else:
         p1_int = toInt(param1)
 
-    if p1_int > 7 or p1_int < 0:
+    if p1_int < 0:
         return param1
+    if p1_int > 7:
+        p1_int = p1_int % 8
     param1 = p1_int
 
-    result = '0' * (param1 - 1)
-    result = '0b1' + result
+    result = '0b' + '0' * (8 - param1 - 1) + '1' + '0' * param1
     return result
 
 
