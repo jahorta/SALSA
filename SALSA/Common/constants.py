@@ -49,6 +49,27 @@ class ScriptEditorTrees:
     instruction = 2
 
 
+class VarStarts:
+    IntVar = 0x8030e3e4
+    FloatVar = 0x8030e514
+    BitVar = 0x80310b3c
+    ByteVar = 0x80310a1c
+
+    starts = {'intvar': IntVar, 'floatvar': FloatVar, 'bitvar': BitVar, 'bytevar': ByteVar}
+
+    @classmethod
+    def getAddr(cls, type_: str, num: int) -> str:
+        if type_.lower() not in ['intvar', 'floatvar', 'bitvar', 'bytevar']:
+            return hex(num)
+
+        if type_.lower() == 'bitvar':
+            return f'GC_US:{hex(cls.starts[type_.lower()] + (num // 8))} bit:{num % 8}'
+
+        if type_.lower() in ['intvar', 'floatvar']:
+            num *= 4
+        return f'GC_US:{hex(cls.starts[type_.lower()] + num)}'
+
+
 class ReservedVars:
     IntVar = {
         15: 'Pre-script Context'

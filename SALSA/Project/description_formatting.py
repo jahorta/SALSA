@@ -4,11 +4,46 @@ from typing import List
 from SALSA.BaseInstructions.bi_container import BaseInst
 from SALSA.Common.byte_array_utils import getTypeFromString, toInt, asStringOfType, toFloat, float2Hex, padded_hex, is_hex
 from SALSA.Project.project_container import SCTInstruction, SCTParameter
+from SALSA.Common.constants import VarStarts
 
 
-def format_description(inst: SCTInstruction, base_inst: BaseInst, callbacks):
+def format_description(inst: SCTInstruction, base_inst: BaseInst, callbacks, add_var_addresses=True):
     desc = description_insert_param_values(inst, base_inst, callbacks)
-    return resolveDescriptionFuncs(desc, inst, base_inst, callbacks)
+    desc = resolveDescriptionFuncs(desc, inst, base_inst, callbacks)
+    if add_var_addresses:
+        desc = addAddressesToVars(desc)
+    return desc
+
+
+def addAddressesToVars(desc):
+    for type_str in ['IntVar:', 'FloatVar:', 'BitVar:', 'ByteVar:']:
+        new_parts = []
+        parts = desc.split(type_str)
+        while len(parts) > 1:
+            cur_part = parts.pop(1)
+            c = 0
+
+            while c < len(cur_part):
+                if cur_part[c].isnumeric():
+                    break
+                if cur_part[c].isalpha():
+                    c = len(cur_part)
+                c += 1
+            if c >= len(cur_part):
+                continue
+
+            num = ''
+            while cur_part[c].isnumeric():
+                num += cur_part[c]
+                c += 1
+                if c >= len(cur_part):
+                    break
+
+            insert = VarStarts.getAddr(type_str[:-1], int(num))
+            new_parts.append(f'{cur_part[:c]} ({insert}) {cur_part[c:]}')
+        new_parts = [parts[0]] + new_parts
+        desc = type_str.join(new_parts)
+    return desc
 
 
 def description_insert_param_values(inst: SCTInstruction, base_inst: BaseInst, callbacks):
