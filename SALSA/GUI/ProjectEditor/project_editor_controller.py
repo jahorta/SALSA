@@ -1110,15 +1110,20 @@ class ProjectEditorController:
             return
         m = tk.Menu(self.view, tearoff=0)
 
-        param = e.widget.row_data[row]
-        if param is None:
-            loop_num = int(e.widget.item(row)['text'][4:])
-            m.add_command(label='Add Loop Parameter Above',
-                          command=lambda: self.handle_loop_param_change('add-above', loop_num=loop_num))
-            m.add_command(label='Add Loop Parameter Below',
-                          command=lambda: self.handle_loop_param_change('add-below', loop_num=loop_num))
-            m.add_command(label='Remove Loop Parameter',
-                          command=lambda: self.handle_loop_param_change('remove', loop_num=loop_num))
+        if row == '':
+            loop_num = 0
+            m.add_command(label='Add Loop Parameter',
+                          command=lambda: self.handle_loop_param_change('add-last', loop_num=loop_num))
+        else:
+            param = e.widget.row_data[row]
+            if param is None:
+                loop_num = int(e.widget.item(row)['text'][4:])
+                m.add_command(label='Add Loop Parameter Above',
+                              command=lambda: self.handle_loop_param_change('add-above', loop_num=loop_num))
+                m.add_command(label='Add Loop Parameter Below',
+                              command=lambda: self.handle_loop_param_change('add-below', loop_num=loop_num))
+                m.add_command(label='Remove Loop Parameter',
+                              command=lambda: self.handle_loop_param_change('remove', loop_num=loop_num))
 
         if self.project.inst_is_switch(**self.current):
             m.entryconfigure('Add a Loop Parameter Above', state='disabled')
@@ -1130,15 +1135,18 @@ class ProjectEditorController:
 
             m.add_command(label='Use Instruction Tree to edit a Switch', command=blank)
         m.bind('<Escape>', m.destroy)
+
         try:
             m.tk_popup(e.x_root, e.y_root)
         finally:
             m.grab_release()
 
-    def handle_loop_param_change(self, change: Literal['add-above', 'add-below', 'remove'], loop_num=None):
+    def handle_loop_param_change(self, change: Literal['add-above', 'add-below', 'add-last', 'remove'], loop_num=None):
         has_changed = False
         if 'add' in change:
             position = loop_num if 'below' not in change else loop_num + 1
+            if 'last' in change:
+                position = -1
             has_changed = self.project.add_loop_param(**self.current, position=position)
         if change == 'remove':
             has_changed = self.project.remove_loop_param(**self.current, loop_num=loop_num)
