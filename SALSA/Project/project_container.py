@@ -372,7 +372,7 @@ class SCTProject:
     file_name: str
     scts: Dict[str, SCTScript]
 
-    cur_version = 6
+    cur_version = 7
 
     def __init__(self):
         self.scts = {}
@@ -380,3 +380,15 @@ class SCTProject:
         self.filepath = None
         self.global_variables = {'BitVar': {}, 'IntVar': {}, 'ByteVar': {}, 'FloatVar': {}}
         self.version = copy(self.cur_version)
+        self.inst_id_colors: Dict[int, str] = {}
+
+    def set_color(self, inst_id, color = ''):
+        if isinstance(inst_id, str):
+            inst_id = int(inst_id)
+
+        self.inst_id_colors[inst_id] = color
+
+    def get_color(self, inst_id):
+        if isinstance(inst_id, str):
+            inst_id = int(inst_id)
+        return self.inst_id_colors.get(inst_id, '')

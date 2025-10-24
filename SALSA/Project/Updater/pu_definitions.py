@@ -1,5 +1,14 @@
 from SALSA.Project.Updater.pu_constants import PP, UP
 
+v7 = {
+    PP.project: {
+        1: {
+            UP.callable: '_add_attr',
+            UP.arguments: [('inst_id_colors', {})]
+        }
+    }
+}
+
 v6 = {
     PP.instruction: {
         1: {
@@ -105,7 +114,8 @@ update_tasks = {
     2: v3,
     3: v4,
     4: v5,
-    5: v6
+    5: v6,
+    6: v7
 }
 
 p_max_depth = {
@@ -113,5 +123,6 @@ p_max_depth = {
     2: PP.instruction,
     3: PP.script,
     4: PP.parameter,
-    5: PP.instruction
+    5: PP.instruction,
+    6: PP.project
 }
