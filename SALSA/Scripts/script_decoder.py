@@ -123,9 +123,9 @@ class SCTDecoder:
         decoder._other_endian = 'little'
         decoder._cur_endian = decoder._base_endian
         decoder._inst_lib = inst_lib
-        section = decoder._decode_sct_section(name, bounds=(0, len(sect_bytes)))
+        section = decoder._decode_sct_section(name, bounds=(0, len(sect_bytes)), additional_offset=sect_offset)
         # May want to generate links to make sure all potential instructions are decoded
-        decoder._setup_scpt_links(sect_info={'section': section, 'offset': sect_offset, 'bounds': (0, len(sect_bytes))})
+        decoder._setup_scpt_links(sect_info={'section': section, 'offset': sect_offset, 'bounds': (sect_offset, len(sect_bytes) + sect_offset)})
         return section
 
     @classmethod
@@ -226,7 +226,7 @@ class SCTDecoder:
 
         return decoded_sct
 
-    def _decode_sct_section(self, sect_name, bounds) -> Union[SCTSection, None]:
+    def _decode_sct_section(self, sect_name, bounds, additional_offset=0) -> Union[SCTSection, None]:
 
         sct_start_pos = bounds[0]
         length = bounds[1] - bounds[0]
@@ -253,7 +253,7 @@ class SCTDecoder:
                 section.set_type('Label')
             return section
 
-        section = self._create_insts_from_region(bounds, section, 0)
+        section = self._create_insts_from_region(bounds, section, 0, additional_offset)
 
         if len(section.insts) == 1:
             section.set_type('Label')
@@ -262,7 +262,7 @@ class SCTDecoder:
 
         return section
 
-    def _create_insts_from_region(self, bounds, section: SCTSection, inst_list_id_start):
+    def _create_insts_from_region(self, bounds, section: SCTSection, inst_list_id_start, additional_offset):
         self._cursor = bounds[0] // 4
         self.end = bounds[1]
         inst_list_id = inst_list_id_start
@@ -297,6 +297,7 @@ class SCTDecoder:
                     currWord_int = self.getInt(self._cursor * 4)
 
                 instResult = self._decode_instruction(currWord_int, inst_pos, [sect_name])
+                instResult.absolute_offset += additional_offset
 
                 if instResult.base_id == 9:
                     instResult.label = sect_name
@@ -1646,7 +1647,7 @@ class SCTDecoder:
 
         bounds = (start, end)
         pref_len = len(sect.inst_list)
-        sect = self._create_insts_from_region(bounds, sect, inst_ind + 1)
+        sect = self._create_insts_from_region(bounds, sect, inst_ind + 1, 0)
         insts_made = len(sect.inst_list) - pref_len
         sect.inst_list += suffix_insts
 
