@@ -1200,6 +1200,8 @@ class SCTProjectFacade:
             loop_param.set_value(base_param.default_value)
             loop[int(param_id)] = loop_param
         pos = 0 if position is None else position
+        if position == -1:
+            pos = len(inst.l_params)
         inst.l_params.insert(pos, loop)
         self.update_loop_param_num(inst)
         return True
