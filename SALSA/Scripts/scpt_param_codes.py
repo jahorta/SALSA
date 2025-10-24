@@ -46,10 +46,10 @@ no_loop = [
 ]
 
 input = [
-    (0x50000000, 'IntVar: '),
-    (0x40000000, 'FloatVar: '),
-    (0x20000000, 'BitVar: '),
-    (0x10000000, 'ByteVar: '),
+    (0x50000000, 'IntVar: '),    # 0x8030e3e4
+    (0x40000000, 'FloatVar: '),  # 0x8030e514
+    (0x20000000, 'BitVar: '),    # 0x80310b3c
+    (0x10000000, 'ByteVar: '),   # 0x80310a1c
     (0x08000000, 'decimal: '),
     (0x04000000, 'float: '),
 ]
