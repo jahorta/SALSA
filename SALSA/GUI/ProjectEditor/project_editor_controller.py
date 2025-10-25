@@ -1,6 +1,6 @@
-from typing import Union, Dict, Literal
+from typing import Union, Dict, Literal, List, Tuple
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, ttk, colorchooser
 
 from SALSA.GUI.ProjectEditor.data_tree_state import ChildViewStateTree, DataViewState
 from SALSA.GUI.Widgets.widgets import LabelNameEntry
@@ -33,6 +33,8 @@ tree_and_parent_lists = {
 
 group_handle_width = 20
 
+
+color_tag_prefix = 'row_color_'
 
 class ProjectEditorController:
     log_name = 'PrjEditorCtrl'
@@ -104,6 +106,8 @@ class ProjectEditorController:
             'instruction': self.view.insts_tree,
             'parameter': self.view.param_tree
         }
+
+        self.inst_tree_color_tags: Dict[str, List[int]] = {}
 
         self.project.set_callback(key='update_scripts', callback=lambda: self.update_tree('script',
                                                                                           self.project.get_tree(
@@ -255,6 +259,8 @@ class ProjectEditorController:
         tree = self.trees[tree_key]
         if not isinstance(tree_list, list):
             return
+        if tree_key == 'instruction':
+            self.inst_tree_color_tags.clear()
         parent_list = ['']
         prev_iid = -1
         headers = self.view.get_headers(tree_key)
@@ -269,6 +275,10 @@ class ProjectEditorController:
                 else:
                     raise ValueError(f'{self.log_name}: Unknown command in tree list sent to _add_tree_entries')
                 continue
+
+            if tree_key == 'instruction':
+                base_id = entry.get('base_id', '')
+
             kwargs = {'parent': parent_list[-1], 'index': 'end'}
             values = []
             first = True
@@ -294,6 +304,30 @@ class ProjectEditorController:
             kwargs['values'] = values
             kwargs = {**kwargs, **entry}
             prev_iid = tree.insert_entry(**kwargs)
+
+            if tree_key != 'instruction':
+                continue
+
+            tree.item(prev_iid, tags=())
+            # check if ID has a color and if so add it to color tags
+            if base_id == '':
+                continue
+            row_color = self.project.project.get_color(base_id)
+            if row_color == '':
+                continue
+            if row_color not in self.inst_tree_color_tags:
+                self.inst_tree_color_tags[row_color] = []
+            self.inst_tree_color_tags[row_color].append(prev_iid)
+
+        if tree_key != 'instruction':
+            return
+
+        # apply all colors to background of rows
+        for color, ids in self.inst_tree_color_tags.items():
+            tag_name = f'{color_tag_prefix}{color}'
+            tree.tag_configure(tag_name, background=color)
+            for row_id in ids:
+                tree.item(row_id, tags=(tag_name, ))
 
     def adjust_tree_entries(self, entries, key):
         if key == 'instruction':
@@ -882,6 +916,10 @@ class ProjectEditorController:
         m.add_command(label='Disable Instructions', command=lambda: self.activate_insts(False))
         m.add_command(label='Enable Instructions', command=lambda: self.activate_insts(True))
 
+        m.add_separator()
+        m.add_command(label='Set Base Inst Color', command=lambda: self.set_base_inst_color(True))
+        m.add_command(label='Clear Base Inst Color', command=lambda: self.set_base_inst_color(False))
+
         m.bind('<Escape>', m.destroy)
         try:
             m.tk_popup(e.x_root, e.y_root)
@@ -1180,3 +1218,19 @@ class ProjectEditorController:
     def show_error_warning(self):
         message = 'Encoding errors were found.\n\nPlease resolve these for proper script encoding.'
         tk.messagebox.showwarning(title='Confirm Instruction Group Removal', message=message)
+
+    def set_base_inst_color(self, choose_color):
+        sel_iid = self.trees['instruction'].focus()
+        inst_id = self.trees['instruction'].row_data[sel_iid]
+
+        if inst_id == '':
+            return
+
+        base_inst = self.project.get_inst_id(self.current['script'], self.current['section'], inst_id)
+
+        color = ('','')
+        if choose_color:
+            color = colorchooser.askcolor(title="choose a color for inst")
+
+        self.project.project.set_color(base_inst, color[1])
+        self.refresh_all_trees()
