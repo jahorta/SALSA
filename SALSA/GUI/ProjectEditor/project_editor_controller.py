@@ -216,6 +216,7 @@ class ProjectEditorController:
             if next_item is not None:
                 if self.tree_states.has_state(next_item, **{k: v for k, v in self.current.items() if k in tree_and_parent_lists[tree_key]}):
                     self.on_select_tree_entry(child_tree, next_item)
+        return None
 
     def on_select_instruction(self, instructID):
         if self.entry_widget is not None:

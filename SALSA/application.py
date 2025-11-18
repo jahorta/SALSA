@@ -5,8 +5,11 @@ import random
 import threading
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
+from tkinter.filedialog import asksaveasfilename
+from tkinter.messagebox import askyesno
 from typing import Union
 
+from Analysis.var_usage import VarUsage
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
 from SALSA.FileModels.project_model import ProjectModel
@@ -145,6 +148,7 @@ class Application(tk.Tk):
             'prj->repair->textbox': self.textbox_fadeout_repair,
             'prj->search': self.gui.show_project_search_popup,
             'prj->aklz_style': self.set_aklz_decoder,
+            'analysis->var_usage': self.analyze_var_usage,
             # 'analysis->export': self.gui.show_analysis_view,
             'view->inst': self.gui.show_instruction_view,
             'view->theme': self.change_theme,
@@ -488,3 +492,18 @@ class Application(tk.Tk):
 
     def set_aklz_decoder(self):
         set_aklz_slow(self.menu.aklz_var.get() == 1)
+
+    def analyze_var_usage(self):
+        filename = asksaveasfilename(parent=self, title='Save Variable Usage CSV', filetypes=[("CSV file", '*.csv')],
+                                     confirmoverwrite=True, defaultextension=".csv")
+        if filename is None or filename == "":
+            return
+        use_verbose = False
+        # use_verbose = askyesno(title='Export all usages?', message='Export all usage locations for variables? (Verbose export).\nIf "No" will just export if variable is used or not')
+        print('Analyzing variable usage')
+        csv_out = VarUsage.record_usage(self.project.project).get_usage_csv(use_verbose)
+
+        with open(filename, 'w') as fh:
+            fh.write(csv_out)
+
+        print('Variable usage written to ' + filename)

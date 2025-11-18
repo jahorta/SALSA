@@ -47,9 +47,10 @@ class MainMenu(tk.Menu):
         self.project_menu.add_checkbutton(label='Use Legacy AKLZ', variable=self.aklz_var, onvalue=1, offvalue=0, command=callbacks['prj->aklz_style'])
         self.add_cascade(label='Project', menu=self.project_menu)
 
-        # analysis_menu = tk.Menu(self, tearoff=False)
+        analysis_menu = tk.Menu(self, tearoff=False)
         # analysis_menu.add_command(label='Export Data', command=callbacks['analysis->export'])
-        # self.add_cascade(label='Analysis', menu=analysis_menu)
+        analysis_menu.add_command(label='Export Project Var Usage', command=callbacks['analysis->var_usage'])
+        self.add_cascade(label='Analysis', menu=analysis_menu)
 
         self.view_menu = tk.Menu(self, tearoff=False)
         self.view_menu.add_command(label='Instruction editor', command=callbacks['view->inst'])

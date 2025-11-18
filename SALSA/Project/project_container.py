@@ -8,9 +8,6 @@ from SALSA.Common.constants import sep, uuid_sep
 from SALSA.Scripts import scpt_condition_changes as cond_changes
 
 
-
-
-
 @dataclass
 class SCTTrace:
     sect: str
