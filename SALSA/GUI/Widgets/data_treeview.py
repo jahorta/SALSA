@@ -1,8 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Dict
 
-from SALSA.GUI.themes import dark_theme, light_theme
 from SALSA.Common.constants import sep
 
 drag_tree_info = {
@@ -97,7 +96,7 @@ class DataTreeview(ttk.Treeview):
         self._parent = parent
         self.name = name
         self.callbacks = callbacks if callbacks is not None else {}
-        self.row_data = {}
+        self.row_data: Dict[str, str] = {}
         self.group_types = {}
         self.cur_selection = []
         self.selection_order = []
@@ -183,11 +182,11 @@ class DataTreeview(ttk.Treeview):
         elif self.return_none:
             self.callbacks['select'](self.name, row_data)
 
-    def insert_entry(self, parent, text, values, group_type=None, row_data=None, **kwargs):
+    def insert_entry(self, parent, text, values, index='end', group_type=None, row_data=None, **kwargs):
         iid = str(len(self.row_data))
         self.row_data[iid] = row_data
         self.group_types[iid] = group_type
-        super().insert(parent=parent, iid=iid, text=text, values=values, **kwargs)
+        super().insert(parent=parent, index=index, iid=iid, text=text, values=values, **kwargs)
         self.last_entry = iid
         self.first_entry = '0'
         return iid
@@ -217,24 +216,35 @@ class DataTreeview(ttk.Treeview):
     def get_open_elements(self, parent='', open_items=None):
         if open_items is None:
             open_items = []
-        for child in self.get_children(parent):
-            is_open = self.item(child)['open']
+        children = self.get_children(parent)
+        cur_ind = 0
+        while cur_ind < len(children):
+            is_open = self.item(children[cur_ind])['open']
             if not isinstance(is_open, bool):
                 is_open = is_open == 1
             if not is_open:
+                cur_ind += 1
                 continue
 
-            child_uuid = self.row_data.get(child, None)
+            child_uuid = self.row_data.get(children[cur_ind], None)
             if child_uuid is None:
-                child_child_uuid = self.row_data.get(self.get_children(child)[-1], None)
+                child_child_uuid = self.row_data.get(self.get_children(children[cur_ind])[-1], None)
                 open_items.append(('see', child_child_uuid))
             else:
-                open_items.append(('open', child_uuid))
-            self.get_open_elements(parent=child, open_items=open_items)
+                if cur_ind + 1 < len(children):
+                    next_uuid = self.row_data.get(children[cur_ind + 1], None)
+                    if next_uuid == child_uuid:
+                        open_items.append(('open_prev', child_uuid, 1))
+                    else:
+                        open_items.append(('open', child_uuid))
+                else:
+                    open_items.append(('open', child_uuid))
+            self.get_open_elements(parent=children[cur_ind], open_items=open_items)
+            cur_ind += 1
         return open_items
 
     def open_tree_elements(self, open_items):
-        rows = {v: k for k, v in self.row_data.items() if k is not None}
+        rows: Dict[str, str] = {v: k for k, v in self.row_data.items() if k is not None}
         for entry in open_items:
             if entry[1] not in rows:
                 continue
@@ -242,6 +252,10 @@ class DataTreeview(ttk.Treeview):
                 self.see(rows[entry[1]])
             elif entry[0] == 'open':
                 self.item(rows[entry[1]], open=True)
+            elif entry[0] == 'open_prev':
+                siblings = self.get_children(self.parent(rows[entry[1]]))
+                prev_iid = siblings[siblings.index(rows[entry[1]]) - entry[2]]
+                self.item(prev_iid, open=True)
 
     def open_all_groups(self):
         for entry in self.row_data.keys():
@@ -512,4 +526,3 @@ class DataTreeview(ttk.Treeview):
     def print_parent_and_index(self, event):
         iid = self.identify_row(event.y)
         print(f'parent: {self.parent(iid)}, index: {self.index(iid)}')
-

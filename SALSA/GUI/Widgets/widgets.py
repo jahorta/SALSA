@@ -349,12 +349,19 @@ class ScrollCanvas(ttk.Frame):
             self.canvas.unbind_all("<MouseWheel>")
 
     def change_theme(self, theme):
-        self.canvas.configure(**theme['TCanvas']['configure'])
+        w = self.canvas['width']
+        h = self.canvas['height']
+        self.canvas.configure(**theme['TCanvas']['configure'], width=w, height=h)
 
     def set_size(self, w, h):
         self.canvas.config(scrollregion=self.canvas.bbox("all"))
         w -= self.canvas_scrollbar.winfo_width()
         self.canvas.configure(width=w, height=h)
+
+    def delete_all(self):
+        objs = self.canvas.find_all()
+        for obj in objs:
+            self.canvas.delete(obj)
 
 
 class ScrollLabelCanvas(ttk.LabelFrame):

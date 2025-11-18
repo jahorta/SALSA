@@ -21,19 +21,18 @@ sp_char_rows_vis = 10
 sel_halo = 2
 
 
-class SpecialCharSelectWidget(tk.Frame):
+class SpecialCharSelectWidget(ttk.Frame):
 
     def __init__(self, master, insert_callback: Callable, recents=None, theme=None, cur_enc=None, location=None, button_num=recent_num, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
-        global recent_num
-        recent_num = button_num
+        self.theme = theme
 
         self.recents = recents if recents is not None else []
-        if len(self.recents) >= recent_num:
-            self.recents = self.recents[:recent_num]
+        if len(self.recents) >= button_num:
+            self.recents = self.recents[:button_num]
 
-        self.cur_enc: Literal['EU','US/JP'] = cur_enc if cur_enc is not None else 'US/JP'
+        self.cur_enc: Literal['EU', 'US/JP'] = cur_enc if cur_enc is not None else 'US/JP'
         self.insert_callback = insert_callback
 
         self.expand_button = ttk.Button(self, text='Other chars...', command=lambda: self.toggle_widget(location=location))
@@ -43,14 +42,14 @@ class SpecialCharSelectWidget(tk.Frame):
         self.recent_buttons = []
         i = 0
         for char in self.recents:
-            if i >= recent_num:
+            if i >= button_num:
                 break
             b = ttk.Button(self, text=char, command=lambda ind=i: self.select_recent(ind), width=button_width)
             b.grid(row=0, column=i+1, padx=button_pad)
             self.recent_buttons.append(b)
             i += 1
 
-        while i < recent_num:
+        while i < button_num:
             b = ttk.Button(self, text='', state='disabled', width=button_width)
             b.grid(row=0, column=i+1, padx=button_pad)
             self.recent_buttons.append(b)
@@ -60,8 +59,17 @@ class SpecialCharSelectWidget(tk.Frame):
                                                       'US/JP': ScrollCanvas(master, size={'width': 0, 'height': 0}, theme=theme)}
 
         self.insert_callback = insert_callback
-        self.configure(**theme['lightCanvas']['configure'])
-        txt_fill = 'black' if theme is None else theme['TCanvasText']['configure']['fill']
+
+        self.populate_chars(is_init=True)
+        for w in self.char_widgets.values():
+            w.canvas.tag_bind('char', '<ButtonRelease-1>', self.select_char)
+
+    def populate_chars(self, is_init=False):
+        if not is_init:
+            for w in self.char_widgets.values():
+                w.delete_all()
+
+        txt_fill = 'black' if self.theme is None else self.theme['TCanvasText']['configure']['fill']
 
         max_dim = 0
         char_ids = {}
@@ -69,7 +77,8 @@ class SpecialCharSelectWidget(tk.Frame):
             char_ids[key] = []
             i = 0
             while i < len(chars):
-                new_id = self.char_widgets[key].canvas.create_text(0, 0, text=chars[i], font=font, tags=(chars[i], 'char'), fill=txt_fill)
+                new_id = self.char_widgets[key].canvas.create_text(0, 0, text=chars[i], font=font,
+                                                                   tags=(chars[i], 'char'), fill=txt_fill)
                 char_ids[key].append(new_id)
                 bbox = self.char_widgets[key].canvas.bbox(new_id)
                 max_dim = max(max_dim, bbox[2] - bbox[0], bbox[3] - bbox[1])
@@ -84,11 +93,10 @@ class SpecialCharSelectWidget(tk.Frame):
         for key, txt_ids in char_ids.items():
             i = 0
             while i < len(txt_ids):
-                self.char_widgets[key].canvas.moveto(txt_ids[i],
-                                                     max_dim * (i % sp_char_cols) + center_dim, max_dim * (i // sp_char_cols) + center_dim)
+                self.char_widgets[key].canvas.moveto(txt_ids[i], max_dim * (i % sp_char_cols) + center_dim,
+                                                     max_dim * (i // sp_char_cols) + center_dim)
                 i += 1
             self.char_widgets[key].set_size(max_dim * sp_char_cols, max_dim * sp_char_rows_vis)
-            self.char_widgets[key].canvas.tag_bind('char', '<ButtonRelease-1>', self.select_char)
 
     def toggle_widget(self, location=None):
         if self.widget_is_expanded:
@@ -126,7 +134,7 @@ class SpecialCharSelectWidget(tk.Frame):
             if char in self.recents:
                 self.recents.remove(char)
             self.recents.insert(0, char)
-            if len(self.recents) > recent_num:
+            if len(self.recents) > len(self.recent_buttons):
                 self.recents.pop(-1)
         for i, c in enumerate(self.recents):
             self.recent_buttons[i].configure(text=c)
@@ -141,6 +149,13 @@ class SpecialCharSelectWidget(tk.Frame):
         self.expand_button.configure(state=state)
         for i in range(len(self.recents)):
             self.recent_buttons[i].configure(state=state)
+
+    def change_theme(self, theme):
+        self.theme = theme
+        for c in self.char_widgets.values():
+            c.change_theme(theme)
+
+        self.populate_chars()
 
 
 if __name__ == '__main__':

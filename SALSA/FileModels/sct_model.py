@@ -35,10 +35,10 @@ class SCTModel:
             print(f'{self.log_key}: Unable to save, directory does not exist: {path_dir}')
             return
 
-        print(f'{self.log_key}: Compressing sct file')
         if compress:
-            sct_file = Aklz().compress(sct_file)
-        print(f'{self.log_key}: Finished compressing sct file')
+            print(f'{self.log_key}: Compressing sct file')
+            sct_file = Aklz.compress(sct_file)
+            print(f'{self.log_key}: Finished compressing sct file')
 
         with open(filepath, 'wb') as sct:
             sct.write(sct_file)
@@ -55,7 +55,7 @@ class SCTModel:
         sct_out = SCTDecoder.decode_sct_from_file(name=name, sct=sct_raw, inst_lib=insts, status=status)
         return name, sct_out
 
-    def read_sct_file(self, filepath: str) -> (str, bytearray):
+    def read_sct_file(self, filepath: str, use_slow=False) -> (str, bytearray):
         if '/' not in filepath:
             filename = filepath.split('.')[0]
             if 'directory' not in settings[self.log_key]:
@@ -72,6 +72,6 @@ class SCTModel:
             raise FileExistsError(f'{self.log_key}: {filename} does not exist.')
 
         if Aklz.is_compressed(ba):
-            ba = Aklz().decompress(ba)
+            ba = Aklz.decompress(ba)
 
         return filename, ba

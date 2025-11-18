@@ -58,6 +58,9 @@ default_tree_anchor = tk.W
 default_tree_stretch = False
 default_tree_label = ''
 
+flash_count = 3
+flash_dur = 600
+
 
 class ProjectEditorView(ttk.Frame):
     log_name = 'PrjEditorView'
@@ -99,13 +102,17 @@ class ProjectEditorView(ttk.Frame):
                                     command=lambda: self.use_future_callback('refresh_offsets'))
         refresh_offset.grid(row=0, column=4, padx=5)
 
+        search_button = ttk.Button(header_frame, text='Search in Project',
+                                   command=lambda: self.use_future_callback('show_search'))
+        search_button.grid(row=0, column=5, padx=5)
+
         separator = ttk.Label(header_frame, text=' ')
-        separator.grid(row=0, column=5, sticky='NSEW')
-        header_frame.columnconfigure(5, weight=1)
+        separator.grid(row=0, column=6, sticky='NSEW')
+        header_frame.columnconfigure(6, weight=1)
 
         self.error_button = ttk.Button(header_frame, text='Show Encoding Errors', style='error.TButton',
                                        command=lambda: self.use_future_callback('show_project_errors'))
-        self.error_button.grid(row=0, column=6, sticky=tk.E)
+        self.error_button.grid(row=0, column=7, sticky=tk.E)
         self.error_button.grid_remove()
 
         self.pane_frame = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
@@ -236,10 +243,11 @@ class ProjectEditorView(ttk.Frame):
         self.skip_error_label = ttk.Label(skip_frame, text='')
         self.skip_error_label.grid(row=1, column=0, columnspan=2, sticky='NSEW')
 
-        delay_frame = ttk.LabelFrame(inst_top_frame, text='Instruction Delay')
-        delay_frame.grid(row=2, column=0, columnspan=2, sticky='NSEW')
+        self.delay_frame_label = ttk.Label(inst_top_frame, text='Instruction Delay')
+        self.delay_frame = ttk.LabelFrame(inst_top_frame, labelwidget=self.delay_frame_label)
+        self.delay_frame.grid(row=2, column=0, columnspan=2, sticky='NSEW')
 
-        self.delay_label = ttk.Label(delay_frame, text=' ')
+        self.delay_label = ttk.Label(self.delay_frame, text=' ')
         self.delay_label.grid(row=0, column=0, sticky='NSEW')
         self.delay_label.bind('<Double-1>', lambda e: self.on_param_double_click('delay', e))
 
@@ -409,6 +417,19 @@ class ProjectEditorView(ttk.Frame):
 
         if force_delete_all:
             handler.close(cancel=False)
+
+    def flash_delay_param(self, count=flash_count, in_flash=False):
+        if in_flash:
+            self.delay_frame_label.configure(style='TLabel')
+            self.delay_frame.configure(style='TLabelframe')
+            self.delay_label.configure(style='TLabel')
+            if count > 1:
+                self.after(flash_dur//2, self.flash_delay_param, count - 1, False)
+        else:
+            self.delay_frame_label.configure(style='flash.TLabel')
+            self.delay_frame.configure(style='flash.TLabelframe')
+            self.delay_label.configure(style='flash.TLabel')
+            self.after(flash_dur//2, self.flash_delay_param, count, True)
 
     def change_theme(self, theme):
         self.theme = theme

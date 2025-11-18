@@ -5,6 +5,7 @@ from tkinter import ttk
 from typing import Union, TypedDict, Literal
 import webbrowser
 
+from SALSA.GUI.ProjectSearch.project_search_popup import ProjectSearchPopup
 from SALSA.GUI.dolphin_link_popup import DolphinLinkPopup
 from SALSA.GUI.EncodeErrorPopup.project_error_popup import ProjectErrorPopup
 from SALSA.GUI.ProjectEditor.project_editor_controller import ProjectEditorController
@@ -34,6 +35,7 @@ class PopupTypes(TypedDict):
     export: Union[None, SCTExportPopup]
     errors: Union[None, ProjectErrorPopup]
     d_link: Union[None, DolphinLinkPopup]
+    search: Union[None, ProjectSearchPopup]
 
 
 class GUIController:
@@ -55,7 +57,7 @@ class GUIController:
         self.theme = theme
 
         self.popups: PopupTypes = {'inst': None, 'analysis': None, 'about': None, 'errors': None,
-                                   'variable': None, 'string': None, 'export': None, 'd_link': None}
+                                   'variable': None, 'string': None, 'export': None, 'd_link': None, 'search': None}
 
         self.callbacks = {}
 
@@ -140,7 +142,7 @@ class GUIController:
             return
         callbacks = {
             'get_errors': self.project.get_project_encode_errors,
-            'goto_error': self.prj_cont.resolve_link,
+            'goto_error': self.prj_cont.goto_link_target,
             'close': self.close_popup
         }
         self.popups['errors'] = ProjectErrorPopup(self.parent, callbacks=callbacks, name='errors',
@@ -156,7 +158,7 @@ class GUIController:
             'set_alias': self.project.set_variable_alias,
             'remove_global': self.project.remove_global,
             'get_var_usage': self.project.get_variable_usages,
-            'goto_link': self.prj_cont.resolve_link,
+            'goto_link': self.prj_cont.goto_link_target,
             'refresh_prj_trees': self.prj_cont.refresh_all_trees,
             'set_change_flag': self.prj_cont.set_has_changes,
             'close': self.close_popup
@@ -175,8 +177,8 @@ class GUIController:
             'add_string_group': self.project.add_string_group, 'delete_string_group': self.project.remove_string_group,
             'rename_string_group': self.project.rename_string_group, 'add_string': self.project.add_string,
             'delete_string': self.project.delete_string, 'rename_string': self.project.change_string_id,
-            'is_sect_name_used': self.project.is_sect_name_used,
-            'refresh_sections': lambda: self.prj_cont.refresh_tree('section')
+            'is_sect_name_used': self.project.is_sect_name_used, 'find_usage': self.send_string_to_search,
+            'refresh_sections': lambda: self.prj_cont.refresh_tree('section'),
         }
         self.popups['string'] = StringPopup(self.parent, callbacks=callbacks, name='string',
                                             theme=self.theme)
@@ -198,6 +200,27 @@ class GUIController:
             return
         callbacks |= {'close': self.close_popup}
         self.popups['d_link'] = DolphinLinkPopup(self.parent, callbacks=callbacks, name='d_link', theme=self.theme)
+
+    def show_project_search_popup(self):
+        if self.popups['search'] is not None:
+            self.popups['search'].tkraise()
+            return
+        callbacks = {
+            'search': self.project.search,
+            'goto_result': self.prj_cont.goto_link_target,
+            'goto_dialog': self.goto_string_helper,
+            'get_filters': self.project.get_search_filter_trees,
+            'close': self.close_popup
+        }
+        self.popups['search'] = ProjectSearchPopup(self.parent, callbacks=callbacks, name='search',
+                                                   theme=self.theme)
+
+    def send_string_to_search(self, string, **options):
+        self.show_project_search_popup()
+        self.popups['search'].search_entry.delete(0, tk.END)
+        self.popups['search'].search_entry.insert(0, string)
+        # self.popups['search'].set_options(options)
+        self.popups['search'].start_search()
 
     # ------------- #
     # Popup refresh #
@@ -285,3 +308,14 @@ class GUIController:
             if isinstance(item, dict):
                 self.change_status_msg(**item)
         self.status_popup.after(20, self.status_listener)
+
+    # ------------------ #
+    # Goto String Helper #
+    # ------------------ #
+
+    def goto_string_helper(self, script, group, string, string_popup_up=False):
+        if string_popup_up:
+            self.popups['string'].goto_string(script, group, string)
+        else:
+            self.show_strings_popup()
+            self.prj_view.after(10, self.goto_string_helper, script, group, string, True)

@@ -18,7 +18,8 @@ class SCTEncoder:
     endian_struct_format = {'big': '>', 'little': '<'}
     _header_offset_length = 0x4
     _header_name_length = 0x10
-    _default_header_start = bytearray(b'\x07\xd2\x00\x06\x00\x0e\x00\x00')
+    _default_header_starts = {'little': bytearray(b'\x07\xd2\x06\x00\x0e\x00\x00\x00'),
+                              'big': bytearray(b'\x07\xd2\x00\x06\x00\x0e\x00\x00')}
 
     use_garbage: bool
     combine_footer_links: bool
@@ -34,7 +35,10 @@ class SCTEncoder:
         self.validation = validation
         self._EU_validation = eu_validation
 
+        self._default_header_start = self._default_header_starts[endian]
+
         self._str_label = b'\x00\x00\x00\x09\x04\x00\x00\x00\x3f\x80\x00\x00\x00\x00\x00\x1d'
+        self._str_label = b'\x09\x00\x00\x00\x00\x00\x00\x04\x00\x00\x80\x3f\x1d\x00\x00\x00' if endian == 'little' else self._str_label
         if endian == 'little' and re.search('5[0-9]{2}A', script.name) and self.validation:
             self._str_label = b'\x00\x00\x00\x09\x08\x00\x01\x00\x00\x00\x00\x1d'
 
@@ -198,6 +202,8 @@ class SCTEncoder:
 
         # Resolve string links
         for link_offset, (section, trace) in self.string_links.items():
+            if 'FOOTER' in section:
+                continue
             if section not in self.header_dict:
                 self.script.errors.append(('Encoding', 'String', f'No string {section}', alt_sep.join(trace)))
                 print(f'No string {section}')
@@ -211,7 +217,6 @@ class SCTEncoder:
         has_footer_dialogue = footer_str_group_name in self.script.string_groups
         added_footer_entries = {}
         for offset, (string, trace) in self.footer_links.items():
-
             if has_footer_dialogue:
                 if string in self.script.string_groups[footer_str_group_name]:
                     string = self.script.strings[string]
@@ -220,6 +225,7 @@ class SCTEncoder:
                 str_pos = added_footer_entries[string]
             else:
                 str_pos = len(self.sct_body) + len(self.sct_foot)
+                added_footer_entries[string] = str_pos
             str_offset = str_pos - offset
             str_offset_word = self._make_word(i=str_offset)
             self.sct_foot.extend(self._encode_string(string=string, align=False))

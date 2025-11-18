@@ -37,11 +37,14 @@ class MainMenu(tk.Menu):
         self.project_menu.add_separator()
         self.project_menu.add_command(label='Variable alias editor', command=callbacks['prj->variable'])
         self.project_menu.add_command(label='String editor', command=callbacks['prj->string'])
+        self.project_menu.add_command(label='Project Search', command=callbacks['prj->search'])
         self.project_menu.add_separator()
         self.project_menu.add_command(label='Refresh Sect/Inst Offsets', command=callbacks['prj->refresh_pos'])
         self.p_repair_menu = tk.Menu(self.project_menu, tearoff=False)
         self.p_repair_menu.add_command(label='Repair Textbox Fadeout', command=callbacks['prj->repair->textbox'])
         self.project_menu.add_cascade(label='Repair', menu=self.p_repair_menu)
+        self.aklz_var = tk.IntVar(master=self, value=0)
+        self.project_menu.add_checkbutton(label='Use Legacy AKLZ', variable=self.aklz_var, onvalue=1, offvalue=0, command=callbacks['prj->aklz_style'])
         self.add_cascade(label='Project', menu=self.project_menu)
 
         # analysis_menu = tk.Menu(self, tearoff=False)
@@ -81,7 +84,9 @@ class MainMenu(tk.Menu):
         self.project_menu.entryconfig('Variable alias editor', state='disabled')
         self.project_menu.entryconfig('String editor', state='disabled')
         self.project_menu.entryconfig('Refresh Sect/Inst Offsets', state='disabled')
+        self.project_menu.entryconfig('Project Search', state='disabled')
         self.project_menu.entryconfig('Repair', state='disabled')
+        self.project_menu.entryconfig('Use Legacy AKLZ', state='disabled')
         self.file_menu.entryconfig('Save Project', state='disabled')
         self.file_menu.entryconfig('Save Project as', state='disabled')
         if self.has_debug:
@@ -93,7 +98,9 @@ class MainMenu(tk.Menu):
         self.project_menu.entryconfig('Variable alias editor', state='normal')
         self.project_menu.entryconfig('String editor', state='normal')
         self.project_menu.entryconfig('Refresh Sect/Inst Offsets', state='normal')
+        self.project_menu.entryconfig('Project Search', state='normal')
         self.project_menu.entryconfig('Repair', state='normal')
+        self.project_menu.entryconfig('Use Legacy AKLZ', state='normal')
         self.file_menu.entryconfig('Save Project', state='normal')
         self.file_menu.entryconfig('Save Project as', state='normal')
         if self.has_debug and self.can_debug:
@@ -111,5 +118,4 @@ class MainMenu(tk.Menu):
 
     def toggle_dark_mode(self):
         dark_mode = True if self.dark_mode_var.get() == 1 else False
-
         self.callbacks['view->theme'](dark_mode)

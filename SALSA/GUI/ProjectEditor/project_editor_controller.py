@@ -1,7 +1,8 @@
-from typing import Union, Dict, Literal
+from typing import Union, Dict, Literal, List, Tuple
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, ttk, colorchooser
 
+from SALSA.GUI.ProjectEditor.data_tree_state import ChildViewStateTree, DataViewState
 from SALSA.GUI.Widgets.widgets import LabelNameEntry
 from SALSA.GUI.Widgets.hover_tooltip import schedule_tooltip
 from SALSA.GUI.Widgets.data_treeview import DataTreeview
@@ -24,8 +25,16 @@ tree_children = {
 
 tree_parents = {v: k for k, v in tree_children.items()}
 
+tree_and_parent_lists = {
+    'script': ['script'],
+    'section': ['script', 'section'],
+    'instruction': ['script', 'section', 'instruction']
+}
+
 group_handle_width = 20
 
+
+color_tag_prefix = 'row_color_'
 
 class ProjectEditorController:
     log_name = 'PrjEditorCtrl'
@@ -98,6 +107,8 @@ class ProjectEditorController:
             'parameter': self.view.param_tree
         }
 
+        self.inst_tree_color_tags: Dict[str, List[int]] = {}
+
         self.project.set_callback(key='update_scripts', callback=lambda: self.update_tree('script',
                                                                                           self.project.get_tree(
                                                                                               self.view.get_headers(
@@ -108,6 +119,8 @@ class ProjectEditorController:
         self.trees['section'].add_callback('move_items', self.on_move_items)
         self.trees['instruction'].add_callback('select', self.on_select_tree_entry)
         self.trees['instruction'].add_callback('move_items', self.on_move_items)
+
+        self.tree_states = ChildViewStateTree()
 
         self.has_changes = False
 
@@ -153,35 +166,62 @@ class ProjectEditorController:
         if len(self.project.get_project_encode_errors()) > 0:
             self.encoding_errors = ['True']
         self.check_encoding_errors()
+        self.tree_states.reset()
+
+    def save_child_dataview_state(self, tree_key):
+        if tree_children[tree_key] != 'parameter':
+            if self.current[tree_children[tree_key]] is not None:
+                self.save_child_dataview_state(tree_children[tree_key])
+        state = DataViewState(open_items=self.trees[tree_children[tree_key]].get_open_elements(),
+                              scroll_height=self.trees[tree_children[tree_key]].yview()[0],
+                              selected_iid=self.trees[tree_children[tree_key]].selection())
+        self.tree_states.set_state(state, **{k: v for k, v in self.current.items() if k in tree_and_parent_lists[tree_key]})
+
+    def load_child_dataview_state(self, tree_key):
+        state = self.tree_states.get_state(**{k: v for k, v in self.current.items() if k in tree_and_parent_lists[tree_key]})
+        if state is not None:
+            self.trees[tree_children[tree_key]].open_tree_elements(state.open_items)
+            self.trees[tree_children[tree_key]].yview_moveto(state.scroll_height)
+            self.trees[tree_children[tree_key]].selection_set(state.selected_iid)
+
+    def clear_child_currents(self, key):
+        key = tree_children[key]
+        while key != '':
+            self.current[key] = None
+            key = tree_children[key]
 
     def on_select_tree_entry(self, tree_key, entry):
         if self.entry_widget is not None:
             self.shake_widget(self.entry_widget)
             return
+        if self.current[tree_key] is not None:
+            self.save_child_dataview_state(tree_key)
+        self.clear_child_currents(tree_key)
         self.clear_inst_details()
         if tree_key == 'instruction':
             self.callbacks['toggle_frame_state'](self.view.inst_frame, 'normal')
             return self.on_select_instruction(entry)
         self.callbacks['toggle_frame_state'](self.view.inst_frame, 'disabled')
+        child_tree = tree_children[tree_key]
         kwargs = {'style': settings[self.log_name]['style']}
         self.current[tree_key] = entry
-        cur_key = tree_key
-        while True:
-            kwargs[cur_key] = self.current[cur_key]
-            cur_key = tree_parents[cur_key]
-            if cur_key == '':
-                break
-        child_tree = tree_children[tree_key]
+        kwargs |= {k: v for k, v in self.current.items() if k in tree_and_parent_lists[tree_key]}
         kwargs['headers'] = self.view.get_headers(tree_key=child_tree)
         tree_list = self.project.get_tree(**kwargs)
         self.update_tree(child_tree, tree_list)
+        self.load_child_dataview_state(tree_key)
+        selected = self.trees[child_tree].selection()
+        if len(selected) == 1 and child_tree in tree_and_parent_lists['instruction']:
+            next_item = self.trees[child_tree].row_data.get(selected[0], None)
+            if next_item is not None:
+                if self.tree_states.has_state(next_item, **{k: v for k, v in self.current.items() if k in tree_and_parent_lists[tree_key]}):
+                    self.on_select_tree_entry(child_tree, next_item)
 
     def on_select_instruction(self, instructID):
         if self.entry_widget is not None:
             self.shake_widget(self.entry_widget)
             return
         self.current['instruction'] = instructID
-        self.current['parameter'] = None
         self.view.param_tree.clear_all_entries()
         details = self.project.get_instruction_details(**self.current)
         if details is None:
@@ -189,6 +229,7 @@ class ProjectEditorController:
         details['parameter_tree'] = self.project.get_parameter_tree(headings=self.view.get_headers('parameter'),
                                                                     **self.current)
         self.set_instruction_details(details)
+        self.load_child_dataview_state('instruction')
 
     def update_tree(self, tree, tree_dict: Union[dict, None], clear_other_trees=True):
         if tree is None:
@@ -218,6 +259,8 @@ class ProjectEditorController:
         tree = self.trees[tree_key]
         if not isinstance(tree_list, list):
             return
+        if tree_key == 'instruction':
+            self.inst_tree_color_tags.clear()
         parent_list = ['']
         prev_iid = -1
         headers = self.view.get_headers(tree_key)
@@ -232,6 +275,10 @@ class ProjectEditorController:
                 else:
                     raise ValueError(f'{self.log_name}: Unknown command in tree list sent to _add_tree_entries')
                 continue
+
+            if tree_key == 'instruction':
+                base_id = entry.get('base_id', '')
+
             kwargs = {'parent': parent_list[-1], 'index': 'end'}
             values = []
             first = True
@@ -257,6 +304,30 @@ class ProjectEditorController:
             kwargs['values'] = values
             kwargs = {**kwargs, **entry}
             prev_iid = tree.insert_entry(**kwargs)
+
+            if tree_key != 'instruction':
+                continue
+
+            tree.item(prev_iid, tags=())
+            # check if ID has a color and if so add it to color tags
+            if base_id == '':
+                continue
+            row_color = self.project.project.get_color(base_id)
+            if row_color == '':
+                continue
+            if row_color not in self.inst_tree_color_tags:
+                self.inst_tree_color_tags[row_color] = []
+            self.inst_tree_color_tags[row_color].append(prev_iid)
+
+        if tree_key != 'instruction':
+            return
+
+        # apply all colors to background of rows
+        for color, ids in self.inst_tree_color_tags.items():
+            tag_name = f'{color_tag_prefix}{color}'
+            tree.tag_configure(tag_name, background=color)
+            for row_id in ids:
+                tree.item(row_id, tags=(tag_name, ))
 
     def adjust_tree_entries(self, entries, key):
         if key == 'instruction':
@@ -302,7 +373,7 @@ class ProjectEditorController:
             tgt_label = ttk.Label(tgt_frame, text=f'{tgt_sect}{link_sep}{tgt_inst}',
                                   font=self.link_font.default_font, style='canvas.TLabel')
             tgt_label.grid(row=0, column=0, sticky=tk.E + tk.W)
-            tgt_label.bind('<ButtonRelease-1>', self.goto_link)
+            tgt_label.bind('<ButtonRelease-1>', self.use_link_widget)
 
         for i, link in enumerate(details['links_in']):
             link: SCTLink
@@ -321,7 +392,7 @@ class ProjectEditorController:
             ori_label = ttk.Label(ori_frame, text=f'{ori_sect}{link_sep}{ori_inst}',
                                   font=self.link_font.default_font, style='canvas.TLabel')
             ori_label.grid(row=0, column=0, sticky=tk.E + tk.W)
-            ori_label.bind('<ButtonRelease-1>', self.goto_link)
+            ori_label.bind('<ButtonRelease-1>', self.use_link_widget)
 
     def handle_link_font(self, e):
         font = self.link_font.default_font if e.type == tk.EventType.Leave else self.link_font.hover_font
@@ -329,16 +400,16 @@ class ProjectEditorController:
         for child in e.widget.winfo_children():
             child.configure(font=font, style=style)
 
-    def goto_link(self, e):
+    def use_link_widget(self, e):
         if self.entry_widget is not None:
             self.shake_widget(self.entry_widget)
             return
         link_parts = e.widget['text'].split(link_sep)
         sect = link_parts[0]
         inst = self.project.get_inst_uuid_by_ind(script=self.current['script'], section=sect, inst_ind=link_parts[1])
-        self.resolve_link(sect=sect, inst=inst)
+        self.goto_link_target(sect=sect, inst=inst)
 
-    def resolve_link(self, script=None, sect=None, inst=None, param=None):
+    def goto_link_target(self, script=None, sect=None, inst=None, param=None):
         if script is None:
             script = self.current['script']
         if sect is None:
@@ -352,14 +423,14 @@ class ProjectEditorController:
             self.trees['script'].focus(sel_iid)
             self.trees['script'].selection_set([sel_iid])
             self.on_select_tree_entry('script', script)
-            self.view.after(10, self.resolve_link, None, sect, inst, param)
+            self.view.after(10, self.goto_link_target, None, sect, inst, param)
         elif sect != self.current['section']:
             sel_iid = self.trees['section'].get_iid_from_rowdata(sect)
             self.trees['section'].see(sel_iid)
             self.trees['section'].focus(sel_iid)
             self.trees['section'].selection_set([sel_iid])
             self.on_select_tree_entry('section', sect)
-            self.view.after(10, self.resolve_link, None, None, inst, param)
+            self.view.after(10, self.goto_link_target, None, None, inst, param)
         elif inst != self.current['instruction']:
             sel_iid = self.trees['instruction'].get_iid_from_rowdata(inst)
             self.trees['instruction'].see(sel_iid)
@@ -367,8 +438,10 @@ class ProjectEditorController:
             self.trees['instruction'].selection_set([sel_iid])
             self.on_select_tree_entry('instruction', inst)
             if param is not None:
-                self.view.after(10, self.resolve_link, None, None, None, param)
+                self.view.after(10, self.goto_link_target, None, None, None, param)
         elif param is not None:
+            if param == 'delay':
+                return self.view.flash_delay_param()
             sel_iid = self.trees['parameter'].get_iid_from_rowdata(param)
             if sel_iid is None and isinstance(param, str):
                 sel_iid = self.trees['parameter'].get_iid_from_rowdata(int(param))
@@ -843,6 +916,10 @@ class ProjectEditorController:
         m.add_command(label='Disable Instructions', command=lambda: self.activate_insts(False))
         m.add_command(label='Enable Instructions', command=lambda: self.activate_insts(True))
 
+        m.add_separator()
+        m.add_command(label='Set Base Inst Color', command=lambda: self.set_base_inst_color(True))
+        m.add_command(label='Clear Base Inst Color', command=lambda: self.set_base_inst_color(False))
+
         m.bind('<Escape>', m.destroy)
         try:
             m.tk_popup(e.x_root, e.y_root)
@@ -1071,15 +1148,20 @@ class ProjectEditorController:
             return
         m = tk.Menu(self.view, tearoff=0)
 
-        param = e.widget.row_data[row]
-        if param is None:
-            loop_num = int(e.widget.item(row)['text'][4:])
-            m.add_command(label='Add Loop Parameter Above',
-                          command=lambda: self.handle_loop_param_change('add-above', loop_num=loop_num))
-            m.add_command(label='Add Loop Parameter Below',
-                          command=lambda: self.handle_loop_param_change('add-below', loop_num=loop_num))
-            m.add_command(label='Remove Loop Parameter',
-                          command=lambda: self.handle_loop_param_change('remove', loop_num=loop_num))
+        if row == '':
+            loop_num = 0
+            m.add_command(label='Add Loop Parameter',
+                          command=lambda: self.handle_loop_param_change('add-last', loop_num=loop_num))
+        else:
+            param = e.widget.row_data[row]
+            if param is None:
+                loop_num = int(e.widget.item(row)['text'][4:])
+                m.add_command(label='Add Loop Parameter Above',
+                              command=lambda: self.handle_loop_param_change('add-above', loop_num=loop_num))
+                m.add_command(label='Add Loop Parameter Below',
+                              command=lambda: self.handle_loop_param_change('add-below', loop_num=loop_num))
+                m.add_command(label='Remove Loop Parameter',
+                              command=lambda: self.handle_loop_param_change('remove', loop_num=loop_num))
 
         if self.project.inst_is_switch(**self.current):
             m.entryconfigure('Add a Loop Parameter Above', state='disabled')
@@ -1091,15 +1173,18 @@ class ProjectEditorController:
 
             m.add_command(label='Use Instruction Tree to edit a Switch', command=blank)
         m.bind('<Escape>', m.destroy)
+
         try:
             m.tk_popup(e.x_root, e.y_root)
         finally:
             m.grab_release()
 
-    def handle_loop_param_change(self, change: Literal['add-above', 'add-below', 'remove'], loop_num=None):
+    def handle_loop_param_change(self, change: Literal['add-above', 'add-below', 'add-last', 'remove'], loop_num=None):
         has_changed = False
         if 'add' in change:
             position = loop_num if 'below' not in change else loop_num + 1
+            if 'last' in change:
+                position = -1
             has_changed = self.project.add_loop_param(**self.current, position=position)
         if change == 'remove':
             has_changed = self.project.remove_loop_param(**self.current, loop_num=loop_num)
@@ -1133,3 +1218,19 @@ class ProjectEditorController:
     def show_error_warning(self):
         message = 'Encoding errors were found.\n\nPlease resolve these for proper script encoding.'
         tk.messagebox.showwarning(title='Confirm Instruction Group Removal', message=message)
+
+    def set_base_inst_color(self, choose_color):
+        sel_iid = self.trees['instruction'].focus()
+        inst_id = self.trees['instruction'].row_data[sel_iid]
+
+        if inst_id == '':
+            return
+
+        base_inst = self.project.get_inst_id(self.current['script'], self.current['section'], inst_id)
+
+        color = ('','')
+        if choose_color:
+            color = colorchooser.askcolor(title="choose a color for inst")
+
+        self.project.project.set_color(base_inst, color[1])
+        self.refresh_all_trees()

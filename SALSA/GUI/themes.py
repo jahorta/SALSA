@@ -41,6 +41,18 @@ def theme_generator(colors: Colors):
                 "highlightbackground": colors.bg_highlight,
                 "highlightcolor": colors.bg_highlight,
                 "highlightthickness": 2,
+                "background": colors.bg,
+                "bordercolor": colors.bg_highlight,
+                "lightcolor": colors.bg_highlight,
+                "darkcolor": colors.bg_internal
+            }
+        },
+        "flash.TLabelframe": {
+            "configure": {
+                "highlightbackground": colors.bg_highlight,
+                "highlightcolor": colors.bg_highlight,
+                "highlightthickness": 2,
+                "background": colors.bg_highlight,
                 "bordercolor": colors.bg_highlight,
                 "lightcolor": colors.bg_highlight,
                 "darkcolor": colors.bg_internal
@@ -49,6 +61,12 @@ def theme_generator(colors: Colors):
         "TLabel": {
             "configure": {
                 "background": colors.bg,
+                "foreground": colors.text
+            }
+        },
+        "flash.TLabel": {
+            "configure": {
+                "background": colors.bg_highlight,
                 "foreground": colors.text
             }
         },
@@ -109,6 +127,14 @@ def theme_generator(colors: Colors):
                 "selectbackground": colors.bright_selector,
                 "selectforeground": colors.selector_text,
                 "insertcolor": colors.insert_indicator,
+            },
+        },
+        "tooltip.TEntry": {
+            "configure": {
+                "background": colors.bg_internal,
+                "foreground": colors.disabled_text,
+                "fieldbackground": colors.bg_internal,
+                "lightcolor": colors.border,
             },
         },
         "TCheckbutton": {
@@ -243,7 +269,7 @@ def theme_generator(colors: Colors):
                 "background": colors.bg_internal,
             }
         },
-        "lightCanvas": {
+        "light.TCanvas": {
             'configure': {
                 "background": colors.bg,
             }
@@ -343,7 +369,7 @@ themes = {
         bg='#eeeeee',
         bg_internal='white',
         bg_highlight='#dddddd',
-        text='black',
+        text='#000000',
         selector='#4444dd',
         bright_selector='#3333bb',
         selector_text='white',

@@ -17,7 +17,7 @@
       <excludeFolder url="file://$MODULE_DIR$/string_extractor" />
       <excludeFolder url="file://$MODULE_DIR$/SALSA/Project/Updater/test" />
       <excludeFolder url="file://$MODULE_DIR$/_script_files/_DC_JP_@barai" />
-      <excludeFolder url="file://$MODULE_DIR$/_scripts" />
+      <excludeFolder url="file://$MODULE_DIR$/_script_files/_DC_US_E3_2000" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.10" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

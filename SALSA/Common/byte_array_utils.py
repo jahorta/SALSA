@@ -149,7 +149,7 @@ def is_a_number(num: str):
 
 
 def is_hex(num: str):
-    return re.search('^[0-9,a-f]+$', num) or re.search('^0x[0-9,a-f]+$', num)
+    return re.search('^[0-9,a-f]+$', num) is not None or re.search('^0x[0-9,a-f]+$', num) is not None
 
 
 def toInt(string: Union[str, int, float]):
