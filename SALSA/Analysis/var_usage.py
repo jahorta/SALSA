@@ -63,7 +63,7 @@ class VarUsage:
         print(f'maxes: bit:{max_bit}, byte:{max_byte}, int:{max_int}, float:{max_float}')
 
         i = 0
-        while i < max_max:
+        while i <= max_max:
             csv_line_parts = []
 
             if i <= max_bit:
