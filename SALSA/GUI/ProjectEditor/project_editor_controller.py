@@ -418,14 +418,14 @@ class ProjectEditorController:
         if inst is None:
             inst = self.current['instruction']
 
-        if script != self.current['script']:
+        if script != self.current['script'] or not self.trees['section'].has_data():
             sel_iid = self.trees['script'].get_iid_from_rowdata(script)
             self.trees['script'].see(sel_iid)
             self.trees['script'].focus(sel_iid)
             self.trees['script'].selection_set([sel_iid])
             self.on_select_tree_entry('script', script)
             self.view.after(10, self.goto_link_target, None, sect, inst, param)
-        elif sect != self.current['section']:
+        elif sect != self.current['section'] or not self.trees['instruction'].has_data():
             sel_iid = self.trees['section'].get_iid_from_rowdata(sect)
             self.trees['section'].see(sel_iid)
             self.trees['section'].focus(sel_iid)

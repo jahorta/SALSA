@@ -526,3 +526,6 @@ class DataTreeview(ttk.Treeview):
     def print_parent_and_index(self, event):
         iid = self.identify_row(event.y)
         print(f'parent: {self.parent(iid)}, index: {self.index(iid)}')
+
+    def has_data(self):
+        return len(self.row_data) > 0
