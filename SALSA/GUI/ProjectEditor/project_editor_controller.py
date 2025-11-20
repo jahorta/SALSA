@@ -449,6 +449,7 @@ class ProjectEditorController:
             self.trees['parameter'].see(sel_iid)
             self.trees['parameter'].focus(sel_iid)
             self.trees['parameter'].selection_set([sel_iid])
+        return None
 
     def clear_inst_details(self):
         self.view.inst_label.config(text='ID - Name')
@@ -751,6 +752,11 @@ class ProjectEditorController:
         s_type.add_command(label='Label', command=lambda: self.rcm_change_sect_type('label'))
         s_type.add_command(label='Code', command=lambda: self.rcm_change_sect_type('code'))
         m.add_cascade(label='Change section type', menu=s_type)
+
+        m.add_separator()
+        m.add_command(label='Show Section Links', command=lambda: self.callbacks['show_section_links'](
+            self.current['script'], self.current['section']
+        ))
 
         if not is_multiple:
             item_text = self.trees['section'].item(sel_iid)['text']

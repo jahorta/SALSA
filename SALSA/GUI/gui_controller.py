@@ -2,9 +2,10 @@ import os.path
 import queue
 import tkinter as tk
 from tkinter import ttk
-from typing import Union, TypedDict, Literal
+from typing import Union, TypedDict, Literal, Optional
 import webbrowser
 
+from GUI.LinkViewPopup.link_view_popup import LinkViewPopup
 from SALSA.GUI.ProjectSearch.project_search_popup import ProjectSearchPopup
 from SALSA.GUI.dolphin_link_popup import DolphinLinkPopup
 from SALSA.GUI.EncodeErrorPopup.project_error_popup import ProjectErrorPopup
@@ -27,15 +28,16 @@ from SALSA.Common.containers import Vector2
 
 
 class PopupTypes(TypedDict):
-    inst: Union[None, InstructionEditorController]
-    analysis: Union[None, AnalysisController]
-    about: Union[None, AboutView]
-    variable: Union[None, VariablePopup]
-    string: Union[None, StringPopup]
-    export: Union[None, SCTExportPopup]
-    errors: Union[None, ProjectErrorPopup]
-    d_link: Union[None, DolphinLinkPopup]
-    search: Union[None, ProjectSearchPopup]
+    inst: Optional[InstructionEditorController]
+    analysis: Optional[AnalysisController]
+    about: Optional[AboutView]
+    variable: Optional[VariablePopup]
+    string: Optional[StringPopup]
+    export: Optional[SCTExportPopup]
+    errors: Optional[ProjectErrorPopup]
+    d_link: Optional[DolphinLinkPopup]
+    search: Optional[ProjectSearchPopup]
+    links: Optional[LinkViewPopup]
 
 
 class GUIController:
@@ -57,7 +59,8 @@ class GUIController:
         self.theme = theme
 
         self.popups: PopupTypes = {'inst': None, 'analysis': None, 'about': None, 'errors': None,
-                                   'variable': None, 'string': None, 'export': None, 'd_link': None, 'search': None}
+                                   'variable': None, 'string': None, 'export': None, 'd_link': None,
+                                   'search': None, 'links': None}
 
         self.callbacks = {}
 
@@ -222,6 +225,17 @@ class GUIController:
         # self.popups['search'].set_options(options)
         self.popups['search'].start_search()
 
+    def show_links_popup(self, link_finder):
+        if self.popups['links'] is not None:
+            self.popups['links'].update_link_widgets(new_registry=link_finder)
+            self.popups['links'].tkraise()
+            return
+        callbacks = {
+            'goto': self.prj_cont.goto_link_target,
+            'close': self.close_popup
+        }
+        self.popups['links'] = LinkViewPopup(self.parent, 'links', callbacks, link_finder, self.theme)
+
     # ------------- #
     # Popup refresh #
     # ------------- #
@@ -239,7 +253,7 @@ class GUIController:
     def close_popup(self,
                     name: Literal['inst', 'analysis', 'about', 'variable', 'string', 'export', 'errors', 'd_link'],
                     popup: Union[InstructionEditorView, AnalysisView, AboutView, SCTExportPopup,
-                    VariablePopup, StringPopup, ProjectErrorPopup, DolphinLinkPopup]):
+                    VariablePopup, StringPopup, ProjectErrorPopup, DolphinLinkPopup, ProjectSearchPopup, LinkViewPopup]):
         popup.destroy()
         self.popups[name] = None
 

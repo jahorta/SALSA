@@ -9,6 +9,7 @@ from tkinter.filedialog import asksaveasfilename
 from tkinter.messagebox import askyesno
 from typing import Union
 
+from Analysis.link_finder import LinkFinder
 from Analysis.var_usage import VarUsage
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
@@ -98,7 +99,11 @@ class Application(tk.Tk):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
-        project_controller_callbacks = {'save_project': self.on_save_project, 'refresh_offsets': self.refresh_offsets}
+        project_controller_callbacks = {
+            'save_project': self.on_save_project,
+            'refresh_offsets': self.refresh_offsets,
+            'show_section_links': self.show_section_links
+        }
         self.project_edit_controller = ProjectEditorController(self, self.project_edit_view, self.project,
                                                                callbacks=project_controller_callbacks,
                                                                theme=theme)
@@ -507,3 +512,7 @@ class Application(tk.Tk):
             fh.write(csv_out)
 
         print('Variable usage written to ' + filename)
+
+    def show_section_links(self, sct, section):
+        link_finder = LinkFinder.find_links(self.project.project, sct, section, self.base_insts)
+        self.gui.show_links_popup(link_finder)
