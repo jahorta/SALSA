@@ -6,11 +6,10 @@ import threading
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from tkinter.filedialog import asksaveasfilename
-from tkinter.messagebox import askyesno
 from typing import Union
 
-from Analysis.link_finder import LinkFinder
-from Analysis.var_usage import VarUsage
+from SALSA.Analysis.link_finder import LinkFinder
+from SALSA.Analysis.var_usage import VarUsage
 from SALSA.BaseInstructions.bi_facade import BaseInstLibFacade
 from SALSA.Common.setting_class import settings
 from SALSA.FileModels.project_model import ProjectModel
