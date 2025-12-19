@@ -44,12 +44,14 @@ class MainMenu(tk.Menu):
         self.p_repair_menu.add_command(label='Repair Textbox Fadeout', command=callbacks['prj->repair->textbox'])
         self.project_menu.add_cascade(label='Repair', menu=self.p_repair_menu)
         self.aklz_var = tk.IntVar(master=self, value=0)
-        self.project_menu.add_checkbutton(label='Use Legacy AKLZ', variable=self.aklz_var, onvalue=1, offvalue=0, command=callbacks['prj->aklz_style'])
+        self.project_menu.add_checkbutton(label='Use Legacy AKLZ', variable=self.aklz_var,
+                                          onvalue=1, offvalue=0, command=callbacks['prj->aklz_style'])
         self.add_cascade(label='Project', menu=self.project_menu)
 
         analysis_menu = tk.Menu(self, tearoff=False)
         # analysis_menu.add_command(label='Export Data', command=callbacks['analysis->export'])
         analysis_menu.add_command(label='Export Project Var Usage', command=callbacks['analysis->var_usage'])
+        analysis_menu.add_command(label='Copy Used Insts to Clipboard', command=callbacks['analysis->insts_to_clipboard'])
         self.add_cascade(label='Analysis', menu=analysis_menu)
 
         self.view_menu = tk.Menu(self, tearoff=False)

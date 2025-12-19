@@ -2253,18 +2253,22 @@ class SCTProjectFacade:
 
         return links
 
+    def get_used_insts(self):
+        inst_ids = []
+        for key, script in self.project.scts.items():
+            for sect_name, sect in script.sects.items():
+                inst_ids += [v.base_id for v in sect.insts.values()]
+        return [(f'{i}:{get_padding_for_number(i, 4, " ")},{self.base_insts.get_inst(i).name}', i) for i in sorted(list(set(inst_ids)))]
+
     def get_search_filter_trees(self):
         scripts = []
         sections = []
-        inst_ids = []
 
         for key, script in self.project.scts.items():
             scripts.append((key, key))
             sections += [(k, k) for k in script.sects]
-            for sect_name, sect in script.sects.items():
-                inst_ids += [v.base_id for v in sect.insts.values()]
 
-        inst_ids = [(f'{i}:{get_padding_for_number(i, 4, " ")}{self.base_insts.get_inst(i).name}', i) for i in sorted(list(set(inst_ids)))]
+        inst_ids = self.get_used_insts()
 
         return {
             'sct:': sorted(list(set(scripts))),

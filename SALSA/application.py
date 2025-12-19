@@ -153,6 +153,7 @@ class Application(tk.Tk):
             'prj->search': self.gui.show_project_search_popup,
             'prj->aklz_style': self.set_aklz_decoder,
             'analysis->var_usage': self.analyze_var_usage,
+            'analysis->insts_to_clipboard': self.insts_used_to_clipboard,
             # 'analysis->export': self.gui.show_analysis_view,
             'view->inst': self.gui.show_instruction_view,
             'view->theme': self.change_theme,
@@ -496,6 +497,13 @@ class Application(tk.Tk):
 
     def set_aklz_decoder(self):
         set_aklz_slow(self.menu.aklz_var.get() == 1)
+
+    def insts_used_to_clipboard(self):
+        used_inst_strings = [inst[0] for inst in self.project.get_used_insts()]
+
+        self.clipboard_clear()
+        self.clipboard_append("\n".join(used_inst_strings))
+        self.update()
 
     def analyze_var_usage(self):
         filename = asksaveasfilename(parent=self, title='Save Variable Usage CSV', filetypes=[("CSV file", '*.csv')],
