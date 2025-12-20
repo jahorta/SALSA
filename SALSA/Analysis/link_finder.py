@@ -79,60 +79,27 @@ class LinkFinder:
     base_insts: BaseInstLibFacade
 
 
-    def get_inst_path(self, sect: SCTSection, target_inst):
-        inst_path = []
-        target_inst_idx = sect.inst_list.index(target_inst)
+    def get_inst_path_recursive(self, sect: SCTSection, target_inst, cur_tree=None):
+        if cur_tree is None:
+            cur_tree = sect.inst_tree
 
-        cur_tree = sect.inst_tree
-        while True:
-            if target_inst in cur_tree:
-                inst_path.append((NodeType.link, target_inst, (sect.name, target_inst),
-                                  f'{target_inst_idx} - {self.base_insts.get_inst(sect.insts[target_inst].base_id).name}'))
-                break
+        if target_inst in cur_tree:
+            target_inst_idx = sect.inst_list.index(target_inst)
+            return [(NodeType.link, target_inst, (sect.name, target_inst),
+                              f'{target_inst_idx} - {self.base_insts.get_inst(sect.insts[target_inst].base_id).name}')]
 
-            bounds_found = False
-            parent_id = ''
-            group_type = ''
-            group_list = []
-            parent_index = -1
-            for child in cur_tree:
-                if isinstance(child, dict):
-                    dict_key = list(child.keys())[0]
-                    parent_id, group_type = dict_key.split('|')
-                    parent_index = sect.inst_list.index(parent_id)
-                    if group_type != 'switch':
-                        group_list = child[dict_key]
-                        last_group_index = self.get_last_idx(sect, group_list)
+        for child in cur_tree:
+            if isinstance(child, str):
+                continue
+            dict_key = list(child.keys())[0]
+            result = self.get_inst_path_recursive(sect, target_inst, child[dict_key])
+            if result is None:
+                continue
+            parent_id, group_type = dict_key.split('|')
+            parent_index = sect.inst_list.index(parent_id)
+            return [(NodeType.group, parent_id, (sect.name, parent_id), f'{parent_index} - {group_type}'), *result]
 
-                        if parent_index < target_inst_idx < last_group_index:
-                            bounds_found = True
-                            break
-
-                        continue
-
-                    case_dict = child[dict_key]
-                    for case in case_dict:
-                        group_list = case_dict[case]
-                        first_group_index = self.get_first_index(sect, group_list)
-                        last_group_index = self.get_last_idx(sect, group_list)
-
-                        if first_group_index < target_inst_idx < last_group_index:
-                            group_type += f':{case}'
-                            bounds_found = True
-                            break
-
-                    if bounds_found:
-                        break
-
-
-            if not bounds_found:
-                return None
-            else:
-                cur_tree = group_list
-                inst_path.append((NodeType.group, parent_id, (sect.name, parent_id), f'{parent_index} - {group_type}'))
-
-        return inst_path
-
+        return None
 
     def find_links_in(self, sct: SCTScript, sect_label_inst):
         root = LinkNode(NodeType.root, 'links_in')
@@ -145,7 +112,7 @@ class LinkFinder:
                 sect_node = LinkNode(NodeType.sect, sect_name)
                 root.add_child(sect_node)
             sect_node.link_trace = (sect_name, )
-            inst_path = self.get_inst_path(sct.sects[sect_name], link.origin_trace[1])
+            inst_path = self.get_inst_path_recursive(sct.sects[sect_name], link.origin_trace[1])
             if inst_path is None:
                 continue
             parent_node = sect_node
@@ -171,7 +138,7 @@ class LinkFinder:
         self.links_out = root
 
         for link in all_links_out:
-            inst_path = self.get_inst_path(sect, link.origin_trace[1])
+            inst_path = self.get_inst_path_recursive(sect, link.origin_trace[1])
             if inst_path is None:
                 continue
             parent_node = root
