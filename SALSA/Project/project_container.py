@@ -386,6 +386,8 @@ class SCTProject:
         self.inst_id_colors[inst_id] = color
 
     def get_color(self, inst_id):
+        if inst_id is None or inst_id == 'None':
+            return ''
         if isinstance(inst_id, str):
             inst_id = int(inst_id)
         return self.inst_id_colors.get(inst_id, '')
