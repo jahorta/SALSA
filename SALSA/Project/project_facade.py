@@ -1270,7 +1270,7 @@ class SCTProjectFacade:
         if ref_inst_uuid is not None:
             ungroup_ref_inst_uuid = ref_inst_uuid
 
-            self.inst_specific_setup(script, new_inst)
+            self.inst_specific_setup(script, section, new_inst)
 
             if direction == 'below' and isinstance(cur_group[index], dict):
                 # The ref inst for below is the last instruction of the group this should almost always be a goto
@@ -1411,8 +1411,6 @@ class SCTProjectFacade:
         # Add in default parameter values with no loops
         base_inst = self.base_insts.get_inst(int(new_id))
 
-        self.inst_specific_setup(script, cur_inst)
-
         for i in [*base_inst.params_before, *base_inst.params_after]:
             base_param = base_inst.params[i]
             new_param = SCTParameter(base_param.param_ID, base_param.type)
@@ -1421,6 +1419,8 @@ class SCTProjectFacade:
             else:
                 new_param.set_value(base_param.default_value)
             cur_inst.params[i] = new_param
+
+        self.inst_specific_setup(script, section, cur_inst)
 
         if int(new_id) in self.base_insts.group_inst_list:
             self.setup_group_type_inst(script, section, inst, cur_inst, parent_list, index)
@@ -1726,7 +1726,7 @@ class SCTProjectFacade:
         cur_sect.inst_list.insert(inst_pos + 1, case_goto.ID)
         cur_group[index][list(cur_group[index].keys())[0]] = {sub_group: [case_goto.ID], **test_group}
 
-    def inst_specific_setup(self, script, new_inst: SCTInstruction):
+    def inst_specific_setup(self, script, sect, new_inst: SCTInstruction):
         if new_inst.base_id == 9:
             i = 0
             new_label = f'Untitiled({i})'
@@ -1734,6 +1734,18 @@ class SCTProjectFacade:
                 i += 1
                 new_label = f'Untitiled({i})'
             new_inst.label = new_label
+        if new_inst.base_id == 10:
+            section = self.project.scts[script].sects[sect]
+            new_idx = section.inst_list.index(new_inst.ID)
+            if new_idx == len(section.inst_list) - 1:
+                tgt_inst = section.inst_list[new_idx - 1]
+            else:
+                tgt_inst = section.inst_list[new_idx + 1]
+            new_link = SCTLink('Jump', origin=-1, origin_trace=[sect, new_inst.ID, 0],
+                                           target=-1, target_trace=[sect, tgt_inst], script=script)
+            new_inst.links_out.append(new_link)
+            new_inst.params[0].link = new_link
+
 
     def adjust_IF_grouping_type(self, script, section, inst, new_tgt_inst):
         cur_sect = self.project.scts[script].sects[section]
