@@ -1164,6 +1164,7 @@ class SCTProjectFacade:
         elif cur_type == 'virtual':
             new_inst_UUID = self.add_inst(script, section)
             self.change_inst(script, section, new_inst_UUID, new_id=9)
+            cur_sect.insts[new_inst_UUID].label = cur_sect.name
 
         if s_type == 'code':
             new_inst_UUID = self.add_inst(script, section, cur_sect.inst_tree[0])
