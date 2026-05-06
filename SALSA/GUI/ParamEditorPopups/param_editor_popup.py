@@ -304,7 +304,10 @@ class IntEditWidget(tk.Frame):
     def __init__(self, parent, name, signed=True, b_min=-math.inf, b_max=math.inf, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
-        label = ttk.Label(self, text=f'{name}: ')
+        if name[-2:] != ': ':
+            name += ': '
+
+        label = ttk.Label(self, text=name)
         label.grid(row=0, column=0, sticky=tk.W)
 
         self.entry_field = w.RequiredIntEntry(self, width=15, signed=signed, b_min=b_min, b_max=b_max)
