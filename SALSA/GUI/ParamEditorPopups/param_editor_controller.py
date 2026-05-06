@@ -312,7 +312,7 @@ class ParamEditController:
             self.int_field = VarSelectionWidget(self.view.main_frame, name=f'{self.base_param.name} - {var_type}',
                                                 b_min=0, var_type=var_type, signed=False,
                                                 callback=self.callbacks['get_var_alias'])
-            value = self.param.value
+            value = self.param.value[len(var_type):]
         else:
             self.int_field = IntEditWidget(self.view.main_frame, name=self.base_param.name)
             value = self.param.value
