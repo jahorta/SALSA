@@ -223,10 +223,13 @@ class RequiredIntEntry(RequiredEntry):
         if self.signed:
             chars += '-'
 
-        if char not in chars:
-            return False
+        for c in char:
+            if c not in chars:
+                return False
 
         if '-' in proposed:
+            if proposed.count('-') > 1:
+                return False
             if not re.search('^-', proposed):
                 return False
 
@@ -262,10 +265,21 @@ class RequiredFloatEntry(RequiredEntry):
         valid = super()._key_validate(char=char, index=index, current=current, proposed=proposed, action=action,
                                       **kwargs)
 
-        if char not in '-1234567890.':
+        for c in char:
+            if c not in '-1234567890.':
+                return False
+
+        if proposed.count('-') > 1:
             return False
 
-        if proposed == '':
+        if proposed.count('.') > 1:
+            return False
+
+        if '-' in proposed:
+            if not re.search('^-', proposed):
+                return False
+
+        if proposed in ('', '-'):
             return True
 
         if float(proposed) < self.min or float(proposed) > self.max:
