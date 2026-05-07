@@ -342,8 +342,10 @@ class VarSelectionWidget(IntEditWidget):
         self.var_type = var_type
 
     def set_value(self, value):
-        super().set_value(value)
-        if self.var_type is None:
+        if value is not None and self.var_type is not None:
+            value = value[len(self.var_type):]
+            super().set_value(value)
+        elif self.var_type is None:
             return
         alias = self.get_alias_callback(self.var_type, value)
         alias_str = 'No alias'
