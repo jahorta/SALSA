@@ -287,27 +287,28 @@ class ParamEditController:
             self.int_field = ObjectSelectionWidget(self.view.main_frame, name=self.base_param.name,
                                                    selections=self.callbacks['get_subscript_list'](
                                                        self.cur_trace['script'], self.cur_trace['section']))
-            value = self.param.link.target_trace[0]
+            if self.param.link is not None and self.param.link.target_trace[0] is not None:
+                value = self.param.link.target_trace[0]
         elif 'jump' in self.base_param.type:
             self.int_field = ObjectSelectionWidget(self.view.main_frame, name=self.base_param.name,
                                                    selections=self.callbacks['get_instruction_list'](
                                                        self.cur_trace['script'], self.cur_trace['section'],
                                                        self.cur_trace['instruction']))
-            value = self.callbacks['get_instruction_identifier'](self.param.link)
+            if self.param.link is not None:
+                value = self.callbacks['get_instruction_identifier'](self.param.link)
         elif 'string' in self.base_param.type:
             is_footer = 'footer' in self.base_param.type
             self.int_field = StringSelectionWidget(self.view.main_frame, name=self.base_param.name,
                                                    options=self.callbacks['get_string_list'](self.cur_trace[
                                                                                                     'script'
                                                                                                 ], is_footer))
-            if self.param.linked_string is None:
-                value = None
-            else:
+            if self.param.linked_string is not None:
                 group = self.callbacks['get_string_group'](self.cur_trace['script'], self.param.linked_string)
                 value = (group, self.param.linked_string)
         elif 'footer' in self.base_param.type:
             self.int_field = FooterEditWidget(self.view.main_frame, name=self.base_param.name)
-            value = self.param.linked_string
+            if self.param.linked_string is not None:
+                value = self.param.linked_string
         elif 'var' in self.base_param.type:
             var_type = f'{self.base_param.type.split(sep)[-1].capitalize()}Var: '
             self.int_field = VarSelectionWidget(self.view.main_frame, name=f'{self.base_param.name} - {var_type}',
@@ -316,7 +317,8 @@ class ParamEditController:
             value = self.param.value
         else:
             self.int_field = IntEditWidget(self.view.main_frame, name=self.base_param.name)
-            value = self.param.value
+            if self.param.value is not None:
+                value = self.param.value
         self.int_field.grid(row=0, column=0)
         self.int_field.set_value(value)
 
