@@ -1,9 +1,10 @@
+import copy
 from typing import Union, Dict
 
 from SALSA.BaseInstructions.bi_container import BaseParam
 from SALSA.Common.constants import sep, override_str
 from SALSA.Common.are_same_checker import are_same
-from SALSA.Project.project_container import SCTParameter
+from SALSA.Project.project_container import SCTParameter, SCTLink
 from SALSA.GUI.ParamEditorPopups.param_editor_popup import ParamEditPopup, SCPTEditWidget, IntEditWidget, \
     FooterEditWidget, ObjectSelectionWidget, VarSelectionWidget, StringSelectionWidget
 from SALSA.Scripts.scpt_param_codes import SCPTParamCodes
@@ -327,7 +328,7 @@ class ParamEditController:
 
         cur_value = self.param.value if self.param is not None else self.base_param.default_value
 
-        if ('jump' in self.base_param.type or 'subscript' in self.base_param.type) and self.param is not None:
+        if ('jump' in self.base_param.type or 'subscript' in self.base_param.type) and self.param is not None and self.param.link is not None:
             trace_ind = 1 if 'jump' in self.base_param.type else 0
             cur_value = self.param.link.target_trace[trace_ind]
 
@@ -349,16 +350,20 @@ class ParamEditController:
             return
 
         if 'subscript' in self.base_param.type:
-            inst_id = self.callbacks['get_first_inst'](value)
+            inst_id = self.callbacks['get_first_inst'](self.cur_trace['script'], value)
+            self.param.link = SCTLink('Jump', self.cur_trace['script'], -1, [self.cur_trace['section'], self.cur_trace['instruction'], '0'], -1)
             self.param.link.target_trace = [value, inst_id]
         elif 'jump' in self.base_param.type:
             self.callbacks['adjust_inst_grouping'](self.cur_trace['script'], self.cur_trace['section'],
                                                    self.cur_trace['instruction'], value)
+            self.param.link = copy.deepcopy(self.param.link)
             self.param.link.target_trace[1] = value
         elif 'footer' in self.base_param.type or 'string' in self.base_param.type:
             self.param.linked_string = value
         else:
             self.param.value = value
+        if 'jump' in self.base_param.type or 'subscript' in self.base_param.type:
+            self.callbacks['refresh_links'](self.cur_trace['script'], self.cur_trace['section'], self.cur_trace['instruction'])
 
         self.callbacks['refresh_inst']()
         self.callbacks['set_change']()

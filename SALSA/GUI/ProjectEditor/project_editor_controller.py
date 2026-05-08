@@ -73,6 +73,8 @@ class ProjectEditorController:
                         'refresh_inst': self.pe_on_refresh_inst,
                         'update_variables': self.update_var_usage,
                         'get_subscript_list': self.project.get_jmp_section_list,
+                        'get_first_inst': self.project.get_first_inst,
+                        'refresh_links': self.project.refresh_links,
                         'set_change': self.set_refresh_flag,
                         'get_instruction_list': self.project.get_jmp_inst_dict,
                         'get_instruction_identifier': self.project.get_inst_desc_info,
