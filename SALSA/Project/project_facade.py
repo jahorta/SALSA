@@ -485,6 +485,22 @@ class SCTProjectFacade:
     def get_jmp_section_list(self, script, section):
         return [_ for _ in self.project.scts[script].sect_list if _ != section]
 
+    def get_first_inst(self, script, section):
+        return self.project.scts[script].sects[section].inst_list[0]
+
+    def refresh_links(self, script, section, instruction):
+        inst = self.project.scts[script].sects[section].insts[instruction]
+        for l in inst.links_out:
+            target_inst = self.project.scts[script].sects[l.target_trace[0]].insts[l.target_trace[1]]
+            if l in target_inst.links_in:
+                target_inst.links_in.remove(l)
+        inst.links_out.clear()
+        for p in inst.params.values():
+            if p.link is not None:
+                inst.links_out.append(p.link)
+                target_inst = self.project.scts[script].sects[p.link.target_trace[0]].insts[p.link.target_trace[1]]
+                target_inst.links_in.append(p.link)
+
     def get_jmp_inst_dict(self, script, section, goto_inst):
         cur_sect = self.project.scts[script].sects[section]
         cur_inst = cur_sect.insts[goto_inst]
