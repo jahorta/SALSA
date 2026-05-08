@@ -357,7 +357,7 @@ class ProjectEditorController:
         else:
             self.view.skip_error_label.config(text='')
 
-        self.view.delay_label.config(text=str(details['delay_param']))
+        self.view.delay_label.config(text="  " + str(details['delay_param']))
 
         for i, link in enumerate(details['links_out']):
             link: SCTLink
