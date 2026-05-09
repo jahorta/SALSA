@@ -91,26 +91,39 @@ class LinkFinder:
                 break
 
             bounds_found = False
-            check_next_str = False
             parent_id = ''
             group_type = ''
             group_list = []
             parent_index = -1
             for child in cur_tree:
-                if isinstance(child, str) and check_next_str:
-                    if sect.inst_list.index(child) > target_inst_idx:
-                        bounds_found = True
-                        break
-                    check_next_str = False
-                elif isinstance(child, dict):
+                if isinstance(child, dict):
                     dict_key = list(child.keys())[0]
                     parent_id, group_type = dict_key.split('|')
-                    group_list = child[dict_key]
                     parent_index = sect.inst_list.index(parent_id)
-                    if parent_index < target_inst_idx:
-                        check_next_str = True
-                    else:
+                    if group_type != 'switch':
+                        group_list = child[dict_key]
+                        last_group_index = self.get_last_idx(sect, group_list)
+
+                        if parent_index < target_inst_idx < last_group_index:
+                            bounds_found = True
+                            break
+
+                        continue
+
+                    case_dict = child[dict_key]
+                    for case in case_dict:
+                        group_list = case_dict[case]
+                        first_group_index = self.get_first_index(sect, group_list)
+                        last_group_index = self.get_last_idx(sect, group_list)
+
+                        if first_group_index < target_inst_idx < last_group_index:
+                            group_type += f':{case}'
+                            bounds_found = True
+                            break
+
+                    if bounds_found:
                         break
+
 
             if not bounds_found:
                 return None
@@ -213,3 +226,37 @@ class LinkFinder:
 
     def get_out_tree(self):
         pass
+
+    def get_last_idx(self, sect, item):
+        last_idx = 0
+        if isinstance(item, dict):
+            dict_keys = list(item.keys())
+            for key in dict_keys:
+                if '|' in key:
+                    key_id = key.split('|')[0]
+                    last_idx = max(last_idx, sect.inst_list.index(key_id))
+                last_idx = max(last_idx, self.get_last_idx(sect, item[key]))
+        elif isinstance(item, list) and len(item) > 0:
+            last_idx = max(last_idx, self.get_last_idx(sect, item[-1]))
+        elif item is None:
+            return 0
+        else:
+            last_idx = sect.inst_list.index(item)
+        return last_idx
+
+    def get_first_index(self, sect, item):
+        first_idx = 10000000
+        if isinstance(item, dict):
+            dict_keys = list(item.keys())
+            for key in dict_keys:
+                if '|' in key:
+                    key_id = key.split('|')[0]
+                    first_idx = min(first_idx, sect.inst_list.index(key_id))
+                first_idx = min(first_idx, self.get_first_index(sect, item[key]))
+        elif isinstance(item, list) and len(item) > 0:
+            first_idx = min(first_idx, self.get_first_index(sect, item[0]))
+        elif item is None:
+            return 10000000
+        else:
+            first_idx = sect.inst_list.index(item)
+        return first_idx
