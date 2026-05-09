@@ -31,11 +31,9 @@ class ParamEditController:
         self.base_param: Union[None, BaseParam] = None
         self.scpt_codes = SCPTParamCodes()
 
-        self.scpt_rows: Dict[str, int] = {}
         self.scpt_fields: Dict[str, SCPTEditWidget] = {}
-        self.old_scpt_fields: Dict[str, SCPTEditWidget] = {}
         self.scpt_callbacks = {'add_child_scpt_rows': self.add_scpt_rows,
-                               'remove_child_scpt_rows': self.remove_scpt_rows,
+                               'regrid_rows': self.regrid_scpt_rows,
                                'has_changes': self.scpt_has_changed,
                                'save': self.scpt_save, 'close': self.close_view,
                                'clear_value': lambda: self.clear_value('scpt')}
@@ -79,7 +77,6 @@ class ParamEditController:
         self.base_param = None
         self.param_id = None
         self.column_id = None
-        self.scpt_rows = {}
         self.scpt_fields = {}
         if self.end_callback is not None:
             self.end_callback(**self.end_kwargs)
@@ -99,7 +96,6 @@ class ParamEditController:
     # Initial SCPT Parameter View Setup
     def setup_scpt_view(self, cleared=False):
         self.view.set_callbacks(self.scpt_callbacks)
-        self.scpt_rows['0'] = 0
         self.scpt_fields['0'] = SCPTEditWidget(parent=self.view.main_frame, callbacks=self.scpt_callbacks, key='0',
                                                is_base=self.param is None, is_delay=self.param_id == 'delay')
         self.scpt_fields['0'].grid(row=0, column=0, sticky='W')
@@ -131,8 +127,6 @@ class ParamEditController:
         for field in self.scpt_fields.values():
             field.destroy()
         self.scpt_fields = {}
-        self.scpt_rows = {}
-        self.old_scpt_fields = {}
         self.setup_scpt_view(cleared=True)
 
     # ------------------------------------------- #
@@ -140,62 +134,31 @@ class ParamEditController:
     # ------------------------------------------- #
 
     def add_scpt_rows(self, p_key, is_base):
-        if p_key not in self.scpt_rows:
+        if p_key not in self.scpt_fields:
             return
-
-        changed_keys = []
-
-        p_row = self.scpt_rows[p_key]
-        for key in self.scpt_rows:
-            if self.scpt_rows[key] > p_row:
-                self.scpt_rows[key] += 2
-                changed_keys.append(key)
 
         new_keys = [f'{p_key}{sep}{j}' for j in range(0, 2)]
         for i, key in enumerate(new_keys):
-            changed_keys.append(key)
-            if key in self.old_scpt_fields:
-                self.scpt_fields[key] = self.old_scpt_fields.pop(key)
-                self.scpt_rows[key] = p_row + i + 1
-            else:
+            if key not in self.scpt_fields:
                 self.scpt_fields[key] = SCPTEditWidget(self.view.main_frame, self.scpt_callbacks, key, prefix=i + 1,
                                                        is_base=is_base)
-                self.scpt_rows[key] = p_row + i + 1
-
-        self.regrid_scpt_rows(changed_keys)
 
         return new_keys
 
-    def remove_scpt_rows(self, p_key):
-        if p_key not in self.scpt_rows:
-            return
+    def regrid_scpt_rows(self):
+        for field in self.scpt_fields.values():
+            field.grid_remove()
 
-        keys_to_pop = []
-        for key in self.scpt_rows.keys():
-            if p_key in key and p_key != key:
-                keys_to_pop.append(key)
+        field_keys = ['0']
+        i = 0
+        while len(field_keys) > 0:
+            key = field_keys.pop(0)
+            self.scpt_fields[key].grid(row=i, column=0, sticky='W')
+            if not self.scpt_fields[key].suppress_children and len(self.scpt_fields[key].child_fields) > 0:
+                field_keys = sorted([*self.scpt_fields[key].child_fields, *field_keys])
 
-        if len(keys_to_pop) == 0:
-            return
+            i += 1
 
-        changed_keys = []
-
-        for key in keys_to_pop:
-            self.scpt_rows.pop(key)
-            self.old_scpt_fields[key] = self.scpt_fields.pop(key)
-            self.old_scpt_fields[key].grid_remove()
-
-        p_row = self.scpt_rows[p_key]
-        for key in self.scpt_rows:
-            if self.scpt_rows[key] > p_row:
-                self.scpt_rows[key] -= 2
-                changed_keys.append(key)
-
-        self.regrid_scpt_rows(changed_keys=changed_keys)
-
-    def regrid_scpt_rows(self, changed_keys):
-        for key in changed_keys:
-            self.scpt_fields[key].grid(row=self.scpt_rows[key], column=0, sticky='W')
 
     # ---------------------------------------- #
     # SCPT Parameter Editor Validation methods #

@@ -148,6 +148,8 @@ class SCPTEditWidget(ttk.Frame):
 
         self.prev_active_widget = ''
         self.active_widget = ''
+        self.suppress_children = True
+        self.child_fields = []
 
     def update_options(self):
         class_selected = self.class_selection.get()
@@ -164,26 +166,33 @@ class SCPTEditWidget(ttk.Frame):
             if self.active_widget != '':
                 self.set_active_input_widget('')
             self.option_selection.set(option_list[0])
+            self.suppress_children = False
         elif class_selected == 'secondary':
             if self.active_widget != '':
                 self.set_active_input_widget('')
             self.option_selection.set(self.secondary_option_selection)
+            self.suppress_children = True
         elif class_selected == 'input':
             if self.prev_active_widget != self.active_widget:
                 self.set_active_input_widget(self.prev_active_widget)
             self.option_selection.set(self.secondary_option_selection)
+            self.suppress_children = True
+        self.ensure_child_widgets()
+
+    def ensure_child_widgets(self):
+        if self.class_selection.get() in ('compare', 'arithmetic'):
+            self.child_fields = self.callbacks['add_child_scpt_rows'](self.key, self.is_base)
+        self.callbacks['regrid_rows']()
+
 
     def choose_option(self, option):
         self.option_selection.set(option)
-        self.update_input_entry()
+        self.update_active_widget()
 
-    def update_input_entry(self):
+    def update_active_widget(self):
         if self.class_selection.get() in ('compare', 'arithmetic'):
-            # May need to ungrid other entry fields
-            self.callbacks['add_child_scpt_rows'](self.key, self.is_base)
             self.set_active_input_widget('')
             return
-        self.callbacks['remove_child_scpt_rows'](self.key)
 
         option_selection = self.option_selection.get()
         if self.class_selection.get() == 'secondary':
