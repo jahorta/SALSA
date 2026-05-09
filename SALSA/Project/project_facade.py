@@ -491,7 +491,7 @@ class SCTProjectFacade:
     def refresh_links(self, script, section, instruction):
         inst = self.project.scts[script].sects[section].insts[instruction]
         for l in inst.links_out:
-            if l.type == 'String':
+            if l.type in ['String', 'Footer']:
                 continue
             target_inst = self.project.scts[script].sects[l.target_trace[0]].insts[l.target_trace[1]]
             if l in target_inst.links_in:
@@ -499,7 +499,7 @@ class SCTProjectFacade:
         inst.links_out.clear()
         for p in inst.params.values():
             if p.link is not None:
-                if p.link.type == 'String':
+                if p.link.type in ['String', 'Footer']:
                     continue
                 inst.links_out.append(p.link)
                 target_inst = self.project.scts[script].sects[p.link.target_trace[0]].insts[p.link.target_trace[1]]
