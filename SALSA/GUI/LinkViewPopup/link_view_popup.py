@@ -121,9 +121,9 @@ class LinkViewPopup(tk.Toplevel):
                     self.link_out_links.append(part[1])
 
                 i += 1
-        last_label = ttk.Label(row_frame, text='', style='canvas.TLabel')
-        last_label.grid(row=0, column=i, sticky='NSEW')
-        row_frame.columnconfigure(i, weight=1)
+            last_label = ttk.Label(row_frame, text='', style='canvas.TLabel')
+            last_label.grid(row=0, column=i, sticky='NSEW')
+            row_frame.columnconfigure(i, weight=1)
 
     def close(self):
         self.callbacks['close'](self.name, self)
