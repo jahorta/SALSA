@@ -549,6 +549,11 @@ class SCTProjectFacade:
                 return f'No footer strings in _Footer_ group. Cannot select a string'
         return None
 
+    def ensure_delay_param(self, script, section, instruction, new_param):
+        inst = self.project.scts[script].sects[section].insts[instruction]
+        if inst.delay_param is None:
+            inst.delay_param = new_param
+
     def get_string_group_length(self, script, group_name):
         if group_name not in self.project.scts[script].string_groups:
             return None

@@ -174,6 +174,9 @@ class ParamEditController:
             self.callbacks['set_change'](self.param_id, self.column_id, new_scpt_value)
             return
 
+        if self.param_id == 'delay':
+            self.callbacks['ensure_delay_param'](self.cur_trace['script'], self.cur_trace['section'], self.cur_trace['instruction'],self.param)
+
         var_changes = self.get_var_changes(self.param.value, new_scpt_value)
         if var_changes is not None:
             self.callbacks['update_variables'](var_changes)
