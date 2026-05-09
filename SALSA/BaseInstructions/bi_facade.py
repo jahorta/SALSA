@@ -114,9 +114,11 @@ class BaseInstLibFacade:
     def get_relevant(self, search, exclude_modifiers=False):
         relevant = []
         if search == '':
-            return relevant
+            return [f'{inst.instruction_id} - {inst.name}' for inst in self.lib.insts if inst.name != 'code_error']
         for inst in self.lib.insts:
             inst: BaseInst
+            if inst.name == 'code_error':
+                continue
             if search in str(inst.instruction_id) or search.lower() in inst.name.lower():
                 if exclude_modifiers and inst.instruction_id in modifiers:
                     continue
