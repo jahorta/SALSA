@@ -1110,6 +1110,9 @@ class ProjectEditorController:
         if self.entry_widget is not None:
             self.shake_widget(self.entry_widget)
             return
+        if self.current['script'] is None or self.current['section'] is None or self.current['instruction'] is None:
+            return
+
         paramID = str(paramID)
         self.current['parameter'] = paramID
         error = self.project.check_param_editable(**self.current)
