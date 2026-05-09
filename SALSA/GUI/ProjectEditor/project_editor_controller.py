@@ -227,6 +227,7 @@ class ProjectEditorController:
             return
         self.current['instruction'] = instructID
         self.view.param_tree.clear_all_entries()
+        self.project.refresh_links(self.current['script'], self.current['section'], self.current['instruction'])
         details = self.project.get_instruction_details(**self.current)
         if details is None:
             return
