@@ -940,7 +940,7 @@ class ProjectEditorController:
             m.grab_release()
 
     def rcm_add_inst(self, direction):
-        sel_iid = self.trees['instruction'].focus()
+        sel_iid = self.trees['instruction'].selection()[0]
         pre_rowdata = self.trees['instruction'].row_data[sel_iid]
 
         # if switch case selected
