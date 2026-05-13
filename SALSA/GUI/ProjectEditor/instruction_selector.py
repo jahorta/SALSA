@@ -140,8 +140,7 @@ class InstructionSelectorWidget(ttk.Frame):
             if result == 'cancel':
                 return
         self.callbacks['set_inst_id'](*self.inst_trace, new_id=new_ID, change_type=result)
-        self.cancel()
-        self.callbacks['update_tree']()
+        self.close()
         self.callbacks['update_inst']('instruction', self.inst_trace[2])
 
     def move_to_results(self, e):
@@ -232,6 +231,10 @@ class InstructionSelectorWidget(ttk.Frame):
             return
         self.select_inst(name=None, new_ID=self.result_dropdown.row_data[self.result_dropdown.identify_row(e.y)[0]])
 
-    def cancel(self):
+    def close(self):
         self.result_dropdown.destroy()
         self.callbacks['destroy_widget']()
+
+    def cancel(self):
+        self.result_dropdown.destroy()
+        self.callbacks['cancel_add_inst'](self.inst_trace[2])

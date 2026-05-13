@@ -975,24 +975,29 @@ class ProjectEditorController:
             'get_relevant': self.project.base_insts.get_relevant,
             'update_tree': self.refresh_all_trees,
             'update_inst': self.on_select_tree_entry,
-            'destroy_widget': self.delete_entry_widget
+            'destroy_widget': self.delete_entry_widget,
+            'cancel_add_inst': self.cancel_inst_entry
         }
         cell_bbox = self.trees['instruction'].bbox(sel_iid, 'name')
         x_mod = self.trees['instruction'].winfo_x()
         y_mod = self.trees['instruction'].winfo_y()
         w = InstructionSelectorWidget(self.view.inst_tree_frame, callbacks, inst_trace,
                                       x=cell_bbox[0] + x_mod, y=cell_bbox[1] + y_mod + cell_bbox[3])
-        w.bind('<Escape>', lambda event: self.delete_entry_widget())
         w.place(x=cell_bbox[0] + x_mod, y=cell_bbox[1] + y_mod, w=cell_bbox[2], h=cell_bbox[3])
         self.entry_widget = w
         for tree in self.trees.values():
             tree.unbind_events()
+
+    def cancel_inst_entry(self, uuid):
+        self.project.remove_inst(self.current['script'], self.current['section'], uuid, None)
+        self.delete_entry_widget()
 
     def delete_entry_widget(self):
         self.entry_widget.destroy()
         self.entry_widget = None
         for tree in self.trees.values():
             tree.bind_events()
+        self.refresh_tree('instruction')
 
     def rcm_remove_inst(self, remaining_sel_iids=None):
         if remaining_sel_iids is None:
