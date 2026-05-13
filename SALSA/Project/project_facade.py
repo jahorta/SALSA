@@ -53,8 +53,8 @@ class SCTProjectFacade:
                 return False
 
         self.project = prj
-        self.searcher = ProjectSearcher(self.base_insts, self.project)
         self.project_cleanup_placeholder_insts()
+        self.searcher = ProjectSearcher(self.base_insts, self.project)
         return True
 
     def project_cleanup_placeholder_insts(self):
@@ -64,7 +64,7 @@ class SCTProjectFacade:
                 section = script.sects[sect_name]
                 insts_to_remove = []
                 for inst in section.insts:
-                    if section.insts[inst] is None:
+                    if section.insts[inst].base_id is None:
                         insts_to_remove.append(inst)
 
                 for inst in insts_to_remove:
