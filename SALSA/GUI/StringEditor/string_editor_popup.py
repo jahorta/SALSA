@@ -450,21 +450,23 @@ class StringPopup(tk.Toplevel):
         m = tk.Menu(self, tearoff=0)
         if row_data is None:
             m.add_command(label='Add String Group', command=self.string_group_add)
-        if sel_iid != '' and row_data is None:
-            m.add_command(label='Rename String Group', command=lambda: self.show_rename_widget(sel_iid))
-        m.add_command(label='Add String', command=lambda: self.string_add(sel_iid))
-        if sel_iid != '' and row_data is not None:
-            m.add_command(label='Change String ID', command=lambda: self.show_rename_widget(sel_iid))
-            m.add_separator()
-            m.add_command(label='Delete String', command=lambda: self.string_delete(sel_iid))
-            m.add_separator()
-            m.add_command(label='Find String Usages', command=lambda: self.find_usage(sel_iid))
+        if sel_iid != '':
+            if row_data is None:
+                m.add_command(label='Rename String Group', command=lambda: self.show_rename_widget(sel_iid))
+            m.add_command(label='Add String', command=lambda: self.string_add(sel_iid))
 
-        elif sel_iid != '' and row_data is None:
-            m.add_separator()
-            m.add_command(label='Delete String Group', command=lambda: self.string_group_delete(sel_iid))
-            if len(self.string_tree.get_children(sel_iid)) > 0:
-                m.entryconfigure('Delete String Group', state='disabled')
+            if row_data is not None:
+                m.add_command(label='Change String ID', command=lambda: self.show_rename_widget(sel_iid))
+                m.add_separator()
+                m.add_command(label='Delete String', command=lambda: self.string_delete(sel_iid))
+                m.add_separator()
+                m.add_command(label='Find String Usages', command=lambda: self.find_usage(sel_iid))
+
+            else:
+                m.add_separator()
+                m.add_command(label='Delete String Group', command=lambda: self.string_group_delete(sel_iid))
+                if len(self.string_tree.get_children(sel_iid)) > 0:
+                    m.entryconfigure('Delete String Group', state='disabled')
 
         m.bind('<Escape>', m.destroy)
         try:
