@@ -445,7 +445,7 @@ class StringPopup(tk.Toplevel):
         sel_iid = self.string_tree.identify_row(e.y)
         self.string_tree.focus(sel_iid)
         self.string_tree.selection_set([sel_iid])
-        row_data = self.string_tree.row_data[sel_iid]
+        row_data = self.string_tree.row_data.get(sel_iid, None)
 
         m = tk.Menu(self, tearoff=0)
         if row_data is None:
