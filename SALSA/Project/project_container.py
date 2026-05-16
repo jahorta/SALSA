@@ -112,6 +112,8 @@ class SCTParameter:
         return returnValue
 
     def __repr__(self):
+        if self.override is not None:
+            return 'Overridden'
         return f'{self.formatted_value}'
 
     def set_override(self, o_value: bytearray):

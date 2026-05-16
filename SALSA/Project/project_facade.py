@@ -189,8 +189,12 @@ class SCTProjectFacade:
                         if header_key not in base_dict:
                             raise KeyError(f'PrjFacade: {header_key} not in {element} or {base[base_key]}')
                         value_dict = base_dict
-                    values[header_key] = value_dict[header_key] if isinstance(value_dict[header_key], str) else str(
-                        value_dict[header_key])
+
+                    if header_key == 'value' and element_dict['override'] is not None:
+                        values[header_key] = 'Overridden'
+                    else:
+                        values[header_key] = value_dict[header_key] if isinstance(value_dict[header_key], str) else str(
+                            value_dict[header_key])
                 if isinstance(element, SCTSection):
                     if element.is_compound:
                         values['name'] += compound_sect_suffix
