@@ -796,7 +796,21 @@ class SCTProjectFacade:
         return ''
 
     def get_inst_desc_info(self, link: SCTLink):
-        inst = self.project.scts[link.script].sects[link.target_trace[0]].insts[link.target_trace[1]]
+        if link.target_trace is None:
+            return f'Link has no target'
+        if link.script not in self.project.scts:
+            return f'Link has no section'
+        if link.target_trace[0] not in self.project.scts[link.script].sects:
+            return f'Link target section ({link.target_trace[0]}) not in script ({link.script})'
+        if link.target_trace[1] is None:
+            return 'Link target instruction was none'
+
+        section = self.project.scts[link.script].sects[link.target_trace[0]]
+        if link.target_trace[1] not in section.insts:
+            return f'Link target instruction ({link.target_trace[1]}) not in section {section.name}'
+
+        inst = section.insts[link.target_trace[1]]
+
         return f'{inst.ungrouped_position}{link_sep}' \
                f'{self.base_insts.get_inst(inst.base_id).name}{link_sep}' \
                f'{inst.base_id}'
