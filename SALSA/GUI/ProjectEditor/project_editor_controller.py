@@ -981,8 +981,7 @@ class ProjectEditorController:
         cell_bbox = self.trees['instruction'].bbox(sel_iid, 'name')
         x_mod = self.trees['instruction'].winfo_x()
         y_mod = self.trees['instruction'].winfo_y()
-        w = InstructionSelectorWidget(self.view.inst_tree_frame, callbacks, inst_trace,
-                                      x=cell_bbox[0] + x_mod, y=cell_bbox[1] + y_mod + cell_bbox[3])
+        w = InstructionSelectorWidget(self.view.inst_tree_frame, callbacks, inst_trace)
         w.place(x=cell_bbox[0] + x_mod, y=cell_bbox[1] + y_mod, w=cell_bbox[2], h=cell_bbox[3])
         self.entry_widget = w
         for tree in self.trees.values():

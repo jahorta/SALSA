@@ -46,7 +46,7 @@ class InstructionSelectorWidget(ttk.Frame):
     shift_up_idx = 7
     shift_down_idx = 3
 
-    def __init__(self, parent, callbacks, inst_trace, x, y, *args, **kwargs):
+    def __init__(self, parent, callbacks, inst_trace, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         self.callbacks = callbacks
@@ -69,11 +69,22 @@ class InstructionSelectorWidget(ttk.Frame):
         r_callbacks = {
             'select': self.select_inst
         }
-        self.result_dropdown = DataTreeview(parent, name='result', callbacks=r_callbacks)
-        self.result_dropdown.place(x=x, y=y, anchor='nw')
+        self.dropdown_root = self.winfo_toplevel()
+        self.dropdown_popup = tk.Toplevel(self.dropdown_root)
+        self.dropdown_popup.overrideredirect(True)
+        self.dropdown_popup.transient(self.dropdown_root)
+        self.dropdown_popup.columnconfigure(0, weight=1)
+        self.dropdown_popup.rowconfigure(0, weight=1)
+
+        self.result_dropdown = DataTreeview(self.dropdown_popup, name='result', callbacks=r_callbacks)
+        self.result_dropdown.grid(row=0, column=0, sticky=tk.NSEW)
         self.result_dropdown.heading('#0', text='Relevant Instructions')
         self.result_dropdown.configure(show='tree')
         self.result_dropdown.configure(height=1)
+
+        self._root_configure_binding = self.dropdown_root.bind('<Configure>', self.reposition_dropdown, add='+')
+        self.bind('<Configure>', self.reposition_dropdown, add='+')
+        self.search.bind('<Configure>', self.reposition_dropdown, add='+')
 
         self.relevant_entries = []
         self.relevant_index = 0
@@ -100,6 +111,22 @@ class InstructionSelectorWidget(ttk.Frame):
         self.result_dropdown.bind("<Motion>", self.on_hover)
 
         self.after(10, self.update_search, '')
+        self.after_idle(self.reposition_dropdown)
+
+    def reposition_dropdown(self, event=None):
+        if event is not None and event.widget == self.dropdown_popup:
+            return
+        if not self.winfo_exists() or not self.dropdown_popup.winfo_exists():
+            return
+
+        self.update_idletasks()
+        dropdown_width = max(self.search.winfo_width(), self.result_dropdown.winfo_reqwidth())
+        dropdown_height = self.result_dropdown.winfo_reqheight()
+        x = self.search.winfo_rootx()
+        y = self.search.winfo_rooty() + self.search.winfo_height()
+
+        self.dropdown_popup.geometry(f'{dropdown_width}x{dropdown_height}+{x}+{y}')
+        self.dropdown_popup.lift(self.dropdown_root)
 
     def update_search(self, current):
         self.update_relevant_entries(self.callbacks['get_relevant'](current, exclude_modifiers=True))
@@ -111,6 +138,8 @@ class InstructionSelectorWidget(ttk.Frame):
     def update_menu(self, start_index=0):
         self.result_dropdown.clear_all_entries()
         if len(self.relevant_entries) == 0:
+            self.result_dropdown.configure(height=1)
+            self.after_idle(self.reposition_dropdown)
             return
         rows = min(self.entry_max, len(self.relevant_entries))
         rows = max(rows, 1)
@@ -126,6 +155,7 @@ class InstructionSelectorWidget(ttk.Frame):
             inst_id = entry_parts[0]
             self.result_dropdown.insert_entry(parent='', index='end', text=entry, values=[], row_data=inst_id)
         self.result_dropdown.selection_set(self.result_dropdown.get_children('')[0])
+        self.after_idle(self.reposition_dropdown)
 
     def select_inst(self, name, new_ID):
         end_callback = self.finish_select_inst
@@ -231,10 +261,17 @@ class InstructionSelectorWidget(ttk.Frame):
             return
         self.select_inst(name=None, new_ID=self.result_dropdown.row_data[self.result_dropdown.identify_row(e.y)[0]])
 
+    def destroy_dropdown(self):
+        if self._root_configure_binding is not None:
+            self.dropdown_root.unbind('<Configure>', self._root_configure_binding)
+            self._root_configure_binding = None
+        if self.dropdown_popup.winfo_exists():
+            self.dropdown_popup.destroy()
+
     def close(self):
-        self.result_dropdown.destroy()
+        self.destroy_dropdown()
         self.callbacks['destroy_widget']()
 
     def cancel(self):
-        self.result_dropdown.destroy()
+        self.destroy_dropdown()
         self.callbacks['cancel_add_inst'](self.inst_trace[2])
