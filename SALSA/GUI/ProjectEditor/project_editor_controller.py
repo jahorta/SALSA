@@ -988,6 +988,8 @@ class ProjectEditorController:
         for tree in self.trees.values():
             tree.unbind_events()
 
+        self.view.lock_tree_scrolling()
+
     def cancel_inst_entry(self, uuid):
         self.project.remove_inst(self.current['script'], self.current['section'], uuid, None)
         self.delete_entry_widget()
@@ -997,6 +999,7 @@ class ProjectEditorController:
         self.entry_widget = None
         for tree in self.trees.values():
             tree.bind_events()
+        self.view.unlock_tree_scrolling()
         self.refresh_tree('instruction')
 
     def rcm_remove_inst(self, remaining_sel_iids=None):

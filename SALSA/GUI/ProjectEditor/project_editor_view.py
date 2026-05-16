@@ -144,9 +144,9 @@ class ProjectEditorView(ttk.Frame):
             self.scripts_tree.heading(name, text=label, anchor=anchor)
             self.scripts_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
         self.scripts_tree['displaycolumns'] = self.visible_headers['script'][1:]
-        script_tree_scrollbar = ttk.Scrollbar(script_tree_frame, orient='vertical', command=self.scripts_tree.yview)
-        script_tree_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.S)
-        self.scripts_tree.config(yscrollcommand=script_tree_scrollbar.set)
+        self.script_tree_scrollbar = ttk.Scrollbar(script_tree_frame, orient='vertical', command=self.scripts_tree.yview)
+        self.script_tree_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.S)
+        self.scripts_tree.config(yscrollcommand=self.script_tree_scrollbar.set)
 
         section_tree_frame = ttk.Frame(self.pane_frame, width=400)
         section_tree_frame.grid(row=0, column=0, sticky='NSEW')
@@ -175,9 +175,9 @@ class ProjectEditorView(ttk.Frame):
             self.sections_tree.heading(name, text=label, anchor=anchor)
             self.sections_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
         self.sections_tree['displaycolumns'] = self.visible_headers['section'][1:]
-        section_tree_scrollbar = ttk.Scrollbar(section_tree_frame, orient='vertical', command=self.sections_tree.yview)
-        section_tree_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.S)
-        self.sections_tree.config(yscrollcommand=section_tree_scrollbar.set)
+        self.section_tree_scrollbar = ttk.Scrollbar(section_tree_frame, orient='vertical', command=self.sections_tree.yview)
+        self.section_tree_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.S)
+        self.sections_tree.config(yscrollcommand=self.section_tree_scrollbar.set)
         self.sections_tree.bind('<Double-1>', lambda e: self.callbacks['show_rename_widget']('section', e))
 
         self.inst_tree_frame = ttk.Frame(self.pane_frame, width=400)
@@ -207,9 +207,9 @@ class ProjectEditorView(ttk.Frame):
             self.insts_tree.heading(name, text=label, anchor=anchor)
             self.insts_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
         self.insts_tree['displaycolumns'] = self.visible_headers['instruction'][1:]
-        inst_tree_scrollbar = ttk.Scrollbar(self.inst_tree_frame, orient='vertical', command=self.insts_tree.yview)
-        inst_tree_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.S)
-        self.insts_tree.config(yscrollcommand=inst_tree_scrollbar.set)
+        self.inst_tree_scrollbar = ttk.Scrollbar(self.inst_tree_frame, orient='vertical', command=self.insts_tree.yview)
+        self.inst_tree_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.S)
+        self.insts_tree.config(yscrollcommand=self.inst_tree_scrollbar.set)
         self.insts_tree.bind('<Double-1>', lambda e: self.callbacks['show_rename_widget']('instruction', e))
 
         # Instruction details frame setup
@@ -284,9 +284,9 @@ class ProjectEditorView(ttk.Frame):
             self.param_tree.heading(name, text=label, anchor=anchor)
             self.param_tree.column(name, anchor=anchor, minwidth=minwidth, width=width, stretch=stretch)
         self.param_tree['displaycolumns'] = self.visible_headers['parameter'][1:]
-        param_tree_scrollbar = ttk.Scrollbar(param_frame, orient='vertical', command=self.param_tree.yview)
-        param_tree_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
-        self.param_tree.config(yscrollcommand=param_tree_scrollbar.set)
+        self.param_tree_scrollbar = ttk.Scrollbar(param_frame, orient='vertical', command=self.param_tree.yview)
+        self.param_tree_scrollbar.grid(row=0, column=1, sticky=tk.N + tk.S)
+        self.param_tree.config(yscrollcommand=self.param_tree_scrollbar.set)
         self.param_tree.bind('<Double-1>', lambda e: self.on_param_double_click('param', e))
         self.param_tree.bind('<Button-3>', self.param_right_click)
 
@@ -431,6 +431,43 @@ class ProjectEditorView(ttk.Frame):
             self.delay_frame.configure(style='flash.TLabelframe')
             self.delay_label.configure(style='flash.TLabel')
             self.after(flash_dur//2, self.flash_delay_param, count, True)
+
+    @staticmethod
+    def _lock_scroll(e):
+        return "break"
+
+    def lock_tree_scrolling(self):
+        self.scripts_tree.bind("<MouseWheel>", self._lock_scroll)
+        self.scripts_tree.bind("<Button-4>", self._lock_scroll)
+        self.scripts_tree.bind("<Button-5>", self._lock_scroll)
+        self.script_tree_scrollbar.config(command= lambda *args: None)
+
+        self.sections_tree.bind("<MouseWheel>", self._lock_scroll)
+        self.sections_tree.bind("<Button-4>", self._lock_scroll)
+        self.sections_tree.bind("<Button-5>", self._lock_scroll)
+        self.section_tree_scrollbar.config(command= lambda *args: None)
+
+        self.insts_tree.bind("<MouseWheel>", self._lock_scroll)
+        self.insts_tree.bind("<Button-4>", self._lock_scroll)
+        self.insts_tree.bind("<Button-5>", self._lock_scroll)
+        self.inst_tree_scrollbar.config(command= lambda *args: None)
+
+    def unlock_tree_scrolling(self):
+        self.scripts_tree.unbind("<MouseWheel>")
+        self.scripts_tree.unbind("<Button-4>")
+        self.scripts_tree.unbind("<Button-5>")
+        self.script_tree_scrollbar.config(command=self.scripts_tree.yview)
+
+        self.sections_tree.unbind("<MouseWheel>")
+        self.sections_tree.unbind("<Button-4>")
+        self.sections_tree.unbind("<Button-5>")
+        self.section_tree_scrollbar.config(command=self.sections_tree.yview)
+
+        self.insts_tree.unbind("<MouseWheel>")
+        self.insts_tree.unbind("<Button-4>")
+        self.insts_tree.unbind("<Button-5>")
+        self.inst_tree_scrollbar.config(command=self.insts_tree.yview)
+
 
     def change_theme(self, theme):
         self.theme = theme
