@@ -71,6 +71,7 @@ class InstructionSelectorWidget(ttk.Frame):
         }
         self.dropdown_root = self.winfo_toplevel()
         self.dropdown_popup = tk.Toplevel(self.dropdown_root)
+        self.dropdown_popup.withdraw()
         self.dropdown_popup.overrideredirect(True)
         self.dropdown_popup.transient(self.dropdown_root)
         self.dropdown_popup.columnconfigure(0, weight=1)
@@ -82,9 +83,10 @@ class InstructionSelectorWidget(ttk.Frame):
         self.result_dropdown.configure(show='tree')
         self.result_dropdown.configure(height=1)
 
-        self._root_configure_binding = self.dropdown_root.bind('<Configure>', self.reposition_dropdown, add='+')
-        self.bind('<Configure>', self.reposition_dropdown, add='+')
-        self.search.bind('<Configure>', self.reposition_dropdown, add='+')
+        self._last_dropdown_geometry = None
+        self._last_root_position = self.get_root_position()
+        self._root_configure_binding = self.dropdown_root.bind('<Configure>', self.reposition_dropdown_on_root_move, add='+')
+        self.bind('<Destroy>', self.destroy_dropdown, add='+')
 
         self.relevant_entries = []
         self.relevant_index = 0
@@ -113,19 +115,38 @@ class InstructionSelectorWidget(ttk.Frame):
         self.after(10, self.update_search, '')
         self.after_idle(self.reposition_dropdown)
 
-    def reposition_dropdown(self, event=None):
-        if event is not None and event.widget == self.dropdown_popup:
-            return
-        if not self.winfo_exists() or not self.dropdown_popup.winfo_exists():
+    def get_root_position(self):
+        return self.dropdown_root.winfo_rootx(), self.dropdown_root.winfo_rooty()
+
+    def reposition_dropdown_on_root_move(self, event=None):
+        if event is not None and event.widget is not self.dropdown_root:
             return
 
-        self.update_idletasks()
+        root_position = self.get_root_position()
+        if root_position == self._last_root_position:
+            return
+
+        self._last_root_position = root_position
+        self.reposition_dropdown()
+
+    def reposition_dropdown(self):
+        if not self.winfo_exists() or not self.dropdown_popup.winfo_exists():
+            return
+        if not self.search.winfo_ismapped():
+            self.dropdown_popup.withdraw()
+            return
+
         dropdown_width = max(self.search.winfo_width(), self.result_dropdown.winfo_reqwidth())
         dropdown_height = self.result_dropdown.winfo_reqheight()
         x = self.search.winfo_rootx()
         y = self.search.winfo_rooty() + self.search.winfo_height()
+        new_geometry = f'{dropdown_width}x{dropdown_height}+{x}+{y}'
 
-        self.dropdown_popup.geometry(f'{dropdown_width}x{dropdown_height}+{x}+{y}')
+        if new_geometry != self._last_dropdown_geometry:
+            self.dropdown_popup.geometry(new_geometry)
+            self._last_dropdown_geometry = new_geometry
+        if self.dropdown_popup.state() == 'withdrawn':
+            self.dropdown_popup.deiconify()
         self.dropdown_popup.lift(self.dropdown_root)
 
     def update_search(self, current):
@@ -133,7 +154,8 @@ class InstructionSelectorWidget(ttk.Frame):
 
     def update_relevant_entries(self, relevant_entries, start_index=0):
         self.relevant_entries = relevant_entries
-        self.update_menu()
+        self.relevant_index = start_index
+        self.update_menu(start_index)
 
     def update_menu(self, start_index=0):
         self.result_dropdown.clear_all_entries()
@@ -191,7 +213,10 @@ class InstructionSelectorWidget(ttk.Frame):
 
     def handle_dropdown_up_keypress(self, e):
         children = e.widget.get_children('')
-        cur_item_ind = children.index(e.widget.selection()[0])
+        selection = e.widget.selection()
+        if len(children) == 0 or len(selection) == 0:
+            return
+        cur_item_ind = children.index(selection[0])
         if cur_item_ind == 0:
             self.search.focus_set()
         elif cur_item_ind < self.shift_down_idx and self.relevant_index > 0:
@@ -199,7 +224,10 @@ class InstructionSelectorWidget(ttk.Frame):
 
     def handle_dropdown_down_keypress(self, e):
         children = e.widget.get_children('')
-        cur_item_ind = children.index(e.widget.selection()[0])
+        selection = e.widget.selection()
+        if len(children) == 0 or len(selection) == 0:
+            return
+        cur_item_ind = children.index(selection[0])
         if cur_item_ind + 1 > self.shift_up_idx and self.relevant_index + self.entry_max < len(self.relevant_entries):
             self.try_shift_results_up()
 
@@ -209,7 +237,10 @@ class InstructionSelectorWidget(ttk.Frame):
             return
 
         children = self.result_dropdown.get_children('')
-        cur_item_ind = children.index(self.result_dropdown.selection()[0])
+        selection = self.result_dropdown.selection()
+        if len(children) == 0 or len(selection) == 0:
+            return
+        cur_item_ind = children.index(selection[0])
 
         self.relevant_index += 1
         self.update_menu(self.relevant_index)
@@ -221,7 +252,10 @@ class InstructionSelectorWidget(ttk.Frame):
         if self.relevant_index == 0:
             return
         children = self.result_dropdown.get_children('')
-        cur_item_ind = children.index(self.result_dropdown.selection()[0])
+        selection = self.result_dropdown.selection()
+        if len(children) == 0 or len(selection) == 0:
+            return
+        cur_item_ind = children.index(selection[0])
 
         self.relevant_index -= 1
         self.update_menu(self.relevant_index)
@@ -232,11 +266,15 @@ class InstructionSelectorWidget(ttk.Frame):
     def target_dropdown_index(self, target_ind):
         if target_ind < 0:
             target_ind = 0
-        if target_ind >= self.entry_max:
-            target_ind = self.entry_max - 1
+        children = self.result_dropdown.get_children('')
+        if len(children) == 0:
+            return
+        if target_ind >= len(children):
+            target_ind = len(children) - 1
 
-        self.result_dropdown.selection_set([target_ind])
-        self.result_dropdown.focus(target_ind)
+        target_iid = children[target_ind]
+        self.result_dropdown.selection_set([target_iid])
+        self.result_dropdown.focus(target_iid)
 
     def on_mouse_wheel(self, e):
         if e.num == 4 or e.delta > 0:
@@ -252,16 +290,21 @@ class InstructionSelectorWidget(ttk.Frame):
         self.target_dropdown_index(target_ind)
 
     def select_inst_by_enter(self, e):
-        if len(self.result_dropdown.get_children('')) == 0:
+        if len(self.result_dropdown.get_children('')) == 0 or len(self.result_dropdown.selection()) == 0:
             return
         self.select_inst(name=None, new_ID=self.result_dropdown.row_data[self.result_dropdown.selection()[0]])
 
     def select_inst_by_click(self, e):
         if len(self.result_dropdown.get_children('')) == 0:
             return
-        self.select_inst(name=None, new_ID=self.result_dropdown.row_data[self.result_dropdown.identify_row(e.y)[0]])
+        row = self.result_dropdown.identify_row(e.y)
+        if row == '':
+            return
+        self.select_inst(name=None, new_ID=self.result_dropdown.row_data[row])
 
-    def destroy_dropdown(self):
+    def destroy_dropdown(self, event=None):
+        if event is not None and event.widget is not self:
+            return
         if self._root_configure_binding is not None:
             self.dropdown_root.unbind('<Configure>', self._root_configure_binding)
             self._root_configure_binding = None
