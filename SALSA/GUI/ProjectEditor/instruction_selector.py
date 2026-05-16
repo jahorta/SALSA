@@ -145,6 +145,7 @@ class InstructionSelectorWidget(ttk.Frame):
         if new_geometry != self._last_dropdown_geometry:
             self.dropdown_popup.geometry(new_geometry)
             self._last_dropdown_geometry = new_geometry
+            self.dropdown_popup.update()
         if self.dropdown_popup.state() == 'withdrawn':
             self.dropdown_popup.deiconify()
         self.dropdown_popup.lift(self.dropdown_root)
