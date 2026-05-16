@@ -1184,15 +1184,16 @@ class ProjectEditorController:
                 m.add_command(label='Remove Loop Parameter',
                               command=lambda: self.handle_loop_param_change('remove', loop_num=loop_num))
 
-        if self.project.inst_is_switch(**self.current):
-            m.entryconfigure('Add a Loop Parameter Above', state='disabled')
-            m.entryconfigure('Add a Loop Parameter Below', state='disabled')
-            m.entryconfigure('Remove this Loop Parameter', state='disabled')
+                if self.project.inst_is_switch(**self.current):
+                    m.entryconfigure('Add a Loop Parameter Above', state='disabled')
+                    m.entryconfigure('Add a Loop Parameter Below', state='disabled')
+                    m.entryconfigure('Remove this Loop Parameter', state='disabled')
 
-            def blank():
-                pass
+                    def blank():
+                        pass
 
-            m.add_command(label='Use Instruction Tree to edit a Switch', command=blank)
+                    m.add_command(label='Use Instruction Tree to edit a Switch', command=blank)
+
         m.bind('<Escape>', m.destroy)
 
         try:
