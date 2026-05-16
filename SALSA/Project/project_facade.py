@@ -1810,6 +1810,10 @@ class SCTProjectFacade:
         goto_inst = cur_sect.insts[inst]
         goto_tgt = goto_inst.links_out[0].target_trace[1]
         master_inst = cur_sect.insts[goto_inst.my_master_uuids[0]]
+
+        if master_inst.base_id == 3:
+            return
+
         master_tgt = master_inst.links_out[0].target_trace[1]
 
         if goto_tgt == master_tgt:
