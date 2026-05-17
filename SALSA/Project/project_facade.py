@@ -460,6 +460,8 @@ class SCTProjectFacade:
 
         self.callbacks['set_change'](script)
 
+        return string_group
+
     def remove_string_group(self, script, string_group):
         cur_script = self.project.scts[script]
         cur_script.string_groups.pop(string_group)

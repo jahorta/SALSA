@@ -475,9 +475,10 @@ class StringPopup(tk.Toplevel):
             m.grab_release()
 
     def string_group_add(self):
-        self.callbacks['add_string_group'](self.cur_script)
+        groupid = self.callbacks['add_string_group'](self.cur_script)
         self.update_strings()
         self.callbacks['refresh_sections']()
+        self.goto_string(self.cur_script, groupid)
 
     def string_group_delete(self, sel_iid):
         group_name = self.string_tree.item(sel_iid)['text']
@@ -574,11 +575,11 @@ class StringPopup(tk.Toplevel):
         self.rename_active = False
         widget.destroy()
             
-    # ----------- #
-    # Goto string #
-    # ----------- #
+    # ----------------- #
+    # Goto string/group #
+    # ----------------- #
 
-    def goto_string(self, script, group, string):
+    def goto_string(self, script, group, string=None):
         if script is not None:
             self.update_scripts()
             s_iid = self.scripts_tree.get_iid_from_rowdata(script)
@@ -586,10 +587,19 @@ class StringPopup(tk.Toplevel):
             self.on_script_select('script', script)
             return self.after(10, self.goto_string(None, group, string))
         self.string_tree.close_all_groups()
+        if string is None:
+            return self.goto_string_section(group)
         s_iid = self.string_tree.get_iid_from_rowdata(string)
         self.string_tree.see(s_iid)
         self.string_tree.selection_set(s_iid)
         self.string_tree.focus(s_iid)
+
+    def goto_string_section(self, name):
+        items = self.string_tree.get_children()
+        for item in items:
+            if self.string_tree.item(item)['text'] == name:
+                self.string_tree.selection_set([item,])
+                return
 
     # ---------- #
     # Find Usage #
