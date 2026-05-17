@@ -244,6 +244,8 @@ class SCTDecoder:
             string = self.getString(self._cursor * 4, encoding=self._enc)
             if string == '':
                 section.add_error('Length of string == 0')
+            if '\\h' not in string:
+                string = '\\h()' + string
             section.set_type('String')
             section.set_string(self._cursor * 4, string)
             garbage = self._get_garbage_after_string(bounds=bounds)
@@ -1141,6 +1143,8 @@ class SCTDecoder:
         for link in self._str_foot_links:
             foot_str = self.getString(link.target, force_jis=True)
             origin_inst = decoded_sct.sects[link.origin_trace[0]].insts[link.origin_trace[1]]
+            if origin_inst.base_id in (24, 25, 144, 155) and '\\h' not in foot_str:
+                foot_str = '\\h()' + foot_str
             param: SCTParameter = origin_inst.params[int(link.origin_trace[2])]
             param.linked_string = foot_str
             param.link.type = 'Footer'
