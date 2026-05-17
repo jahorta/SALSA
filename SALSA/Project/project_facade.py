@@ -55,6 +55,7 @@ class SCTProjectFacade:
 
         self.project = prj
         self.project_cleanup_placeholder_insts()
+        self.project_cleanup_string_headers()
         self.searcher = ProjectSearcher(self.base_insts, self.project)
         return True
 
@@ -70,6 +71,13 @@ class SCTProjectFacade:
 
                 for inst in insts_to_remove:
                     self.remove_inst(sct_name, sect_name, inst, None)
+
+    def project_cleanup_string_headers(self):
+        for sct_name in self.project.scts:
+            cur_script = self.project.scts[sct_name]
+            for string in cur_script.strings:
+                if '\\h' not in cur_script.strings[string]:
+                    cur_script.strings[string] = '\\h()' + cur_script.strings[string]
 
     def create_new_project(self):
         self.project = SCTProject()
