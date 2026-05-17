@@ -492,8 +492,9 @@ class StringPopup(tk.Toplevel):
         else:
             group_iid = sel_iid
         string_group = self.string_tree.item(group_iid)['text']
-        self.callbacks['add_string'](self.cur_script, string_group)
+        new_id = self.callbacks['add_string'](self.cur_script, string_group)
         self.update_strings()
+        self.goto_string(self.cur_script, string_group, new_id)
 
     def string_delete(self, sel_iid):
         string_id = self.string_tree.row_data[sel_iid]

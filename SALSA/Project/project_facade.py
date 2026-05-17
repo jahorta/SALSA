@@ -481,6 +481,8 @@ class SCTProjectFacade:
 
         self.callbacks['set_change'](script)
 
+        return string_id
+
     def delete_string(self, script, string_id):
         self.project.scts[script].strings.pop(string_id)
         group = self.project.scts[script].string_locations[string_id]
