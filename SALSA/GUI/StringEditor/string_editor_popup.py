@@ -557,6 +557,7 @@ class StringPopup(tk.Toplevel):
                 self.cur_string_id = new_name
         self.string_tree.item(sel_iid, text=new_name)
         self.callbacks['refresh_sections']()
+        self.update_strings()
 
     def shake_widget(self, widget):
         shake_speed = 70
