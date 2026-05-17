@@ -3074,7 +3074,7 @@
   },
   "183": {
     "Name": "??Chk Item?",
-    "Description": "Checks for the item with ID <unknown0> in the players inventory",
+    "Description": "Checks for the item with ID <unknown0> in the players inventory\n\nPuts the count of item ID <unknown0> at IntVar: 36",
     "Notes": "Only runs if param1 & 1 == 1:\n\n1: scpt-short\n\nruns 801f452c((1)) which either returns the item ID or amount, not sure which yet.\n\nSets 0x8030e474 to the result of 801f452c()",
     "Parameters": {
       "0": {
