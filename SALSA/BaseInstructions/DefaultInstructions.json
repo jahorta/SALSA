@@ -221,7 +221,7 @@
   },
   "24": {
     "Name": "??Print",
-    "Description": "Displays a string from the footer:\n*str[Offset]*\n\n\n",
+    "Description": "Displays a string from the footer:\n*str[Offset]*\n\n!!A header will not be passed to this string!!",
     "Notes": "Dependency on param1:\n\nHas Debug Messages:\n\"scptPRINT: malloc failed 1\"\n\"scptPRINT: message post timed out\"",
     "Parameters": {
       "0": {
@@ -231,7 +231,7 @@
   },
   "25": {
     "Name": "??Select",
-    "Description": "Option num: <Num>\n\nOptions:\n*str[Offset]*\n\n",
+    "Description": "Option num: <Num>\n\nOptions:\n*str[Offset]*\n\n!!A header will not be passed to this instruction!!",
     "Notes": "Dependent on param1:\nbit is 1:\n1:\nRequires allocation of memory.\nFirst, gets an SCPT variable...\n\nWill need to figure out rest in game\n\nMight not support headers, so inst 24 (Print) should be used to make the header for the choices\n",
     "Parameters": {
       "0": {
