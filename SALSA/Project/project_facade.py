@@ -2336,7 +2336,7 @@ class SCTProjectFacade:
 
     def search(self, search_entry, keep_case, headers=None):
         if self.searcher is None:
-            return None
+            self.searcher = ProjectSearcher(self.base_insts, self.project)
         links = self.searcher.search(search_entry, keep_case)
 
         return links
