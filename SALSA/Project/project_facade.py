@@ -1,6 +1,7 @@
 import copy
 from typing import Union, Tuple, Literal
 
+from Project.project_container import SCTScript
 from SALSA.Common.string_utils import get_padding_for_number
 from SALSA.Project.project_searcher import ProjectSearcher
 from SALSA.Project.RepairTools.texbox_disappear_repair import TBStringToParamRepair
@@ -615,7 +616,7 @@ class SCTProjectFacade:
         return f'untitled{i}'
 
     def is_sect_name_used(self, script, new_name, code_only=False):
-        cur_script = self.project.scts[script]
+        cur_script: SCTScript = self.project.scts[script]
         for sect in cur_script.sects.values():
             if sect.is_compound:
                 for inst in sect.insts.values():
@@ -627,7 +628,7 @@ class SCTProjectFacade:
                     if code_only:
                         return len(sect.insts) > 1
                     return True
-        if code_only:
+        if not code_only:
             if new_name in cur_script.strings.keys():
                 return True
         return False
