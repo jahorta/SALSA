@@ -585,7 +585,7 @@ class StringPopup(tk.Toplevel):
             s_iid = self.scripts_tree.get_iid_from_rowdata(script)
             self.scripts_tree.selection_set(s_iid)
             self.on_script_select('script', script)
-            return self.after(10, self.goto_string(None, group, string))
+            return self.after(10, self.goto_string, None, group, string)
         self.string_tree.close_all_groups()
         if string is None:
             return self.goto_string_section(group)
