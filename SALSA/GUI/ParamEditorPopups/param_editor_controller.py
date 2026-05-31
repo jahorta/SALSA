@@ -252,16 +252,21 @@ class ParamEditController:
             value = self.base_param.default_value
         elif 'subscript' in self.base_param.type:
             self.int_field = ObjectSelectionWidget(self.view.main_frame, name=self.base_param.name,
-                                                   selections=self.callbacks['get_subscript_list'](
-                                                       self.cur_trace['script'], self.cur_trace['section']))
-            if self.param.link is not None and self.param.link.target_trace[0] is not None:
-                value = self.param.link.target_trace[0]
+                                                   options=self.callbacks['get_subscript_list'](
+                                                       self.cur_trace['script'], self.cur_trace['section'], True))
+            if self.param.link is not None:
+                if self.param.link.target_trace[0] is not None:
+                    self.int_field.set_group(self.param.link.target_trace[0])
+                if self.param.link.target_trace[1] is not None:
+                    value = self.callbacks['get_instruction_identifier'](self.param.link)
         elif 'jump' in self.base_param.type:
             self.int_field = ObjectSelectionWidget(self.view.main_frame, name=self.base_param.name,
-                                                   selections=self.callbacks['get_instruction_list'](
+                                                   options=self.callbacks['get_instruction_list'](
                                                        self.cur_trace['script'], self.cur_trace['section'],
                                                        self.cur_trace['instruction']))
             if self.param.link is not None:
+                if self.param.link.target_trace[0] is not None:
+                    self.int_field.set_group(self.param.link.target_trace[0])
                 value = self.callbacks['get_instruction_identifier'](self.param.link)
         elif 'string' in self.base_param.type:
             is_footer = 'footer' in self.base_param.type
@@ -295,8 +300,7 @@ class ParamEditController:
         cur_value = self.param.value if self.param is not None else self.base_param.default_value
 
         if ('jump' in self.base_param.type or 'subscript' in self.base_param.type) and self.param is not None and self.param.link is not None:
-            trace_ind = 1 if 'jump' in self.base_param.type else 0
-            cur_value = self.param.link.target_trace[trace_ind]
+            cur_value = self.param.link.target_trace
 
         if 'footer' in self.base_param.type or 'string' in self.base_param.type:
             cur_value = self.param.linked_string
@@ -316,14 +320,14 @@ class ParamEditController:
             return
 
         if 'subscript' in self.base_param.type:
-            inst_id = self.callbacks['get_first_inst'](self.cur_trace['script'], value)
             self.param.link = SCTLink('Jump', self.cur_trace['script'], -1, [self.cur_trace['section'], self.cur_trace['instruction'], '0'], -1)
-            self.param.link.target_trace = [value, inst_id]
+            self.param.link.target_trace = value
         elif 'jump' in self.base_param.type:
-            self.callbacks['adjust_inst_grouping'](self.cur_trace['script'], self.cur_trace['section'],
-                                                   self.cur_trace['instruction'], value)
-            self.param.link = copy.deepcopy(self.param.link)
-            self.param.link.target_trace[1] = value
+            if value[0] == self.cur_trace['section']:
+                self.callbacks['adjust_inst_grouping'](self.cur_trace['script'], self.cur_trace['section'],
+                                                       self.cur_trace['instruction'], value[1])
+            self.param.link = SCTLink('Jump', self.cur_trace['script'], -1, [self.cur_trace['section'], self.cur_trace['instruction'], '0'], -1)
+            self.param.link.target_trace = value
         elif 'footer' in self.base_param.type or 'string' in self.base_param.type:
             self.param.linked_string = value
         else:

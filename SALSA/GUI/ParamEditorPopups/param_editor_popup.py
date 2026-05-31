@@ -480,8 +480,10 @@ class ObjectSelectionWidget(tk.Frame):
         for entry in self.value_dict.keys():
             self.entry_field['menu'].add_command(label=entry, command=lambda e=entry: self.set_value(e))
 
-        self.entry_field.configure(state='normal')
-        self.entry_variable.set('---')
+        if len(self.value_dict) == 1:
+            self.set_value(list(self.value_dict.keys())[0])
+        else:
+            self.entry_variable.set('---')
 
     def set_value(self, value: str):
         self.entry_variable.set(value)
