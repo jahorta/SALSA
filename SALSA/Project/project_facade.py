@@ -513,8 +513,19 @@ class SCTProjectFacade:
     # Param Editor Callback Methods #
     # ----------------------------- #
 
-    def get_jmp_section_list(self, script, section):
-        return [_ for _ in self.project.scts[script].sect_list if _ != section]
+    def get_jmp_section_list(self, script, first_only=False):
+        dict_out = {}
+        for sect in self.project.scts[script].sect_list:
+            dict_out[sect] = {}
+            cur_sect = self.project.scts[script].sects[sect]
+            for i in cur_sect.inst_list:
+                key = (f'{cur_sect.insts[i].ungrouped_position}{link_sep}'
+                       f'{self.base_insts.get_inst(cur_sect.insts[i].base_id).name}{link_sep}'
+                       f'{cur_sect.insts[i].base_id}')
+                dict_out[sect][key] = i
+                if first_only:
+                    break
+        return dict_out
 
     def get_first_inst(self, script, section):
         return self.project.scts[script].sects[section].inst_list[0]
@@ -537,6 +548,8 @@ class SCTProjectFacade:
                 target_inst.links_in.append(p.link)
 
     def get_jmp_inst_dict(self, script, section, goto_inst):
+        dict_out = self.get_jmp_section_list(script, False)
+
         cur_sect = self.project.scts[script].sects[section]
         cur_inst = cur_sect.insts[goto_inst]
         inst_list = [_ for _ in cur_sect.inst_list if _ != goto_inst]
@@ -557,9 +570,11 @@ class SCTProjectFacade:
                 for entry in cur_group[index+1:]:
                     inst_list.append(self.extract_parent_uuid_from_group(entry))
 
-        return {f'{cur_sect.insts[i].ungrouped_position}{link_sep}'
+        dict_out[section] = {f'{cur_sect.insts[i].ungrouped_position}{link_sep}'
                 f'{self.base_insts.get_inst(cur_sect.insts[i].base_id).name}'
                 f'{link_sep}{cur_sect.insts[i].base_id}': f'{i}' for i in inst_list}
+
+        return dict_out
 
     def get_string_options(self, script, is_footer=False):
         if is_footer:
@@ -1825,6 +1840,10 @@ class SCTProjectFacade:
             return
 
         goto_inst = cur_sect.insts[inst]
+
+        if section != goto_inst.links_out[0].target_trace[0]:
+            return
+
         goto_tgt = goto_inst.links_out[0].target_trace[1]
         master_inst = cur_sect.insts[goto_inst.my_master_uuids[0]]
 
