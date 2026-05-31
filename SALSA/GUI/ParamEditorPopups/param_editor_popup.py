@@ -1,7 +1,7 @@
 import math
 import tkinter as tk
 from tkinter import ttk
-from typing import Union, Dict, List
+from typing import Union, Dict, List, Tuple
 
 import SALSA.GUI.Widgets.widgets as w
 from SALSA.Common.constants import sep, override_str
@@ -445,30 +445,49 @@ class StringSelectionWidget(tk.Frame):
 
 class ObjectSelectionWidget(tk.Frame):
 
-    def __init__(self, parent, name, selections: Union[Dict[str, str], List[str]], *args, **kwargs):
+    def __init__(self, parent, name, options: Dict[str, Dict[str, str]], *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         label = ttk.Label(self, text=f'{name}: ')
         label.grid(row=0, column=0, sticky=tk.W + tk.N + tk.S)
 
-        if isinstance(selections, list):
-            self.value_dict = {_: _ for _ in selections}
-        else:
-            self.value_dict = selections
+        self.option_dict = options
+        self.groups = list(options.keys())
+        self.value_dict = self.option_dict[self.groups[0]]
+
+        self.group_variable = tk.StringVar(self)
+        group_field = ttk.OptionMenu(self, self.group_variable, self.groups[0], *self.groups, command=self.set_group)
+        group_field.grid(row=0, column=1, sticky=tk.W)
 
         self.entry_variable = tk.StringVar(self)
         options = list(self.value_dict.keys())
-        option_field = ttk.OptionMenu(self, self.entry_variable, options[0], *options)
-        option_field.grid(row=0, column=1, sticky=tk.W)
+        self.entry_field = ttk.OptionMenu(self, self.entry_variable, options[0], *options)
+        self.entry_field.grid(row=0, column=2, sticky=tk.W)
 
     def remove_value(self):
         self.set_value('')
 
-    def set_value(self, value):
+    def set_group(self, group=None):
+        if group is None:
+            group = self.group_variable.get()
+        self.group_variable.set(group)
+        if group not in self.groups:
+            return
+
+        self.value_dict = self.option_dict[group]
+
+        self.entry_field['menu'].delete(0, 'end')
+        for entry in self.value_dict.keys():
+            self.entry_field['menu'].add_command(label=entry, command=lambda e=entry: self.set_value(e))
+
+        self.entry_field.configure(state='normal')
+        self.entry_variable.set('---')
+
+    def set_value(self, value: str):
         self.entry_variable.set(value)
 
     def get_value(self):
-        return self.value_dict[self.entry_variable.get()]
+        return [self.group_variable.get(), self.value_dict[self.entry_variable.get()]]
 
 
 # --------------------------- #
