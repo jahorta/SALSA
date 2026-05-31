@@ -323,9 +323,8 @@ class ParamEditController:
             self.param.link = SCTLink('Jump', self.cur_trace['script'], -1, [self.cur_trace['section'], self.cur_trace['instruction'], '0'], -1)
             self.param.link.target_trace = value
         elif 'jump' in self.base_param.type:
-            if value[0] == self.cur_trace['section']:
-                self.callbacks['adjust_inst_grouping'](self.cur_trace['script'], self.cur_trace['section'],
-                                                       self.cur_trace['instruction'], value[1])
+            self.callbacks['adjust_inst_grouping'](self.cur_trace['script'], self.cur_trace['section'],
+                                                   self.cur_trace['instruction'], value[1])
             self.param.link = SCTLink('Jump', self.cur_trace['script'], -1, [self.cur_trace['section'], self.cur_trace['instruction'], '0'], -1)
             self.param.link.target_trace = value
         elif 'footer' in self.base_param.type or 'string' in self.base_param.type:

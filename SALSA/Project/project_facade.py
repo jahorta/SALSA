@@ -516,7 +516,7 @@ class SCTProjectFacade:
     def get_jmp_section_list(self, script, section, first_only=False):
         dict_out = {}
         for sect in self.project.scts[script].sect_list:
-            if sect == section:
+            if sect == section and first_only:
                 continue
             dict_out[sect] = {}
             cur_sect = self.project.scts[script].sects[sect]
@@ -1843,8 +1843,7 @@ class SCTProjectFacade:
 
         goto_inst = cur_sect.insts[inst]
 
-        if section != goto_inst.links_out[0].target_trace[0]:
-            return
+
 
         goto_tgt = goto_inst.links_out[0].target_trace[1]
         master_inst = cur_sect.insts[goto_inst.my_master_uuids[0]]
@@ -1854,14 +1853,14 @@ class SCTProjectFacade:
 
         master_tgt = master_inst.links_out[0].target_trace[1]
 
-        if goto_tgt == master_tgt:
+        if section != goto_inst.links_out[0].target_trace[0] or goto_tgt == master_tgt:
             cur_group_type = 'if'
         elif cur_sect.inst_list.index(goto_tgt) > cur_sect.inst_list.index(master_tgt):
             cur_group_type = 'else'
         else:
             cur_group_type = 'while'
 
-        if new_tgt_inst == master_tgt:
+        if new_tgt_inst == master_tgt or new_tgt_inst not in cur_sect.inst_list:
             new_group_type = 'if'
         elif cur_sect.inst_list.index(new_tgt_inst) > cur_sect.inst_list.index(master_tgt):
             new_group_type = 'else'
