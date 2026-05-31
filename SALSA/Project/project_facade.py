@@ -513,9 +513,11 @@ class SCTProjectFacade:
     # Param Editor Callback Methods #
     # ----------------------------- #
 
-    def get_jmp_section_list(self, script, first_only=False):
+    def get_jmp_section_list(self, script, section, first_only=False):
         dict_out = {}
         for sect in self.project.scts[script].sect_list:
+            if sect == section:
+                continue
             dict_out[sect] = {}
             cur_sect = self.project.scts[script].sects[sect]
             for i in cur_sect.inst_list:
@@ -548,7 +550,7 @@ class SCTProjectFacade:
                 target_inst.links_in.append(p.link)
 
     def get_jmp_inst_dict(self, script, section, goto_inst):
-        dict_out = self.get_jmp_section_list(script, False)
+        dict_out = self.get_jmp_section_list(script, section, False)
 
         cur_sect = self.project.scts[script].sects[section]
         cur_inst = cur_sect.insts[goto_inst]
